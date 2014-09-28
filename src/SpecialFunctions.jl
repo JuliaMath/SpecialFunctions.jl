@@ -26,6 +26,10 @@ export
     hankelh2,
     hankelh2x
 
+include("amos/Amos.jl")
+
+using Base.Math.libm
+
 for jy in ("j","y"), nu in (0,1)
     jynu = Expr(:quote, symbol(string(jy,nu)))
     jynuf = Expr(:quote, symbol(string(jy,nu,"f")))
@@ -53,37 +57,22 @@ type AmosException <: Exception
     info::Int32
 end
 
-let
-    const ai::Array{Float64,1} = Array(Float64,2)
-    const ae::Array{Int32,1} = Array(Int32,2)
-    global _airy, _biry
-    function _airy(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zairy_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1), pointer(ae,2))
-        if ae[2] == 0 || ae[2] == 3 
-            return complex(ai[1],ai[2])
-        else
-            throw(AmosException(ae[2]))
-        end        
+function _airy(z::Complex128, id::Int32, kode::Int32)
+    nz = ierr = int32(0)
+    (air,aii,nz,ierr) = Amos.ZAIRY(real(z), imag(z), id, kode, 0., 0., nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(air,aii)
+    else
+        throw(AmosException(ierr))
     end
-    function _biry(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zbiry_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1))
-        if ae[1] == 0 || ae[1] == 3  # ignore underflow
-            return complex(ai[1],ai[2]) 
-        else
-            throw(AmosException(ae[2]))
-        end
+end
+
+function _biry(z::Complex128, id::Int32, kode::Int32)
+    (air,aii,ierr) = Amos.ZBIRY(real(z), imag(z), id, kode, 0., 0., int32(0))
+    if ierr == 0 || ierr == 3
+        return complex(air,aii)
+    else
+        throw(AmosException(ierr))
     end
 end
 
@@ -137,79 +126,59 @@ airyx(k::Number, z::Complex64) = complex64(airyx(k, complex128(z)))
 airyx(k::Number, z::Complex) = airyx(convert(Int,k), complex128(z))
 @vectorize_2arg Number airyx
 
-const cy = Array(Float64,2)
-const ae = Array(Int32,2)
-const wrk = Array(Float64,2)
+const cy1 = [0.]
+const cy2 = [0.]
+const wrk1 = [0.]
+const wrk2 = [0.]
 
 function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
-    ccall((:zbesh_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &k, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3 
-        return complex(cy[1],cy[2]) 
+    nz = ierr = int32(0)
+    (nz,ierr) = Amos.ZBESH(real(z), imag(z), nu, kode, k, int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besseli(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesi_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3 
-        return complex(cy[1],cy[2]) 
+    nz = ierr = int32(0)
+    (nz,ierr) = Amos.ZBESI(real(z), imag(z), nu, kode, int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besselj(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesj_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3 
-        return complex(cy[1],cy[2]) 
+    nz = ierr = int32(0)
+    (nz,ierr) = Amos.ZBESJ(real(z), imag(z), nu, kode, int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
+
 end
 
 function _besselk(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesk_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3 
-        return complex(cy[1],cy[2]) 
+    nz = ierr = int32(0)
+    (nz,ierr) = Amos.ZBESK(real(z), imag(z), nu, kode, int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
 function _bessely(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesy_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32},
-           Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(wrk,1),
-          pointer(wrk,2), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3 
-        return complex(cy[1],cy[2]) 
+    nz = ierr = int32(0)
+    (nz,ierr) = Amos.ZBESY(real(z), imag(z), nu, kode, int32(1), cy1, cy2, nz, wrk1, wrk2, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
