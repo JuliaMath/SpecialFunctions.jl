@@ -46,15 +46,6 @@ const MIN0 = min
 const MOD = mod
 const SNGL = float32
 
-macro debug(xs)
-    isa(xs,Symbol) && return :(println($xs))
-    e = :(println($(xs.args[1])))
-    for x in xs.args[2:end]
-        push!(e.args, ",", esc(x))
-    end
-    e
-end
-
 include("dgamln.jl")
 include("zabs.jl")
 include("zacai.jl")
