@@ -1,61 +1,61 @@
-function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,RL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
-    AA::Float64 = 0
-    AEZ::Float64 = 0
-    AK::Float64 = 0
-    AK1I::Float64 = 0
-    AK1R::Float64 = 0
-    ARG::Float64 = 0
-    ARM::Float64 = 0
-    ATOL::Float64 = 0
-    AZ::Float64 = 0
-    BB::Float64 = 0
-    BK::Float64 = 0
-    CKI::Float64 = 0
-    CKR::Float64 = 0
-    CONEI::Float64 = 0
-    CONER::Float64 = 0
-    CS1I::Float64 = 0
-    CS1R::Float64 = 0
-    CS2I::Float64 = 0
-    CS2R::Float64 = 0
-    CZI::Float64 = 0
-    CZR::Float64 = 0
-    DFNU::Float64 = 0
-    DKI::Float64 = 0
-    DKR::Float64 = 0
-    DNU2::Float64 = 0
-    EZI::Float64 = 0
-    EZR::Float64 = 0
-    FDN::Float64 = 0
-    I::Int32 = 0
-    IB::Int32 = 0
-    IL::Int32 = 0
-    INU::Int32 = 0
-    J::Int32 = 0
-    JL::Int32 = 0
-    K::Int32 = 0
-    KODED::Int32 = 0
-    M::Int32 = 0
-    NN::Int32 = 0
-    P1I::Float64 = 0
-    P1R::Float64 = 0
-    PI::Float64 = 0
-    RAZ::Float64 = 0
-    RTPI::Float64 = 0
-    RTR1::Float64 = 0
-    RZI::Float64 = 0
-    RZR::Float64 = 0
-    S::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    SGN::Float64 = 0
-    SQK::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    TZI::Float64 = 0
-    TZR::Float64 = 0
-    ZEROI::Float64 = 0
-    ZEROR::Float64 = 0
+function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,RL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
+    AA::Float64 = zero(Float64)
+    AEZ::Float64 = zero(Float64)
+    AK::Float64 = zero(Float64)
+    AK1I::Float64 = zero(Float64)
+    AK1R::Float64 = zero(Float64)
+    ARG::Float64 = zero(Float64)
+    ARM::Float64 = zero(Float64)
+    ATOL::Float64 = zero(Float64)
+    AZ::Float64 = zero(Float64)
+    BB::Float64 = zero(Float64)
+    BK::Float64 = zero(Float64)
+    CKI::Float64 = zero(Float64)
+    CKR::Float64 = zero(Float64)
+    CONEI::Float64 = zero(Float64)
+    CONER::Float64 = zero(Float64)
+    CS1I::Float64 = zero(Float64)
+    CS1R::Float64 = zero(Float64)
+    CS2I::Float64 = zero(Float64)
+    CS2R::Float64 = zero(Float64)
+    CZI::Float64 = zero(Float64)
+    CZR::Float64 = zero(Float64)
+    DFNU::Float64 = zero(Float64)
+    DKI::Float64 = zero(Float64)
+    DKR::Float64 = zero(Float64)
+    DNU2::Float64 = zero(Float64)
+    EZI::Float64 = zero(Float64)
+    EZR::Float64 = zero(Float64)
+    FDN::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    IB::Int32 = zero(Int32)
+    IL::Int32 = zero(Int32)
+    INU::Int32 = zero(Int32)
+    J::Int32 = zero(Int32)
+    JL::Int32 = zero(Int32)
+    K::Int32 = zero(Int32)
+    KODED::Int32 = zero(Int32)
+    M::Int32 = zero(Int32)
+    NN::Int32 = zero(Int32)
+    P1I::Float64 = zero(Float64)
+    P1R::Float64 = zero(Float64)
+    PI::Float64 = zero(Float64)
+    RAZ::Float64 = zero(Float64)
+    RTPI::Float64 = zero(Float64)
+    RTR1::Float64 = zero(Float64)
+    RZI::Float64 = zero(Float64)
+    RZR::Float64 = zero(Float64)
+    S::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    SGN::Float64 = zero(Float64)
+    SQK::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    TZI::Float64 = zero(Float64)
+    TZR::Float64 = zero(Float64)
+    ZEROI::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
     begin 
         PI = 3.141592653589793
         RTPI = 0.15915494309189535
@@ -66,11 +66,11 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         CONER = 1.0
         CONEI = 0.0
     end
-    NZ = 0
+    NZ = int32(0)
     AZ = ZABS(COMPLEX(ZR,ZI))
     ARM = 1000.0D1MACH1
     RTR1 = DSQRT(ARM)
-    IL = MIN0(2,N)
+    IL = MIN0(int32(2),N)
     DFNU = FNU + DBLE(FLOAT(N - IL))
     RAZ = 1.0 / AZ
     STR = ZR * RAZ
@@ -80,7 +80,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     (AK1R,AK1I) = ZSQRT(AK1R,AK1I,AK1R,AK1I)
     CZR = ZR
     CZI = ZI
-    if KODE != 2
+    if KODE != int32(2)
         @goto line10
     end
     CZR = ZEROR
@@ -90,11 +90,11 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         @goto line100
     end
     DNU2 = DFNU + DFNU
-    KODED = 1
-    if DABS(CZR) > ALIM && N > 2
+    KODED = int32(1)
+    if DABS(CZR) > ALIM && N > int32(2)
         @goto line20
     end
-    KODED = 0
+    KODED = int32(0)
     (STR,STI) = ZEXP(CZR,CZI,STR,STI)
     (AK1R,AK1I) = ZMLT(AK1R,AK1I,STR,STI,AK1R,AK1I)
     @label line20
@@ -106,7 +106,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     EZI = ZI * 8.0
     AEZ = 8.0AZ
     S = TOL / AEZ
-    JL = INT(SNGL(RL + RL)) + 2
+    JL = INT(SNGL(RL + RL)) + int32(2)
     P1R = ZEROR
     P1I = ZEROI
     if ZI == 0.0
@@ -122,13 +122,13 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     P1R = AK
     P1I = BK
-    if MOD(INU,2) == 0
+    if MOD(INU,int32(2)) == int32(0)
         @goto line30
     end
     P1R = -P1R
     P1I = -P1I
     @label line30
-    for K = 1:IL
+    for K = int32(1):IL
         SQK = FDN - 1.0
         ATOL = S * DABS(SQK)
         SGN = 1.0
@@ -143,7 +143,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         BB = AEZ
         DKR = EZR
         DKI = EZI
-        for J = 1:JL
+        for J = int32(1):JL
             (STR,STI) = ZDIV(CKR,CKI,DKR,DKI,STR,STI)
             CKR = STR * SQK
             CKI = STI * SQK
@@ -186,29 +186,29 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         YI[M] = S2R * AK1I + S2I * AK1R
         @label line70
     end
-    if N <= 2
+    if N <= int32(2)
         return NZ
     end
     NN = N
-    K = NN - 2
+    K = NN - int32(2)
     AK = DBLE(FLOAT(K))
     STR = ZR * RAZ
     STI = -ZI * RAZ
     RZR = (STR + STR) * RAZ
     RZI = (STI + STI) * RAZ
-    IB = 3
+    IB = int32(3)
     for I = IB:NN
-        YR[K] = (AK + FNU) * (RZR * YR[K + 1] - RZI * YI[K + 1]) + YR[K + 2]
-        YI[K] = (AK + FNU) * (RZR * YI[K + 1] + RZI * YR[K + 1]) + YI[K + 2]
+        YR[K] = (AK + FNU) * (RZR * YR[K + int32(1)] - RZI * YI[K + int32(1)]) + YR[K + int32(2)]
+        YI[K] = (AK + FNU) * (RZR * YI[K + int32(1)] + RZI * YR[K + int32(1)]) + YI[K + int32(2)]
         AK = AK - 1.0
-        K = K - 1
+        K = K - int32(1)
         @label line80
     end
-    if KODED == 0
+    if KODED == int32(0)
         return NZ
     end
     (CKR,CKI) = ZEXP(CZR,CZI,CKR,CKI)
-    for I = 1:NN
+    for I = int32(1):NN
         STR = YR[I] * CKR - YI[I] * CKI
         YI[I] = YR[I] * CKI + YI[I] * CKR
         YR[I] = STR
@@ -216,9 +216,9 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     return NZ
     @label line100
-    NZ = -1
+    NZ = int32(-1)
     return NZ
     @label line110
-    NZ = -2
+    NZ = int32(-2)
     return NZ
 end

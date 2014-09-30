@@ -1,8 +1,8 @@
 function ZSQRT(AR::Float64,AI::Float64,BR::Float64,BI::Float64)
-    DPI::Float64 = 0
-    DRT::Float64 = 0
-    DTHETA::Float64 = 0
-    ZM::Float64 = 0
+    DPI::Float64 = zero(Float64)
+    DRT::Float64 = zero(Float64)
+    DTHETA::Float64 = zero(Float64)
+    ZM::Float64 = zero(Float64)
     begin 
         DRT = 0.7071067811865476
         DPI = 3.141592653589793

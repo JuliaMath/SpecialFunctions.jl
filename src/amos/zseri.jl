@@ -1,62 +1,62 @@
 const _ZSERI_WR = Array(Float64,2)
 const _ZSERI_WI = Array(Float64,2)
-function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,TOL::Float64,ELIM::Float64,ALIM::Float64)
-    AA::Float64 = 0
-    ACZ::Float64 = 0
-    AK::Float64 = 0
-    AK1I::Float64 = 0
-    AK1R::Float64 = 0
-    ARM::Float64 = 0
-    ASCLE::Float64 = 0
-    ATOL::Float64 = 0
-    AZ::Float64 = 0
-    CKI::Float64 = 0
-    CKR::Float64 = 0
-    COEFI::Float64 = 0
-    COEFR::Float64 = 0
-    CONEI::Float64 = 0
-    CONER::Float64 = 0
-    CRSCR::Float64 = 0
-    CZI::Float64 = 0
-    CZR::Float64 = 0
-    DFNU::Float64 = 0
-    FNUP::Float64 = 0
-    HZI::Float64 = 0
-    HZR::Float64 = 0
-    I::Int32 = 0
-    IB::Int32 = 0
-    IDUM::Int32 = 0
-    IFLAG::Int32 = 0
-    IL::Int32 = 0
-    K::Int32 = 0
-    L::Int32 = 0
-    M::Int32 = 0
-    NN::Int32 = 0
-    NW::Int32 = 0
-    RAZ::Float64 = 0
-    RS::Float64 = 0
-    RTR1::Float64 = 0
-    RZI::Float64 = 0
-    RZR::Float64 = 0
-    S::Float64 = 0
-    S1I::Float64 = 0
-    S1R::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    SS::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
+function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,TOL::Float64,ELIM::Float64,ALIM::Float64)
+    AA::Float64 = zero(Float64)
+    ACZ::Float64 = zero(Float64)
+    AK::Float64 = zero(Float64)
+    AK1I::Float64 = zero(Float64)
+    AK1R::Float64 = zero(Float64)
+    ARM::Float64 = zero(Float64)
+    ASCLE::Float64 = zero(Float64)
+    ATOL::Float64 = zero(Float64)
+    AZ::Float64 = zero(Float64)
+    CKI::Float64 = zero(Float64)
+    CKR::Float64 = zero(Float64)
+    COEFI::Float64 = zero(Float64)
+    COEFR::Float64 = zero(Float64)
+    CONEI::Float64 = zero(Float64)
+    CONER::Float64 = zero(Float64)
+    CRSCR::Float64 = zero(Float64)
+    CZI::Float64 = zero(Float64)
+    CZR::Float64 = zero(Float64)
+    DFNU::Float64 = zero(Float64)
+    FNUP::Float64 = zero(Float64)
+    HZI::Float64 = zero(Float64)
+    HZR::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    IB::Int32 = zero(Int32)
+    IDUM::Int32 = zero(Int32)
+    IFLAG::Int32 = zero(Int32)
+    IL::Int32 = zero(Int32)
+    K::Int32 = zero(Int32)
+    L::Int32 = zero(Int32)
+    M::Int32 = zero(Int32)
+    NN::Int32 = zero(Int32)
+    NW::Int32 = zero(Int32)
+    RAZ::Float64 = zero(Float64)
+    RS::Float64 = zero(Float64)
+    RTR1::Float64 = zero(Float64)
+    RZI::Float64 = zero(Float64)
+    RZR::Float64 = zero(Float64)
+    S::Float64 = zero(Float64)
+    S1I::Float64 = zero(Float64)
+    S1R::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    SS::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
     const WI = _ZSERI_WI
     const WR = _ZSERI_WR
-    ZEROI::Float64 = 0
-    ZEROR::Float64 = 0
+    ZEROI::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
     begin 
         ZEROR = 0.0
         ZEROI = 0.0
         CONER = 1.0
         CONEI = 0.0
     end
-    NZ = 0
+    NZ = int32(0)
     AZ = ZABS(COMPLEX(ZR,ZI))
     if AZ == 0.0
         @goto line160
@@ -64,7 +64,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     ARM = 1000.0D1MACH1
     RTR1 = DSQRT(ARM)
     CRSCR = 1.0
-    IFLAG = 0
+    IFLAG = int32(0)
     if AZ < ARM
         @goto line150
     end
@@ -81,27 +81,27 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     NN = N
     (CKR,CKI,IDUM) = ZLOG(HZR,HZI,CKR,CKI,IDUM)
     @label line20
-    DFNU = FNU + DBLE(FLOAT(NN - 1))
+    DFNU = FNU + DBLE(FLOAT(NN - int32(1)))
     FNUP = DFNU + 1.0
     AK1R = CKR * DFNU
     AK1I = CKI * DFNU
     AK = DGAMLN(FNUP,IDUM)
     AK1R = AK1R - AK
-    if KODE == 2
+    if KODE == int32(2)
         AK1R = AK1R - ZR
     end
     if AK1R > -ELIM
         @goto line40
     end
     @label line30
-    NZ = NZ + 1
+    NZ = NZ + int32(1)
     YR[NN] = ZEROR
     YI[NN] = ZEROI
     if ACZ > DFNU
         @goto line190
     end
-    NN = NN - 1
-    if NN == 0
+    NN = NN - int32(1)
+    if NN == int32(0)
         return NZ
     end
     @goto line20
@@ -109,20 +109,20 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     if AK1R > -ALIM
         @goto line50
     end
-    IFLAG = 1
+    IFLAG = int32(1)
     SS = 1.0 / TOL
     CRSCR = TOL
     ASCLE = ARM * SS
     @label line50
     AA = DEXP(AK1R)
-    if IFLAG == 1
+    if IFLAG == int32(1)
         AA = AA * SS
     end
     COEFR = AA * DCOS(AK1I)
     COEFI = AA * DSIN(AK1I)
     ATOL = (TOL * ACZ) / FNUP
-    IL = MIN0(2,NN)
-    for I = 1:IL
+    IL = MIN0(int32(2),NN)
+    for I = int32(1):IL
         DFNU = FNU + DBLE(FLOAT(NN - I))
         FNUP = DFNU + 1.0
         S1R = CONER
@@ -154,15 +154,15 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         S2I = S1R * COEFI + S1I * COEFR
         WR[I] = S2R
         WI[I] = S2I
-        if IFLAG == 0
+        if IFLAG == int32(0)
             @goto line80
         end
         (NW,) = ZUCHK(S2R,S2I,NW,ASCLE,TOL)
-        if NW != 0
+        if NW != int32(0)
             @goto line30
         end
         @label line80
-        M = (NN - I) + 1
+        M = (NN - I) + int32(1)
         YR[M] = S2R * CRSCR
         YI[M] = S2I * CRSCR
         if I == IL
@@ -173,35 +173,35 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         COEFI = STI * DFNU
         @label line90
     end
-    if NN <= 2
+    if NN <= int32(2)
         return NZ
     end
-    K = NN - 2
+    K = NN - int32(2)
     AK = DBLE(FLOAT(K))
     RAZ = 1.0 / AZ
     STR = ZR * RAZ
     STI = -ZI * RAZ
     RZR = (STR + STR) * RAZ
     RZI = (STI + STI) * RAZ
-    if IFLAG == 1
+    if IFLAG == int32(1)
         @goto line120
     end
-    IB = 3
+    IB = int32(3)
     @label line100
     for I = IB:NN
-        YR[K] = (AK + FNU) * (RZR * YR[K + 1] - RZI * YI[K + 1]) + YR[K + 2]
-        YI[K] = (AK + FNU) * (RZR * YI[K + 1] + RZI * YR[K + 1]) + YI[K + 2]
+        YR[K] = (AK + FNU) * (RZR * YR[K + int32(1)] - RZI * YI[K + int32(1)]) + YR[K + int32(2)]
+        YI[K] = (AK + FNU) * (RZR * YI[K + int32(1)] + RZI * YR[K + int32(1)]) + YI[K + int32(2)]
         AK = AK - 1.0
-        K = K - 1
+        K = K - int32(1)
         @label line110
     end
     return NZ
     @label line120
-    S1R = WR[1]
-    S1I = WI[1]
-    S2R = WR[2]
-    S2I = WI[2]
-    for L = 3:NN
+    S1R = WR[int32(1)]
+    S1I = WI[int32(1)]
+    S2R = WR[int32(2)]
+    S2I = WI[int32(2)]
+    for L = int32(3):NN
         CKR = S2R
         CKI = S2I
         S2R = S1R + (AK + FNU) * (RZR * CKR - RZI * CKI)
@@ -213,7 +213,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         YR[K] = CKR
         YI[K] = CKI
         AK = AK - 1.0
-        K = K - 1
+        K = K - int32(1)
         if ZABS(COMPLEX(CKR,CKI)) > ASCLE
             @goto line140
         end
@@ -221,7 +221,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     return NZ
     @label line140
-    IB = L + 1
+    IB = L + int32(1)
     if IB > NN
         return NZ
     end
@@ -229,21 +229,21 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     @label line150
     NZ = N
     if FNU == 0.0
-        NZ = NZ - 1
+        NZ = NZ - int32(1)
     end
     @label line160
-    YR[1] = ZEROR
-    YI[1] = ZEROI
+    YR[int32(1)] = ZEROR
+    YI[int32(1)] = ZEROI
     if FNU != 0.0
         @goto line170
     end
-    YR[1] = CONER
-    YI[1] = CONEI
+    YR[int32(1)] = CONER
+    YI[int32(1)] = CONEI
     @label line170
-    if N == 1
+    if N == int32(1)
         return NZ
     end
-    for I = 2:N
+    for I = int32(2):N
         YR[I] = ZEROR
         YI[I] = ZEROI
         @label line180

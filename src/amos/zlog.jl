@@ -1,13 +1,13 @@
-function ZLOG(AR::Float64,AI::Float64,BR::Float64,BI::Float64,IERR::Integer)
-    DHPI::Float64 = 0
-    DPI::Float64 = 0
-    DTHETA::Float64 = 0
-    ZM::Float64 = 0
+function ZLOG(AR::Float64,AI::Float64,BR::Float64,BI::Float64,IERR::Int32)
+    DHPI::Float64 = zero(Float64)
+    DPI::Float64 = zero(Float64)
+    DTHETA::Float64 = zero(Float64)
+    ZM::Float64 = zero(Float64)
     begin 
         DPI = 3.141592653589793
         DHPI = 1.5707963267948966
     end
-    IERR = 0
+    IERR = int32(0)
     if AR == 0.0
         @goto line10
     end
@@ -53,6 +53,6 @@ function ZLOG(AR::Float64,AI::Float64,BR::Float64,BI::Float64,IERR::Integer)
     BI = DTHETA
     return (BR,BI,IERR)
     @label line60
-    IERR = 1
+    IERR = int32(1)
     return (BR,BI,IERR)
 end

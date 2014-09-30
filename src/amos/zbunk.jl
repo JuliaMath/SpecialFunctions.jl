@@ -1,7 +1,7 @@
-function ZBUNK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,TOL::Float64,ELIM::Float64,ALIM::Float64)
-    AX::Float64 = 0
-    AY::Float64 = 0
-    NZ = 0
+function ZBUNK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,TOL::Float64,ELIM::Float64,ALIM::Float64)
+    AX::Float64 = zero(Float64)
+    AY::Float64 = zero(Float64)
+    NZ = int32(0)
     AX = DABS(ZR) * 1.7321
     AY = DABS(ZI)
     if AY > AX

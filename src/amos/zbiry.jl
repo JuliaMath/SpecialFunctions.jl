@@ -1,60 +1,60 @@
 const _ZBIRY_CYR = Array(Float64,2)
 const _ZBIRY_CYI = Array(Float64,2)
-function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BII::Float64,IERR::Integer)
-    AA::Float64 = 0
-    AD::Float64 = 0
-    AK::Float64 = 0
-    ALIM::Float64 = 0
-    ATRM::Float64 = 0
-    AZ::Float64 = 0
-    AZ3::Float64 = 0
-    BB::Float64 = 0
-    BK::Float64 = 0
-    C1::Float64 = 0
-    C2::Float64 = 0
-    CC::Float64 = 0
-    CK::Float64 = 0
-    COEF::Float64 = 0
-    CONEI::Float64 = 0
-    CONER::Float64 = 0
-    CSQI::Float64 = 0
-    CSQR::Float64 = 0
+function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::Float64,IERR::Int32)
+    AA::Float64 = zero(Float64)
+    AD::Float64 = zero(Float64)
+    AK::Float64 = zero(Float64)
+    ALIM::Float64 = zero(Float64)
+    ATRM::Float64 = zero(Float64)
+    AZ::Float64 = zero(Float64)
+    AZ3::Float64 = zero(Float64)
+    BB::Float64 = zero(Float64)
+    BK::Float64 = zero(Float64)
+    C1::Float64 = zero(Float64)
+    C2::Float64 = zero(Float64)
+    CC::Float64 = zero(Float64)
+    CK::Float64 = zero(Float64)
+    COEF::Float64 = zero(Float64)
+    CONEI::Float64 = zero(Float64)
+    CONER::Float64 = zero(Float64)
+    CSQI::Float64 = zero(Float64)
+    CSQR::Float64 = zero(Float64)
     const CYI = _ZBIRY_CYI
     const CYR = _ZBIRY_CYR
-    D1::Float64 = 0
-    D2::Float64 = 0
-    DIG::Float64 = 0
-    DK::Float64 = 0
-    EAA::Float64 = 0
-    ELIM::Float64 = 0
-    FID::Float64 = 0
-    FMR::Float64 = 0
-    FNU::Float64 = 0
-    FNUL::Float64 = 0
-    K::Int32 = 0
-    K1::Int32 = 0
-    K2::Int32 = 0
-    NZ::Int32 = 0
-    PI::Float64 = 0
-    R1M5::Float64 = 0
-    RL::Float64 = 0
-    S1I::Float64 = 0
-    S1R::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    SFAC::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    TOL::Float64 = 0
-    TRM1I::Float64 = 0
-    TRM1R::Float64 = 0
-    TRM2I::Float64 = 0
-    TRM2R::Float64 = 0
-    TTH::Float64 = 0
-    Z3I::Float64 = 0
-    Z3R::Float64 = 0
-    ZTAI::Float64 = 0
-    ZTAR::Float64 = 0
+    D1::Float64 = zero(Float64)
+    D2::Float64 = zero(Float64)
+    DIG::Float64 = zero(Float64)
+    DK::Float64 = zero(Float64)
+    EAA::Float64 = zero(Float64)
+    ELIM::Float64 = zero(Float64)
+    FID::Float64 = zero(Float64)
+    FMR::Float64 = zero(Float64)
+    FNU::Float64 = zero(Float64)
+    FNUL::Float64 = zero(Float64)
+    K::Int32 = zero(Int32)
+    K1::Int32 = zero(Int32)
+    K2::Int32 = zero(Int32)
+    NZ::Int32 = zero(Int32)
+    PI::Float64 = zero(Float64)
+    R1M5::Float64 = zero(Float64)
+    RL::Float64 = zero(Float64)
+    S1I::Float64 = zero(Float64)
+    S1R::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    SFAC::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    TOL::Float64 = zero(Float64)
+    TRM1I::Float64 = zero(Float64)
+    TRM1R::Float64 = zero(Float64)
+    TRM2I::Float64 = zero(Float64)
+    TRM2R::Float64 = zero(Float64)
+    TTH::Float64 = zero(Float64)
+    Z3I::Float64 = zero(Float64)
+    Z3R::Float64 = zero(Float64)
+    ZTAI::Float64 = zero(Float64)
+    ZTAR::Float64 = zero(Float64)
     begin 
         TTH = 0.6666666666666666
         C1 = 0.6149266274460007
@@ -66,15 +66,15 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
         CONER = 1.0
         CONEI = 0.0
     end
-    IERR = 0
-    NZ = 0
-    if ID < 0 || ID > 1
-        IERR = 1
+    IERR = int32(0)
+    NZ = int32(0)
+    if ID < int32(0) || ID > int32(1)
+        IERR = int32(1)
     end
-    if KODE < 1 || KODE > 2
-        IERR = 1
+    if KODE < int32(1) || KODE > int32(2)
+        IERR = int32(1)
     end
-    if IERR != 0
+    if IERR != int32(0)
         return (BIR,BII,IERR)
     end
     AZ = ZABS(COMPLEX(ZR,ZI))
@@ -113,7 +113,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     AD = DMIN1(D1,D2)
     AK = 24.0 + 9.0FID
     BK = 30.0 - 9.0FID
-    for K = 1:25
+    for K = int32(1):int32(25)
         STR = (TRM1R * Z3R - TRM1I * Z3I) / D1
         TRM1I = (TRM1R * Z3I + TRM1I * Z3R) / D1
         TRM1R = STR
@@ -136,12 +136,12 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
         @label line30
     end
     @label line40
-    if ID == 1
+    if ID == int32(1)
         @goto line50
     end
     BIR = C1 * S1R + C2 * (ZR * S2R - ZI * S2I)
     BII = C1 * S1I + C2 * (ZR * S2I + ZI * S2R)
-    if KODE == 1
+    if KODE == int32(1)
         return (BIR,BII,IERR)
     end
     (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
@@ -165,7 +165,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     BIR = BIR + CC * (STR * ZR - STI * ZI)
     BII = BII + CC * (STR * ZI + STI * ZR)
     @label line60
-    if KODE == 1
+    if KODE == int32(1)
         return (BIR,BII,IERR)
     end
     (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
@@ -184,7 +184,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     R1M5 = D1MACH5
     K = MIN0(IABS(K1),IABS(K2))
     ELIM = 2.303 * (DBLE(FLOAT(K)) * R1M5 - 3.0)
-    K1 = I1MACH14 - 1
+    K1 = I1MACH14 - int32(1)
     AA = R1M5 * DBLE(FLOAT(K1))
     DIG = DMIN1(AA,18.0)
     AA = AA * 2.303
@@ -200,7 +200,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     end
     AA = DSQRT(AA)
     if AZ > AA
-        IERR = 3
+        IERR = int32(3)
     end
     (CSQR,CSQI) = ZSQRT(ZR,ZI,CSQR,CSQI)
     ZTAR = TTH * (ZR * CSQR - ZI * CSQI)
@@ -222,7 +222,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     ZTAI = AK
     @label line90
     AA = ZTAR
-    if KODE == 2
+    if KODE == int32(2)
         @goto line100
     end
     BB = DABS(AA)
@@ -246,31 +246,31 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     ZTAR = -ZTAR
     ZTAI = -ZTAI
     @label line110
-    (NZ,) = ZBINU(ZTAR,ZTAI,FNU,KODE,1,CYR,CYI,NZ,RL,FNUL,TOL,ELIM,ALIM)
-    if NZ < 0
+    (NZ,) = ZBINU(ZTAR,ZTAI,FNU,KODE,int32(1),CYR,CYI,NZ,RL,FNUL,TOL,ELIM,ALIM)
+    if NZ < int32(0)
         @goto line200
     end
     AA = FMR * FNU
     Z3R = SFAC
     STR = DCOS(AA)
     STI = DSIN(AA)
-    S1R = (STR * CYR[1] - STI * CYI[1]) * Z3R
-    S1I = (STR * CYI[1] + STI * CYR[1]) * Z3R
+    S1R = (STR * CYR[int32(1)] - STI * CYI[int32(1)]) * Z3R
+    S1I = (STR * CYI[int32(1)] + STI * CYR[int32(1)]) * Z3R
     FNU = (2.0 - FID) / 3.0
-    (NZ,) = ZBINU(ZTAR,ZTAI,FNU,KODE,2,CYR,CYI,NZ,RL,FNUL,TOL,ELIM,ALIM)
-    CYR[1] = CYR[1] * Z3R
-    CYI[1] = CYI[1] * Z3R
-    CYR[2] = CYR[2] * Z3R
-    CYI[2] = CYI[2] * Z3R
-    (STR,STI) = ZDIV(CYR[1],CYI[1],ZTAR,ZTAI,STR,STI)
-    S2R = (FNU + FNU) * STR + CYR[2]
-    S2I = (FNU + FNU) * STI + CYI[2]
+    (NZ,) = ZBINU(ZTAR,ZTAI,FNU,KODE,int32(2),CYR,CYI,NZ,RL,FNUL,TOL,ELIM,ALIM)
+    CYR[int32(1)] = CYR[int32(1)] * Z3R
+    CYI[int32(1)] = CYI[int32(1)] * Z3R
+    CYR[int32(2)] = CYR[int32(2)] * Z3R
+    CYI[int32(2)] = CYI[int32(2)] * Z3R
+    (STR,STI) = ZDIV(CYR[int32(1)],CYI[int32(1)],ZTAR,ZTAI,STR,STI)
+    S2R = (FNU + FNU) * STR + CYR[int32(2)]
+    S2I = (FNU + FNU) * STI + CYI[int32(2)]
     AA = FMR * (FNU - 1.0)
     STR = DCOS(AA)
     STI = DSIN(AA)
     S1R = COEF * ((S1R + S2R * STR) - S2I * STI)
     S1I = COEF * (S1I + S2R * STI + S2I * STR)
-    if ID == 1
+    if ID == int32(1)
         @goto line120
     end
     STR = CSQR * S1R - CSQI * S1I
@@ -292,18 +292,18 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     BII = 0.0
     return (BIR,BII,IERR)
     @label line190
-    IERR = 2
-    NZ = 0
+    IERR = int32(2)
+    NZ = int32(0)
     return (BIR,BII,IERR)
     @label line200
-    if NZ == -1
+    if NZ == int32(-1)
         @goto line190
     end
-    NZ = 0
-    IERR = 5
+    NZ = int32(0)
+    IERR = int32(5)
     return (BIR,BII,IERR)
     @label line260
-    IERR = 4
-    NZ = 0
+    IERR = int32(4)
+    NZ = int32(0)
     return (BIR,BII,IERR)
 end

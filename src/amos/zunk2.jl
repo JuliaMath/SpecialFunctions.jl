@@ -17,116 +17,116 @@ const _ZUNK2_ASUMR = Array(Float64,2)
 const _ZUNK2_ASUMI = Array(Float64,2)
 const _ZUNK2_ARGR = Array(Float64,2)
 const _ZUNK2_ARGI = Array(Float64,2)
-function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,TOL::Float64,ELIM::Float64,ALIM::Float64)
-    AARG::Float64 = 0
-    AIC::Float64 = 0
-    AII::Float64 = 0
-    AIR::Float64 = 0
-    ANG::Float64 = 0
-    APHI::Float64 = 0
-    ARGDI::Float64 = 0
-    ARGDR::Float64 = 0
+function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,TOL::Float64,ELIM::Float64,ALIM::Float64)
+    AARG::Float64 = zero(Float64)
+    AIC::Float64 = zero(Float64)
+    AII::Float64 = zero(Float64)
+    AIR::Float64 = zero(Float64)
+    ANG::Float64 = zero(Float64)
+    APHI::Float64 = zero(Float64)
+    ARGDI::Float64 = zero(Float64)
+    ARGDR::Float64 = zero(Float64)
     const ARGI = _ZUNK2_ARGI
     const ARGR = _ZUNK2_ARGR
-    ASC::Float64 = 0
-    ASCLE::Float64 = 0
-    ASUMDI::Float64 = 0
-    ASUMDR::Float64 = 0
+    ASC::Float64 = zero(Float64)
+    ASCLE::Float64 = zero(Float64)
+    ASUMDI::Float64 = zero(Float64)
+    ASUMDR::Float64 = zero(Float64)
     const ASUMI = _ZUNK2_ASUMI
     const ASUMR = _ZUNK2_ASUMR
     const BRY = _ZUNK2_BRY
-    BSUMDI::Float64 = 0
-    BSUMDR::Float64 = 0
+    BSUMDI::Float64 = zero(Float64)
+    BSUMDR::Float64 = zero(Float64)
     const BSUMI = _ZUNK2_BSUMI
     const BSUMR = _ZUNK2_BSUMR
-    C1I::Float64 = 0
-    C1R::Float64 = 0
-    C2I::Float64 = 0
-    C2M::Float64 = 0
-    C2R::Float64 = 0
-    CAR::Float64 = 0
+    C1I::Float64 = zero(Float64)
+    C1R::Float64 = zero(Float64)
+    C2I::Float64 = zero(Float64)
+    C2M::Float64 = zero(Float64)
+    C2R::Float64 = zero(Float64)
+    CAR::Float64 = zero(Float64)
     const CIPI = _ZUNK2_CIPI
     const CIPR = _ZUNK2_CIPR
-    CKI::Float64 = 0
-    CKR::Float64 = 0
-    CONER::Float64 = 0
-    CR1I::Float64 = 0
-    CR1R::Float64 = 0
-    CR2I::Float64 = 0
-    CR2R::Float64 = 0
-    CRSC::Float64 = 0
-    CSCL::Float64 = 0
-    CSGNI::Float64 = 0
-    CSI::Float64 = 0
-    CSPNI::Float64 = 0
-    CSPNR::Float64 = 0
-    CSR::Float64 = 0
+    CKI::Float64 = zero(Float64)
+    CKR::Float64 = zero(Float64)
+    CONER::Float64 = zero(Float64)
+    CR1I::Float64 = zero(Float64)
+    CR1R::Float64 = zero(Float64)
+    CR2I::Float64 = zero(Float64)
+    CR2R::Float64 = zero(Float64)
+    CRSC::Float64 = zero(Float64)
+    CSCL::Float64 = zero(Float64)
+    CSGNI::Float64 = zero(Float64)
+    CSI::Float64 = zero(Float64)
+    CSPNI::Float64 = zero(Float64)
+    CSPNR::Float64 = zero(Float64)
+    CSR::Float64 = zero(Float64)
     const CSRR = _ZUNK2_CSRR
     const CSSR = _ZUNK2_CSSR
     const CYI = _ZUNK2_CYI
     const CYR = _ZUNK2_CYR
-    DAII::Float64 = 0
-    DAIR::Float64 = 0
-    FMR::Float64 = 0
-    FN::Float64 = 0
-    FNF::Float64 = 0
-    HPI::Float64 = 0
-    I::Int32 = 0
-    IB::Int32 = 0
-    IC::Int32 = 0
-    IDUM::Int32 = 0
-    IFLAG::Int32 = 0
-    IFN::Int32 = 0
-    IL::Int32 = 0
-    IN::Int32 = 0
-    INU::Int32 = 0
-    IPARD::Int32 = 0
-    IUF::Int32 = 0
-    J::Int32 = 0
-    K::Int32 = 0
-    KDFLG::Int32 = 0
-    KFLAG::Int32 = 0
-    KK::Int32 = 0
-    NAI::Int32 = 0
-    NDAI::Int32 = 0
-    NW::Int32 = 0
-    PHIDI::Float64 = 0
-    PHIDR::Float64 = 0
+    DAII::Float64 = zero(Float64)
+    DAIR::Float64 = zero(Float64)
+    FMR::Float64 = zero(Float64)
+    FN::Float64 = zero(Float64)
+    FNF::Float64 = zero(Float64)
+    HPI::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    IB::Int32 = zero(Int32)
+    IC::Int32 = zero(Int32)
+    IDUM::Int32 = zero(Int32)
+    IFLAG::Int32 = zero(Int32)
+    IFN::Int32 = zero(Int32)
+    IL::Int32 = zero(Int32)
+    IN::Int32 = zero(Int32)
+    INU::Int32 = zero(Int32)
+    IPARD::Int32 = zero(Int32)
+    IUF::Int32 = zero(Int32)
+    J::Int32 = zero(Int32)
+    K::Int32 = zero(Int32)
+    KDFLG::Int32 = zero(Int32)
+    KFLAG::Int32 = zero(Int32)
+    KK::Int32 = zero(Int32)
+    NAI::Int32 = zero(Int32)
+    NDAI::Int32 = zero(Int32)
+    NW::Int32 = zero(Int32)
+    PHIDI::Float64 = zero(Float64)
+    PHIDR::Float64 = zero(Float64)
     const PHII = _ZUNK2_PHII
     const PHIR = _ZUNK2_PHIR
-    PI::Float64 = 0
-    PTI::Float64 = 0
-    PTR::Float64 = 0
-    RAST::Float64 = 0
-    RAZR::Float64 = 0
-    RS1::Float64 = 0
-    RZI::Float64 = 0
-    RZR::Float64 = 0
-    S1I::Float64 = 0
-    S1R::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    SAR::Float64 = 0
-    SGN::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    YY::Float64 = 0
-    ZBI::Float64 = 0
-    ZBR::Float64 = 0
-    ZEROI::Float64 = 0
-    ZEROR::Float64 = 0
-    ZET1DI::Float64 = 0
-    ZET1DR::Float64 = 0
-    ZET2DI::Float64 = 0
-    ZET2DR::Float64 = 0
+    PI::Float64 = zero(Float64)
+    PTI::Float64 = zero(Float64)
+    PTR::Float64 = zero(Float64)
+    RAST::Float64 = zero(Float64)
+    RAZR::Float64 = zero(Float64)
+    RS1::Float64 = zero(Float64)
+    RZI::Float64 = zero(Float64)
+    RZR::Float64 = zero(Float64)
+    S1I::Float64 = zero(Float64)
+    S1R::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    SAR::Float64 = zero(Float64)
+    SGN::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    YY::Float64 = zero(Float64)
+    ZBI::Float64 = zero(Float64)
+    ZBR::Float64 = zero(Float64)
+    ZEROI::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
+    ZET1DI::Float64 = zero(Float64)
+    ZET1DR::Float64 = zero(Float64)
+    ZET2DI::Float64 = zero(Float64)
+    ZET2DR::Float64 = zero(Float64)
     const ZETA1I = _ZUNK2_ZETA1I
     const ZETA1R = _ZUNK2_ZETA1R
     const ZETA2I = _ZUNK2_ZETA2I
     const ZETA2R = _ZUNK2_ZETA2R
-    ZNI::Float64 = 0
-    ZNR::Float64 = 0
-    ZRI::Float64 = 0
-    ZRR::Float64 = 0
+    ZNI::Float64 = zero(Float64)
+    ZNR::Float64 = zero(Float64)
+    ZRI::Float64 = zero(Float64)
+    ZRR::Float64 = zero(Float64)
     begin 
         ZEROR = 0.0
         ZEROI = 0.0
@@ -142,28 +142,28 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         AIC = 1.2655121234846454
     end
     begin 
-        CIPR[1] = 1.0
-        CIPI[1] = 0.0
-        CIPR[2] = 0.0
-        CIPI[2] = -1.0
-        CIPR[3] = -1.0
-        CIPI[3] = 0.0
-        CIPR[4] = 0.0
-        CIPI[4] = 1.0
+        CIPR[int32(1)] = 1.0
+        CIPI[int32(1)] = 0.0
+        CIPR[int32(2)] = 0.0
+        CIPI[int32(2)] = -1.0
+        CIPR[int32(3)] = -1.0
+        CIPI[int32(3)] = 0.0
+        CIPR[int32(4)] = 0.0
+        CIPI[int32(4)] = 1.0
     end
-    KDFLG = 1
-    NZ = 0
+    KDFLG = int32(1)
+    NZ = int32(0)
     CSCL = 1.0 / TOL
     CRSC = TOL
-    CSSR[1] = CSCL
-    CSSR[2] = CONER
-    CSSR[3] = CRSC
-    CSRR[1] = CRSC
-    CSRR[2] = CONER
-    CSRR[3] = CSCL
-    BRY[1] = (1000.0D1MACH1) / TOL
-    BRY[2] = 1.0 / BRY[1]
-    BRY[3] = D1MACH2
+    CSSR[int32(1)] = CSCL
+    CSSR[int32(2)] = CONER
+    CSSR[int32(3)] = CRSC
+    CSRR[int32(1)] = CRSC
+    CSRR[int32(2)] = CONER
+    CSRR[int32(3)] = CSCL
+    BRY[int32(1)] = (1000.0D1MACH1) / TOL
+    BRY[int32(2)] = 1.0 / BRY[int32(1)]
+    BRY[int32(3)] = D1MACH2
     ZRR = ZR
     ZRI = ZI
     if ZR >= 0.0
@@ -184,7 +184,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     SAR = DSIN(ANG)
     C2R = HPI * SAR
     C2I = -HPI * CAR
-    KK = MOD(INU,4) + 1
+    KK = MOD(INU,int32(4)) + int32(1)
     STR = C2R * CIPR[KK] - C2I * CIPI[KK]
     STI = C2R * CIPI[KK] + C2I * CIPR[KK]
     CSR = CR1R * STR - CR1I * STI
@@ -195,12 +195,12 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     ZNR = -ZNR
     ZBI = -ZBI
     @label line20
-    J = 2
-    for I = 1:N
-        J = 3 - J
-        FN = FNU + DBLE(FLOAT(I - 1))
-        (PHIR[J],PHII[J],ARGR[J],ARGI[J],ZETA1R[J],ZETA1I[J],ZETA2R[J],ZETA2I[J],ASUMR[J],ASUMI[J],BSUMR[J],BSUMI[J]) = ZUNHJ(ZNR,ZNI,FN,0,TOL,PHIR[J],PHII[J],ARGR[J],ARGI[J],ZETA1R[J],ZETA1I[J],ZETA2R[J],ZETA2I[J],ASUMR[J],ASUMI[J],BSUMR[J],BSUMI[J])
-        if KODE == 1
+    J = int32(2)
+    for I = int32(1):N
+        J = int32(3) - J
+        FN = FNU + DBLE(FLOAT(I - int32(1)))
+        (PHIR[J],PHII[J],ARGR[J],ARGI[J],ZETA1R[J],ZETA1I[J],ZETA2R[J],ZETA2I[J],ASUMR[J],ASUMI[J],BSUMR[J],BSUMI[J]) = ZUNHJ(ZNR,ZNI,FN,int32(0),TOL,PHIR[J],PHII[J],ARGR[J],ARGI[J],ZETA1R[J],ZETA1I[J],ZETA2R[J],ZETA2I[J],ASUMR[J],ASUMI[J],BSUMR[J],BSUMI[J])
+        if KODE == int32(1)
             @goto line30
         end
         STR = ZBR + ZETA2R[J]
@@ -219,8 +219,8 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if DABS(RS1) > ELIM
             @goto line70
         end
-        if KDFLG == 1
-            KFLAG = 2
+        if KDFLG == int32(1)
+            KFLAG = int32(2)
         end
         if DABS(RS1) < ALIM
             @goto line50
@@ -231,20 +231,20 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if DABS(RS1) > ELIM
             @goto line70
         end
-        if KDFLG == 1
-            KFLAG = 1
+        if KDFLG == int32(1)
+            KFLAG = int32(1)
         end
         if RS1 < 0.0
             @goto line50
         end
-        if KDFLG == 1
-            KFLAG = 3
+        if KDFLG == int32(1)
+            KFLAG = int32(3)
         end
         @label line50
         C2R = ARGR[J] * CR2R - ARGI[J] * CR2I
         C2I = ARGR[J] * CR2I + ARGI[J] * CR2R
-        (AIR,AII,NAI,IDUM) = ZAIRY(C2R,C2I,0,2,AIR,AII,NAI,IDUM)
-        (DAIR,DAII,NDAI,IDUM) = ZAIRY(C2R,C2I,1,2,DAIR,DAII,NDAI,IDUM)
+        (AIR,AII,NAI,IDUM) = ZAIRY(C2R,C2I,int32(0),int32(2),AIR,AII,NAI,IDUM)
+        (DAIR,DAII,NDAI,IDUM) = ZAIRY(C2R,C2I,int32(1),int32(2),DAIR,DAII,NDAI,IDUM)
         STR = DAIR * BSUMR[J] - DAII * BSUMI[J]
         STI = DAIR * BSUMI[J] + DAII * BSUMR[J]
         PTR = STR * CR2R - STI * CR2I
@@ -261,11 +261,11 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         STR = S2R * S1R - S2I * S1I
         S2I = S1R * S2I + S2R * S1I
         S2R = STR
-        if KFLAG != 1
+        if KFLAG != int32(1)
             @goto line60
         end
-        (NW,) = ZUCHK(S2R,S2I,NW,BRY[1],TOL)
-        if NW != 0
+        (NW,) = ZUCHK(S2R,S2I,NW,BRY[int32(1)],TOL)
+        if NW != int32(0)
             @goto line70
         end
         @label line60
@@ -279,10 +279,10 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         STR = CSI
         CSI = -CSR
         CSR = STR
-        if KDFLG == 2
+        if KDFLG == int32(2)
             @goto line85
         end
-        KDFLG = 2
+        KDFLG = int32(2)
         @goto line80
         @label line70
         if RS1 > 0.0
@@ -291,22 +291,22 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if ZR < 0.0
             @goto line320
         end
-        KDFLG = 1
+        KDFLG = int32(1)
         YR[I] = ZEROR
         YI[I] = ZEROI
-        NZ = NZ + 1
+        NZ = NZ + int32(1)
         STR = CSI
         CSI = -CSR
         CSR = STR
-        if I == 1
+        if I == int32(1)
             @goto line80
         end
-        if YR[I - 1] == ZEROR && YI[I - 1] == ZEROI
+        if YR[I - int32(1)] == ZEROR && YI[I - int32(1)] == ZEROI
             @goto line80
         end
-        YR[I - 1] = ZEROR
-        YI[I - 1] = ZEROI
-        NZ = NZ + 1
+        YR[I - int32(1)] = ZEROR
+        YI[I - int32(1)] = ZEROI
+        NZ = NZ + int32(1)
         @label line80
     end
     I = N
@@ -318,17 +318,17 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     RZI = (STI + STI) * RAZR
     CKR = FN * RZR
     CKI = FN * RZI
-    IB = I + 1
+    IB = I + int32(1)
     if N < IB
         @goto line180
     end
-    FN = FNU + DBLE(FLOAT(N - 1))
-    IPARD = 1
-    if MR != 0
-        IPARD = 0
+    FN = FNU + DBLE(FLOAT(N - int32(1)))
+    IPARD = int32(1)
+    if MR != int32(0)
+        IPARD = int32(0)
     end
     (PHIDR,PHIDI,ARGDR,ARGDI,ZET1DR,ZET1DI,ZET2DR,ZET2DI,ASUMDR,ASUMDI,BSUMDR,BSUMDI) = ZUNHJ(ZNR,ZNI,FN,IPARD,TOL,PHIDR,PHIDI,ARGDR,ARGDI,ZET1DR,ZET1DI,ZET2DR,ZET2DI,ASUMDR,ASUMDI,BSUMDR,BSUMDI)
-    if KODE == 1
+    if KODE == int32(1)
         @goto line90
     end
     STR = ZBR + ZET2DR
@@ -363,17 +363,17 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         @goto line320
     end
     NZ = N
-    for I = 1:N
+    for I = int32(1):N
         YR[I] = ZEROR
         YI[I] = ZEROI
         @label line106
     end
     return NZ
     @label line120
-    S1R = CYR[1]
-    S1I = CYI[1]
-    S2R = CYR[2]
-    S2I = CYI[2]
+    S1R = CYR[int32(1)]
+    S1I = CYI[int32(1)]
+    S2R = CYR[int32(2)]
+    S2I = CYI[int32(2)]
     C1R = CSRR[KFLAG]
     ASCLE = BRY[KFLAG]
     for I = IB:N
@@ -389,7 +389,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         C2I = S2I * C1R
         YR[I] = C2R
         YI[I] = C2I
-        if KFLAG >= 3
+        if KFLAG >= int32(3)
             @goto line130
         end
         STR = DABS(C2R)
@@ -398,7 +398,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if C2M <= ASCLE
             @goto line130
         end
-        KFLAG = KFLAG + 1
+        KFLAG = KFLAG + int32(1)
         ASCLE = BRY[KFLAG]
         S1R = S1R * C1R
         S1I = S1I * C1R
@@ -412,21 +412,21 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         @label line130
     end
     @label line180
-    if MR == 0
+    if MR == int32(0)
         return NZ
     end
-    NZ = 0
+    NZ = int32(0)
     FMR = DBLE(FLOAT(MR))
     SGN = -(DSIGN(PI,FMR))
     CSGNI = SGN
     if YY <= 0.0
         CSGNI = -CSGNI
     end
-    IFN = (INU + N) - 1
+    IFN = (INU + N) - int32(1)
     ANG = FNF * SGN
     CSPNR = DCOS(ANG)
     CSPNI = DSIN(ANG)
-    if MOD(IFN,2) == 0
+    if MOD(IFN,int32(2)) == int32(0)
         @goto line190
     end
     CSPNR = -CSPNR
@@ -434,21 +434,21 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     @label line190
     CSR = SAR * CSGNI
     CSI = CAR * CSGNI
-    IN = MOD(IFN,4) + 1
+    IN = MOD(IFN,int32(4)) + int32(1)
     C2R = CIPR[IN]
     C2I = CIPI[IN]
     STR = CSR * C2R + CSI * C2I
     CSI = -CSR * C2I + CSI * C2R
     CSR = STR
-    ASC = BRY[1]
-    IUF = 0
+    ASC = BRY[int32(1)]
+    IUF = int32(0)
     KK = N
-    KDFLG = 1
-    IB = IB - 1
-    IC = IB - 1
-    for K = 1:N
-        FN = FNU + DBLE(FLOAT(KK - 1))
-        if N > 2
+    KDFLG = int32(1)
+    IB = IB - int32(1)
+    IC = IB - int32(1)
+    for K = int32(1):N
+        FN = FNU + DBLE(FLOAT(KK - int32(1)))
+        if N > int32(2)
             @goto line175
         end
         @label line172
@@ -464,7 +464,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         ASUMDI = ASUMI[J]
         BSUMDR = BSUMR[J]
         BSUMDI = BSUMI[J]
-        J = 3 - J
+        J = int32(3) - J
         @goto line210
         @label line175
         if KK == N && IB < N
@@ -473,9 +473,9 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if KK == IB || KK == IC
             @goto line172
         end
-        (PHIDR,PHIDI,ARGDR,ARGDI,ZET1DR,ZET1DI,ZET2DR,ZET2DI,ASUMDR,ASUMDI,BSUMDR,BSUMDI) = ZUNHJ(ZNR,ZNI,FN,0,TOL,PHIDR,PHIDI,ARGDR,ARGDI,ZET1DR,ZET1DI,ZET2DR,ZET2DI,ASUMDR,ASUMDI,BSUMDR,BSUMDI)
+        (PHIDR,PHIDI,ARGDR,ARGDI,ZET1DR,ZET1DI,ZET2DR,ZET2DI,ASUMDR,ASUMDI,BSUMDR,BSUMDI) = ZUNHJ(ZNR,ZNI,FN,int32(0),TOL,PHIDR,PHIDI,ARGDR,ARGDI,ZET1DR,ZET1DI,ZET2DR,ZET2DI,ASUMDR,ASUMDI,BSUMDR,BSUMDI)
         @label line210
-        if KODE == 1
+        if KODE == int32(1)
             @goto line220
         end
         STR = ZBR + ZET2DR
@@ -494,8 +494,8 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if DABS(RS1) > ELIM
             @goto line280
         end
-        if KDFLG == 1
-            IFLAG = 2
+        if KDFLG == int32(1)
+            IFLAG = int32(2)
         end
         if DABS(RS1) < ALIM
             @goto line240
@@ -506,18 +506,18 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if DABS(RS1) > ELIM
             @goto line280
         end
-        if KDFLG == 1
-            IFLAG = 1
+        if KDFLG == int32(1)
+            IFLAG = int32(1)
         end
         if RS1 < 0.0
             @goto line240
         end
-        if KDFLG == 1
-            IFLAG = 3
+        if KDFLG == int32(1)
+            IFLAG = int32(3)
         end
         @label line240
-        (AIR,AII,NAI,IDUM) = ZAIRY(ARGDR,ARGDI,0,2,AIR,AII,NAI,IDUM)
-        (DAIR,DAII,NDAI,IDUM) = ZAIRY(ARGDR,ARGDI,1,2,DAIR,DAII,NDAI,IDUM)
+        (AIR,AII,NAI,IDUM) = ZAIRY(ARGDR,ARGDI,int32(0),int32(2),AIR,AII,NAI,IDUM)
+        (DAIR,DAII,NDAI,IDUM) = ZAIRY(ARGDR,ARGDI,int32(1),int32(2),DAIR,DAII,NDAI,IDUM)
         STR = DAIR * BSUMDR - DAII * BSUMDI
         STI = DAIR * BSUMDI + DAII * BSUMDR
         STR = STR + (AIR * ASUMDR - AII * ASUMDI)
@@ -532,11 +532,11 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         STR = S2R * S1R - S2I * S1I
         S2I = S2R * S1I + S2I * S1R
         S2R = STR
-        if IFLAG != 1
+        if IFLAG != int32(1)
             @goto line250
         end
-        (NW,) = ZUCHK(S2R,S2I,NW,BRY[1],TOL)
-        if NW == 0
+        (NW,) = ZUCHK(S2R,S2I,NW,BRY[int32(1)],TOL)
+        if NW == int32(0)
             @goto line250
         end
         S2R = ZEROR
@@ -553,7 +553,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         S2I = S2I * CSRR[IFLAG]
         S1R = YR[KK]
         S1I = YI[KK]
-        if KODE == 1
+        if KODE == int32(1)
             @goto line270
         end
         (S1R,S1I,S2R,S2I,NW,IUF) = ZS1S2(ZRR,ZRI,S1R,S1I,S2R,S2I,NW,ASC,ALIM,IUF)
@@ -561,7 +561,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         @label line270
         YR[KK] = (S1R * CSPNR - S1I * CSPNI) + S2R
         YI[KK] = S1R * CSPNI + S1I * CSPNR + S2I
-        KK = KK - 1
+        KK = KK - int32(1)
         CSPNR = -CSPNR
         CSPNI = -CSPNI
         STR = CSI
@@ -570,13 +570,13 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if C2R != 0.0 || C2I != 0.0
             @goto line255
         end
-        KDFLG = 1
+        KDFLG = int32(1)
         @goto line290
         @label line255
-        if KDFLG == 2
+        if KDFLG == int32(2)
             @goto line295
         end
-        KDFLG = 2
+        KDFLG = int32(2)
         @goto line290
         @label line280
         if RS1 > 0.0
@@ -590,17 +590,17 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     K = N
     @label line295
     IL = N - K
-    if IL == 0
+    if IL == int32(0)
         return NZ
     end
-    S1R = CYR[1]
-    S1I = CYI[1]
-    S2R = CYR[2]
-    S2I = CYI[2]
+    S1R = CYR[int32(1)]
+    S1I = CYI[int32(1)]
+    S2R = CYR[int32(2)]
+    S2I = CYI[int32(2)]
     CSR = CSRR[IFLAG]
     ASCLE = BRY[IFLAG]
     FN = DBLE(FLOAT(INU + IL))
-    for I = 1:IL
+    for I = int32(1):IL
         C2R = S2R
         C2I = S2I
         S2R = S1R + (FN + FNF) * (RZR * C2R - RZI * C2I)
@@ -614,7 +614,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         CKI = C2I
         C1R = YR[KK]
         C1I = YI[KK]
-        if KODE == 1
+        if KODE == int32(1)
             @goto line300
         end
         (C1R,C1I,C2R,C2I,NW,IUF) = ZS1S2(ZRR,ZRI,C1R,C1I,C2R,C2I,NW,ASC,ALIM,IUF)
@@ -622,10 +622,10 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         @label line300
         YR[KK] = (C1R * CSPNR - C1I * CSPNI) + C2R
         YI[KK] = C1R * CSPNI + C1I * CSPNR + C2I
-        KK = KK - 1
+        KK = KK - int32(1)
         CSPNR = -CSPNR
         CSPNI = -CSPNI
-        if IFLAG >= 3
+        if IFLAG >= int32(3)
             @goto line310
         end
         C2R = DABS(CKR)
@@ -634,7 +634,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if C2M <= ASCLE
             @goto line310
         end
-        IFLAG = IFLAG + 1
+        IFLAG = IFLAG + int32(1)
         ASCLE = BRY[IFLAG]
         S1R = S1R * CSR
         S1I = S1I * CSR
@@ -649,6 +649,6 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     end
     return NZ
     @label line320
-    NZ = -1
+    NZ = int32(-1)
     return NZ
 end

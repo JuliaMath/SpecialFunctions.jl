@@ -118,7 +118,7 @@ function main()
         vardims = [e.args[1] => e.args[2:end] for e in extract_macro(symbol("@DIMENSION"))]
 
         # add types to signature
-        ts = map(t->(t == :Int32 ? :Integer : t), [get(vartypes,v,:Int32) for v in args])
+        ts = [get(vartypes,v,:Int32) for v in args]
         ast.args[1].args[2:end] = {haskey(vardims,v) ? :($v::AbstractArray{$t}) : :($v::$t)
                                    for (v,t) in zip(args,ts)}
 
@@ -156,6 +156,9 @@ function main()
                 e
             end, ast)
 
+        # convert all int literals to int32
+        ast = map_nonexpr(x->(isa(x,Int) ? :(int32($x)) : x), ast)
+
         # get scalar assignments
         modifies = mapreduce_expr(
             e->(isexpr(e,:(=)) && isa(e.args[1],Symbol) ?
@@ -189,7 +192,7 @@ function main()
                 push!(routine.globals, :(const $gv = Array($t,$(d...))))
                 e = :(const $v = $gv)
             else
-                e = :($v::$t = 0)
+                e = :($v::$t = zero($t))
             end
             unshift!(routine.ast.args[2].args, e)
         end
@@ -198,7 +201,7 @@ function main()
         if !routine.issubroutine
             v = routine.name
             t = routine.types[v]
-            unshift!(routine.ast.args[2].args, :($v::$t = 0))
+            unshift!(routine.ast.args[2].args, :($v::$t = zero($t)))
         end
     end
 

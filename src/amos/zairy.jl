@@ -1,62 +1,62 @@
 const _ZAIRY_CYR = Array(Float64,1)
 const _ZAIRY_CYI = Array(Float64,1)
-function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AII::Float64,NZ::Integer,IERR::Integer)
-    AA::Float64 = 0
-    AD::Float64 = 0
-    AK::Float64 = 0
-    ALAZ::Float64 = 0
-    ALIM::Float64 = 0
-    ATRM::Float64 = 0
-    AZ::Float64 = 0
-    AZ3::Float64 = 0
-    BB::Float64 = 0
-    BK::Float64 = 0
-    C1::Float64 = 0
-    C2::Float64 = 0
-    CC::Float64 = 0
-    CK::Float64 = 0
-    COEF::Float64 = 0
-    CONEI::Float64 = 0
-    CONER::Float64 = 0
-    CSQI::Float64 = 0
-    CSQR::Float64 = 0
+function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::Float64,NZ::Int32,IERR::Int32)
+    AA::Float64 = zero(Float64)
+    AD::Float64 = zero(Float64)
+    AK::Float64 = zero(Float64)
+    ALAZ::Float64 = zero(Float64)
+    ALIM::Float64 = zero(Float64)
+    ATRM::Float64 = zero(Float64)
+    AZ::Float64 = zero(Float64)
+    AZ3::Float64 = zero(Float64)
+    BB::Float64 = zero(Float64)
+    BK::Float64 = zero(Float64)
+    C1::Float64 = zero(Float64)
+    C2::Float64 = zero(Float64)
+    CC::Float64 = zero(Float64)
+    CK::Float64 = zero(Float64)
+    COEF::Float64 = zero(Float64)
+    CONEI::Float64 = zero(Float64)
+    CONER::Float64 = zero(Float64)
+    CSQI::Float64 = zero(Float64)
+    CSQR::Float64 = zero(Float64)
     const CYI = _ZAIRY_CYI
     const CYR = _ZAIRY_CYR
-    D1::Float64 = 0
-    D2::Float64 = 0
-    DIG::Float64 = 0
-    DK::Float64 = 0
-    ELIM::Float64 = 0
-    FID::Float64 = 0
-    FNU::Float64 = 0
-    IFLAG::Int32 = 0
-    K::Int32 = 0
-    K1::Int32 = 0
-    K2::Int32 = 0
-    MR::Int32 = 0
-    NN::Int32 = 0
-    PTR::Float64 = 0
-    R1M5::Float64 = 0
-    RL::Float64 = 0
-    S1I::Float64 = 0
-    S1R::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    SFAC::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    TOL::Float64 = 0
-    TRM1I::Float64 = 0
-    TRM1R::Float64 = 0
-    TRM2I::Float64 = 0
-    TRM2R::Float64 = 0
-    TTH::Float64 = 0
-    Z3I::Float64 = 0
-    Z3R::Float64 = 0
-    ZEROI::Float64 = 0
-    ZEROR::Float64 = 0
-    ZTAI::Float64 = 0
-    ZTAR::Float64 = 0
+    D1::Float64 = zero(Float64)
+    D2::Float64 = zero(Float64)
+    DIG::Float64 = zero(Float64)
+    DK::Float64 = zero(Float64)
+    ELIM::Float64 = zero(Float64)
+    FID::Float64 = zero(Float64)
+    FNU::Float64 = zero(Float64)
+    IFLAG::Int32 = zero(Int32)
+    K::Int32 = zero(Int32)
+    K1::Int32 = zero(Int32)
+    K2::Int32 = zero(Int32)
+    MR::Int32 = zero(Int32)
+    NN::Int32 = zero(Int32)
+    PTR::Float64 = zero(Float64)
+    R1M5::Float64 = zero(Float64)
+    RL::Float64 = zero(Float64)
+    S1I::Float64 = zero(Float64)
+    S1R::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    SFAC::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    TOL::Float64 = zero(Float64)
+    TRM1I::Float64 = zero(Float64)
+    TRM1R::Float64 = zero(Float64)
+    TRM2I::Float64 = zero(Float64)
+    TRM2R::Float64 = zero(Float64)
+    TTH::Float64 = zero(Float64)
+    Z3I::Float64 = zero(Float64)
+    Z3R::Float64 = zero(Float64)
+    ZEROI::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
+    ZTAI::Float64 = zero(Float64)
+    ZTAR::Float64 = zero(Float64)
     begin 
         TTH = 0.6666666666666666
         C1 = 0.3550280538878172
@@ -69,15 +69,15 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
         CONER = 1.0
         CONEI = 0.0
     end
-    IERR = 0
-    NZ = 0
-    if ID < 0 || ID > 1
-        IERR = 1
+    IERR = int32(0)
+    NZ = int32(0)
+    if ID < int32(0) || ID > int32(1)
+        IERR = int32(1)
     end
-    if KODE < 1 || KODE > 2
-        IERR = 1
+    if KODE < int32(1) || KODE > int32(2)
+        IERR = int32(1)
     end
-    if IERR != 0
+    if IERR != int32(0)
         return (AIR,AII,NZ,IERR)
     end
     AZ = ZABS(COMPLEX(ZR,ZI))
@@ -116,7 +116,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     AD = DMIN1(D1,D2)
     AK = 24.0 + 9.0FID
     BK = 30.0 - 9.0FID
-    for K = 1:25
+    for K = int32(1):int32(25)
         STR = (TRM1R * Z3R - TRM1I * Z3I) / D1
         TRM1I = (TRM1R * Z3I + TRM1I * Z3R) / D1
         TRM1R = STR
@@ -139,12 +139,12 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
         @label line30
     end
     @label line40
-    if ID == 1
+    if ID == int32(1)
         @goto line50
     end
     AIR = S1R * C1 - C2 * (ZR * S2R - ZI * S2I)
     AII = S1I * C1 - C2 * (ZR * S2I + ZI * S2R)
-    if KODE == 1
+    if KODE == int32(1)
         return (AIR,AII,NZ,IERR)
     end
     (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
@@ -167,7 +167,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     AIR = AIR + CC * (STR * ZR - STI * ZI)
     AII = AII + CC * (STR * ZI + STI * ZR)
     @label line60
-    if KODE == 1
+    if KODE == int32(1)
         return (AIR,AII,NZ,IERR)
     end
     (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
@@ -185,7 +185,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     R1M5 = D1MACH5
     K = MIN0(IABS(K1),IABS(K2))
     ELIM = 2.303 * (DBLE(FLOAT(K)) * R1M5 - 3.0)
-    K1 = I1MACH14 - 1
+    K1 = I1MACH14 - int32(1)
     AA = R1M5 * DBLE(FLOAT(K1))
     DIG = DMIN1(AA,18.0)
     AA = AA * 2.303
@@ -201,12 +201,12 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     end
     AA = DSQRT(AA)
     if AZ > AA
-        IERR = 3
+        IERR = int32(3)
     end
     (CSQR,CSQI) = ZSQRT(ZR,ZI,CSQR,CSQI)
     ZTAR = TTH * (ZR * CSQR - ZI * CSQI)
     ZTAI = TTH * (ZR * CSQI + ZI * CSQR)
-    IFLAG = 0
+    IFLAG = int32(0)
     SFAC = 1.0
     AK = ZTAI
     if ZR >= 0.0
@@ -230,51 +230,51 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     if AA >= 0.0 && ZR > 0.0
         @goto line110
     end
-    if KODE == 2
+    if KODE == int32(2)
         @goto line100
     end
     if AA > -ALIM
         @goto line100
     end
     AA = -AA + 0.25ALAZ
-    IFLAG = 1
+    IFLAG = int32(1)
     SFAC = TOL
     if AA > ELIM
         @goto line270
     end
     @label line100
-    MR = 1
+    MR = int32(1)
     if ZI < 0.0
-        MR = -1
+        MR = int32(-1)
     end
-    (NN,) = ZACAI(ZTAR,ZTAI,FNU,KODE,MR,1,CYR,CYI,NN,RL,TOL,ELIM,ALIM)
-    if NN < 0
+    (NN,) = ZACAI(ZTAR,ZTAI,FNU,KODE,MR,int32(1),CYR,CYI,NN,RL,TOL,ELIM,ALIM)
+    if NN < int32(0)
         @goto line280
     end
     NZ = NZ + NN
     @goto line130
     @label line110
-    if KODE == 2
+    if KODE == int32(2)
         @goto line120
     end
     if AA < ALIM
         @goto line120
     end
     AA = -AA - 0.25ALAZ
-    IFLAG = 2
+    IFLAG = int32(2)
     SFAC = 1.0 / TOL
     if AA < -ELIM
         @goto line210
     end
     @label line120
-    (NZ,) = ZBKNU(ZTAR,ZTAI,FNU,KODE,1,CYR,CYI,NZ,TOL,ELIM,ALIM)
+    (NZ,) = ZBKNU(ZTAR,ZTAI,FNU,KODE,int32(1),CYR,CYI,NZ,TOL,ELIM,ALIM)
     @label line130
-    S1R = CYR[1] * COEF
-    S1I = CYI[1] * COEF
-    if IFLAG != 0
+    S1R = CYR[int32(1)] * COEF
+    S1I = CYI[int32(1)] * COEF
+    if IFLAG != int32(0)
         @goto line150
     end
-    if ID == 1
+    if ID == int32(1)
         @goto line140
     end
     AIR = CSQR * S1R - CSQI * S1I
@@ -287,7 +287,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     @label line150
     S1R = S1R * SFAC
     S1I = S1I * SFAC
-    if ID == 1
+    if ID == int32(1)
         @goto line160
     end
     STR = S1R * CSQR - S1I * CSQI
@@ -307,7 +307,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     AA = 1000.0D1MACH1
     S1R = ZEROR
     S1I = ZEROI
-    if ID == 1
+    if ID == int32(1)
         @goto line190
     end
     if AZ <= AA
@@ -333,23 +333,23 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,AIR::Float64,AI
     AII = AII + C1 * S1I
     return (AIR,AII,NZ,IERR)
     @label line210
-    NZ = 1
+    NZ = int32(1)
     AIR = ZEROR
     AII = ZEROI
     return (AIR,AII,NZ,IERR)
     @label line270
-    NZ = 0
-    IERR = 2
+    NZ = int32(0)
+    IERR = int32(2)
     return (AIR,AII,NZ,IERR)
     @label line280
-    if NN == -1
+    if NN == int32(-1)
         @goto line270
     end
-    NZ = 0
-    IERR = 5
+    NZ = int32(0)
+    IERR = int32(5)
     return (AIR,AII,NZ,IERR)
     @label line260
-    IERR = 4
-    NZ = 0
+    IERR = int32(4)
+    NZ = int32(0)
     return (AIR,AII,NZ,IERR)
 end

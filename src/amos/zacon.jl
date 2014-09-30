@@ -3,63 +3,63 @@ const _ZACON_CYI = Array(Float64,2)
 const _ZACON_CSSR = Array(Float64,3)
 const _ZACON_CSRR = Array(Float64,3)
 const _ZACON_BRY = Array(Float64,3)
-function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,RL::Float64,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
-    ARG::Float64 = 0
-    AS2::Float64 = 0
-    ASCLE::Float64 = 0
-    AZN::Float64 = 0
+function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,RL::Float64,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
+    ARG::Float64 = zero(Float64)
+    AS2::Float64 = zero(Float64)
+    ASCLE::Float64 = zero(Float64)
+    AZN::Float64 = zero(Float64)
     const BRY = _ZACON_BRY
-    BSCLE::Float64 = 0
-    C1I::Float64 = 0
-    C1M::Float64 = 0
-    C1R::Float64 = 0
-    C2I::Float64 = 0
-    C2R::Float64 = 0
-    CKI::Float64 = 0
-    CKR::Float64 = 0
-    CONER::Float64 = 0
-    CPN::Float64 = 0
-    CSCL::Float64 = 0
-    CSCR::Float64 = 0
-    CSGNI::Float64 = 0
-    CSGNR::Float64 = 0
-    CSPNI::Float64 = 0
-    CSPNR::Float64 = 0
-    CSR::Float64 = 0
+    BSCLE::Float64 = zero(Float64)
+    C1I::Float64 = zero(Float64)
+    C1M::Float64 = zero(Float64)
+    C1R::Float64 = zero(Float64)
+    C2I::Float64 = zero(Float64)
+    C2R::Float64 = zero(Float64)
+    CKI::Float64 = zero(Float64)
+    CKR::Float64 = zero(Float64)
+    CONER::Float64 = zero(Float64)
+    CPN::Float64 = zero(Float64)
+    CSCL::Float64 = zero(Float64)
+    CSCR::Float64 = zero(Float64)
+    CSGNI::Float64 = zero(Float64)
+    CSGNR::Float64 = zero(Float64)
+    CSPNI::Float64 = zero(Float64)
+    CSPNR::Float64 = zero(Float64)
+    CSR::Float64 = zero(Float64)
     const CSRR = _ZACON_CSRR
     const CSSR = _ZACON_CSSR
     const CYI = _ZACON_CYI
     const CYR = _ZACON_CYR
-    FMR::Float64 = 0
-    FN::Float64 = 0
-    I::Int32 = 0
-    INU::Int32 = 0
-    IUF::Int32 = 0
-    KFLAG::Int32 = 0
-    NN::Int32 = 0
-    NW::Int32 = 0
-    PI::Float64 = 0
-    PTI::Float64 = 0
-    PTR::Float64 = 0
-    RAZN::Float64 = 0
-    RZI::Float64 = 0
-    RZR::Float64 = 0
-    S1I::Float64 = 0
-    S1R::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    SC1I::Float64 = 0
-    SC1R::Float64 = 0
-    SC2I::Float64 = 0
-    SC2R::Float64 = 0
-    SGN::Float64 = 0
-    SPN::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    YY::Float64 = 0
-    ZEROR::Float64 = 0
-    ZNI::Float64 = 0
-    ZNR::Float64 = 0
+    FMR::Float64 = zero(Float64)
+    FN::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    INU::Int32 = zero(Int32)
+    IUF::Int32 = zero(Int32)
+    KFLAG::Int32 = zero(Int32)
+    NN::Int32 = zero(Int32)
+    NW::Int32 = zero(Int32)
+    PI::Float64 = zero(Float64)
+    PTI::Float64 = zero(Float64)
+    PTR::Float64 = zero(Float64)
+    RAZN::Float64 = zero(Float64)
+    RZI::Float64 = zero(Float64)
+    RZR::Float64 = zero(Float64)
+    S1I::Float64 = zero(Float64)
+    S1R::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    SC1I::Float64 = zero(Float64)
+    SC1R::Float64 = zero(Float64)
+    SC2I::Float64 = zero(Float64)
+    SC2R::Float64 = zero(Float64)
+    SGN::Float64 = zero(Float64)
+    SPN::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    YY::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
+    ZNI::Float64 = zero(Float64)
+    ZNR::Float64 = zero(Float64)
     begin 
         PI = 3.141592653589793
     end
@@ -67,26 +67,26 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         ZEROR = 0.0
         CONER = 1.0
     end
-    NZ = 0
+    NZ = int32(0)
     ZNR = -ZR
     ZNI = -ZI
     NN = N
     (NW,) = ZBINU(ZNR,ZNI,FNU,KODE,NN,YR,YI,NW,RL,FNUL,TOL,ELIM,ALIM)
-    if NW < 0
+    if NW < int32(0)
         @goto line90
     end
-    NN = MIN0(2,N)
+    NN = MIN0(int32(2),N)
     (NW,) = ZBKNU(ZNR,ZNI,FNU,KODE,NN,CYR,CYI,NW,TOL,ELIM,ALIM)
-    if NW != 0
+    if NW != int32(0)
         @goto line90
     end
-    S1R = CYR[1]
-    S1I = CYI[1]
+    S1R = CYR[int32(1)]
+    S1I = CYI[int32(1)]
     FMR = DBLE(FLOAT(MR))
     SGN = -(DSIGN(PI,FMR))
     CSGNR = ZEROR
     CSGNI = SGN
-    if KODE == 1
+    if KODE == int32(1)
         @goto line10
     end
     YY = -ZNI
@@ -100,19 +100,19 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     SPN = DSIN(ARG)
     CSPNR = CPN
     CSPNI = SPN
-    if MOD(INU,2) == 0
+    if MOD(INU,int32(2)) == int32(0)
         @goto line20
     end
     CSPNR = -CSPNR
     CSPNI = -CSPNI
     @label line20
-    IUF = 0
+    IUF = int32(0)
     C1R = S1R
     C1I = S1I
-    C2R = YR[1]
-    C2I = YI[1]
+    C2R = YR[int32(1)]
+    C2I = YI[int32(1)]
     ASCLE = (1000.0D1MACH1) / TOL
-    if KODE == 1
+    if KODE == int32(1)
         @goto line30
     end
     (C1R,C1I,C2R,C2I,NW,IUF) = ZS1S2(ZNR,ZNI,C1R,C1I,C2R,C2I,NW,ASCLE,ALIM,IUF)
@@ -122,20 +122,20 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     @label line30
     (STR,STI) = ZMLT(CSPNR,CSPNI,C1R,C1I,STR,STI)
     (PTR,PTI) = ZMLT(CSGNR,CSGNI,C2R,C2I,PTR,PTI)
-    YR[1] = STR + PTR
-    YI[1] = STI + PTI
-    if N == 1
+    YR[int32(1)] = STR + PTR
+    YI[int32(1)] = STI + PTI
+    if N == int32(1)
         return NZ
     end
     CSPNR = -CSPNR
     CSPNI = -CSPNI
-    S2R = CYR[2]
-    S2I = CYI[2]
+    S2R = CYR[int32(2)]
+    S2I = CYI[int32(2)]
     C1R = S2R
     C1I = S2I
-    C2R = YR[2]
-    C2I = YI[2]
-    if KODE == 1
+    C2R = YR[int32(2)]
+    C2I = YI[int32(2)]
+    if KODE == int32(1)
         @goto line40
     end
     (C1R,C1I,C2R,C2I,NW,IUF) = ZS1S2(ZNR,ZNI,C1R,C1I,C2R,C2I,NW,ASCLE,ALIM,IUF)
@@ -145,9 +145,9 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     @label line40
     (STR,STI) = ZMLT(CSPNR,CSPNI,C1R,C1I,STR,STI)
     (PTR,PTI) = ZMLT(CSGNR,CSGNI,C2R,C2I,PTR,PTI)
-    YR[2] = STR + PTR
-    YI[2] = STI + PTI
-    if N == 2
+    YR[int32(2)] = STR + PTR
+    YI[int32(2)] = STI + PTI
+    if N == int32(2)
         return NZ
     end
     CSPNR = -CSPNR
@@ -163,27 +163,27 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     CKI = FN * RZI
     CSCL = 1.0 / TOL
     CSCR = TOL
-    CSSR[1] = CSCL
-    CSSR[2] = CONER
-    CSSR[3] = CSCR
-    CSRR[1] = CSCR
-    CSRR[2] = CONER
-    CSRR[3] = CSCL
-    BRY[1] = ASCLE
-    BRY[2] = 1.0 / ASCLE
-    BRY[3] = D1MACH2
+    CSSR[int32(1)] = CSCL
+    CSSR[int32(2)] = CONER
+    CSSR[int32(3)] = CSCR
+    CSRR[int32(1)] = CSCR
+    CSRR[int32(2)] = CONER
+    CSRR[int32(3)] = CSCL
+    BRY[int32(1)] = ASCLE
+    BRY[int32(2)] = 1.0 / ASCLE
+    BRY[int32(3)] = D1MACH2
     AS2 = ZABS(COMPLEX(S2R,S2I))
-    KFLAG = 2
-    if AS2 > BRY[1]
+    KFLAG = int32(2)
+    if AS2 > BRY[int32(1)]
         @goto line50
     end
-    KFLAG = 1
+    KFLAG = int32(1)
     @goto line60
     @label line50
-    if AS2 < BRY[2]
+    if AS2 < BRY[int32(2)]
         @goto line60
     end
-    KFLAG = 3
+    KFLAG = int32(3)
     @label line60
     BSCLE = BRY[KFLAG]
     S1R = S1R * CSSR[KFLAG]
@@ -191,7 +191,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     S2R = S2R * CSSR[KFLAG]
     S2I = S2I * CSSR[KFLAG]
     CSR = CSRR[KFLAG]
-    for I = 3:N
+    for I = int32(3):N
         STR = S2R
         STI = S2I
         S2R = (CKR * STR - CKI * STI) + S1R
@@ -204,10 +204,10 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         STI = C1I
         C2R = YR[I]
         C2I = YI[I]
-        if KODE == 1
+        if KODE == int32(1)
             @goto line70
         end
-        if IUF < 0
+        if IUF < int32(0)
             @goto line70
         end
         (C1R,C1I,C2R,C2I,NW,IUF) = ZS1S2(ZNR,ZNI,C1R,C1I,C2R,C2I,NW,ASCLE,ALIM,IUF)
@@ -216,10 +216,10 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         SC1I = SC2I
         SC2R = C1R
         SC2I = C1I
-        if IUF != 3
+        if IUF != int32(3)
             @goto line70
         end
-        IUF = -4
+        IUF = int32(-4)
         S1R = SC1R * CSSR[KFLAG]
         S1I = SC1I * CSSR[KFLAG]
         S2R = SC2R * CSSR[KFLAG]
@@ -235,7 +235,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         CKI = CKI + RZI
         CSPNR = -CSPNR
         CSPNI = -CSPNI
-        if KFLAG >= 3
+        if KFLAG >= int32(3)
             @goto line80
         end
         PTR = DABS(C1R)
@@ -244,7 +244,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
         if C1M <= BSCLE
             @goto line80
         end
-        KFLAG = KFLAG + 1
+        KFLAG = KFLAG + int32(1)
         BSCLE = BRY[KFLAG]
         S1R = S1R * CSR
         S1I = S1I * CSR
@@ -259,9 +259,9 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     end
     return NZ
     @label line90
-    NZ = -1
-    if NW == -2
-        NZ = -2
+    NZ = int32(-1)
+    if NW == int32(-2)
+        NZ = int32(-2)
     end
     return NZ
 end

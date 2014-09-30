@@ -1,96 +1,96 @@
 const _ZBUNI_CYR = Array(Float64,2)
 const _ZBUNI_CYI = Array(Float64,2)
 const _ZBUNI_BRY = Array(Float64,3)
-function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,NUI::Integer,NLAST::Integer,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
-    ASCLE::Float64 = 0
-    AX::Float64 = 0
-    AY::Float64 = 0
+function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,NUI::Int32,NLAST::Int32,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
+    ASCLE::Float64 = zero(Float64)
+    AX::Float64 = zero(Float64)
+    AY::Float64 = zero(Float64)
     const BRY = _ZBUNI_BRY
-    C1I::Float64 = 0
-    C1M::Float64 = 0
-    C1R::Float64 = 0
-    CSCLR::Float64 = 0
-    CSCRR::Float64 = 0
+    C1I::Float64 = zero(Float64)
+    C1M::Float64 = zero(Float64)
+    C1R::Float64 = zero(Float64)
+    CSCLR::Float64 = zero(Float64)
+    CSCRR::Float64 = zero(Float64)
     const CYI = _ZBUNI_CYI
     const CYR = _ZBUNI_CYR
-    DFNU::Float64 = 0
-    FNUI::Float64 = 0
-    GNU::Float64 = 0
-    I::Int32 = 0
-    IFLAG::Int32 = 0
-    IFORM::Int32 = 0
-    K::Int32 = 0
-    NL::Int32 = 0
-    NW::Int32 = 0
-    RAZ::Float64 = 0
-    RZI::Float64 = 0
-    RZR::Float64 = 0
-    S1I::Float64 = 0
-    S1R::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    NZ = 0
+    DFNU::Float64 = zero(Float64)
+    FNUI::Float64 = zero(Float64)
+    GNU::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    IFLAG::Int32 = zero(Int32)
+    IFORM::Int32 = zero(Int32)
+    K::Int32 = zero(Int32)
+    NL::Int32 = zero(Int32)
+    NW::Int32 = zero(Int32)
+    RAZ::Float64 = zero(Float64)
+    RZI::Float64 = zero(Float64)
+    RZR::Float64 = zero(Float64)
+    S1I::Float64 = zero(Float64)
+    S1R::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    NZ = int32(0)
     AX = DABS(ZR) * 1.7321
     AY = DABS(ZI)
-    IFORM = 1
+    IFORM = int32(1)
     if AY > AX
-        IFORM = 2
+        IFORM = int32(2)
     end
-    if NUI == 0
+    if NUI == int32(0)
         @goto line60
     end
     FNUI = DBLE(FLOAT(NUI))
-    DFNU = FNU + DBLE(FLOAT(N - 1))
+    DFNU = FNU + DBLE(FLOAT(N - int32(1)))
     GNU = DFNU + FNUI
-    if IFORM == 2
+    if IFORM == int32(2)
         @goto line10
     end
-    (NW,NLAST) = ZUNI1(ZR,ZI,GNU,KODE,2,CYR,CYI,NW,NLAST,FNUL,TOL,ELIM,ALIM)
+    (NW,NLAST) = ZUNI1(ZR,ZI,GNU,KODE,int32(2),CYR,CYI,NW,NLAST,FNUL,TOL,ELIM,ALIM)
     @goto line20
     @label line10
-    (NW,NLAST) = ZUNI2(ZR,ZI,GNU,KODE,2,CYR,CYI,NW,NLAST,FNUL,TOL,ELIM,ALIM)
+    (NW,NLAST) = ZUNI2(ZR,ZI,GNU,KODE,int32(2),CYR,CYI,NW,NLAST,FNUL,TOL,ELIM,ALIM)
     @label line20
-    if NW < 0
+    if NW < int32(0)
         @goto line50
     end
-    if NW != 0
+    if NW != int32(0)
         @goto line90
     end
-    STR = ZABS(COMPLEX(CYR[1],CYI[1]))
-    BRY[1] = (1000.0D1MACH1) / TOL
-    BRY[2] = 1.0 / BRY[1]
-    BRY[3] = BRY[2]
-    IFLAG = 2
-    ASCLE = BRY[2]
+    STR = ZABS(COMPLEX(CYR[int32(1)],CYI[int32(1)]))
+    BRY[int32(1)] = (1000.0D1MACH1) / TOL
+    BRY[int32(2)] = 1.0 / BRY[int32(1)]
+    BRY[int32(3)] = BRY[int32(2)]
+    IFLAG = int32(2)
+    ASCLE = BRY[int32(2)]
     CSCLR = 1.0
-    if STR > BRY[1]
+    if STR > BRY[int32(1)]
         @goto line21
     end
-    IFLAG = 1
-    ASCLE = BRY[1]
+    IFLAG = int32(1)
+    ASCLE = BRY[int32(1)]
     CSCLR = 1.0 / TOL
     @goto line25
     @label line21
-    if STR < BRY[2]
+    if STR < BRY[int32(2)]
         @goto line25
     end
-    IFLAG = 3
-    ASCLE = BRY[3]
+    IFLAG = int32(3)
+    ASCLE = BRY[int32(3)]
     CSCLR = TOL
     @label line25
     CSCRR = 1.0 / CSCLR
-    S1R = CYR[2] * CSCLR
-    S1I = CYI[2] * CSCLR
-    S2R = CYR[1] * CSCLR
-    S2I = CYI[1] * CSCLR
+    S1R = CYR[int32(2)] * CSCLR
+    S1I = CYI[int32(2)] * CSCLR
+    S2R = CYR[int32(1)] * CSCLR
+    S2I = CYI[int32(1)] * CSCLR
     RAZ = 1.0 / ZABS(COMPLEX(ZR,ZI))
     STR = ZR * RAZ
     STI = -ZI * RAZ
     RZR = (STR + STR) * RAZ
     RZI = (STI + STI) * RAZ
-    for I = 1:NUI
+    for I = int32(1):NUI
         STR = S2R
         STI = S2I
         S2R = (DFNU + FNUI) * (RZR * STR - RZI * STI) + S1R
@@ -98,7 +98,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         S1R = STR
         S1I = STI
         FNUI = FNUI - 1.0
-        if IFLAG >= 3
+        if IFLAG >= int32(3)
             @goto line30
         end
         STR = S2R * CSCRR
@@ -109,7 +109,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         if C1M <= ASCLE
             @goto line30
         end
-        IFLAG = IFLAG + 1
+        IFLAG = IFLAG + int32(1)
         ASCLE = BRY[IFLAG]
         S1R = S1R * CSCRR
         S1I = S1I * CSCRR
@@ -125,13 +125,13 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     YR[N] = S2R * CSCRR
     YI[N] = S2I * CSCRR
-    if N == 1
+    if N == int32(1)
         return (NZ,NLAST)
     end
-    NL = N - 1
+    NL = N - int32(1)
     FNUI = DBLE(FLOAT(NL))
     K = NL
-    for I = 1:NL
+    for I = int32(1):NL
         STR = S2R
         STI = S2I
         S2R = (FNU + FNUI) * (RZR * STR - RZI * STI) + S1R
@@ -143,8 +143,8 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         YR[K] = STR
         YI[K] = STI
         FNUI = FNUI - 1.0
-        K = K - 1
-        if IFLAG >= 3
+        K = K - int32(1)
+        if IFLAG >= int32(3)
             @goto line40
         end
         C1R = DABS(STR)
@@ -153,7 +153,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         if C1M <= ASCLE
             @goto line40
         end
-        IFLAG = IFLAG + 1
+        IFLAG = IFLAG + int32(1)
         ASCLE = BRY[IFLAG]
         S1R = S1R * CSCRR
         S1I = S1I * CSCRR
@@ -169,13 +169,13 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     return (NZ,NLAST)
     @label line50
-    NZ = -1
-    if NW == -2
-        NZ = -2
+    NZ = int32(-1)
+    if NW == int32(-2)
+        NZ = int32(-2)
     end
     return (NZ,NLAST)
     @label line60
-    if IFORM == 2
+    if IFORM == int32(2)
         @goto line70
     end
     (NW,NLAST) = ZUNI1(ZR,ZI,FNU,KODE,N,YR,YI,NW,NLAST,FNUL,TOL,ELIM,ALIM)
@@ -183,7 +183,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     @label line70
     (NW,NLAST) = ZUNI2(ZR,ZI,FNU,KODE,N,YR,YI,NW,NLAST,FNUL,TOL,ELIM,ALIM)
     @label line80
-    if NW < 0
+    if NW < int32(0)
         @goto line50
     end
     NZ = NW

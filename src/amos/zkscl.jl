@@ -1,49 +1,49 @@
 const _ZKSCL_CYR = Array(Float64,2)
 const _ZKSCL_CYI = Array(Float64,2)
-function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,RZR::Float64,RZI::Float64,ASCLE::Float64,TOL::Float64,ELIM::Float64)
-    ACS::Float64 = 0
-    ALAS::Float64 = 0
-    AS::Float64 = 0
-    CELMR::Float64 = 0
-    CKI::Float64 = 0
-    CKR::Float64 = 0
-    CSI::Float64 = 0
-    CSR::Float64 = 0
+function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,RZR::Float64,RZI::Float64,ASCLE::Float64,TOL::Float64,ELIM::Float64)
+    ACS::Float64 = zero(Float64)
+    ALAS::Float64 = zero(Float64)
+    AS::Float64 = zero(Float64)
+    CELMR::Float64 = zero(Float64)
+    CKI::Float64 = zero(Float64)
+    CKR::Float64 = zero(Float64)
+    CSI::Float64 = zero(Float64)
+    CSR::Float64 = zero(Float64)
     const CYI = _ZKSCL_CYI
     const CYR = _ZKSCL_CYR
-    ELM::Float64 = 0
-    FN::Float64 = 0
-    HELIM::Float64 = 0
-    I::Int32 = 0
-    IC::Int32 = 0
-    IDUM::Int32 = 0
-    KK::Int32 = 0
-    NN::Int32 = 0
-    NW::Int32 = 0
-    S1I::Float64 = 0
-    S1R::Float64 = 0
-    S2I::Float64 = 0
-    S2R::Float64 = 0
-    STR::Float64 = 0
-    ZDI::Float64 = 0
-    ZDR::Float64 = 0
-    ZEROI::Float64 = 0
-    ZEROR::Float64 = 0
+    ELM::Float64 = zero(Float64)
+    FN::Float64 = zero(Float64)
+    HELIM::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    IC::Int32 = zero(Int32)
+    IDUM::Int32 = zero(Int32)
+    KK::Int32 = zero(Int32)
+    NN::Int32 = zero(Int32)
+    NW::Int32 = zero(Int32)
+    S1I::Float64 = zero(Float64)
+    S1R::Float64 = zero(Float64)
+    S2I::Float64 = zero(Float64)
+    S2R::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    ZDI::Float64 = zero(Float64)
+    ZDR::Float64 = zero(Float64)
+    ZEROI::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
     begin 
         ZEROR = 0.0
         ZEROI = 0.0
     end
-    NZ = 0
-    IC = 0
-    NN = MIN0(2,N)
-    for I = 1:NN
+    NZ = int32(0)
+    IC = int32(0)
+    NN = MIN0(int32(2),N)
+    for I = int32(1):NN
         S1R = YR[I]
         S1I = YI[I]
         CYR[I] = S1R
         CYI[I] = S1I
         AS = ZABS(COMPLEX(S1R,S1I))
         ACS = -ZRR + DLOG(AS)
-        NZ = NZ + 1
+        NZ = NZ + int32(1)
         YR[I] = ZEROR
         YI[I] = ZEROI
         if ACS < -ELIM
@@ -56,44 +56,44 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Integer,YR::AbstractArr
         CSR = STR * DCOS(CSI)
         CSI = STR * DSIN(CSI)
         (NW,) = ZUCHK(CSR,CSI,NW,ASCLE,TOL)
-        if NW != 0
+        if NW != int32(0)
             @goto line10
         end
         YR[I] = CSR
         YI[I] = CSI
         IC = I
-        NZ = NZ - 1
+        NZ = NZ - int32(1)
         @label line10
     end
-    if N == 1
+    if N == int32(1)
         return NZ
     end
-    if IC > 1
+    if IC > int32(1)
         @goto line20
     end
-    YR[1] = ZEROR
-    YI[1] = ZEROI
-    NZ = 2
+    YR[int32(1)] = ZEROR
+    YI[int32(1)] = ZEROI
+    NZ = int32(2)
     @label line20
-    if N == 2
+    if N == int32(2)
         return NZ
     end
-    if NZ == 0
+    if NZ == int32(0)
         return NZ
     end
     FN = FNU + 1.0
     CKR = FN * RZR
     CKI = FN * RZI
-    S1R = CYR[1]
-    S1I = CYI[1]
-    S2R = CYR[2]
-    S2I = CYI[2]
+    S1R = CYR[int32(1)]
+    S1I = CYI[int32(1)]
+    S2R = CYR[int32(2)]
+    S2I = CYI[int32(2)]
     HELIM = 0.5ELIM
     ELM = DEXP(-ELIM)
     CELMR = ELM
     ZDR = ZRR
     ZDI = ZRI
-    for I = 3:N
+    for I = int32(3):N
         KK = I
         CSR = S2R
         CSI = S2I
@@ -106,7 +106,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Integer,YR::AbstractArr
         AS = ZABS(COMPLEX(S2R,S2I))
         ALAS = DLOG(AS)
         ACS = -ZDR + ALAS
-        NZ = NZ + 1
+        NZ = NZ + int32(1)
         YR[I] = ZEROR
         YI[I] = ZEROI
         if ACS < -ELIM
@@ -119,13 +119,13 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Integer,YR::AbstractArr
         CSR = STR * DCOS(CSI)
         CSI = STR * DSIN(CSI)
         (NW,) = ZUCHK(CSR,CSI,NW,ASCLE,TOL)
-        if NW != 0
+        if NW != int32(0)
             @goto line25
         end
         YR[I] = CSR
         YI[I] = CSI
-        NZ = NZ - 1
-        if IC == KK - 1
+        NZ = NZ - int32(1)
+        if IC == KK - int32(1)
             @goto line40
         end
         IC = KK
@@ -143,13 +143,13 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Integer,YR::AbstractArr
     end
     NZ = N
     if IC == N
-        NZ = N - 1
+        NZ = N - int32(1)
     end
     @goto line45
     @label line40
-    NZ = KK - 2
+    NZ = KK - int32(2)
     @label line45
-    for I = 1:NZ
+    for I = int32(1):NZ
         YR[I] = ZEROR
         YI[I] = ZEROI
         @label line50

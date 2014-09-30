@@ -1,50 +1,50 @@
-function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,TOL::Float64)
-    ACK::Float64 = 0
-    AK::Float64 = 0
-    AP::Float64 = 0
-    AT::Float64 = 0
-    AZ::Float64 = 0
-    BK::Float64 = 0
-    CKI::Float64 = 0
-    CKR::Float64 = 0
-    CNORMI::Float64 = 0
-    CNORMR::Float64 = 0
-    CONEI::Float64 = 0
-    CONER::Float64 = 0
-    FKAP::Float64 = 0
-    FKK::Float64 = 0
-    FLAM::Float64 = 0
-    FNF::Float64 = 0
-    I::Int32 = 0
-    IAZ::Int32 = 0
-    IDUM::Int32 = 0
-    IFNU::Int32 = 0
-    INU::Int32 = 0
-    ITIME::Int32 = 0
-    K::Int32 = 0
-    KK::Int32 = 0
-    KM::Int32 = 0
-    M::Int32 = 0
-    P1I::Float64 = 0
-    P1R::Float64 = 0
-    P2I::Float64 = 0
-    P2R::Float64 = 0
-    PTI::Float64 = 0
-    PTR::Float64 = 0
-    RAZ::Float64 = 0
-    RHO::Float64 = 0
-    RHO2::Float64 = 0
-    RZI::Float64 = 0
-    RZR::Float64 = 0
-    SCLE::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    SUMI::Float64 = 0
-    SUMR::Float64 = 0
-    TFNF::Float64 = 0
-    TST::Float64 = 0
-    ZEROI::Float64 = 0
-    ZEROR::Float64 = 0
+function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,TOL::Float64)
+    ACK::Float64 = zero(Float64)
+    AK::Float64 = zero(Float64)
+    AP::Float64 = zero(Float64)
+    AT::Float64 = zero(Float64)
+    AZ::Float64 = zero(Float64)
+    BK::Float64 = zero(Float64)
+    CKI::Float64 = zero(Float64)
+    CKR::Float64 = zero(Float64)
+    CNORMI::Float64 = zero(Float64)
+    CNORMR::Float64 = zero(Float64)
+    CONEI::Float64 = zero(Float64)
+    CONER::Float64 = zero(Float64)
+    FKAP::Float64 = zero(Float64)
+    FKK::Float64 = zero(Float64)
+    FLAM::Float64 = zero(Float64)
+    FNF::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    IAZ::Int32 = zero(Int32)
+    IDUM::Int32 = zero(Int32)
+    IFNU::Int32 = zero(Int32)
+    INU::Int32 = zero(Int32)
+    ITIME::Int32 = zero(Int32)
+    K::Int32 = zero(Int32)
+    KK::Int32 = zero(Int32)
+    KM::Int32 = zero(Int32)
+    M::Int32 = zero(Int32)
+    P1I::Float64 = zero(Float64)
+    P1R::Float64 = zero(Float64)
+    P2I::Float64 = zero(Float64)
+    P2R::Float64 = zero(Float64)
+    PTI::Float64 = zero(Float64)
+    PTR::Float64 = zero(Float64)
+    RAZ::Float64 = zero(Float64)
+    RHO::Float64 = zero(Float64)
+    RHO2::Float64 = zero(Float64)
+    RZI::Float64 = zero(Float64)
+    RZR::Float64 = zero(Float64)
+    SCLE::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    SUMI::Float64 = zero(Float64)
+    SUMR::Float64 = zero(Float64)
+    TFNF::Float64 = zero(Float64)
+    TST::Float64 = zero(Float64)
+    ZEROI::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
     begin 
         ZEROR = 0.0
         ZEROI = 0.0
@@ -52,11 +52,11 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         CONEI = 0.0
     end
     SCLE = D1MACH1 / TOL
-    NZ = 0
+    NZ = int32(0)
     AZ = ZABS(COMPLEX(ZR,ZI))
     IAZ = INT(SNGL(AZ))
     IFNU = INT(SNGL(FNU))
-    INU = (IFNU + N) - 1
+    INU = (IFNU + N) - int32(1)
     AT = DBLE(FLOAT(IAZ)) + 1.0
     RAZ = 1.0 / AZ
     STR = ZR * RAZ
@@ -75,7 +75,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     TST = (RHO2 + RHO2) / ((RHO2 - 1.0) * (RHO - 1.0))
     TST = TST / TOL
     AK = AT
-    for I = 1:80
+    for I = int32(1):int32(80)
         PTR = P2R
         PTI = P2I
         P2R = P1R - (CKR * PTR - CKI * PTI)
@@ -93,8 +93,8 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     @goto line110
     @label line20
-    I = I + 1
-    K = 0
+    I = I + int32(1)
+    K = int32(0)
     if INU < IAZ
         @goto line40
     end
@@ -109,8 +109,8 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     CKI = STI * AT * RAZ
     ACK = AT * RAZ
     TST = DSQRT(ACK / TOL)
-    ITIME = 1
-    for K = 1:80
+    ITIME = int32(1)
+    for K = int32(1):int32(80)
         PTR = P2R
         PTI = P2I
         P2R = P1R - (CKR * PTR - CKI * PTI)
@@ -123,7 +123,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         if AP < TST
             @goto line30
         end
-        if ITIME == 2
+        if ITIME == int32(2)
             @goto line40
         end
         ACK = ZABS(COMPLEX(CKR,CKI))
@@ -131,12 +131,12 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         FKAP = AP / ZABS(COMPLEX(P1R,P1I))
         RHO = DMIN1(FLAM,FKAP)
         TST = TST * DSQRT(RHO / (RHO * RHO - 1.0))
-        ITIME = 2
+        ITIME = int32(2)
         @label line30
     end
     @goto line110
     @label line40
-    K = K + 1
+    K = K + int32(1)
     KK = MAX0(I + IAZ,K + INU)
     FKK = DBLE(FLOAT(KK))
     P1R = ZEROR
@@ -150,7 +150,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     SUMR = ZEROR
     SUMI = ZEROI
     KM = KK - INU
-    for I = 1:KM
+    for I = int32(1):KM
         PTR = P2R
         PTI = P2I
         P2R = P1R + (FKK + FNF) * (RZR * PTR - RZI * PTI)
@@ -167,10 +167,10 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     YR[N] = P2R
     YI[N] = P2I
-    if N == 1
+    if N == int32(1)
         @goto line70
     end
-    for I = 2:N
+    for I = int32(2):N
         PTR = P2R
         PTI = P2I
         P2R = P1R + (FKK + FNF) * (RZR * PTR - RZI * PTI)
@@ -183,16 +183,16 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
         SUMI = SUMI + (ACK + BK) * P1I
         BK = ACK
         FKK = FKK - 1.0
-        M = (N - I) + 1
+        M = (N - I) + int32(1)
         YR[M] = P2R
         YI[M] = P2I
         @label line60
     end
     @label line70
-    if IFNU <= 0
+    if IFNU <= int32(0)
         @goto line90
     end
-    for I = 1:IFNU
+    for I = int32(1):IFNU
         PTR = P2R
         PTI = P2I
         P2R = P1R + (FKK + FNF) * (RZR * PTR - RZI * PTI)
@@ -210,7 +210,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     @label line90
     PTR = ZR
     PTI = ZI
-    if KODE == 2
+    if KODE == int32(2)
         PTR = ZEROR
     end
     (STR,STI,IDUM) = ZLOG(RZR,RZI,STR,STI,IDUM)
@@ -229,7 +229,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     PTR = P2R * P1R
     PTI = -P2I * P1R
     (CNORMR,CNORMI) = ZMLT(CKR,CKI,PTR,PTI,CNORMR,CNORMI)
-    for I = 1:N
+    for I = int32(1):N
         STR = YR[I] * CNORMR - YI[I] * CNORMI
         YI[I] = YR[I] * CNORMI + YI[I] * CNORMR
         YR[I] = STR
@@ -237,6 +237,6 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     end
     return NZ
     @label line110
-    NZ = -2
+    NZ = int32(-2)
     return NZ
 end

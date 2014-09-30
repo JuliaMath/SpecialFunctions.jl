@@ -1,50 +1,50 @@
 const _ZUOIK_CWRKR = Array(Float64,16)
 const _ZUOIK_CWRKI = Array(Float64,16)
-function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NUF::Integer,TOL::Float64,ELIM::Float64,ALIM::Float64)
-    AARG::Float64 = 0
-    AIC::Float64 = 0
-    APHI::Float64 = 0
-    ARGI::Float64 = 0
-    ARGR::Float64 = 0
-    ASCLE::Float64 = 0
-    ASUMI::Float64 = 0
-    ASUMR::Float64 = 0
-    AX::Float64 = 0
-    AY::Float64 = 0
-    BSUMI::Float64 = 0
-    BSUMR::Float64 = 0
+function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NUF::Int32,TOL::Float64,ELIM::Float64,ALIM::Float64)
+    AARG::Float64 = zero(Float64)
+    AIC::Float64 = zero(Float64)
+    APHI::Float64 = zero(Float64)
+    ARGI::Float64 = zero(Float64)
+    ARGR::Float64 = zero(Float64)
+    ASCLE::Float64 = zero(Float64)
+    ASUMI::Float64 = zero(Float64)
+    ASUMR::Float64 = zero(Float64)
+    AX::Float64 = zero(Float64)
+    AY::Float64 = zero(Float64)
+    BSUMI::Float64 = zero(Float64)
+    BSUMR::Float64 = zero(Float64)
     const CWRKI = _ZUOIK_CWRKI
     const CWRKR = _ZUOIK_CWRKR
-    CZI::Float64 = 0
-    CZR::Float64 = 0
-    FNN::Float64 = 0
-    GNN::Float64 = 0
-    GNU::Float64 = 0
-    I::Int32 = 0
-    IDUM::Int32 = 0
-    IFORM::Int32 = 0
-    INIT::Int32 = 0
-    NN::Int32 = 0
-    NW::Int32 = 0
-    PHII::Float64 = 0
-    PHIR::Float64 = 0
-    RCZ::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    SUMI::Float64 = 0
-    SUMR::Float64 = 0
-    ZBI::Float64 = 0
-    ZBR::Float64 = 0
-    ZEROI::Float64 = 0
-    ZEROR::Float64 = 0
-    ZETA1I::Float64 = 0
-    ZETA1R::Float64 = 0
-    ZETA2I::Float64 = 0
-    ZETA2R::Float64 = 0
-    ZNI::Float64 = 0
-    ZNR::Float64 = 0
-    ZRI::Float64 = 0
-    ZRR::Float64 = 0
+    CZI::Float64 = zero(Float64)
+    CZR::Float64 = zero(Float64)
+    FNN::Float64 = zero(Float64)
+    GNN::Float64 = zero(Float64)
+    GNU::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    IDUM::Int32 = zero(Int32)
+    IFORM::Int32 = zero(Int32)
+    INIT::Int32 = zero(Int32)
+    NN::Int32 = zero(Int32)
+    NW::Int32 = zero(Int32)
+    PHII::Float64 = zero(Float64)
+    PHIR::Float64 = zero(Float64)
+    RCZ::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    SUMI::Float64 = zero(Float64)
+    SUMR::Float64 = zero(Float64)
+    ZBI::Float64 = zero(Float64)
+    ZBR::Float64 = zero(Float64)
+    ZEROI::Float64 = zero(Float64)
+    ZEROR::Float64 = zero(Float64)
+    ZETA1I::Float64 = zero(Float64)
+    ZETA1R::Float64 = zero(Float64)
+    ZETA2I::Float64 = zero(Float64)
+    ZETA2R::Float64 = zero(Float64)
+    ZNI::Float64 = zero(Float64)
+    ZNR::Float64 = zero(Float64)
+    ZRI::Float64 = zero(Float64)
+    ZRR::Float64 = zero(Float64)
     begin 
         ZEROR = 0.0
         ZEROI = 0.0
@@ -52,7 +52,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     begin 
         AIC = 1.2655121234846454
     end
-    NUF = 0
+    NUF = int32(0)
     NN = N
     ZRR = ZR
     ZRI = ZI
@@ -66,23 +66,23 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     ZBI = ZRI
     AX = DABS(ZR) * 1.7321
     AY = DABS(ZI)
-    IFORM = 1
+    IFORM = int32(1)
     if AY > AX
-        IFORM = 2
+        IFORM = int32(2)
     end
     GNU = DMAX1(FNU,1.0)
-    if IKFLG == 1
+    if IKFLG == int32(1)
         @goto line20
     end
     FNN = DBLE(FLOAT(NN))
     GNN = (FNU + FNN) - 1.0
     GNU = DMAX1(GNN,FNN)
     @label line20
-    if IFORM == 2
+    if IFORM == int32(2)
         @goto line30
     end
-    INIT = 0
-    (INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI) = ZUNIK(ZRR,ZRI,GNU,IKFLG,1,TOL,INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI,CWRKR,CWRKI)
+    INIT = int32(0)
+    (INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI) = ZUNIK(ZRR,ZRI,GNU,IKFLG,int32(1),TOL,INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI,CWRKR,CWRKI)
     CZR = -ZETA1R + ZETA2R
     CZI = -ZETA1I + ZETA2I
     @goto line50
@@ -94,18 +94,18 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     end
     ZNR = -ZNR
     @label line40
-    (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,GNU,1,TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
+    (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,GNU,int32(1),TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
     CZR = -ZETA1R + ZETA2R
     CZI = -ZETA1I + ZETA2I
     AARG = ZABS(COMPLEX(ARGR,ARGI))
     @label line50
-    if KODE == 1
+    if KODE == int32(1)
         @goto line60
     end
     CZR = CZR - ZBR
     CZI = CZI - ZBI
     @label line60
-    if IKFLG == 1
+    if IKFLG == int32(1)
         @goto line70
     end
     CZR = -CZR
@@ -120,7 +120,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
         @goto line80
     end
     RCZ = RCZ + DLOG(APHI)
-    if IFORM == 2
+    if IFORM == int32(2)
         RCZ = (RCZ - 0.25 * DLOG(AARG)) - AIC
     end
     if RCZ > ELIM
@@ -135,14 +135,14 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
         @goto line130
     end
     RCZ = RCZ + DLOG(APHI)
-    if IFORM == 2
+    if IFORM == int32(2)
         RCZ = (RCZ - 0.25 * DLOG(AARG)) - AIC
     end
     if RCZ > -ELIM
         @goto line110
     end
     @label line90
-    for I = 1:NN
+    for I = int32(1):NN
         YR[I] = ZEROR
         YI[I] = ZEROI
         @label line100
@@ -154,7 +154,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     (STR,STI,IDUM) = ZLOG(PHIR,PHII,STR,STI,IDUM)
     CZR = CZR + STR
     CZI = CZI + STI
-    if IFORM == 1
+    if IFORM == int32(1)
         @goto line120
     end
     (STR,STI,IDUM) = ZLOG(ARGR,ARGI,STR,STI,IDUM)
@@ -166,33 +166,33 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     CZR = AX * DCOS(AY)
     CZI = AX * DSIN(AY)
     (NW,) = ZUCHK(CZR,CZI,NW,ASCLE,TOL)
-    if NW != 0
+    if NW != int32(0)
         @goto line90
     end
     @label line130
-    if IKFLG == 2
+    if IKFLG == int32(2)
         return NUF
     end
-    if N == 1
+    if N == int32(1)
         return NUF
     end
     @label line140
-    GNU = FNU + DBLE(FLOAT(NN - 1))
-    if IFORM == 2
+    GNU = FNU + DBLE(FLOAT(NN - int32(1)))
+    if IFORM == int32(2)
         @goto line150
     end
-    INIT = 0
-    (INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI) = ZUNIK(ZRR,ZRI,GNU,IKFLG,1,TOL,INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI,CWRKR,CWRKI)
+    INIT = int32(0)
+    (INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI) = ZUNIK(ZRR,ZRI,GNU,IKFLG,int32(1),TOL,INIT,PHIR,PHII,ZETA1R,ZETA1I,ZETA2R,ZETA2I,SUMR,SUMI,CWRKR,CWRKI)
     CZR = -ZETA1R + ZETA2R
     CZI = -ZETA1I + ZETA2I
     @goto line160
     @label line150
-    (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,GNU,1,TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
+    (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,GNU,int32(1),TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
     CZR = -ZETA1R + ZETA2R
     CZI = -ZETA1I + ZETA2I
     AARG = ZABS(COMPLEX(ARGR,ARGI))
     @label line160
-    if KODE == 1
+    if KODE == int32(1)
         @goto line170
     end
     CZR = CZR - ZBR
@@ -207,7 +207,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
         return NUF
     end
     RCZ = RCZ + DLOG(APHI)
-    if IFORM == 2
+    if IFORM == int32(2)
         RCZ = (RCZ - 0.25 * DLOG(AARG)) - AIC
     end
     if RCZ > -ELIM
@@ -216,9 +216,9 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     @label line180
     YR[NN] = ZEROR
     YI[NN] = ZEROI
-    NN = NN - 1
-    NUF = NUF + 1
-    if NN == 0
+    NN = NN - int32(1)
+    NUF = NUF + int32(1)
+    if NN == int32(0)
         return NUF
     end
     @goto line140
@@ -227,7 +227,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     (STR,STI,IDUM) = ZLOG(PHIR,PHII,STR,STI,IDUM)
     CZR = CZR + STR
     CZI = CZI + STI
-    if IFORM == 1
+    if IFORM == int32(1)
         @goto line200
     end
     (STR,STI,IDUM) = ZLOG(ARGR,ARGI,STR,STI,IDUM)
@@ -239,11 +239,11 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     CZR = AX * DCOS(AY)
     CZI = AX * DSIN(AY)
     (NW,) = ZUCHK(CZR,CZI,NW,ASCLE,TOL)
-    if NW != 0
+    if NW != int32(0)
         @goto line180
     end
     return NUF
     @label line210
-    NUF = -1
+    NUF = int32(-1)
     return NUF
 end

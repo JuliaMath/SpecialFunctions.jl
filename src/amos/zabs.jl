@@ -1,11 +1,11 @@
 function ZABS(Z::Complex128)
-    __ZABS__::Float64 = 0
-    Q::Float64 = 0
-    S::Float64 = 0
-    U::Float64 = 0
-    V::Float64 = 0
-    ZI::Float64 = 0
-    ZR::Float64 = 0
+    __ZABS__::Float64 = zero(Float64)
+    Q::Float64 = zero(Float64)
+    S::Float64 = zero(Float64)
+    U::Float64 = zero(Float64)
+    V::Float64 = zero(Float64)
+    ZI::Float64 = zero(Float64)
+    ZR::Float64 = zero(Float64)
     ZR = real(Z)
     ZI = imag(Z)
     U = DABS(ZR)

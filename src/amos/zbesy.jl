@@ -1,59 +1,59 @@
-function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,CYR::AbstractArray{Float64},CYI::AbstractArray{Float64},NZ::Integer,CWRKR::AbstractArray{Float64},CWRKI::AbstractArray{Float64},IERR::Integer)
-    AA::Float64 = 0
-    ASCLE::Float64 = 0
-    ATOL::Float64 = 0
-    BB::Float64 = 0
-    C1I::Float64 = 0
-    C1R::Float64 = 0
-    C2I::Float64 = 0
-    C2R::Float64 = 0
-    ELIM::Float64 = 0
-    EXI::Float64 = 0
-    EXR::Float64 = 0
-    EY::Float64 = 0
-    HCII::Float64 = 0
-    I::Int32 = 0
-    K::Int32 = 0
-    K1::Int32 = 0
-    K2::Int32 = 0
-    NZ1::Int32 = 0
-    NZ2::Int32 = 0
-    RTOL::Float64 = 0
-    STI::Float64 = 0
-    STR::Float64 = 0
-    TAY::Float64 = 0
-    TOL::Float64 = 0
-    IERR = 0
-    NZ = 0
+function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::AbstractArray{Float64},CYI::AbstractArray{Float64},NZ::Int32,CWRKR::AbstractArray{Float64},CWRKI::AbstractArray{Float64},IERR::Int32)
+    AA::Float64 = zero(Float64)
+    ASCLE::Float64 = zero(Float64)
+    ATOL::Float64 = zero(Float64)
+    BB::Float64 = zero(Float64)
+    C1I::Float64 = zero(Float64)
+    C1R::Float64 = zero(Float64)
+    C2I::Float64 = zero(Float64)
+    C2R::Float64 = zero(Float64)
+    ELIM::Float64 = zero(Float64)
+    EXI::Float64 = zero(Float64)
+    EXR::Float64 = zero(Float64)
+    EY::Float64 = zero(Float64)
+    HCII::Float64 = zero(Float64)
+    I::Int32 = zero(Int32)
+    K::Int32 = zero(Int32)
+    K1::Int32 = zero(Int32)
+    K2::Int32 = zero(Int32)
+    NZ1::Int32 = zero(Int32)
+    NZ2::Int32 = zero(Int32)
+    RTOL::Float64 = zero(Float64)
+    STI::Float64 = zero(Float64)
+    STR::Float64 = zero(Float64)
+    TAY::Float64 = zero(Float64)
+    TOL::Float64 = zero(Float64)
+    IERR = int32(0)
+    NZ = int32(0)
     if ZR == 0.0 && ZI == 0.0
-        IERR = 1
+        IERR = int32(1)
     end
     if FNU < 0.0
-        IERR = 1
+        IERR = int32(1)
     end
-    if KODE < 1 || KODE > 2
-        IERR = 1
+    if KODE < int32(1) || KODE > int32(2)
+        IERR = int32(1)
     end
-    if N < 1
-        IERR = 1
+    if N < int32(1)
+        IERR = int32(1)
     end
-    if IERR != 0
+    if IERR != int32(0)
         return (NZ,IERR)
     end
     HCII = 0.5
-    (NZ1,IERR) = ZBESH(ZR,ZI,FNU,KODE,1,N,CYR,CYI,NZ1,IERR)
-    if IERR != 0 && IERR != 3
+    (NZ1,IERR) = ZBESH(ZR,ZI,FNU,KODE,int32(1),N,CYR,CYI,NZ1,IERR)
+    if IERR != int32(0) && IERR != int32(3)
         @goto line170
     end
-    (NZ2,IERR) = ZBESH(ZR,ZI,FNU,KODE,2,N,CWRKR,CWRKI,NZ2,IERR)
-    if IERR != 0 && IERR != 3
+    (NZ2,IERR) = ZBESH(ZR,ZI,FNU,KODE,int32(2),N,CWRKR,CWRKI,NZ2,IERR)
+    if IERR != int32(0) && IERR != int32(3)
         @goto line170
     end
     NZ = MIN0(NZ1,NZ2)
-    if KODE == 2
+    if KODE == int32(2)
         @goto line60
     end
-    for I = 1:N
+    for I = int32(1):N
         STR = CWRKR[I] - CYR[I]
         STI = CWRKI[I] - CYI[I]
         CYR[I] = -STI * HCII
@@ -83,10 +83,10 @@ function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,CYR
     C2R = EXR
     C2I = -EXI
     @label line70
-    NZ = 0
+    NZ = int32(0)
     RTOL = 1.0 / TOL
     ASCLE = D1MACH1 * RTOL * 1000.0
-    for I = 1:N
+    for I = int32(1):N
         AA = CWRKR[I]
         BB = CWRKI[I]
         ATOL = 1.0
@@ -114,7 +114,7 @@ function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,CYR
         CYR[I] = -STI * HCII
         CYI[I] = STR * HCII
         if STR == 0.0 && STI == 0.0 && EY == 0.0
-            NZ = NZ + 1
+            NZ = NZ + int32(1)
         end
         @label line80
     end
@@ -126,6 +126,6 @@ function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,CYR
     C2I = -EXI * EY
     @goto line70
     @label line170
-    NZ = 0
+    NZ = int32(0)
     return (NZ,IERR)
 end
