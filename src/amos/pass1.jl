@@ -58,6 +58,7 @@ type FortranRoutine
     types::Dict{Symbol,Symbol}
     dims::Dict{Symbol,Vector{Any}}
     locals::Set{Symbol}
+    globals::Vector{Expr}
 end
 
 const GLOBALS = Set([:D1MACH,:I1MACH])
@@ -166,7 +167,8 @@ function main()
         issubroutine = !(name in modifies)
 
         routines[name] = FortranRoutine(filename, ast, name, args, isdimargs, isoutargs,
-                                        issubroutine, calls, vartypes, vardims, Set{Symbol}())
+                                        issubroutine, calls, vartypes, vardims, Set{Symbol}(),
+                                        Expr[])
     end
 
     # figure out and initialize local vars
@@ -183,7 +185,9 @@ function main()
             t = routine.types[v]
             if haskey(routine.dims,v)
                 d = routine.dims[v]
-                e = :($v = Array($t,$(d...)))
+                gv = symbol("_$(name)_$v")
+                push!(routine.globals, :(const $gv = Array($t,$(d...))))
+                e = :(const $v = $gv)
             else
                 e = :($v::$t = 0)
             end
@@ -283,6 +287,9 @@ function main()
     for (_,routine) in routines
         fn = splitext(routine.filename)[1] * ".jl"
         open(fn,"w") do f
+            for g in routine.globals
+                println(f, g)
+            end
             println(f, routine.ast)
         end
     end

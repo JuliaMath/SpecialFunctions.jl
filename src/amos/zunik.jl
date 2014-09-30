@@ -1,7 +1,9 @@
+const _ZUNIK_CON = Array(Float64,2)
+const _ZUNIK_C = Array(Float64,120)
 function ZUNIK(ZRR::Float64,ZRI::Float64,FNU::Float64,IKFLG::Integer,IPMTR::Integer,TOL::Float64,INIT::Integer,PHIR::Float64,PHII::Float64,ZETA1R::Float64,ZETA1I::Float64,ZETA2R::Float64,ZETA2I::Float64,SUMR::Float64,SUMI::Float64,CWRKR::AbstractArray{Float64},CWRKI::AbstractArray{Float64})
     AC::Float64 = 0
-    C = Array(Float64,120)
-    CON = Array(Float64,2)
+    const C = _ZUNIK_C
+    const CON = _ZUNIK_CON
     CONEI::Float64 = 0
     CONER::Float64 = 0
     CRFNI::Float64 = 0

@@ -1,3 +1,5 @@
+const _ZBIRY_CYR = Array(Float64,2)
+const _ZBIRY_CYI = Array(Float64,2)
 function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BII::Float64,IERR::Integer)
     AA::Float64 = 0
     AD::Float64 = 0
@@ -17,8 +19,8 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Integer,KODE::Integer,BIR::Float64,BI
     CONER::Float64 = 0
     CSQI::Float64 = 0
     CSQR::Float64 = 0
-    CYI = Array(Float64,2)
-    CYR = Array(Float64,2)
+    const CYI = _ZBIRY_CYI
+    const CYR = _ZBIRY_CYR
     D1::Float64 = 0
     D2::Float64 = 0
     DIG::Float64 = 0

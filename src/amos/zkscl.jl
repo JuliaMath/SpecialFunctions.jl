@@ -1,3 +1,5 @@
+const _ZKSCL_CYR = Array(Float64,2)
+const _ZKSCL_CYI = Array(Float64,2)
 function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,RZR::Float64,RZI::Float64,ASCLE::Float64,TOL::Float64,ELIM::Float64)
     ACS::Float64 = 0
     ALAS::Float64 = 0
@@ -7,8 +9,8 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Integer,YR::AbstractArr
     CKR::Float64 = 0
     CSI::Float64 = 0
     CSR::Float64 = 0
-    CYI = Array(Float64,2)
-    CYR = Array(Float64,2)
+    const CYI = _ZKSCL_CYI
+    const CYR = _ZKSCL_CYR
     ELM::Float64 = 0
     FN::Float64 = 0
     HELIM::Float64 = 0

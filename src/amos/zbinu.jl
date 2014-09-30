@@ -1,7 +1,9 @@
+const _ZBINU_CWR = Array(Float64,2)
+const _ZBINU_CWI = Array(Float64,2)
 function ZBINU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,CYR::AbstractArray{Float64},CYI::AbstractArray{Float64},NZ::Integer,RL::Float64,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
     AZ::Float64 = 0
-    CWI = Array(Float64,2)
-    CWR = Array(Float64,2)
+    const CWI = _ZBINU_CWI
+    const CWR = _ZBINU_CWR
     DFNU::Float64 = 0
     I::Int32 = 0
     INW::Int32 = 0

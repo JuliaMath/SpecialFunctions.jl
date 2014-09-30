@@ -1,7 +1,14 @@
+const _ZUNI1_CYR = Array(Float64,2)
+const _ZUNI1_CYI = Array(Float64,2)
+const _ZUNI1_CWRKR = Array(Float64,16)
+const _ZUNI1_CWRKI = Array(Float64,16)
+const _ZUNI1_CSSR = Array(Float64,3)
+const _ZUNI1_CSRR = Array(Float64,3)
+const _ZUNI1_BRY = Array(Float64,3)
 function ZUNI1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,NLAST::Integer,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
     APHI::Float64 = 0
     ASCLE::Float64 = 0
-    BRY = Array(Float64,3)
+    const BRY = _ZUNI1_BRY
     C1R::Float64 = 0
     C2I::Float64 = 0
     C2M::Float64 = 0
@@ -9,12 +16,12 @@ function ZUNI1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     CONER::Float64 = 0
     CRSC::Float64 = 0
     CSCL::Float64 = 0
-    CSRR = Array(Float64,3)
-    CSSR = Array(Float64,3)
-    CWRKI = Array(Float64,16)
-    CWRKR = Array(Float64,16)
-    CYI = Array(Float64,2)
-    CYR = Array(Float64,2)
+    const CSRR = _ZUNI1_CSRR
+    const CSSR = _ZUNI1_CSSR
+    const CWRKI = _ZUNI1_CWRKI
+    const CWRKR = _ZUNI1_CWRKR
+    const CYI = _ZUNI1_CYI
+    const CYR = _ZUNI1_CYR
     FN::Float64 = 0
     I::Int32 = 0
     IFLAG::Int32 = 0

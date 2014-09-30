@@ -1,3 +1,5 @@
+const _ZACAI_CYR = Array(Float64,2)
+const _ZACAI_CYI = Array(Float64,2)
 function ZACAI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,RL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
     ARG::Float64 = 0
     ASCLE::Float64 = 0
@@ -10,8 +12,8 @@ function ZACAI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,MR::Integer,N:
     CSGNR::Float64 = 0
     CSPNI::Float64 = 0
     CSPNR::Float64 = 0
-    CYI = Array(Float64,2)
-    CYR = Array(Float64,2)
+    const CYI = _ZACAI_CYI
+    const CYR = _ZACAI_CYR
     DFNU::Float64 = 0
     FMR::Float64 = 0
     INU::Int32 = 0

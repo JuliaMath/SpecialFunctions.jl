@@ -1,3 +1,5 @@
+const _ZUOIK_CWRKR = Array(Float64,16)
+const _ZUOIK_CWRKI = Array(Float64,16)
 function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NUF::Integer,TOL::Float64,ELIM::Float64,ALIM::Float64)
     AARG::Float64 = 0
     AIC::Float64 = 0
@@ -11,8 +13,8 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,IKFLG::Integer
     AY::Float64 = 0
     BSUMI::Float64 = 0
     BSUMR::Float64 = 0
-    CWRKI = Array(Float64,16)
-    CWRKR = Array(Float64,16)
+    const CWRKI = _ZUOIK_CWRKI
+    const CWRKR = _ZUOIK_CWRKR
     CZI::Float64 = 0
     CZR::Float64 = 0
     FNN::Float64 = 0

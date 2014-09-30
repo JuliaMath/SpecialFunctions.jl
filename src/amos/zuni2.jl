@@ -1,3 +1,10 @@
+const _ZUNI2_CYR = Array(Float64,2)
+const _ZUNI2_CYI = Array(Float64,2)
+const _ZUNI2_CSSR = Array(Float64,3)
+const _ZUNI2_CSRR = Array(Float64,3)
+const _ZUNI2_CIPR = Array(Float64,4)
+const _ZUNI2_CIPI = Array(Float64,4)
+const _ZUNI2_BRY = Array(Float64,3)
 function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,NLAST::Integer,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
     AARG::Float64 = 0
     AIC::Float64 = 0
@@ -10,7 +17,7 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     ASCLE::Float64 = 0
     ASUMI::Float64 = 0
     ASUMR::Float64 = 0
-    BRY = Array(Float64,3)
+    const BRY = _ZUNI2_BRY
     BSUMI::Float64 = 0
     BSUMR::Float64 = 0
     C1R::Float64 = 0
@@ -19,15 +26,15 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     C2R::Float64 = 0
     CAR::Float64 = 0
     CIDI::Float64 = 0
-    CIPI = Array(Float64,4)
-    CIPR = Array(Float64,4)
+    const CIPI = _ZUNI2_CIPI
+    const CIPR = _ZUNI2_CIPR
     CONER::Float64 = 0
     CRSC::Float64 = 0
     CSCL::Float64 = 0
-    CSRR = Array(Float64,3)
-    CSSR = Array(Float64,3)
-    CYI = Array(Float64,2)
-    CYR = Array(Float64,2)
+    const CSRR = _ZUNI2_CSRR
+    const CSSR = _ZUNI2_CSSR
+    const CYI = _ZUNI2_CYI
+    const CYR = _ZUNI2_CYR
     DAII::Float64 = 0
     DAIR::Float64 = 0
     FN::Float64 = 0

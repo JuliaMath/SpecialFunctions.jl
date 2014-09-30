@@ -1,3 +1,9 @@
+const _ZBKNU_CYR = Array(Float64,2)
+const _ZBKNU_CYI = Array(Float64,2)
+const _ZBKNU_CSSR = Array(Float64,3)
+const _ZBKNU_CSRR = Array(Float64,3)
+const _ZBKNU_CC = Array(Float64,8)
+const _ZBKNU_BRY = Array(Float64,3)
 function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Integer,TOL::Float64,ELIM::Float64,ALIM::Float64)
     A1::Float64 = 0
     A2::Float64 = 0
@@ -8,11 +14,11 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     ASCLE::Float64 = 0
     BB::Float64 = 0
     BK::Float64 = 0
-    BRY = Array(Float64,3)
+    const BRY = _ZBKNU_BRY
     CAZ::Float64 = 0
     CBI::Float64 = 0
     CBR::Float64 = 0
-    CC = Array(Float64,8)
+    const CC = _ZBKNU_CC
     CCHI::Float64 = 0
     CCHR::Float64 = 0
     CELMR::Float64 = 0
@@ -28,11 +34,11 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Integer,N::Integer,YR:
     CSHR::Float64 = 0
     CSI::Float64 = 0
     CSR::Float64 = 0
-    CSRR = Array(Float64,3)
-    CSSR = Array(Float64,3)
+    const CSRR = _ZBKNU_CSRR
+    const CSSR = _ZBKNU_CSSR
     CTWOR::Float64 = 0
-    CYI = Array(Float64,2)
-    CYR = Array(Float64,2)
+    const CYI = _ZBKNU_CYI
+    const CYR = _ZBKNU_CYR
     CZEROI::Float64 = 0
     CZEROR::Float64 = 0
     CZI::Float64 = 0
