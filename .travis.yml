@@ -8,7 +8,7 @@ notifications:
   email: false
 env:
   matrix:
-    - JULIAVERSION="juliareleases"
+    #- JULIAVERSION="juliareleases"
     - JULIAVERSION="julianightlies"
 before_install:
   - curl http://julialang.org/install-julia.sh | sh -s $JULIAVERSION
