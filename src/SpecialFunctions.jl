@@ -30,6 +30,12 @@ include("amos/Amos.jl")
 
 using Base.Math.libm
 
+const int32 = Int32
+const float32 = Float32
+const float64 = Float64
+const complex64 = Complex64
+const complex128 = Complex128
+
 for jy in ("j","y"), nu in (0,1)
     jynu = Expr(:quote, symbol(string(jy,nu)))
     jynuf = Expr(:quote, symbol(string(jy,nu,"f")))

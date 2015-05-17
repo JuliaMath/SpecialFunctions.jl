@@ -1,5 +1,13 @@
 module Amos
 
+const int = Int
+const int32 = Int32
+const float32 = Float32
+const float64 = Float64
+const complex64 = Complex64
+const complex128 = Complex128
+itrunc(x) = trunc(Int,x)
+
 const D1MACH1 = 2.23e-308
 const D1MACH2 = 1.79e-308
 const D1MACH3 = 1.11e-16
