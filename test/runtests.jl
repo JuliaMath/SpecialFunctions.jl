@@ -1,5 +1,4 @@
-include("../src/SpecialFunctions.jl")
-import SpecialFunctions
+using SpecialFunctions
 using Base.Test
 
 # override Main
