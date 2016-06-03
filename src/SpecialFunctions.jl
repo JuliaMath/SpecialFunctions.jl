@@ -89,7 +89,7 @@ function airy(k::Int, z::Complex128)
     elseif k == 2 || k == 3
         return _biry(z, id, int32(1))
     else
-        error("invalid argument")
+        throw(ArgumentError("k must be between 0 and 3, got $k"))
     end
 end
 
@@ -119,7 +119,7 @@ function airyx(k::Int, z::Complex128)
     elseif k == 2 || k == 3
         return _biry(z, id, int32(2))
     else
-        error("invalid argument")
+        throw(ArgumentError("k must be between 0 and 3, got $k"))
     end
 end
 
