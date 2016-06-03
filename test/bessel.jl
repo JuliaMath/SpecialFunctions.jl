@@ -10,6 +10,9 @@ z = 1.8 + 1.0im
 @test_approx_eq SpecialFunctions.airyx(1, z) SpecialFunctions.airy(1, z) * exp(2/3 * z * sqrt(z))
 @test_approx_eq SpecialFunctions.airyx(2, z) SpecialFunctions.airy(2, z) * exp(-abs(real(2/3 * z * sqrt(z))))
 @test_approx_eq SpecialFunctions.airyx(3, z) SpecialFunctions.airy(3, z) * exp(-abs(real(2/3 * z * sqrt(z))))
+@test_approx_eq SpecialFunctions.airyx(1) 0.26351364474914013
+@test_throws ArgumentError SpecialFunctions.airy(4, 1)
+@test_throws ArgumentError SpecialFunctions.airyx(4, 1)
 
 # besselh
 true_h133 = 0.30906272225525164362 - 0.53854161610503161800im
