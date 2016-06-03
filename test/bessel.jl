@@ -75,6 +75,7 @@ y33 = SpecialFunctions.bessely(3,3.)
 @test_approx_eq SpecialFunctions.bessely(-3,3) -y33
 @test_approx_eq y33 -0.53854161610503161800
 @test_throws DomainError SpecialFunctions.bessely(3,-3)
+@test_throws DomainError SpecialFunctions.bessely(3, Float32(-3))
 @test_approx_eq SpecialFunctions.bessely(3,complex(-3)) 0.53854161610503161800 - 0.61812544451050328724im
 @test_throws SpecialFunctions.AmosException SpecialFunctions.bessely(200.5,0.1)
 
@@ -100,6 +101,7 @@ end
 @test_throws SpecialFunctions.AmosException SpecialFunctions.besseljx(-1, 0)
 @test SpecialFunctions.besselkx(1, 0) == Inf
 @test_throws SpecialFunctions.AmosException SpecialFunctions.besselyx(1, 0)
+@test_throws DomainError SpecialFunctions.besselyx(1, -1.0)
 
 # values from Abramowitz & Stegun, Table 10.11 (p475)
 #   x     Ai(x)         Ai'(x)       Bi(x)        Bi'(x)       x     Ai(x)         Ai'(x)       Bi(x)        Bi'(x)
