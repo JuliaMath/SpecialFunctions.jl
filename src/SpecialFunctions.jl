@@ -2,6 +2,10 @@ __precompile__()
 
 module SpecialFunctions
 
+using Compat
+
+import Base.Math: libm, nan_dom_err
+
 # export
 #     airy,
 #     airyai,
@@ -29,8 +33,6 @@ module SpecialFunctions
 #     hankelh2x
 
 include("amos/Amos.jl")
-
-import Base.Math: libm, nan_dom_err
 
 type AmosException <: Exception
     info::Int32
@@ -153,9 +155,9 @@ function airyx(k,x) end
 
 # besselj0, besselj1, bessely0, bessely1
 for jy in ("j","y"), nu in (0,1)
-    jynu = Expr(:quote, Symbol(jy,nu))
-    jynuf = Expr(:quote, Symbol(jy,nu,"f"))
-    bjynu = Symbol("bessel",jy,nu)
+    jynu = @compat Expr(:quote, Symbol(jy,nu))
+    jynuf = @compat Expr(:quote, Symbol(jy,nu,"f"))
+    bjynu = @compat Symbol("bessel",jy,nu)
     if jy == "y"
         @eval begin
             $bjynu(x::Float64) = nan_dom_err(ccall(($jynu,libm),  Float64, (Float64,), x), x)
@@ -169,7 +171,7 @@ for jy in ("j","y"), nu in (0,1)
     end
     @eval begin
         $bjynu(x::Real) = $bjynu(float(x))
-        $bjynu(x::Complex) = $(Symbol("bessel",jy))($nu,x)
+        $bjynu(x::Complex) = @compat $(Symbol("bessel",jy))($nu,x)
         @vectorize_1arg Number $bjynu
     end
 end
@@ -437,7 +439,7 @@ function besselyx(nu::Real, x::AbstractFloat)
 end
 
 for f in ("i", "ix", "j", "jx", "k", "kx", "y", "yx")
-    bfn = Symbol("bessel", f)
+    bfn = @compat Symbol("bessel", f)
     @eval begin
         $bfn(nu::Real, x::Real) = $bfn(nu, float(x))
         function $bfn(nu::Real, z::Complex)
