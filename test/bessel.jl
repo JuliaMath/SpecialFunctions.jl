@@ -10,9 +10,9 @@ const SF = SpecialFunctions
 @test_throws SF.AmosException SF.airybi(200)
 @test_throws ArgumentError SF.airy(5,one(Complex128))
 z = 1.8 + 1.0im
-for elty in [Complex64,Complex128]
-    @test SF.airy(convert(elty,1.8)) ≈ 0.0470362168668458052247
-    z = convert(elty,z)
+for (T,S) in zip([Complex64,Complex128], [Float32,Float64])
+    @test SF.airy(convert(T,1.8)) ≈ convert(S,0.0470362168668458052247)
+    z = convert(T,z)
     @test SF.airyx(z) ≈ SF.airyx(0,z)
     @test SF.airyx(0, z) ≈ SF.airy(0, z) * exp(2/3 * z * sqrt(z))
     @test SF.airyx(1, z) ≈ SF.airy(1, z) * exp(2/3 * z * sqrt(z))
