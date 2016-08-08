@@ -1,3 +1,5 @@
+__precompile__()
+
 module SpecialFunctions
 
 # export
@@ -488,3 +490,5 @@ Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
 @vectorize_2arg Number hankelh2x
+
+end # module
