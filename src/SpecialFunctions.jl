@@ -36,6 +36,11 @@ type AmosException <: Exception
     info::Int32
 end
 
+const cy1 = [0.]
+const cy2 = [0.]
+const wrk1 = [0.]
+const wrk2 = [0.]
+
 ## Airy functions
 
 let
