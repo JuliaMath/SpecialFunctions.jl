@@ -17,10 +17,10 @@ make = is_bsd() && !is_apple() ? "gmake" : "make"
 provides(Sources, URI("https://github.com/JuliaLang/openspecfun/archive/v$OSF_VERSION.tar.gz"),
          openspecfun, unpacked_dir="openspecfun-$OSF_VERSION")
 
-# if is_apple()
-#     using Homebrew
-#     provides(Homebrew.HB, "staticfloat/openspecfun", openspecfun, os=:Darwin)
-# end
+if is_apple()
+    using Homebrew
+    provides(Homebrew.HB, "staticfloat/juliadeps/openspecfun", openspecfun, os=:Darwin)
+end
 
 provides(BuildProcess, (@build_steps begin
     GetSources(openspecfun)

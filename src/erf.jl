@@ -1,4 +1,23 @@
-# This file is a part of Julia. License is MIT: http://julialang.org/license
+# This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
+
+using Base.Math: @horner, libm
+using Base.MPFR: ROUNDING_MODE
+
+for f in (:erf, :erfc)
+    @eval begin
+        ($f)(x::Float64) = ccall(($(string(f)),libm), Float64, (Float64,), x)
+        ($f)(x::Float32) = ccall(($(string(f,"f")),libm), Float32, (Float32,), x)
+        ($f)(x::Real) = ($f)(float(x))
+        ($f)(a::Float16) = Float16($f(Float32(a)))
+        ($f)(a::Complex32) = Complex32($f(Complex64(a)))
+        function ($f)(x::BigFloat)
+            z = BigFloat()
+            ccall(($(string(:mpfr_,f)), :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+            return z
+        end
+        ($f)(x::AbstractFloat) = error("not implemented for ", typeof(x))
+    end
+end
 
 for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
     fname = (f === :Dawson) ? :dawson : f
@@ -8,6 +27,7 @@ for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
         ($fname)(z::Complex) = ($fname)(Complex128(z))
     end
 end
+
 for f in (:erfcx, :erfi, :Dawson)
     fname = (f === :Dawson) ? :dawson : f
     @eval begin
@@ -17,6 +37,42 @@ for f in (:erfcx, :erfi, :Dawson)
     end
 end
 
+"""
+    erf(x)
+Compute the error function of `x`, defined by ``\\frac{2}{\\sqrt{\\pi}} \\int_0^x e^{-t^2} dt``
+for arbitrary complex `x`.
+"""
+erf
+
+"""
+    erfc(x)
+Compute the complementary error function of `x`, defined by ``1 - \\operatorname{erf}(x)``.
+"""
+erfc
+
+"""
+    erfcx(x)
+
+Compute the scaled complementary error function of `x`, defined by ``e^{x^2} \\operatorname{erfc}(x)``.
+Note also that ``\\operatorname{erfcx}(-ix)`` computes the Faddeeva function ``w(x)``.
+"""
+erfcx
+
+"""
+    erfi(x)
+
+Compute the imaginary error function of `x`, defined by ``-i \\operatorname{erf}(ix)``.
+"""
+erfi
+
+"""
+    dawson(x)
+
+Compute the Dawson function (scaled imaginary error function) of `x`, defined by
+``\\frac{\\sqrt{\\pi}}{2} e^{-x^2} \\operatorname{erfi}(x)``.
+"""
+dawson
+
 # Compute the inverse of the error function: erf(erfinv(x)) == x,
 # using the rational approximants tabulated in:
 #     J. M. Blair, C. A. Edwards, and J. H. Johnson, "Rational Chebyshev
@@ -24,6 +80,11 @@ end
 #     pp. 827--830 (1976).
 #         http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7
 #         http://www.jstor.org/stable/2005402
+"""
+    erfinv(x)
+
+Compute the inverse error function of a real `x`, defined by ``\\operatorname{erf}(\\operatorname{erfinv}(x)) = x``.
+"""
 function erfinv(x::Float64)
     a = abs(x)
     if a >= 1.0
@@ -139,6 +200,12 @@ erfinv(x::Integer) = erfinv(float(x))
 
 # Inverse complementary error function: use Blair tables for y = 1-x,
 # exploiting the greater accuracy of y (vs. x) when y is small.
+"""
+    erfcinv(x)
+
+Compute the inverse error complementary function of a real `x`, defined by
+``\\operatorname{erfc}(\\operatorname{erfcinv}(x)) = x``.
+"""
 function erfcinv(y::Float64)
     if y > 0.0625
         return erfinv(1.0 - y)

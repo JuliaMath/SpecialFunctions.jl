@@ -1,4 +1,6 @@
-# This file is a part of Julia. License is MIT: http://julialang.org/license
+# This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
+
+using Base.Math: nan_dom_err
 
 type AmosException <: Exception
     info::Int32
@@ -118,6 +120,12 @@ for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
     else
         @eval $afn(x::Real) = real($afn(complex(float(x))))
     end
+end
+
+function airyai(x::BigFloat)
+    z = BigFloat()
+    ccall((:mpfr_ai, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    return z
 end
 
 ## Bessel functions
@@ -466,6 +474,71 @@ for bfn in (:besselh, :besselhx)
         $bfn{T<:AbstractFloat}(nu::T, k::Integer, z::Complex{T}) = throw(MethodError($bfn,(nu,k,z)))
         $bfn(nu::Float32, k::Integer, x::Complex64) = Complex64($bfn(Float64(nu), k, Complex128(x)))
     end
+end
+
+"""
+    besselj0(x)
+
+Bessel function of the first kind of order 0, ``J_0(x)``.
+"""
+function besselj0(x::BigFloat)
+    z = BigFloat()
+    ccall((:mpfr_j0, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    return z
+end
+
+"""
+    besselj1(x)
+
+Bessel function of the first kind of order 1, ``J_1(x)``.
+"""
+function besselj1(x::BigFloat)
+    z = BigFloat()
+    ccall((:mpfr_j1, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    return z
+end
+
+function besselj(n::Integer, x::BigFloat)
+    z = BigFloat()
+    ccall((:mpfr_jn, :libmpfr), Int32, (Ptr{BigFloat}, Clong, Ptr{BigFloat}, Int32), &z, n, &x, ROUNDING_MODE[])
+    return z
+end
+
+"""
+    bessely0(x)
+
+Bessel function of the second kind of order 0, ``Y_0(x)``.
+"""
+function bessely0(x::BigFloat)
+    if x < 0
+        throw(DomainError())
+    end
+    z = BigFloat()
+    ccall((:mpfr_y0, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    return z
+end
+
+"""
+    bessely1(x)
+
+Bessel function of the second kind of order 1, ``Y_1(x)``.
+"""
+function bessely1(x::BigFloat)
+    if x < 0
+        throw(DomainError())
+    end
+    z = BigFloat()
+    ccall((:mpfr_y1, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    return z
+end
+
+function bessely(n::Integer, x::BigFloat)
+    if x < 0
+        throw(DomainError())
+    end
+    z = BigFloat()
+    ccall((:mpfr_yn, :libmpfr), Int32, (Ptr{BigFloat}, Clong, Ptr{BigFloat}, Int32), &z, n, &x, ROUNDING_MODE[])
+    return z
 end
 
 """

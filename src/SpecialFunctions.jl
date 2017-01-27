@@ -2,8 +2,11 @@ __precompile__()
 
 module SpecialFunctions
 
-# On other versions these are exported from Base
+# On older versions these are exported from Base
+# TODO: Uncomment me once these have been removed!
 # if VERSION >= v"0.6.0-dev.XXXX"
+#     const openspecfun = "libopenspecfun"
+#
 #     export
 #         airyai,
 #         airyaiprime,
@@ -27,13 +30,25 @@ module SpecialFunctions
 #         bessely0,
 #         bessely1,
 #         besselyx,
+#         dawson,
+#         erf,
+#         erfc,
+#         erfcinv,
+#         erfcx,
+#         erfi,
+#         erfinv,
 #         eta,
+#         digamma,
+#         invdigamma,
+#         polygamma,
+#         trigamma,
 #         hankelh1,
 #         hankelh1x,
 #         hankelh2,
 #         hankelh2x,
-#         polygamma,
 #         zeta
+# else
+#     const openspecfun = Base.Math.openspecfun
 # end
 
 include("bessel.jl")

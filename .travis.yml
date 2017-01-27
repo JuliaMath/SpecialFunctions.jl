@@ -1,7 +1,15 @@
 language: julia
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          packages:
+            - gcc-6
+            - g++-6
+            - gfortran-6
+    - os: osx
+      osx_image: xcode8
 julia:
   - 0.5
   - nightly
