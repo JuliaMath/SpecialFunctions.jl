@@ -1,0 +1,15 @@
+language: julia
+os:
+  - linux
+  - osx
+julia:
+  - 0.5
+  - nightly
+notifications:
+  email: false
+#script: # the default script is equivalent to the following
+#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+#  - julia -e 'Pkg.clone(pwd()); Pkg.build("SpecialFunctions"); Pkg.test("SpecialFunctions"; coverage=true)';
+after_success:
+  - julia -e 'cd(Pkg.dir("SpecialFunctions")); Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))';
+  - julia -e 'cd(Pkg.dir("SpecialFunctions")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
