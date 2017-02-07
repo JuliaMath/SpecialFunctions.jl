@@ -1,5 +1,9 @@
 # Functions
 
+```@meta
+CurrentModule = SpecialFunctions
+```
+
 ```@docs
 SpecialFunctions.erf
 SpecialFunctions.erfc
@@ -39,6 +43,5 @@ SpecialFunctions.besselix
 SpecialFunctions.besselk
 SpecialFunctions.besselkx
 SpecialFunctions.eta
-SpecialFunctions.zeta(::Complex)
-SpecialFunctions.zeta(::Any, ::Any)
+SpecialFunctions.zeta
 ```

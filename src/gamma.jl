@@ -14,7 +14,7 @@ using Base.MPFR: ROUNDING_MODE, big_ln2
 """
     digamma(x)
 
-Compute the digamma function of `x` (the logarithmic derivative of [`gamma(x)`](@ref)).
+Compute the digamma function of `x` (the logarithmic derivative of `gamma(x)`).
 """
 function digamma(z::Union{Float64,Complex{Float64}})
     # Based on eq. (12), without looking at the accompanying source
@@ -54,7 +54,7 @@ end
 """
     trigamma(x)
 
-Compute the trigamma function of `x` (the logarithmic second derivative of [`gamma(x)`](@ref)).
+Compute the trigamma function of `x` (the logarithmic second derivative of `gamma(x)`).
 """
 function trigamma(z::Union{Float64,Complex{Float64}})
     # via the derivative of the Kölbig digamma formulation
@@ -317,7 +317,7 @@ end
     polygamma(m, x)
 
 Compute the polygamma function of order `m` of argument `x` (the `(m+1)th` derivative of the
-logarithm of [`gamma(x)`](@ref))
+logarithm of `gamma(x)`)
 """
 function polygamma(m::Integer, z::Union{Float64,Complex{Float64}})
     m == 0 && return digamma(z)
