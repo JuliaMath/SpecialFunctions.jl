@@ -13,7 +13,7 @@ makedocs(
 )
 
 deploydocs(
-    repo = "https://github.com/JuliaMath/SpecialFunctions.jl.git",
+    repo = "github.com/JuliaMath/SpecialFunctions.jl.git",
     target = "build",
     deps = nothing,
     make = nothing,
