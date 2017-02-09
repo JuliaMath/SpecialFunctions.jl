@@ -58,5 +58,6 @@ module SpecialFunctions
 include("bessel.jl")
 include("erf.jl")
 include("gamma.jl")
+include("deprecated.jl")
 
 end # module
