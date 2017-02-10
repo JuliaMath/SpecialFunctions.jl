@@ -1,6 +1,5 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using Base.Math: signflip, f16, f32, f64
 using Base.MPFR: ROUNDING_MODE, big_ln2
 
 typealias ComplexOrReal{T} Union{T,Complex{T}}
@@ -80,6 +79,9 @@ function trigamma(z::ComplexOrReal{Float64})
     # the coefficients here are Float64(bernoulli[2:9])
     ψ += t*w * @evalpoly(w,0.16666666666666666,-0.03333333333333333,0.023809523809523808,-0.03333333333333333,0.07575757575757576,-0.2531135531135531,1.1666666666666667,-7.092156862745098)
 end
+
+signflip(m::Number, z) = (-1+0im)^m * z
+signflip(m::Integer, z) = iseven(m) ? z : -z
 
 # (-1)^m d^m/dz^m cot(z) = p_m(cot z), where p_m is a polynomial
 # that satisfies the recurrence p_{m+1}(x) = p_m′(x) * (1 + x^2).
