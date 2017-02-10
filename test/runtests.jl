@@ -456,8 +456,8 @@ end
 end
 
 @testset "Base Julia issue #17474" begin
-    @test SF.f64(complex(1f0,1f0)) == complex(1.0, 1.0)
-    @test SF.f64(1f0) == 1.0
+    @test SF.f64(complex(1f0,1f0)) === complex(1.0, 1.0)
+    @test SF.f64(1f0) === 1.0
 
     @test typeof(SF.eta(big"2")) == BigFloat
     @test typeof(SF.zeta(big"2")) == BigFloat
