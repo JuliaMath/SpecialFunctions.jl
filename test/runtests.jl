@@ -454,3 +454,35 @@ end
         @test typeof(SF.erfc(a)) == BigFloat
     end
 end
+
+@testset "Base Julia issue #17474" begin
+    @test SF.f64(complex(1f0,1f0)) === complex(1.0, 1.0)
+    @test SF.f64(1f0) === 1.0
+
+    @test typeof(SF.eta(big"2")) == BigFloat
+    @test typeof(SF.zeta(big"2")) == BigFloat
+    @test typeof(SF.digamma(big"2")) == BigFloat
+
+    @test_throws MethodError SF.trigamma(big"2")
+    @test_throws MethodError SF.trigamma(big"2.0")
+    @test_throws MethodError SF.invdigamma(big"2")
+    @test_throws MethodError SF.invdigamma(big"2.0")
+
+    @test_throws MethodError SF.eta(Complex(big"2"))
+    @test_throws MethodError SF.eta(Complex(big"2.0"))
+    @test_throws MethodError SF.zeta(Complex(big"2"))
+    @test_throws MethodError SF.zeta(Complex(big"2.0"))
+    @test_throws MethodError SF.zeta(1.0,big"2")
+    @test_throws MethodError SF.zeta(1.0,big"2.0")
+    @test_throws MethodError SF.zeta(big"1.0",2.0)
+    @test_throws MethodError SF.zeta(big"1",2.0)
+
+
+    @test typeof(SF.polygamma(3, 0x2)) == Float64
+    @test typeof(SF.polygamma(big"3", 2f0)) == Float32
+    @test typeof(SF.zeta(1, 2.0)) == Float64
+    @test typeof(SF.zeta(1, 2f0)) == Float64 # BitIntegers result in Float64 returns
+    @test typeof(SF.zeta(2f0, complex(2f0,0f0))) == Complex{Float32}
+    @test typeof(SF.zeta(complex(1,1), 2f0)) == Complex{Float64}
+    @test typeof(SF.zeta(complex(1), 2.0)) == Complex{Float64}
+end
