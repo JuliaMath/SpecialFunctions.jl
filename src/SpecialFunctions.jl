@@ -10,7 +10,9 @@ if VERSION >= v"0.6.0-dev.2767"
                      besseljx, besselk, besselkx, bessely, bessely0, bessely1, besselyx,
                      hankelh1, hankelh1x, hankelh2, hankelh2x,
                      dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv,
-                     eta, digamma, invdigamma, polygamma, trigamma, zeta
+                     eta, digamma, invdigamma, polygamma, trigamma, zeta,
+                     # deprecated
+                     airy, airyx, airyprime
     else
         export
             airyai,
