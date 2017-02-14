@@ -2,7 +2,7 @@
 
 using Base.MPFR: ROUNDING_MODE, big_ln2
 
-typealias ComplexOrReal{T} Union{T,Complex{T}}
+@compat ComplexOrReal{T} = Union{T,Complex{T}}
 
 # Bernoulli numbers B_{2k}, using tabulated numerators and denominators from
 # the online encyclopedia of integer sequences.  (They actually have data

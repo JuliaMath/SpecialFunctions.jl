@@ -2,6 +2,8 @@ __precompile__()
 
 module SpecialFunctions
 
+using Compat
+
 if VERSION >= v"0.6.0-dev.2767"
     if isdefined(Base, :airyai)
         import Base: airyai, airyaix, airyaiprime, airyaiprimex,
