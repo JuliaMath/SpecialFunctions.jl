@@ -43,7 +43,7 @@ function LegendreP2(n::Integer,m::Integer,x::Number)
           dblfac=j*dblfac  
           end
    
-    pj2= ((-1)^m)*dblfac*(1-x*x)^(m/2)   
+    pj2= ((-1)^m)*dblfac*(one(x)-x*x)^(m/2)   
         pj1=x*(2.*m+1.)*pj2  
     if n == m
         return pj2
@@ -81,7 +81,7 @@ function LegendreP3(n::Integer,m::Integer,z::Number)
           end
     
     
-    pj2=dblfac*(z*z -1.)^(m/2)
+    pj2=dblfac*(z*z - one(z))^(m/2)
         pj1=z*(2.*m+1.)*pj2  
     
     if n==m 
