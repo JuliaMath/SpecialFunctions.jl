@@ -55,7 +55,11 @@ if VERSION >= v"0.6.0-dev.2767"
             hankelh1x,
             hankelh2,
             hankelh2x,
-            zeta
+            zeta,
+            Li,
+            polylog,
+            bernoulli,
+            harmonic
     end
 end
 
@@ -69,5 +73,9 @@ include("bessel.jl")
 include("erf.jl")
 include("gamma.jl")
 include("deprecated.jl")
+
+include("harmonic.jl")
+include("bernoulli.jl")
+include("li.jl")
 
 end # module
