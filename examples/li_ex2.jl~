@@ -4,7 +4,6 @@
 
 using Plots; plotlyjs()
 default(show = true) # shouldn't need display commands
-theme(:solarized_light)
 
 using SpecialFunctions
 const SF = SpecialFunctions
@@ -25,4 +24,15 @@ end
 sleep(1)
 savefig("li_ex.pdf")
 
+
+# one of the figures from https://en.wikipedia.org/wiki/Polylogarithm
+step = 0.01
+xs = -2.0 : step : 2.0
+ys = -2.0 : step : 2.0
+Z = [Complex(x, y) for x in xs, y in ys]'
+tic()
+L = SF.Li.(-2,Z)
+theTime = toc()
+heatmap(xs, ys, angle(L),
+        size = (800, 800), reuse=false)
 

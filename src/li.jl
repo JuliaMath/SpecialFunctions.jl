@@ -31,7 +31,7 @@
            similar to Maximon
            
   Of these the only one that actually specifies a full algorithm is
-  Crandall, and it also treats special cases more carefully, so this
+  Crandall, and he also treats special cases more carefully, so this
   is the one that I have paid most attention to. However, extending it
   for s on the whole complex plane requires some additions, and many
   of these are actually most nicely documented on the wikipedia page
@@ -128,6 +128,7 @@ polylog(s::Number, z::Number ) = Li(s, z)
      
 # Dirichlet beta function, for testing results
 #   https://en.wikipedia.org/wiki/Dirichlet_beta_function
+#   but don't export as it would create confusion with Euler integral     
 function Dbeta(s::Number)
     β = 4.0^(-s) * ( zeta(s,0.25) - zeta(s,0.75) )
 end
