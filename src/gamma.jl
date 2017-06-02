@@ -321,7 +321,7 @@ end
 """
     hurwitz_zeta(s, z)
 
-    An alias for zeta(s, z)
+An alias for zeta(s, z)
 """
 hurwitz_zeta(s::ComplexOrReal{Float64}, z::ComplexOrReal{Float64}) = zeta(s, z)
 
