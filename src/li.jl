@@ -142,7 +142,8 @@ function Li_direct(s::Number, z::Number, accuracy=1.0e-18)
         warn("Slow convergence for  |z| > 1/2")
     end
     total = 0.0
-    L = ceil(-log10(accuracy)*log2(10)) # summation limit from Crandall, which is conservative
+    L = ceil(-log10(accuracy)*log2(10)) # summation limit from Crandall, which is conservative, but based on real s
+    tmp = z;
     for n=1:L
         a = z^n / n^s
         total += a
@@ -158,10 +159,10 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
     if abs(μ) > 2*pi
         throw(DomainError())
     end
-    L = Int(ceil(-log10(accuracy)*log2(10))) # summation limit from Crandall, which is conservative
+    L = Int(ceil(-log10(accuracy)*log2(10))) # summation limit from Crandall, which is conservative, but based on real s
     if isinteger(s)
         n = Int(round(s))
-        if n>0
+        if n>1
             # Crandall's 1.4 for s integer
             total = μ^(n-1)*(harmonic(n-1) - log(-μ))/gamma(n)
             # println("   μ=$μ, total = $total")
@@ -177,9 +178,13 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
                 total -= A
             end
             # println("   μ=$μ, total = $total")
+        elseif n==1
+            total = -log(Complex(1-z))
         elseif n==0
-            total = z ./ (1-z)
-        elseif n<0
+            total = z / (1-z)
+        elseif n==-1
+            total = z / (1-z)^2
+        elseif n<-1
             # Crandall's 1.5 for s integer 
             total = factorial(-n) * (-μ)^(n-1)
             for k=0:L
