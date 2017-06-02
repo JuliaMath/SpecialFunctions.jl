@@ -14,6 +14,11 @@ abserrc(z, x) = max(abserr(real(z),real(x)), abserr(imag(z),imag(x)))
 ≒(a,b) = abserrc(a,b) ≤ 1e-13
 
 @testset "Bernoulli polynomials and numbers" begin
+    @testset "    errors" begin
+        @test_throws DomainError SF.bernoulli(-1)
+        @test_throws DomainError SF.bernoulli(-1, 0.0)
+    end
+
     @testset "    consistency" begin
         for i=0:34
             @test Float64(SF.bernoulli(i)) ≈ SF.bernoulli(i, 0.0)
