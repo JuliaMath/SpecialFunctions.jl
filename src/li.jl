@@ -97,9 +97,11 @@ function Li(s::Number, z::Number, accuracy::Real=1.0e-18)
         return -(-1.0)^s .*Li_direct(s, 1/z, accuracy)
     elseif  abs(z) >= 1/T
         # use inversion formula to calculate in terms of Li_s(1/z)
-        G = (2*pi*im).^s .* zeta( 1-s, 0.5 - log(-1/complex(z))/(2*pi*im) ) ./  gamma(s)
-        F = complex(-1.0)^s .* Li_direct(s, 1/z, accuracy)
-        A = 2*pi*im*log(complex(z))^(s-1)/(gamma(s))
+        z = convert(Complex{Float64}, z)
+        G = (2*pi*im)^s * zeta( 1-s, 0.5 + log(-z)/(2*pi*im) ) /  gamma(s)
+        F = complex(-1.0)^s * Li_direct(s, 1/z, accuracy)
+
+        A = 2*pi*im*log(z)^(s-1)/(gamma(s))
         if ( isreal(z) && real(z)>=1 )
             Θ = 1
         else
@@ -148,18 +150,21 @@ function Li_direct(s::Number, z::Number, accuracy=1.0e-18)
         total += a
         a *= z * ( n/(n+1.0) )^s
         # println("   total = $total")
+        if abs(a)/abs(total) < 1.0e-30
+            break
+        end
     end
     return total
 end
 
 function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
     # calculate using power series around μ = log(z) = 0
-    μ = log(complex(z))
+    μ = log(convert(Complex{Float64}, z))
     # println("μ = $μ") 
     if abs(μ) > 2*pi
         throw(DomainError())
     end
-    L = Int(ceil(-log10(accuracy)*log2(10))) # summation limit from Crandall, which is conservative, but based on real s
+    L = Int(ceil(-log10(accuracy)*log2(10))) # revisit this limit
     if isinteger(s)
         n = Int(round(s))
         if n>1
@@ -174,6 +179,9 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
                 end
                 # println("   m=$m, total = $total, tmp=$tmp, ctmp=$(μ^m /gamma(m+1))")
                 tmp *= μ/(m+1)
+                if abs(tmp)/abs(total) < 1.0e-30
+                    break
+                end
             end
             # println("   μ=$μ, total = $total")
             A = 2*pi*im*log(complex(z))^(s-1)/gamma(n)
@@ -182,7 +190,7 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
             end
             # println("   μ=$μ, total = $total")
         elseif n==1
-            total = -log(Complex(1-z))
+            total = -log(complex(1-z))
         elseif n==0
             total = z / (1-z)
         elseif n==-1
@@ -195,6 +203,9 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
                 # total -= μ^k * bernoulli(k-n+1, 0.0) / ( gamma(k+1)*(k-n+1) )
                 total -= tmp * bernoulli(k-n+1, 0.0) / (k-n+1)
                 tmp *= μ/(k+1)
+                if abs(tmp)/abs(total) < 1.0e-30
+                    break
+                end
            end
         else
             error("Should not get this case")
@@ -202,12 +213,18 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
     else
         # equivalent of Crandalls 1.4 for s non-integer 
         total = gamma(1-s) * (-μ)^(s-1)
+        # println("   μ=$μ, total = $total")
         tmp = 1
         for k=0:L
             # total += μ^k * zeta(s-k)/factorial(Float64(k))
             total += tmp * zeta(s-k)
+            # println("      tmp=$(tmp* zeta(s-k)),  total = $total")
             tmp *= μ/(k+1)
+            if abs(tmp)/abs(total) < 1.0e-30
+                break
+            end
         end
+        
         A = 2*pi*im*log(complex(z))^(s-1)/(gamma(s))
         if isreal(z) && real(z)>=1 
             total -= A

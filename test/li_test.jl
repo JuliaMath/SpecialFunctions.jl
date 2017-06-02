@@ -3,6 +3,15 @@ using Base.Test
 
 const SF = SpecialFunctions
 
+# test functions, see runtests.jl
+relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
+relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
+≅(a,b) = relerrc(a,b) ≤ 1e-13
+
+# test functions, similar to runtests.jl, but can't do relative error when some values are zero
+abserr(z, x) = z == x ? 0.0 : abs(z - x)
+abserrc(z, x) = max(abserr(real(z),real(x)), abserr(imag(z),imag(x)))
+≒(a,b) = abserrc(a,b) ≤ 1e-13
 
 # golden ratio is used in some tests
 ϕ = (sqrt(5)+1)/2.0
@@ -22,9 +31,11 @@ const SF = SpecialFunctions
     end
 
     @testset "Test s = n (a real integer)" begin
-        # simple case
+        # simple cases
         @test SF.Li(1, 0.5) ≈ log(2)
-
+        @test !isfinite( SF.Li(1, 1.0) )
+        @test SF.Li(1, 2) ≒ -pi*im # comes from -log(complex(1-2))
+    
         @testset "   dilogarithm for real z" begin
             @test SF.Li(2,-1.0) ≈ -pi^2/12.0
             @test SF.Li(2, 0.0) ≈ 0.0
@@ -98,6 +109,9 @@ const SF = SpecialFunctions
                 @test SF.Li(s,  im) ≈  - 2.0.^(-s).*SF.eta.(s) + im*SF.Dbeta.(s) 
             end
         end
+
+        # the singularity
+        @test !isfinite( SF.Li(0.5, 1.0) )
     end
 
     @testset "Additional Identities" begin
