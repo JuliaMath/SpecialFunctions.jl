@@ -143,10 +143,10 @@ function Li_direct(s::Number, z::Number, accuracy=1.0e-18)
     end
     total = 0.0
     L = ceil(-log10(accuracy)*log2(10)) # summation limit from Crandall, which is conservative, but based on real s
-    tmp = z;
+    a = z;
     for n=1:L
-        a = z^n / n^s
         total += a
+        a *= z * ( n/(n+1.0) )^s
         # println("   total = $total")
     end
     return total
@@ -166,11 +166,14 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
             # Crandall's 1.4 for s integer
             total = μ^(n-1)*(harmonic(n-1) - log(-μ))/gamma(n)
             # println("   μ=$μ, total = $total")
+            tmp = 1
             for m=0:L
                 if n - m != 1
-                    total += μ^m * zeta(n - m) / gamma(m+1)
+                    # total += μ^m * zeta(n - m) / gamma(m+1)
+                    total += tmp * zeta(n - m)
                 end
-                # println("   m=$m, total = $total")
+                # println("   m=$m, total = $total, tmp=$tmp, ctmp=$(μ^m /gamma(m+1))")
+                tmp *= μ/(m+1)
             end
             # println("   μ=$μ, total = $total")
             A = 2*pi*im*log(complex(z))^(s-1)/gamma(n)
@@ -187,17 +190,23 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
         elseif n<-1
             # Crandall's 1.5 for s integer 
             total = factorial(-n) * (-μ)^(n-1)
+            tmp = 1
             for k=0:L
-                total -= μ^k * bernoulli(k-n+1, 0.0) / ( gamma(k+1)*(k-n+1) )
-            end
+                # total -= μ^k * bernoulli(k-n+1, 0.0) / ( gamma(k+1)*(k-n+1) )
+                total -= tmp * bernoulli(k-n+1, 0.0) / (k-n+1)
+                tmp *= μ/(k+1)
+           end
         else
             error("Should not get this case")
         end
     else
         # equivalent of Crandalls 1.4 for s non-integer 
         total = gamma(1-s) * (-μ)^(s-1)
+        tmp = 1
         for k=0:L
-            total += μ^k * zeta(s-k)/factorial(Float64(k))
+            # total += μ^k * zeta(s-k)/factorial(Float64(k))
+            total += tmp * zeta(s-k)
+            tmp *= μ/(k+1)
         end
         A = 2*pi*im*log(complex(z))^(s-1)/(gamma(s))
         if isreal(z) && real(z)>=1 
