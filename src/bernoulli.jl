@@ -1,17 +1,10 @@
 #
 # Bernoulli numbers (as rationals up to B_{34}) and Bernoulli polynomials
-# The alg. for the latter could use some optimisation, as
-#    (1) the choice of domains for the different approaches was a bit arbitrary
-#    (2) the errors start to creep up for larger n, looks roughly like 1 order per increase in n of 5
-#
 
 """
     bernoulli(n)
 
- created: 	Tue May 23 2017 
- email:   	matthew.roughan@adelaide.edu.au
-
- Calculates (first-kind or NIST) Bernoulli numbers,  B_n (or at least the first 35 of them)
+ Calculates the first 34 Bernoulli numbers B_n  (of the first-kind or NIST type) 
  e.g., see
 
  + http://mathworld.wolfram.com/BernoulliNumber.html
@@ -21,7 +14,10 @@
  N.B. Bernoulli numbers of second kind only seem to differ in that B_1 = + 1/2 (instead of -1/2)
 
 ## Arguments
-* `n::Integer`: the index into the series, n=0,1,2,3,...
+* `n::Integer`: the index into the series, n=0,1,2,3,...,34 (for larger n use ``bernoulli(n,0.0)`` )
+
+ We only provide the 1st 34 as beyond this, we can't return Int64 rationals, so best to compute
+ the real approximation using ``bernoulli(n,0.0)``
 
 ## Examples
 ```jldoctest
@@ -33,11 +29,10 @@ function bernoulli(n::Int)
     # this just does a lookup -- seemed like it would be easier to code and faster
     # for the size of numbers I am working with
     if n<0
-        warn("n should be > 0")
         throw(DomainError)
     end
     if n>34
-        warn("If n > 34, then the numerator needs Int128 at least, and worse, so this code is not the code you want. Try using bernoulli(n, 0.0) to get a floating point approximation to the result.")
+        # warn("If n > 34, then the numerator needs Int128 at least, and worse, so this code is not the code you want. Try using bernoulli(n, 0.0) to get a floating point approximation to the result.")
         throw(DomainError)
     end
 
@@ -67,8 +62,10 @@ end
  (c) M Roughan, 2017
 
  Calculates Bernoulli polynomials from the Hurwitz-zeta function using
-            ``ζ(-n,x) = -B_{n+1}(x)/(n+1), for Re(x)>0 ``
- Its probably not the fastest approach, but we get it almost for free.
+
+```ζ(-n,x) = -B_{n+1}(x)/(n+1), for Re(x)>0,```
+
+ which is faster than direct calculation of the polynomial except for n<=4.
 
  e.g., see
  
@@ -87,7 +84,6 @@ julia> bernoulli(6, 1.2)
 """
 function bernoulli(n::Int, x::Real)
     if n<0
-        warn("n should be > 0")
         throw(DomainError)
     end
     if n == 0
@@ -100,15 +96,21 @@ function bernoulli(n::Int, x::Real)
         return x^3 - 1.5*x^2 + 0.5*x
     elseif n == 4
         return x^4 - 2.0*x^3 +     x^2 - 1/30.0
-    elseif n == 5
-        return x^5 - 2.5*x^4 +(5.0/3.0)*x^3 - x/6.0
+    # elseif n == 5
+    #     return x^5 - 2.5*x^4 +(5.0/3.0)*x^3 - x/6.0 # this isn't faster than just doing the zeta directly
     end
 
-    if n <= 34
-        # direct summation for reasonably small values of coefficients
-        k = 0:n
-        return sum( binomial.(n,k) .* bernoulli.(k) .* x.^(n-k) )
-    elseif x > 0
+    # direct summation is slower than the zeta function below, even for small n
+    # if n <= 34
+    #     # direct summation for reasonably small values of coefficients
+    #     total = 0.0
+    #     for k=0:n
+    #         total +=  binomial.(n,k) .* bernoulli.(k) .* x.^(n-k)
+    #     end
+    #     return total
+    # else
+
+    if x > 0
         return -n*zeta(1-n, x)
     else
         # comments in the gamma.jl note that identity with zeta(s,z) only works for Re(z)>0

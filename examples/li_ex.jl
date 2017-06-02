@@ -1,7 +1,5 @@
 # do plots of the Li function,
 
-
-
 using Plots
 plotlyjs()
 
