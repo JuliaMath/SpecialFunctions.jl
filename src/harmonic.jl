@@ -15,7 +15,10 @@ julia> harmonic(2)
 """
 function harmonic(n::Integer)
     # γ = euler_mascheroni_const = 0.577215664901532860606512090082402431042 # http://oeis.org/A001620
-    if n <=10
+    if n <= 0
+        throw(DomainError())
+    end
+    if n <= 10
         # get exact values for small n
         total = 0.0
         for k=1:n
@@ -49,6 +52,9 @@ julia> harmonic(2,1)
 """
 function harmonic(n::Integer, r::Real)
     total = 0.0
+    if n <= 0
+        throw(DomainError())
+    end
     for k=1:n
         total +=  1.0 / k^r
     end

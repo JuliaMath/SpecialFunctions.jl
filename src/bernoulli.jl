@@ -29,11 +29,11 @@ function bernoulli(n::Int)
     # this just does a lookup -- seemed like it would be easier to code and faster
     # for the size of numbers I am working with
     if n<0
-        throw(DomainError)
+        throw(DomainError())
     end
     if n>34
         # warn("If n > 34, then the numerator needs Int128 at least, and worse, so this code is not the code you want. Try using bernoulli(n, 0.0) to get a floating point approximation to the result.")
-        throw(DomainError)
+        throw(DomainError())
     end
 
     # Denominator of Bernoulli number B_n
@@ -56,10 +56,6 @@ end
 # 
 """
     bernoulli(n, x)
-
- created: 	Tue May 23 2017 
- email:   	matthew.roughan@adelaide.edu.au
- (c) M Roughan, 2017
 
  Calculates Bernoulli polynomials from the Hurwitz-zeta function using
 
@@ -84,7 +80,7 @@ julia> bernoulli(6, 1.2)
 """
 function bernoulli(n::Int, x::Real)
     if n<0
-        throw(DomainError)
+        throw(DomainError())
     end
     if n == 0
         return 1 # zeta formula doesn't hold for n=0, so return explicit value

@@ -34,4 +34,9 @@ const SF = SpecialFunctions
         end
     end
     
+    @testset "    errors" begin
+        @test_throws DomainError SF.harmonic(-1)
+        @test_throws DomainError SF.harmonic(0)
+        @test_throws DomainError SF.harmonic(0, 1.2)
+    end
 end

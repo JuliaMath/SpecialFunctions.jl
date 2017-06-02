@@ -136,8 +136,7 @@ end
 function Li_direct(s::Number, z::Number, accuracy=1.0e-18)
     # calculate using direct definition
     if abs(z) > 1 || ( abs(z) ≈ 1  && real(s) <= 2)
-        warn("Should have |z| < 1 or (|z|==1 and Re(s)>2)")
-        throw(DomainError)
+        throw(DomainError())
     end
     if abs(z) > 1/2
         warn("Slow convergence for  |z| > 1/2")
@@ -157,8 +156,7 @@ function Li_series_mu(s::Number, z::Number, accuracy=1.0e-18)
     μ = log(complex(z))
     # println("μ = $μ") 
     if abs(μ) > 2*pi
-        warn("Should have |μ| < 2*pi, but |μ| = $(abs(μ))")
-        throw(DomainError)
+        throw(DomainError())
     end
     L = Int(ceil(-log10(accuracy)*log2(10))) # summation limit from Crandall, which is conservative
     if isinteger(s)

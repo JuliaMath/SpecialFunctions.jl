@@ -3,6 +3,16 @@ using Base.Test
 
 const SF = SpecialFunctions
 
+# test functions, see runtests.jl
+relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
+relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
+≅(a,b) = relerrc(a,b) ≤ 1e-13
+
+# test functions, similar to runtests.jl, but can't do relative error when some values are zero
+abserr(z, x) = z == x ? 0.0 : abs(z - x)
+abserrc(z, x) = max(abserr(real(z),real(x)), abserr(imag(z),imag(x)))
+≒(a,b) = abserrc(a,b) ≤ 1e-13
+
 @testset "Bernoulli polynomials and numbers" begin
     @testset "    consistency" begin
         for i=0:34
@@ -39,14 +49,14 @@ const SF = SpecialFunctions
             for n=1:9
                 # println("   n = $n, x = $x")
                 # start to get errors of order 1.0e-14 for n=5, 1.0e-13 around n=10, ...
-                @test abs( SF.bernoulli(n, 1-x) - (-1.0)^n * SF.bernoulli(n, x) ) < 1.0e-13
-                @test abs( SF.bernoulli(n, x+1) - SF.bernoulli(n, x) - n*x^(n-1) )  < 1.0e-13
-                @test abs( (-1)^n * SF.bernoulli(n, -x) -  SF.bernoulli(n, x) - n*x^(n-1) ) < 1.0e-13
+                @test SF.bernoulli(n, 1-x)  ≒   (-1.0)^n * SF.bernoulli(n, x)
+                @test SF.bernoulli(n, x+1)  ≒   SF.bernoulli(n, x) + n*x^(n-1)
+                @test (-1)^n * SF.bernoulli(n, -x)   ≒   SF.bernoulli(n, x) + n*x^(n-1) 
 
                 # Raabe (1851)
                 m = 6.0
                 k = 0:m-1
-                @test abs(  sum( SF.bernoulli.(n, x + k/m ) )/m - m^(-n)*SF.bernoulli(n, m*x )  ) < 1.0e-13
+                @test sum( SF.bernoulli.(n, x + k/m ) )/m   ≒   m^(-n)*SF.bernoulli(n, m*x )  
                 
             end
         end
