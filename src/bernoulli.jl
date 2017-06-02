@@ -96,8 +96,8 @@ function bernoulli(n::Int, x::Real)
         return x^3 - 1.5*x^2 + 0.5*x
     elseif n == 4
         return x^4 - 2.0*x^3 +     x^2 - 1/30.0
-    # elseif n == 5
-    #     return x^5 - 2.5*x^4 +(5.0/3.0)*x^3 - x/6.0 # this isn't faster than just doing the zeta directly
+    elseif n == 5
+         return x^5 - 2.5*x^4 +(5.0/3.0)*x^3 - x/6.0
     end
 
     # direct summation is slower than the zeta function below, even for small n
