@@ -126,6 +126,16 @@ function Dbeta(s::Number)
     β = 4.0^(-s) * ( zeta(s,0.25) - zeta(s,0.75) )
 end
     
+function polylog_zeta(s::Number, z::Number, accuracy=1.0e-18)
+    # compute using the Hurwitz-zeta function identity
+    twopi = 2π
+    x = im * (log(complex(-z)) / twopi)
+    ss = 1-s
+    ip = im^ss
+    return ( gamma(ss)/twopi^(ss) ) * (ip * zeta(ss, 0.5-x) + conj(ip) * zeta(ss, 0.5+x))
+end
+
+    
 function polylog_direct(s::Number, z::Number, accuracy=1.0e-18)
     # calculate using direct definition
     if abs(z) > 1 || ( abs(z) ≈ 1  && real(s) <= 2)
@@ -201,8 +211,16 @@ function polylog_series_mu(s::Number, z::Number, accuracy=1.0e-18)
         else
             error("Should not get this case")
         end
+
+    # should have a case in here for when s is close to a real, positive integer
+    # seed Wood 9.4    
+    # elseif abs(s - round(real(s))) < 0.01 # not sure where the right cut off is
+       
+        
+    # could also use Wood 14.1 (square formula) to extend the range over which we sum directly - maybe???
+        
     else
-        # equivalent of Crandalls 1.4 for s non-integer 
+        # equivalent of Crandalls 1.4 for s non-integer, Wood (9.3)
         total = gamma(1-s) * (-μ)^(s-1)
         # println("   μ=$μ, total = $total")
         tmp = 1

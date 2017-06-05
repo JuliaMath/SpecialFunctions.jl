@@ -33,7 +33,9 @@ for line in eachline(f)
         z = parse(Float64, v[3]) + im*parse(Float64, v[4])
         L = parse(Float64, v[5]) + im*parse(Float64, v[6])
         L2 = SF.polylog(s,z,1.0e-18)
-        diff = L - L2
+        L3 = SF.polylog_zeta(s,z)
+        diff = L - L2 
+        diff3 = L - L3
         rel_diff = complex(real(diff)/real(L),  imag(diff)/imag(L))
         
         push!(S, s)
@@ -42,7 +44,7 @@ for line in eachline(f)
         push!(rel_errors, rel_diff)
 
         # println("  L = $L,  L2 =$L2,  diff = $diff,  \t\t rel diff = $rel_diff")
-        println("  s=$s, z=$z, |error|=$(ceil(log10(abs(diff))))")
+        println("  s=$s, z=$z, |error|=$(ceil(log10(abs(diff)))), |error3|=$(ceil(log10(abs(diff3))))")
     end
 end
 
