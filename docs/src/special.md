@@ -12,6 +12,8 @@ SpecialFunctions.erfi
 SpecialFunctions.dawson
 SpecialFunctions.erfinv
 SpecialFunctions.erfcinv
+SpecialFunctions.sinint
+SpecialFunctions.cosint
 SpecialFunctions.digamma
 SpecialFunctions.invdigamma
 SpecialFunctions.trigamma

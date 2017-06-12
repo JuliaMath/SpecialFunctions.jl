@@ -59,6 +59,9 @@ if VERSION >= v"0.6.0-dev.2767"
     end
 end
 
+export sinint,
+       cosint
+
 if isdefined(Base.Math, :openspecfun)
     const openspecfun = Base.Math.openspecfun
 else
@@ -67,6 +70,7 @@ end
 
 include("bessel.jl")
 include("erf.jl")
+include("sincosint.jl")
 include("gamma.jl")
 include("deprecated.jl")
 
