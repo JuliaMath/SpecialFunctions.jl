@@ -5,6 +5,12 @@ using Base.Test
 
 const SF = SpecialFunctions
 
+# useful test functions for relative error, which differ from isapprox
+# in that relerrc separately looks at the real and imaginary parts
+relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
+relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
+≅(a,b) = relerrc(a,b) ≤ 1e-13
+
 @testset "error functions" begin
     @test SF.erf(Float16(1)) ≈ 0.84270079294971486934
     @test SF.erf(1) ≈ 0.84270079294971486934
@@ -53,9 +59,9 @@ end
     sinintvals = [0.9460830703671830149, 1.605412976802694849, 1.848652527999468256, 1.75820313894905306, 1.54993124494467414, 1.4246875512805065, 1.4545966142480936, 1.5741868217069421, 1.665040075829602, 1.658347594218874, 1.578306806945727416, 1.504971241526373371, 1.499361722862824564, 1.556211050077665054, 1.618194443708368739, 1.631302268270032886, 1.590136415870701122, 1.536608096861185462, 1.518630031769363932, 1.548241701043439840]
     cosintvals = [0.3374039229009681347, 0.4229808287748649957, 0.119629786008000328, -0.14098169788693041, -0.19002974965664388, -0.06805724389324713, 0.07669527848218452, 0.122433882532010, 0.0553475313331336, -0.045456433004455, -0.08956313549547997948, -0.04978000688411367560, 0.02676412556403455504, 0.06939635592758454727, 0.04627867767436043960, -0.01420019012019002240, -0.05524268226081385053, -0.04347510299950100478, 0.00515037100842612857, 0.04441982084535331654]
     for x in 1:20
-        @test SF.sinint(x) ≈ sinintvals[x]
-        @test SF.sinint(-x) ≈ -sinintvals[x]
-        @test SF.cosint(x) ≈ cosintvals[x]
+        @test SF.sinint(x) ≅ sinintvals[x]
+        @test SF.sinint(-x) ≅ -sinintvals[x]
+        @test SF.cosint(x) ≅ cosintvals[x]
     end
 
     @test SF.sinint(1.f0) == Float32(SF.sinint(1.0))
@@ -66,6 +72,16 @@ end
 
     @test SF.sinint(1//2) == SF.sinint(0.5)
     @test SF.cosint(1//2) == SF.cosint(0.5)
+
+    @test SF.sinint(1e300) ≅ SF.pidiv2
+    @test SF.cosint(1e300) ≅ -8.17881912115908554103E-301
+    @test SF.sinint(1e-300) ≅ 1.0E-300
+    @test SF.cosint(1e-300) ≅ -690.1983122333121
+
+    @test SF.sinint(Inf) == SF.pidiv2
+    @test SF.cosint(Inf) == 0.0
+    @test isnan(SF.sinint(NaN))
+    @test isnan(SF.cosint(NaN))
 
     @test_throws ErrorException SF.sinint(big(1.0))
     @test_throws ErrorException SF.cosint(big(1.0))
@@ -282,12 +298,6 @@ end
         end
     end
 end
-
-# useful test functions for relative error, which differ from isapprox
-# in that relerrc separately looks at the real and imaginary parts
-relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
-relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
-≅(a,b) = relerrc(a,b) ≤ 1e-13
 
 @testset "gamma and friends" begin
     @testset "digamma" begin
