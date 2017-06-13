@@ -5,8 +5,7 @@ import Base.Math: @horner
 # This program computes the sine integral ∫_0^x sin(t)/t dt using the rational approximations of A.J. MacLeod, Numer. Algor., 12:259--272, 1996.
 function sinint(x::Float64)
     t = x*x
-    absx = abs(x)
-    if absx ≤ 6.0
+    if t ≤ 36.0
         return x * @horner(t, 1.00000000000000000000E0,
                              -0.44663998931312457298E-1,
                               0.11209146443112369449E-2,
@@ -23,9 +22,10 @@ function sinint(x::Float64)
                               0.10378561511331814674E-11,
                               0.13754880327250272679E-14,
                               0.10223981202236205703E-17)
-    elseif absx ≤ 12.0
+    elseif t ≤ 144.0
         invt = inv(t)
-        return sign(x)*pidiv2 - cos(x) * @horner(invt, 0.99999999962173909991E0,
+        return copysign(pidiv2, x) - cos(x) *
+                                         @horner(invt, 0.99999999962173909991E0,
                                                        0.36451060338631902917E3,
                                                        0.44218548041288440874E5,
                                                        0.22467569405961151887E7,
@@ -59,9 +59,9 @@ function sinint(x::Float64)
                                                        0.54570971054996441467E11,
                                                        0.18241750166645704670E12,
                                                        0.15407148148861454434E12)
-    elseif absx < Inf
+    elseif t < Inf
         invt = inv(t)
-        return sign(x) * pidiv2 - cos(x) / x * (1.0 -
+        return copysign(pidiv2, x) - cos(x) / x * (1.0 -
                                                 @horner(invt, 0.19999999999999978257E1,
                                                               0.22206119380434958727E4,
                                                               0.84749007623988236808E6,
@@ -99,7 +99,7 @@ function sinint(x::Float64)
     elseif isnan(x)
         return NaN
     else
-        return sign(x) * pidiv2
+        return copysign(pidiv2, x)
     end
 end
 
