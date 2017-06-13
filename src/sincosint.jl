@@ -2,8 +2,8 @@ const pidiv2 = π/2
 
 import Base.Math: @horner
 
-# Compute the sine integral: ∫_0^x sin(t)/t dt
-# and the cosine integral: γ + log x + ∫_0^x (cos(t)-1)/t dt
+# Compute the sine integral: ∫_0^x sin(t)/t dt,
+# and the cosine integral: γ + log x + ∫_0^x (cos(t)-1)/t dt,
 # using the rational approximants tabulated in:
 #     A.J. MacLeod, "Rational approximations, software and test methods for
 #     sine and cosine integrals," Numer. Algor. 12, pp. 259--272 (1996).
