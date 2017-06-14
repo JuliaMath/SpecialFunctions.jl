@@ -73,12 +73,12 @@ end
     @test SF.sinint(1//2) == SF.sinint(0.5)
     @test SF.cosint(1//2) == SF.cosint(0.5)
 
-    @test SF.sinint(1e300) ≅ SF.pidiv2
+    @test SF.sinint(1e300) ≅ π/2
     @test SF.cosint(1e300) ≅ -8.17881912115908554103E-301
     @test SF.sinint(1e-300) ≅ 1.0E-300
     @test SF.cosint(1e-300) ≅ -690.1983122333121
 
-    @test SF.sinint(Inf) == SF.pidiv2
+    @test SF.sinint(Inf) == π/2
     @test SF.cosint(Inf) == 0.0
     @test isnan(SF.sinint(NaN))
     @test isnan(SF.cosint(NaN))
