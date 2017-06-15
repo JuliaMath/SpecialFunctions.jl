@@ -35,7 +35,7 @@ function sinint(x::Float64)
                               0.13754880327250272679E-14,
                               0.10223981202236205703E-17)
     elseif t ≤ 144.0
-        invt = 1.0/t
+        invt = inv(t)
         return copysign(π/2, x) - cos(x) *
                                          @horner(invt, 0.99999999962173909991E0,
                                                        0.36451060338631902917E3,
@@ -72,7 +72,7 @@ function sinint(x::Float64)
                                                        0.18241750166645704670E12,
                                                        0.15407148148861454434E12)
     elseif t < Inf
-        invt = 1.0/t
+        invt = inv(t)
         return copysign(π/2, x) - cos(x) / x * (1.0 -
                                                 @horner(invt, 0.19999999999999978257E1,
                                                               0.22206119380434958727E4,
@@ -153,7 +153,7 @@ function cosint(x::Float64)
                                                    0.37718676301688932926E-12,
                                                    0.27706844497155995398E-15)
     elseif x ≤ 12.0
-        invt = 1.0/t
+        invt = inv(t)
         return sin(x) * @horner(invt, 0.99999999962173909991E0,
                                       0.36451060338631902917E3,
                                       0.44218548041288440874E5,
@@ -189,7 +189,7 @@ function cosint(x::Float64)
                                       0.18241750166645704670E12,
                                       0.15407148148861454434E12)
     elseif x < Inf
-        invt = 1.0/t
+        invt = inv(t)
         return sin(x)/x * (1.0 - @horner(invt, 0.19999999999999978257E1,
                                                0.22206119380434958727E4,
                                                0.84749007623988236808E6,
