@@ -243,6 +243,7 @@ end
 
 """
     sinint(x)
+
 Compute the sine integral function of `x`, defined by ``\\operatorname{Si}(x) := \\int_0^x\\frac{\\sin t}{t} dt``
 for real `x`.
 """
@@ -250,7 +251,8 @@ sinint
 
 """
     cosint(x)
+
 Compute the cosine integral function of `x`, defined by ``\\operatorname{Ci}(x) := \\gamma + \\log x + \\int_0^x \\frac{\\cos t - 1}{t} dt``
-for real `x > 0`.
+for real `x > 0`, where ``\\gamma`` is the Euler-Mascheroni constant.
 """
 cosint
