@@ -1,8 +1,8 @@
 # SpecialFunctions.jl
 
-Special mathematical functions in Julia, including Bessel, Hankel, Airy, error, Dawson, eta, zeta,
-digamma, inverse digamma, trigamma, and polygamma functions.
-These functions were formerly part of Base.
+Special mathematical functions in Julia, including Bessel, Hankel, Airy, error, Dawson, sine and cosine integrals,
+eta, zeta, digamma, inverse digamma, trigamma, and polygamma functions.
+Most of these functions were formerly part of Base.
 
 [![Travis](https://travis-ci.org/JuliaMath/SpecialFunctions.jl.svg?branch=master)](https://travis-ci.org/JuliaMath/SpecialFunctions.jl)
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/ccfgkm2cjcggu158/branch/master?svg=true)](https://ci.appveyor.com/project/ararslan/specialfunctions-jl/branch/master)

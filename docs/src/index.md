@@ -13,6 +13,8 @@ libraries.
 | [`erfi(x)`](@ref SpecialFunctions.erfi)                       | imaginary error function defined as `-im * erf(x * im)`, where `im` is the imaginary unit                                                                       |
 | [`erfcx(x)`](@ref SpecialFunctions.erfcx)                     | scaled complementary error function, i.e. accurate `exp(x^2) * erfc(x)` for large `x`                                                                           |
 | [`dawson(x)`](@ref SpecialFunctions.dawson)                   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate `exp(-x^2) * erfi(x) * sqrt(pi) / 2` for large `x`                                       |
+| [`sinint(x)`](@ref SpecialFunctions.sinint)                   | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
+| [`cosint(x)`](@ref SpecialFunctions.cosint)                   | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
 | [`digamma(x)`](@ref SpecialFunctions.digamma)                 | [digamma function](https://en.wikipedia.org/wiki/Digamma_function) (i.e. the derivative of `lgamma` at `x`)                                                     |
 | [`eta(x)`](@ref SpecialFunctions.eta)                         | [Dirichlet eta function](https://en.wikipedia.org/wiki/Dirichlet_eta_function) at `x`                                                                           |
 | [`zeta(x)`](@ref SpecialFunctions.zeta)                       | [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function) at `x`                                                                             |
@@ -51,7 +53,7 @@ from the Julia REPL.
 
 ## Note
 
-Prior to Julia 0.6, these functions were available in Julia's Base module.
+Prior to Julia 0.6, most of these functions were available in Julia's Base module.
 Because of this, the symbols from this package are not exported on Julia 0.5
 to avoid name conflicts.
 In this case, the symbols will need to be explicitly imported or called
