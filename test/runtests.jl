@@ -282,7 +282,7 @@ end
         @testset "Error throwing" begin
             @test_throws SF.AmosException SF.hankelh1x(1, 0)
             @test_throws SF.AmosException SF.hankelh2x(1, 0)
-            @test_throws SF.AmosException SF.besselix(-1, 0)
+            @test_throws SF.AmosException SF.besselix(-1.01, 0)
             @test_throws SF.AmosException SF.besseljx(-1, 0)
             @test_throws SF.AmosException SF.besselyx(1, 0)
             @test_throws DomainError SF.besselix(0.4,-1.0)
