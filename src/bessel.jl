@@ -272,7 +272,11 @@ end
 
 function besseli(nu::Float64, z::Complex128)
     if nu < 0
-        return _besseli(-nu,z,Int32(1)) - 2_besselk(-nu,z,Int32(1))*sinpi(nu)/pi
+        if sinpi(nu) == 0
+            return _besseli(-nu,z,Int32(1))
+        else
+            return _besseli(-nu,z,Int32(1)) - 2_besselk(-nu,z,Int32(1))*sinpi(nu)/pi
+        end
     else
         return _besseli(nu,z,Int32(1))
     end
@@ -280,7 +284,11 @@ end
 
 function besselix(nu::Float64, z::Complex128)
     if nu < 0
-        return _besseli(-nu,z,Int32(2)) - 2_besselk(-nu,z,Int32(2))*exp(-abs(real(z))-z)*sinpi(nu)/pi
+        if sinpi(nu) == 0
+            return _besseli(-nu,z,Int32(2))
+        else
+            return _besseli(-nu,z,Int32(2)) - 2_besselk(-nu,z,Int32(2))*exp(-abs(real(z))-z)*sinpi(nu)/pi
+        end
     else
         return _besseli(nu,z,Int32(2))
     end
