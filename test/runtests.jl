@@ -161,6 +161,11 @@ end
         @test SF.besseli(3,-3) ≈ -true_i33
         @test SF.besseli(-3,-3) ≈ -true_i33
         @test SF.besseli(Float32(-3),Complex64(-3,0)) ≈ -true_i33
+        for i in [-5 -3 -1 1 3 5]
+            @test SF.besseli(i,0) == 0.0
+            @test SF.besseli(i,Float32(0)) == 0
+            @test SF.besseli(i,Complex64(0)) == 0
+        end
         @testset "Error throwing" begin
             @test_throws SF.AmosException SF.besseli(1,1000)
             @test_throws DomainError SF.besseli(0.4,-1.0)
@@ -172,11 +177,10 @@ end
     end
     @testset "besselj" begin
         @test SF.besselj(0,0) == 1
-        for i = 1:5
+        for i in [-5 -3 -1 1 3 5]
             @test SF.besselj(i,0) == 0
-            @test SF.besselj(-i,0) == 0
-            @test SF.besselj(-i,Float32(0)) == 0
-            @test SF.besselj(-i,Float32(0)) == 0
+            @test SF.besselj(i,Float32(0)) == 0
+            @test SF.besselj(i,Complex64(0)) == 0
         end
 
         j33 = SF.besselj(3,3.)
@@ -279,11 +283,19 @@ end
             z == zero(z) || @test SF.besselyx(nu, z) ≈ SF.bessely(nu, z) * exp(-abs(imag(z)))
         end
         @test SF.besselkx(1, 0) == Inf
+        for i = [-5 -3 -1 1 3 5]
+            @test SF.besseljx(i,0) == 0
+            @test SF.besselix(i,0) == 0
+            @test SF.besseljx(i,Float32(0)) == 0
+            @test SF.besselix(i,Float32(0)) == 0
+            @test SF.besseljx(i,Complex64(0)) == 0
+            @test SF.besselix(i,Complex64(0)) == 0
+        end
         @testset "Error throwing" begin
             @test_throws SF.AmosException SF.hankelh1x(1, 0)
             @test_throws SF.AmosException SF.hankelh2x(1, 0)
             @test_throws SF.AmosException SF.besselix(-1.01, 0)
-            @test_throws SF.AmosException SF.besseljx(-1, 0)
+            @test_throws SF.AmosException SF.besseljx(-1.01, 0)
             @test_throws SF.AmosException SF.besselyx(1, 0)
             @test_throws DomainError SF.besselix(0.4,-1.0)
             @test_throws DomainError SF.besseljx(0.4, -1.0)
