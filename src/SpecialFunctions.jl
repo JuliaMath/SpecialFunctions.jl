@@ -5,7 +5,7 @@ module SpecialFunctions
 using Compat
 
 if VERSION >= v"0.6.0-dev.2767"
-    if isdefined(Base, :airyai)
+    if isdefined(Base, :airyai) && VERSION < v"0.7.0-DEV.986" #22763
         import Base: airyai, airyaix, airyaiprime, airyaiprimex,
                      airybi, airybix, airybiprime, airybiprimex,
                      besselh, besselhx, besseli, besselix, besselj, besselj0, besselj1,
