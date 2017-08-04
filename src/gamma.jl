@@ -2,7 +2,7 @@
 
 using Base.MPFR: ROUNDING_MODE, big_ln2
 
-@compat ComplexOrReal{T} = Union{T,Complex{T}}
+const ComplexOrReal{T} = Union{T,Complex{T}}
 
 # Bernoulli numbers B_{2k}, using tabulated numerators and denominators from
 # the online encyclopedia of integer sequences.  (They actually have data
@@ -127,7 +127,7 @@ function cotderiv(m::Integer, z)
     isinf(imag(z)) && return zero(z)
     if m <= 0
         m == 0 && return π * cot(π*z)
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     if m <= length(cotderiv_Q)
         q = cotderiv_Q[m]
@@ -235,7 +235,7 @@ function zeta(s::ComplexOrReal{Float64}, z::ComplexOrReal{Float64})
             end
             x > 0 && imag(z) == 0 && imag(s) == 0 && return oftype(ζ, Inf)
         end
-        throw(DomainError()) # nothing clever to return
+        throw(DomainErrorNoArgs) # nothing clever to return
     end
     if isnan(x)
         if imag(z)==0 && imag(s)==0
@@ -338,8 +338,8 @@ function polygamma(m::Integer, z::ComplexOrReal{Float64})
     # here works in this case.  m < 0 polygamma is called a
     # "negapolygamma" function in the literature, and there are
     # multiple possible definitions arising from different integration
-    # constants. We throw a DomainError() since the definition is unclear.
-    real(m) < 0 && throw(DomainError())
+    # constants. We throw a DomainError since the definition is unclear.
+    real(m) < 0 && throw(DomainErrorNoArgs)
 
     s = Float64(m+1)
     # It is safe to convert any integer (including `BigInt`) to a float here

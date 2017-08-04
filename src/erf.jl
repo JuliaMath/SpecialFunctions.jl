@@ -93,7 +93,7 @@ function erfinv(x::Float64)
         elseif x == -1.0
             return -Inf
         end
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     elseif a <= 0.75 # Table 17 in Blair et al.
         t = x*x - 0.5625
         return x * @horner(t, 0.16030_49558_44066_229311e2,
@@ -161,7 +161,7 @@ function erfinv(x::Float32)
         elseif x == -1.0f0
             return -Inf32
         end
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     elseif a <= 0.75f0 # Table 10 in Blair et al.
         t = x*x - 0.5625f0
         return x * @horner(t, -0.13095_99674_22f2,
@@ -213,7 +213,7 @@ function erfcinv(y::Float64)
         if y == 0.0
             return Inf
         end
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     elseif y >= 1e-100 # Table 57 in Blair et al.
         t = 1.0 / sqrt(-log(y))
         return @horner(t, 0.10501_31152_37334_38116e-3,
@@ -265,7 +265,7 @@ function erfcinv(y::Float32)
         if y == 0.0f0
             return Inf32
         end
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     else # Table 50 in Blair et al.
         t = 1.0f0 / sqrt(-log(y))
         return @horner(t, 0.15504_70003_116f0,

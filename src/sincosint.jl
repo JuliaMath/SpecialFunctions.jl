@@ -120,7 +120,7 @@ function cosint(x::Float64)
     r01, r02 = 0.6162109375, 0.29454812071623379711E-3
     r11, r12 = 3.3837890625, 0.39136005118642639785E-3
     if x < 0.0
-        return throw(DomainError())
+        throw(DomainErrorNoArgs)
     elseif x ≤ 3.0
         return log(x/r0) + ((x - r01) - r02) * (x + r0) *
                                        @horner(t, -0.24607411378767540707E0,
