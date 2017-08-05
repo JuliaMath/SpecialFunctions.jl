@@ -2,7 +2,7 @@
 
 using Base.Math: nan_dom_err
 
-type AmosException <: Exception
+struct AmosException <: Exception
     info::Int32
 end
 
@@ -112,11 +112,11 @@ for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
             :airyaix, :airyaiprimex, :airybix, :airybiprimex)
     @eval begin
         $afn(z::Complex) = $afn(float(z))
-        $afn{T<:AbstractFloat}(z::Complex{T}) = throw(MethodError($afn,(z,)))
+        $afn(z::Complex{<:AbstractFloat}) = throw(MethodError($afn,(z,)))
         $afn(z::Complex64) = Complex64($afn(Complex128(z)))
     end
     if afn in (:airyaix, :airyaiprimex)
-        @eval $afn(x::Real) = x < 0 ? throw(DomainError()) : real($afn(complex(float(x))))
+        @eval $afn(x::Real) = x < 0 ? throw(DomainErrorNoArgs) : real($afn(complex(float(x))))
     else
         @eval $afn(x::Real) = real($afn(complex(float(x))))
     end
@@ -312,13 +312,13 @@ besselkx(nu::Float64, z::Complex128) = _besselk(abs(nu), z, Int32(2))
 
 function bessely(nu::Cint, x::Float64)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     ccall((:yn, libm), Float64, (Cint, Float64), nu, x)
 end
 function bessely(nu::Cint, x::Float32)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     ccall((:ynf, libm), Float32, (Cint, Float32), nu, x)
 end
@@ -346,7 +346,7 @@ Modified Bessel function of the first kind of order `nu`, ``I_\\nu(x)``.
 """
 function besseli(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     real(besseli(float(nu), complex(x)))
 end
@@ -358,7 +358,7 @@ Scaled modified Bessel function of the first kind of order `nu`, ``I_\\nu(x) e^{
 """
 function besselix(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     real(besselix(float(nu), complex(x)))
 end
@@ -374,7 +374,7 @@ function besselj(nu::Real, x::AbstractFloat)
             return besselj(Cint(nu), x)
         end
     elseif x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     real(besselj(float(nu), complex(x)))
 end
@@ -386,7 +386,7 @@ Scaled Bessel function of the first kind of order `nu`, ``J_\\nu(x) e^{- | \\ope
 """
 function besseljx(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     real(besseljx(float(nu), complex(x)))
 end
@@ -398,7 +398,7 @@ Modified Bessel function of the second kind of order `nu`, ``K_\\nu(x)``.
 """
 function besselk(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     elseif x == 0
         return oftype(x, Inf)
     end
@@ -412,7 +412,7 @@ Scaled modified Bessel function of the second kind of order `nu`, ``K_\\nu(x) e^
 """
 function besselkx(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     elseif x == 0
         return oftype(x, Inf)
     end
@@ -426,7 +426,7 @@ Bessel function of the second kind of order `nu`, ``Y_\\nu(x)``.
 """
 function bessely(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     elseif isinteger(nu) && typemin(Cint) <= nu <= typemax(Cint)
         return bessely(Cint(nu), x)
     end
@@ -441,7 +441,7 @@ Scaled Bessel function of the second kind of order `nu`,
 """
 function besselyx(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     real(besselyx(float(nu), complex(x)))
 end
@@ -454,7 +454,7 @@ for f in ("i", "ix", "j", "jx", "k", "kx", "y", "yx")
             Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
             $bfn(Tf(nu), Complex{Tf}(z))
         end
-        $bfn{T<:AbstractFloat}(k::T, z::Complex{T}) = throw(MethodError($bfn,(k,z)))
+        $bfn(k::T, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(k,z)))
         $bfn(nu::Float32, x::Complex64) = Complex64($bfn(Float64(nu), Complex128(x)))
     end
 end
@@ -471,7 +471,7 @@ for bfn in (:besselh, :besselhx)
             $bfn(Tf(nu), k, Complex{Tf}(z))
         end
 
-        $bfn{T<:AbstractFloat}(nu::T, k::Integer, z::Complex{T}) = throw(MethodError($bfn,(nu,k,z)))
+        $bfn(nu::T, k::Integer, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(nu,k,z)))
         $bfn(nu::Float32, k::Integer, x::Complex64) = Complex64($bfn(Float64(nu), k, Complex128(x)))
     end
 end
@@ -511,7 +511,7 @@ Bessel function of the second kind of order 0, ``Y_0(x)``.
 """
 function bessely0(x::BigFloat)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     z = BigFloat()
     ccall((:mpfr_y0, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
@@ -525,7 +525,7 @@ Bessel function of the second kind of order 1, ``Y_1(x)``.
 """
 function bessely1(x::BigFloat)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     z = BigFloat()
     ccall((:mpfr_y1, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
@@ -534,7 +534,7 @@ end
 
 function bessely(n::Integer, x::BigFloat)
     if x < 0
-        throw(DomainError())
+        throw(DomainErrorNoArgs)
     end
     z = BigFloat()
     ccall((:mpfr_yn, :libmpfr), Int32, (Ptr{BigFloat}, Clong, Ptr{BigFloat}, Int32), &z, n, &x, ROUNDING_MODE[])

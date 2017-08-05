@@ -9,7 +9,6 @@ Most of these functions were formerly part of Base.
 [![Coverage Status](https://coveralls.io/repos/github/JuliaMath/SpecialFunctions.jl/badge.svg?branch=master)](https://coveralls.io/github/JuliaMath/SpecialFunctions.jl?branch=master)
 
 Latest release:
-[![SpecialFunctions](http://pkg.julialang.org/badges/SpecialFunctions_0.5.svg)](http://pkg.julialang.org/?pkg=SpecialFunctions)
 [![SpecialFunctions](http://pkg.julialang.org/badges/SpecialFunctions_0.6.svg)](http://pkg.julialang.org/?pkg=SpecialFunctions)
 
 Documentation:
