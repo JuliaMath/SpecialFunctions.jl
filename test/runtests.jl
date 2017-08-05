@@ -86,6 +86,9 @@ end
     @test_throws ErrorException SF.sinint(big(1.0))
     @test_throws ErrorException SF.cosint(big(1.0))
     @test_throws DomainError SF.cosint(-1.0)
+    @test_throws DomainError SF.cosint(Float32(-1.0))
+    @test_throws DomainError SF.cosint(Float16(-1.0))
+    @test_throws DomainError SF.cosint(-1//2)
 end
 
 @testset "airy" begin
@@ -161,6 +164,13 @@ end
         @test SF.besseli(3,-3) ≈ -true_i33
         @test SF.besseli(-3,-3) ≈ -true_i33
         @test SF.besseli(Float32(-3),Complex64(-3,0)) ≈ -true_i33
+        true_im3p1_3 = 0.84371226532586351965
+        @test SF.besseli(-3.1,3) ≈ true_im3p1_3
+        for i in [-5 -3 -1 1 3 5]
+            @test SF.besseli(i,0) == 0.0
+            @test SF.besseli(i,Float32(0)) == 0
+            @test SF.besseli(i,Complex64(0)) == 0
+        end
         @testset "Error throwing" begin
             @test_throws SF.AmosException SF.besseli(1,1000)
             @test_throws DomainError SF.besseli(0.4,-1.0)
@@ -172,11 +182,10 @@ end
     end
     @testset "besselj" begin
         @test SF.besselj(0,0) == 1
-        for i = 1:5
+        for i in [-5 -3 -1 1 3 5]
             @test SF.besselj(i,0) == 0
-            @test SF.besselj(-i,0) == 0
-            @test SF.besselj(-i,Float32(0)) == 0
-            @test SF.besselj(-i,Float32(0)) == 0
+            @test SF.besselj(i,Float32(0)) == 0
+            @test SF.besselj(i,Complex64(0)) == 0
         end
 
         j33 = SF.besselj(3,3.)
@@ -205,6 +214,10 @@ end
         @test SF.besselj(3.2, 1.3+0.6im) ≈ 0.01135309305831220201 + 0.03927719044393515275im
         @test SF.besselj(1, 3im) ≈ 3.953370217402609396im
         @test SF.besselj(1.0,3im) ≈ SF.besselj(1,3im)
+
+        true_jm3p1_3 = -0.45024252862270713882
+        @test SF.besselj(-3.1,3) ≈ true_jm3p1_3
+
         @testset "Error throwing" begin
             @test_throws DomainError    SF.besselj(0.1, -0.4)
             @test_throws SF.AmosException SF.besselj(20,1000im)
@@ -245,6 +258,8 @@ end
             @test_throws DomainError SF.bessely(0.4,-1.0)
             @test_throws DomainError SF.bessely(0.4,Float32(-1.0))
             @test_throws DomainError SF.bessely(1,Float32(-1.0))
+            @test_throws DomainError SF.bessely(0.4,BigFloat(-1.0))
+            @test_throws DomainError SF.bessely(1,BigFloat(-1.0))
             @test_throws DomainError SF.bessely(Cint(3),Float32(-3.))
             @test_throws DomainError SF.bessely(Cint(3),Float64(-3.))
 
@@ -279,11 +294,19 @@ end
             z == zero(z) || @test SF.besselyx(nu, z) ≈ SF.bessely(nu, z) * exp(-abs(imag(z)))
         end
         @test SF.besselkx(1, 0) == Inf
+        for i = [-5 -3 -1 1 3 5]
+            @test SF.besseljx(i,0) == 0
+            @test SF.besselix(i,0) == 0
+            @test SF.besseljx(i,Float32(0)) == 0
+            @test SF.besselix(i,Float32(0)) == 0
+            @test SF.besseljx(i,Complex64(0)) == 0
+            @test SF.besselix(i,Complex64(0)) == 0
+        end
         @testset "Error throwing" begin
             @test_throws SF.AmosException SF.hankelh1x(1, 0)
             @test_throws SF.AmosException SF.hankelh2x(1, 0)
-            @test_throws SF.AmosException SF.besselix(-1, 0)
-            @test_throws SF.AmosException SF.besseljx(-1, 0)
+            @test_throws SF.AmosException SF.besselix(-1.01, 0)
+            @test_throws SF.AmosException SF.besseljx(-1.01, 0)
             @test_throws SF.AmosException SF.besselyx(1, 0)
             @test_throws DomainError SF.besselix(0.4,-1.0)
             @test_throws DomainError SF.besseljx(0.4, -1.0)

@@ -272,7 +272,11 @@ end
 
 function besseli(nu::Float64, z::Complex128)
     if nu < 0
-        return _besseli(-nu,z,Int32(1)) - 2_besselk(-nu,z,Int32(1))*sinpi(nu)/pi
+        if isinteger(nu)
+            return _besseli(-nu,z,Int32(1))
+        else
+            return _besseli(-nu,z,Int32(1)) - 2_besselk(-nu,z,Int32(1))*sinpi(nu)/pi
+        end
     else
         return _besseli(nu,z,Int32(1))
     end
@@ -280,7 +284,11 @@ end
 
 function besselix(nu::Float64, z::Complex128)
     if nu < 0
-        return _besseli(-nu,z,Int32(2)) - 2_besselk(-nu,z,Int32(2))*exp(-abs(real(z))-z)*sinpi(nu)/pi
+        if isinteger(nu)
+            return _besseli(-nu,z,Int32(2))
+        else
+            return _besseli(-nu,z,Int32(2)) - 2_besselk(-nu,z,Int32(2))*exp(-abs(real(z))-z)*sinpi(nu)/pi
+        end
     else
         return _besseli(nu,z,Int32(2))
     end
@@ -288,7 +296,11 @@ end
 
 function besselj(nu::Float64, z::Complex128)
     if nu < 0
-        return _besselj(-nu,z,Int32(1))*cospi(nu) + _bessely(-nu,z,Int32(1))*sinpi(nu)
+        if isinteger(nu)
+            return _besselj(-nu,z,Int32(1))*cospi(nu)
+        else
+            return _besselj(-nu,z,Int32(1))*cospi(nu) + _bessely(-nu,z,Int32(1))*sinpi(nu)
+        end
     else
         return _besselj(nu,z,Int32(1))
     end
@@ -300,7 +312,11 @@ besselj(nu::Cint, x::Float32) = ccall((:jnf, libm), Float32, (Cint, Float32), nu
 
 function besseljx(nu::Float64, z::Complex128)
     if nu < 0
-        return _besselj(-nu,z,Int32(2))*cospi(nu) + _bessely(-nu,z,Int32(2))*sinpi(nu)
+        if isinteger(nu)
+            return _besselj(-nu,z,Int32(2))*cospi(nu)
+        else
+            return _besselj(-nu,z,Int32(2))*cospi(nu) + _bessely(-nu,z,Int32(2))*sinpi(nu)
+        end
     else
         return _besselj(nu,z,Int32(2))
     end
