@@ -94,7 +94,7 @@ signflip(m::Integer, z) = iseven(m) ? z : -z
 # This function computes the coefficients of the polynomial q_m(y),
 # returning an array of the coefficients of 1, y, y^2, ...,
 function cotderiv_q(m::Int)
-    m < 0 && throw(ArgumentError("$m < 0 not allowed"))
+    m < 0 && throw(DomainError(m, "`m` must be nonnegative."))
     m == 0 && return [1.0]
     m == 1 && return [1.0, 1.0]
     q₋ = cotderiv_q(m-1)
@@ -127,7 +127,7 @@ function cotderiv(m::Integer, z)
     isinf(imag(z)) && return zero(z)
     if m <= 0
         m == 0 && return π * cot(π*z)
-        throw(DomainErrorNoArgs)
+        throw(DomainError(m, "`m` must be nonnegative."))
     end
     if m <= length(cotderiv_Q)
         q = cotderiv_Q[m]
@@ -235,10 +235,10 @@ function zeta(s::ComplexOrReal{Float64}, z::ComplexOrReal{Float64})
             end
             x > 0 && imag(z) == 0 && imag(s) == 0 && return oftype(ζ, Inf)
         end
-        throw(DomainErrorNoArgs) # nothing clever to return
+        throw(DomainError(s, "`s` must be finite."))  # nothing clever to return
     end
     if isnan(x)
-        if imag(z)==0 && imag(s)==0
+        if imag(z) == 0 && imag(s) == 0
             return oftype(ζ, x)
         else
             return oftype(ζ, Complex(x,x))
@@ -258,7 +258,7 @@ function zeta(s::ComplexOrReal{Float64}, z::ComplexOrReal{Float64})
         # shift using recurrence formula
         xf = floor(x)
         nx = Int(xf)
-        n = ceil(Int,cutoff - nx)
+        n = ceil(Int, cutoff - nx)
         minus_s = -s
         if nx < 0 # x < 0
             # need to use (-z)^(-s) recurrence to be correct for real z < 0
@@ -339,7 +339,7 @@ function polygamma(m::Integer, z::ComplexOrReal{Float64})
     # "negapolygamma" function in the literature, and there are
     # multiple possible definitions arising from different integration
     # constants. We throw a DomainError since the definition is unclear.
-    real(m) < 0 && throw(DomainErrorNoArgs)
+    real(m) < 0 && throw(DomainError(m, "`real(m)` must be nonnegative, since the definition in this case is ambiguous."))
 
     s = Float64(m+1)
     # It is safe to convert any integer (including `BigInt`) to a float here

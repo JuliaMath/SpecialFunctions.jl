@@ -12,7 +12,7 @@ function _airy(k::Integer, z::Complex128)
     elseif k == 2 || k == 3
         return _biry(z, id, Int32(1))
     else
-        throw(ArgumentError("k must be between 0 and 3"))
+        throw(DomainError(k, "`k` must be between 0 and 3."))
     end
 end
 function _airyx(k::Integer, z::Complex128)
@@ -23,7 +23,7 @@ function _airyx(k::Integer, z::Complex128)
     elseif k == 2 || k == 3
         return _biry(z, id, Int32(2))
     else
-        throw(ArgumentError("k must be between 0 and 3"))
+        throw(DomainError(k, "`k` must be between 0 and 3."))
     end
 end
 
