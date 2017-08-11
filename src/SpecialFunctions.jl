@@ -2,6 +2,8 @@ __precompile__()
 
 module SpecialFunctions
 
+using Compat
+
 if isdefined(Base, :airyai) && VERSION < v"0.7.0-DEV.986" #22763
     import Base: airyai, airyaix, airyaiprime, airyaiprimex,
                  airybi, airybix, airybiprime, airybiprimex,
@@ -62,13 +64,6 @@ if isdefined(Base.Math, :openspecfun)
     const openspecfun = Base.Math.openspecfun
 else
     const openspecfun = "libopenspecfun"
-end
-
-# Avoids a deprecation warning for the 0-arg case on 0.7
-if VERSION < v"0.7.0-DEV.924"
-    const DomainErrorNoArgs = DomainError()
-else
-    const DomainErrorNoArgs = DomainError(nothing)
 end
 
 include("bessel.jl")

@@ -116,7 +116,7 @@ for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
         $afn(z::Complex64) = Complex64($afn(Complex128(z)))
     end
     if afn in (:airyaix, :airyaiprimex)
-        @eval $afn(x::Real) = x < 0 ? throw(DomainErrorNoArgs) : real($afn(complex(float(x))))
+        @eval $afn(x::Real) = x < 0 ? throw(DomainError(x, "`x` must be nonnegative.")) : real($afn(complex(float(x))))
     else
         @eval $afn(x::Real) = real($afn(complex(float(x))))
     end
@@ -328,13 +328,13 @@ besselkx(nu::Float64, z::Complex128) = _besselk(abs(nu), z, Int32(2))
 
 function bessely(nu::Cint, x::Float64)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     end
     ccall((:yn, libm), Float64, (Cint, Float64), nu, x)
 end
 function bessely(nu::Cint, x::Float32)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     end
     ccall((:ynf, libm), Float32, (Cint, Float32), nu, x)
 end
@@ -362,7 +362,7 @@ Modified Bessel function of the first kind of order `nu`, ``I_\\nu(x)``.
 """
 function besseli(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative and `nu` must be an integer."))
     end
     real(besseli(float(nu), complex(x)))
 end
@@ -374,7 +374,7 @@ Scaled modified Bessel function of the first kind of order `nu`, ``I_\\nu(x) e^{
 """
 function besselix(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative and `nu` must be an integer."))
     end
     real(besselix(float(nu), complex(x)))
 end
@@ -390,7 +390,7 @@ function besselj(nu::Real, x::AbstractFloat)
             return besselj(Cint(nu), x)
         end
     elseif x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     end
     real(besselj(float(nu), complex(x)))
 end
@@ -402,7 +402,7 @@ Scaled Bessel function of the first kind of order `nu`, ``J_\\nu(x) e^{- | \\ope
 """
 function besseljx(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative and `nu` must be an integer."))
     end
     real(besseljx(float(nu), complex(x)))
 end
@@ -414,7 +414,7 @@ Modified Bessel function of the second kind of order `nu`, ``K_\\nu(x)``.
 """
 function besselk(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     elseif x == 0
         return oftype(x, Inf)
     end
@@ -428,7 +428,7 @@ Scaled modified Bessel function of the second kind of order `nu`, ``K_\\nu(x) e^
 """
 function besselkx(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     elseif x == 0
         return oftype(x, Inf)
     end
@@ -442,7 +442,7 @@ Bessel function of the second kind of order `nu`, ``Y_\\nu(x)``.
 """
 function bessely(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     elseif isinteger(nu) && typemin(Cint) <= nu <= typemax(Cint)
         return bessely(Cint(nu), x)
     end
@@ -457,7 +457,7 @@ Scaled Bessel function of the second kind of order `nu`,
 """
 function besselyx(nu::Real, x::AbstractFloat)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     end
     real(besselyx(float(nu), complex(x)))
 end
@@ -527,7 +527,7 @@ Bessel function of the second kind of order 0, ``Y_0(x)``.
 """
 function bessely0(x::BigFloat)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
     ccall((:mpfr_y0, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
@@ -541,7 +541,7 @@ Bessel function of the second kind of order 1, ``Y_1(x)``.
 """
 function bessely1(x::BigFloat)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
     ccall((:mpfr_y1, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
@@ -550,7 +550,7 @@ end
 
 function bessely(n::Integer, x::BigFloat)
     if x < 0
-        throw(DomainErrorNoArgs)
+        throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
     ccall((:mpfr_yn, :libmpfr), Int32, (Ptr{BigFloat}, Clong, Ptr{BigFloat}, Int32), &z, n, &x, ROUNDING_MODE[])
