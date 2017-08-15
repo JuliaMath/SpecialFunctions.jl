@@ -8,8 +8,8 @@ end
 
 ## Airy functions
 let
-    const ai::Array{Float64,1} = Array{Float64}(2)
-    const ae::Array{Int32,1} = Array{Int32}(2)
+    const ai = Vector{Float64}(2)
+    const ae = Vector{Int32}(2)
     global _airy, _biry
     function _airy(z::Complex128, id::Int32, kode::Int32)
         ccall((:zairy_,openspecfun), Void,
