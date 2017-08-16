@@ -12,7 +12,7 @@ for f in (:erf, :erfc)
         ($f)(a::Complex32) = Complex32($f(Complex64(a)))
         function ($f)(x::BigFloat)
             z = BigFloat()
-            ccall(($(string(:mpfr_,f)), :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+            ccall(($(string(:mpfr_,f)), :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
             return z
         end
         ($f)(x::AbstractFloat) = error("not implemented for ", typeof(x))
