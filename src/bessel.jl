@@ -153,9 +153,9 @@ for jy in ("j","y"), nu in (0,1)
 end
 
 
-const cy = Array{Float64}(2)
-const ae = Array{Int32}(2)
-const wrk = Array{Float64}(2)
+const cy = Vector{Float64}(2)
+const ae = Vector{Int32}(2)
+const wrk = Vector{Float64}(2)
 
 function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
     ccall((:zbesh_,openspecfun), Void,
