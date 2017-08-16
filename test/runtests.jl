@@ -544,4 +544,4 @@ end
     @test typeof(SF.zeta(complex(1), 2.0)) == Complex{Float64}
 end
 
-@test sprint(showerror, AmosException(1)) == "AmosException(1, \"Input error\")"
+@test sprint(showerror, AmosException(1)) == "AmosException with id 1: Input error"
