@@ -7,37 +7,38 @@ struct AmosException <: Exception
 end
 
 ## Airy functions
-let
-    const ai = Vector{Float64}(2)
-    const ae = Vector{Int32}(2)
-    global _airy, _biry
-    function _airy(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zairy_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1), pointer(ae,2))
-        if ae[2] == 0 || ae[2] == 3
-            return complex(ai[1],ai[2])
-        else
-            throw(AmosException(ae[2]))
-        end
+function _airy(z::Complex128, id::Int32, kode::Int32)
+    rz1, rz2 = Ref(real(z)), Ref(imag(z))
+    rid = Ref(id)
+    rkode = Ref(kode)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+    ccall((:zairy_,openspecfun), Void,
+          (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
+           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
+           rz1, rz2, rid, rkode,
+           ai1, ai2, ae1, ae2)
+    if ae2[] == 0 || ae2[] == 3 # ignore underflow and less than half machine accuracy loss
+        return complex(ai1[], ai2[])
+    else
+        throw(AmosException(ae2[]))
     end
-    function _biry(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zbiry_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1))
-        if ae[1] == 0 || ae[1] == 3  # ignore underflow
-            return complex(ai[1],ai[2])
-        else
-            throw(AmosException(ae[2]))
-        end
+end
+function _biry(z::Complex128, id::Int32, kode::Int32)
+    rz1, rz2 = Ref(real(z)), Ref(imag(z))
+    rid = Ref(id)
+    rkode = Ref(kode)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1 = Ref{Int32}()
+    ccall((:zbiry_,openspecfun), Void,
+          (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
+           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
+           rz1, rz2, rid, rkode,
+           ai1, ai2, ae1)
+    if ae1[] == 0 || ae1[] == 3 # ignore less than half machine accuracy loss
+        return complex(ai1[], ai2[])
+    else
+        throw(AmosException(ae1[]))
     end
 end
 
