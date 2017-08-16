@@ -3,8 +3,29 @@
 using Base.Math: nan_dom_err
 
 struct AmosException <: Exception
-    info::Int32
+    id::Int32
+    msg::String
+
+    function AmosException(id::Integer) 
+        msg = if id == 0
+            "Normal return, computation complete."
+        elseif id == 1
+            "Input error"
+        elseif id == 2
+            "Overflow"
+        elseif id == 3
+            "Input argument magnitude large, less than half machine accuracy loss by argument reduction."
+        elseif id == 4
+            "Input argument magnitude too large, complete loss of accuracy by argument reduction."
+        elseif id == 5
+            "Algorithm termination condition not met."
+        else
+            throw(ArgumentError("invalid AMOS error flag"))
+        end
+        new(id,msg)
+    end
 end
+Base.showerror(io::IO, err::AmosException) = print(io, "AmosException with id $(err.id): $(err.msg)")
 
 ## Airy functions
 let
