@@ -13,7 +13,7 @@ function _airy(z::Complex128, id::Int32, kode::Int32)
 
     ccall((:zairy_,openspecfun), Void,
           (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), id, kode,
            ai1, ai2, ae1, ae2)
 
@@ -30,7 +30,7 @@ function _biry(z::Complex128, id::Int32, kode::Int32)
 
     ccall((:zbiry_,openspecfun), Void,
           (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
+           Ref{Float64}, Ref{Float64}, Ref{Int32}),
            real(z), imag(z), id, kode,
            ai1, ai2, ae1)
 
@@ -123,9 +123,9 @@ for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
 end
 
 function airyai(x::BigFloat)
-    z = BigFloat()
+    z = Ref(BigFloat())
     ccall((:mpfr_ai, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z
+    return z[]
 end
 
 ## Bessel functions
@@ -159,7 +159,7 @@ function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
 
     ccall((:zbesh_,openspecfun), Void,
            (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int},
-            Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
+            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
             real(z), imag(z), nu, kode, k, 1,
             ai1, ai2, ae1, ae2)
 
@@ -176,7 +176,7 @@ function _besseli(nu::Float64, z::Complex128, kode::Int32)
   
     ccall((:zbesi_,openspecfun), Void,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
            ai1, ai2, ae1, ae2)
 
@@ -193,7 +193,7 @@ function _besselj(nu::Float64, z::Complex128, kode::Int32)
 
     ccall((:zbesj_,openspecfun), Void,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
            ai1, ai2, ae1, ae2)
     
@@ -210,7 +210,7 @@ function _besselk(nu::Float64, z::Complex128, kode::Int32)
 
     ccall((:zbesk_,openspecfun), Void,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
            ai1, ai2, ae1, ae2)
 
@@ -228,7 +228,7 @@ function _bessely(nu::Float64, z::Complex128, kode::Int32)
 
     ccall((:zbesy_,openspecfun), Void,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Float64}, Ref{Float64}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
            ai1, ai2, ae1, wrk1, wrk2, ae2)
 
@@ -508,9 +508,9 @@ end
 Bessel function of the first kind of order 0, ``J_0(x)``.
 """
 function besselj0(x::BigFloat)
-    z = BigFloat()
+    z = Ref(BigFloat())
     ccall((:mpfr_j0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z
+    return z[]
 end
 
 """
@@ -519,15 +519,15 @@ end
 Bessel function of the first kind of order 1, ``J_1(x)``.
 """
 function besselj1(x::BigFloat)
-    z = BigFloat()
+    z = Ref(BigFloat())
     ccall((:mpfr_j1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z
+    return z[]
 end
 
 function besselj(n::Integer, x::BigFloat)
-    z = BigFloat()
+    z = Ref(BigFloat())
     ccall((:mpfr_jn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
-    return z
+    return z[]
 end
 
 """
@@ -539,9 +539,9 @@ function bessely0(x::BigFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    z = BigFloat()
+    z = Ref(BigFloat())
     ccall((:mpfr_y0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z
+    return z[]
 end
 
 """
@@ -553,18 +553,18 @@ function bessely1(x::BigFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    z = BigFloat()
+    z = Ref(BigFloat())
     ccall((:mpfr_y1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z
+    return z[]
 end
 
 function bessely(n::Integer, x::BigFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    z = BigFloat()
+    z = Ref(BigFloat())
     ccall((:mpfr_yn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
-    return z
+    return z[]
 end
 
 """
