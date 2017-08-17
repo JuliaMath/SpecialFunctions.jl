@@ -20,7 +20,7 @@ struct AmosException <: Exception
         elseif id == 5
             "Algorithm termination condition not met."
         else
-            throw(ArgumentError("invalid AMOS error flag"))
+            throw(ArgumentError("invalid AMOS error flag: $id"))
         end
         new(id,msg)
     end
