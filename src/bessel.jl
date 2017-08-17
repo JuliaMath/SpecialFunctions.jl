@@ -28,37 +28,37 @@ end
 Base.showerror(io::IO, err::AmosException) = print(io, "AmosException with id $(err.id): $(err.msg)")
 
 ## Airy functions
-let
-    const ai::Array{Float64,1} = Array{Float64}(2)
-    const ae::Array{Int32,1} = Array{Int32}(2)
-    global _airy, _biry
-    function _airy(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zairy_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1), pointer(ae,2))
-        if ae[2] == 0 || ae[2] == 3
-            return complex(ai[1],ai[2])
-        else
-            throw(AmosException(ae[2]))
-        end
+function _airy(z::Complex128, id::Int32, kode::Int32)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+
+    ccall((:zairy_,openspecfun), Void,
+          (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
+           real(z), imag(z), id, kode,
+           ai1, ai2, ae1, ae2)
+
+    if ae2[] == 0 || ae2[] == 3 # ignore underflow and less than half machine accuracy loss
+        return complex(ai1[], ai2[])
+    else
+        throw(AmosException(ae2[]))
     end
-    function _biry(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zbiry_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1))
-        if ae[1] == 0 || ae[1] == 3  # ignore underflow
-            return complex(ai[1],ai[2])
-        else
-            throw(AmosException(ae[2]))
-        end
+end
+
+function _biry(z::Complex128, id::Int32, kode::Int32)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1 = Ref{Int32}()
+
+    ccall((:zbiry_,openspecfun), Void,
+          (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
+           Ref{Float64}, Ref{Float64}, Ref{Int32}),
+           real(z), imag(z), id, kode,
+           ai1, ai2, ae1)
+
+    if ae1[] == 0 || ae1[] == 3 # ignore less than half machine accuracy loss
+        return complex(ai1[], ai2[])
+    else
+        throw(AmosException(ae1[]))
     end
 end
 
@@ -145,7 +145,7 @@ end
 
 function airyai(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_ai, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    ccall((:mpfr_ai, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -174,79 +174,89 @@ for jy in ("j","y"), nu in (0,1)
 end
 
 
-const cy = Array{Float64}(2)
-const ae = Array{Int32}(2)
-const wrk = Array{Float64}(2)
-
 function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+
     ccall((:zbesh_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &k, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int},
+            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
+            real(z), imag(z), nu, kode, k, 1,
+            ai1, ai2, ae1, ae2)
+
+    if ae2[] == 0 || ae2[] == 3
+        return complex(ai1[], ai2[])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ae2[]))
     end
 end
 
 function _besseli(nu::Float64, z::Complex128, kode::Int32)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+  
     ccall((:zbesi_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
+           real(z), imag(z), nu, kode, 1,
+           ai1, ai2, ae1, ae2)
+
+    if ae2[] == 0 || ae2[] == 3
+        return complex(ai1[], ai2[])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ae2[]))
     end
 end
 
 function _besselj(nu::Float64, z::Complex128, kode::Int32)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+
     ccall((:zbesj_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
+           real(z), imag(z), nu, kode, 1,
+           ai1, ai2, ae1, ae2)
+    
+    if ae2[] == 0 || ae2[] == 3
+        return complex(ai1[], ai2[])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ae2[]))
     end
 end
 
 function _besselk(nu::Float64, z::Complex128, kode::Int32)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+
     ccall((:zbesk_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
+           real(z), imag(z), nu, kode, 1,
+           ai1, ai2, ae1, ae2)
+
+    if ae2[] == 0 || ae2[] == 3
+        return complex(ai1[], ai2[])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ae2[]))
     end
 end
 
 function _bessely(nu::Float64, z::Complex128, kode::Int32)
+    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+    wrk1, wrk2 = Ref{Float64}(), Ref{Float64}()
+
     ccall((:zbesy_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32},
-           Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(wrk,1),
-          pointer(wrk,2), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
+           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Float64}, Ref{Float64}, Ref{Int32}),
+           real(z), imag(z), nu, kode, 1,
+           ai1, ai2, ae1, wrk1, wrk2, ae2)
+
+    if ae2[] == 0 || ae2[] == 3
+        return complex(ai1[], ai2[])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ae2[]))
     end
 end
 
@@ -520,7 +530,7 @@ Bessel function of the first kind of order 0, ``J_0(x)``.
 """
 function besselj0(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_j0, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    ccall((:mpfr_j0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -531,13 +541,13 @@ Bessel function of the first kind of order 1, ``J_1(x)``.
 """
 function besselj1(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_j1, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    ccall((:mpfr_j1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
 function besselj(n::Integer, x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_jn, :libmpfr), Int32, (Ptr{BigFloat}, Clong, Ptr{BigFloat}, Int32), &z, n, &x, ROUNDING_MODE[])
+    ccall((:mpfr_jn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
     return z
 end
 
@@ -551,7 +561,7 @@ function bessely0(x::BigFloat)
         throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
-    ccall((:mpfr_y0, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    ccall((:mpfr_y0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -565,7 +575,7 @@ function bessely1(x::BigFloat)
         throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
-    ccall((:mpfr_y1, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    ccall((:mpfr_y1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -574,7 +584,7 @@ function bessely(n::Integer, x::BigFloat)
         throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
-    ccall((:mpfr_yn, :libmpfr), Int32, (Ptr{BigFloat}, Clong, Ptr{BigFloat}, Int32), &z, n, &x, ROUNDING_MODE[])
+    ccall((:mpfr_yn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
     return z
 end
 
