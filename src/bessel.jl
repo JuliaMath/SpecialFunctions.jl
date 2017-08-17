@@ -123,9 +123,9 @@ for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
 end
 
 function airyai(x::BigFloat)
-    z = Ref(BigFloat())
+    z = BigFloat()
     ccall((:mpfr_ai, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z[]
+    return z
 end
 
 ## Bessel functions
@@ -508,9 +508,9 @@ end
 Bessel function of the first kind of order 0, ``J_0(x)``.
 """
 function besselj0(x::BigFloat)
-    z = Ref(BigFloat())
+    z = BigFloat()
     ccall((:mpfr_j0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z[]
+    return z
 end
 
 """
@@ -519,15 +519,15 @@ end
 Bessel function of the first kind of order 1, ``J_1(x)``.
 """
 function besselj1(x::BigFloat)
-    z = Ref(BigFloat())
+    z = BigFloat()
     ccall((:mpfr_j1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z[]
+    return z
 end
 
 function besselj(n::Integer, x::BigFloat)
-    z = Ref(BigFloat())
+    z = BigFloat()
     ccall((:mpfr_jn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
-    return z[]
+    return z
 end
 
 """
@@ -539,9 +539,9 @@ function bessely0(x::BigFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    z = Ref(BigFloat())
+    z = BigFloat()
     ccall((:mpfr_y0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z[]
+    return z
 end
 
 """
@@ -553,18 +553,18 @@ function bessely1(x::BigFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    z = Ref(BigFloat())
+    z = BigFloat()
     ccall((:mpfr_y1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    return z[]
+    return z
 end
 
 function bessely(n::Integer, x::BigFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    z = Ref(BigFloat())
+    z = BigFloat()
     ccall((:mpfr_yn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
-    return z[]
+    return z
 end
 
 """

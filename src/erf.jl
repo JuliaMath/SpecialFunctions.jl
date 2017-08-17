@@ -11,9 +11,9 @@ for f in (:erf, :erfc)
         ($f)(a::Float16) = Float16($f(Float32(a)))
         ($f)(a::Complex32) = Complex32($f(Complex64(a)))
         function ($f)(x::BigFloat)
-            z = Ref(BigFloat())
+            z = BigFloat()
             ccall(($(string(:mpfr_,f)), :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-            return z[]
+            return z
         end
         ($f)(x::AbstractFloat) = error("not implemented for ", typeof(x))
     end
