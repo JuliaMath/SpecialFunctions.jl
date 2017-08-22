@@ -4,28 +4,26 @@ using Base.Math: nan_dom_err
 
 struct AmosException <: Exception
     id::Int32
-    msg::String
+end
 
-    function AmosException(id::Integer) 
-        msg = if id == 0
-            "Normal return, computation complete."
-        elseif id == 1
-            "Input error"
-        elseif id == 2
-            "Overflow"
-        elseif id == 3
-            "Input argument magnitude large, less than half machine accuracy loss by argument reduction."
-        elseif id == 4
-            "Input argument magnitude too large, complete loss of accuracy by argument reduction."
-        elseif id == 5
-            "Algorithm termination condition not met."
-        else
-            throw(ArgumentError("invalid AMOS error flag: $id"))
-        end
-        new(id,msg)
+function Base.showerror(io::IO, ex::AmosException)
+    print(io, "AmosException with id $(ex.id): ")
+    if ex.id == 0
+        print(io, "normal return, computation complete.")
+    elseif ex.id == 1
+        print(io, "input error.")
+    elseif ex.id == 2
+        print(io, "overflow.")
+    elseif ex.id == 3
+        print(io, "input argument magnitude large, less than half machine accuracy loss by argument reduction.")
+    elseif ex.id == 4
+        print(io, "input argument magnitude too large, complete loss of accuracy by argument reduction.")
+    elseif ex.id == 5
+        print(io, "algorithm termination condition not met.")
+    else
+        print(io, "invalid error flag.")
     end
 end
-Base.showerror(io::IO, err::AmosException) = print(io, "AmosException with id $(err.id): $(err.msg)")
 
 ## Airy functions
 function _airy(z::Complex128, id::Int32, kode::Int32)
