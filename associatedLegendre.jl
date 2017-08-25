@@ -1,7 +1,7 @@
 
 # solutions, w, of the differential equation are 
 #    associated Legendre functions   
-# (1-x*x)d/dx(dw/dx)â¢-2â¢xâ¢(dw/dx)+(n(n+1)-m*m/(1-x*x))w=0
+# (1-x*x)d/dx(dw/dx)⁢-2⁢x⁢(dw/dx)+(n(n+1)-m*m/(1-x*x))w=0
 #n is the degree and m is the order.
 #for m =0 they are a.k.a. Legendre polynomials
 # see https://github.com/pjabardo/Jacobi.jl/blob/master/src/legendre.jl
@@ -36,7 +36,7 @@
 #Thus we define functions  LegendreP2,....P3,....Q2,...Q3  
 # for n and m positive integers 0<=m<=n
 # refer to http://dlmf.nist.gov/14.6
-#P(n,m,z) and Q(n,m,â¡z) (z> 1) are often referred to as the prolate
+#P(n,m,z) and Q(n,m,⁡z) (z> 1) are often referred to as the prolate
 #spheroidal harmonics of the first and second kinds, respectively
 #  We can define spherical harmonics (there are other definitions)
 # Y(n,m,theta,phi)= LegendreP2(n,|m|,theta)*exp(im*m*phi)*((-)^(|m|-m)/2))
@@ -65,7 +65,7 @@ function LegendreP2(n::Integer,m::Integer,x::Number)
     end
    
     pj2= ((-1)^m)*dblfac*(one(x)-x*x)^(m/2)   
-    pj1=x*(2.*m+1.)*pj2  
+    pj1=x*(2*m+1)*pj2  # pj1=x*(2.*m+1.)*pj2  
     if n == m
         return pj2
     elseif n == m+1
@@ -74,7 +74,8 @@ function LegendreP2(n::Integer,m::Integer,x::Number)
     
 
     for j = m+2 :n 
-        pjj=(x*(2.*j-1.)*pj1 - pj2*(j +m-1.)) /(j-m)
+        pjj=(x*(2*j-1)*pj1 - pj2*(j +m-1)) /(j-m)
+        #pjj=(x*(2.*j-1.)*pj1 - pj2*(j +m-1.)) /(j-m)
         pj2=pj1
         pj1=pjj
     end
@@ -166,14 +167,14 @@ function ZZLegendreP2(n::Integer,m::Integer,z::Number)
         fac=fac*k
     end
     sqz2 = sqrt((one(z)-z.*z))
-    hsqz2 = 0.5*sqz2
+    hsqz2 = sqz2 /2 # 0.5*sqz2
     ihsqz2 = z./hsqz2
     if(n==0)
         pnm[1]=one(z)
         return ((-one(z))^m)*pnm[n+1+m] #pnm
     end
     if(n==1)
-        pnm[1]=-.5*sqz2
+        pnm[1]= -sqz2/2 # -.5*sqz2
         pnm[2]=z 
         pnm[3]=sqz2
         return ((-one(z))^m)*pnm[n+1+m]  #pnm
@@ -349,10 +350,10 @@ end
 testSSLegendreP2F()
 
 # derived from work published at 
-# i. a. selezneva, yu. l. ratis, e. hernÃ¡ndez, j. pÃ©rez-quiles 
-#and p. fernÃ¡ndez de cÃ³rdoba:
+# i. a. selezneva, yu. l. ratis, e. hernández, j. pérez-quiles 
+#and p. fernández de córdoba:
 #a code to calculate high order legendre polynomials
-#rev. acad. colomb. cienc.: volumen xxxvii, nÃºmero 145 - diciembre 2013
+#rev. acad. colomb. cienc.: volumen xxxvii, número 145 - diciembre 2013
 #www.scielo.org.co/pdf/racefn/v37n145/v37n145a09.pdf   
     #Selezneva.....pdf    
        
@@ -373,14 +374,14 @@ function ZZLegendreP3(n::Integer,m::Integer,z::Number)
         fac=fac*k
     end
     sqz2 = sqrt((z.*z - one(z)))
-    hsqz2 = 0.5*sqz2
+    hsqz2 = sqz2 / 2 # 0.5*sqz2
     ihsqz2 = z./hsqz2
     if(n==0)
         pnm[1]=one(z)
         return  ((-one(z))^m)*pnm[n+1+m]  
     end
     if(n==1)
-        pnm[1]=-.5*sqz2
+        pnm[1]= - sqz2 / 2 # -.5*sqz2
         pnm[2]=z
         pnm[3]=-sqz2 # sign
         return   ((-one(z))^m)*pnm[n+1+m] 
@@ -604,10 +605,10 @@ testZZLegendreP2F()
 
 
 # derived from work published at 
-# i. a. selezneva, yu. l. ratis, e. hernÃ¡ndez, j. pÃ©rez-quiles 
-#and p. fernÃ¡ndez de cÃ³rdoba:
+# i. a. selezneva, yu. l. ratis, e. hernández, j. pérez-quiles 
+#and p. fernández de córdoba:
 #a code to calculate high order legendre polynomials
-#rev. acad. colomb. cienc.: volumen xxxvii, nÃºmero 145 - diciembre 2013
+#rev. acad. colomb. cienc.: volumen xxxvii, número 145 - diciembre 2013
 #www.scielo.org.co/pdf/racefn/v37n145/v37n145a09.pdf   
     #Selezneva.....pdf    
        
@@ -987,6 +988,7 @@ m=4 #underflow
 n=4
 T=4.200004199683e-10
 TableSSZZ(n,m,x,T)
+
 
 
 
