@@ -5,6 +5,10 @@ using Base.Test
 
 const SF = SpecialFunctions
 
+if isdefined(Base, :MathConstants) && isdefined(Base.MathConstants, :γ)
+    import Base.MathConstants: γ
+end
+
 # useful test functions for relative error, which differ from isapprox
 # in that relerrc separately looks at the real and imaginary parts
 relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
