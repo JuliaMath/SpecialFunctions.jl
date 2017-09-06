@@ -48,7 +48,7 @@ end
 
 function digamma(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_digamma, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    ccall((:mpfr_digamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -437,7 +437,7 @@ end
 
 function zeta(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_zeta, :libmpfr), Int32, (Ptr{BigFloat}, Ptr{BigFloat}, Int32), &z, &x, ROUNDING_MODE[])
+    ccall((:mpfr_zeta, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
