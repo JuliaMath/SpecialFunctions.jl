@@ -4,6 +4,15 @@ module SpecialFunctions
 
 using Compat
 
+let depsfile = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
+    if isfile(depsfile)
+        include(depsfile)
+    else
+        error("SpecialFunctions is not properly installed. Please run " *
+              "Pkg.build(\"SpecialFunctions\") and restart Julia.")
+    end
+end
+
 if isdefined(Base, :airyai) && VERSION < v"0.7.0-DEV.986" #22763
     import Base: airyai, airyaix, airyaiprime, airyaiprimex,
                  airybi, airybix, airybiprime, airybiprimex,
@@ -59,12 +68,6 @@ end
 
 export sinint,
        cosint
-
-if isdefined(Base.Math, :openspecfun)
-    const openspecfun = Base.Math.openspecfun
-else
-    const openspecfun = "libopenspecfun"
-end
 
 include("bessel.jl")
 include("erf.jl")
