@@ -1,46 +1,52 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
+include("amos/Amos.jl")
+
 using Base.Math: nan_dom_err
 
 struct AmosException <: Exception
-    info::Int32
+    id::Int32
+end
+
+function Base.showerror(io::IO, ex::AmosException)
+    print(io, "AmosException with id $(ex.id): ")
+    if ex.id == 0
+        print(io, "normal return, computation complete.")
+    elseif ex.id == 1
+        print(io, "input error.")
+    elseif ex.id == 2
+        print(io, "overflow.")
+    elseif ex.id == 3
+        print(io, "input argument magnitude large, less than half machine accuracy loss by argument reduction.")
+    elseif ex.id == 4
+        print(io, "input argument magnitude too large, complete loss of accuracy by argument reduction.")
+    elseif ex.id == 5
+        print(io, "algorithm termination condition not met.")
+    else
+        print(io, "invalid error flag.")
+    end
 end
 
 ## Airy functions
-let
-    const ai::Array{Float64,1} = Array{Float64}(2)
-    const ae::Array{Int32,1} = Array{Int32}(2)
-    global _airy, _biry
-    function _airy(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zairy_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1), pointer(ae,2))
-        if ae[2] == 0 || ae[2] == 3
-            return complex(ai[1],ai[2])
-        else
-            throw(AmosException(ae[2]))
-        end
-    end
-    function _biry(z::Complex128, id::Int32, kode::Int32)
-        ccall((:zbiry_,openspecfun), Void,
-              (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-               Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
-              &real(z), &imag(z),
-              &id, &kode,
-              pointer(ai,1), pointer(ai,2),
-              pointer(ae,1))
-        if ae[1] == 0 || ae[1] == 3  # ignore underflow
-            return complex(ai[1],ai[2])
-        else
-            throw(AmosException(ae[2]))
-        end
+
+function _airy(z::Complex128, id::Int32, kode::Int32)
+    (air,aii,nz,ierr) = Amos.ZAIRY(real(z), imag(z), id, kode, 0., 0.,
+                                   Int32(0), Int32(0))
+    if ierr == 0 || ierr == 3
+        return complex(air,aii)
+    else
+        throw(AmosException(ierr))
     end
 end
 
+function _biry(z::Complex128, id::Int32, kode::Int32)
+    (air,aii,ierr) = Amos.ZBIRY(real(z), imag(z), id, kode, 0., 0., Int32(0))
+    if ierr == 0 || ierr == 3
+        return complex(air,aii)
+    else
+        throw(AmosException(ierr))
+    end
+end
 
 """
     airyai(x)
@@ -152,80 +158,58 @@ for jy in ("j","y"), nu in (0,1)
     end
 end
 
-
-const cy = Array{Float64}(2)
-const ae = Array{Int32}(2)
-const wrk = Array{Float64}(2)
+const cy1 = Float64[0.]
+const cy2 = Float64[0.]
+const wrk1 = Float64[0.]
+const wrk2 = Float64[0.]
 
 function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
-    ccall((:zbesh_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &k, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESH(real(z), imag(z), nu, kode, k, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besseli(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesi_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESI(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besselj(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesj_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESJ(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besselk(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesk_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESK(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
 function _bessely(nu::Float64, z::Complex128, kode::Int32)
-    ccall((:zbesy_,openspecfun), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32},
-           Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ptr{Int32}),
-          &real(z), &imag(z), &nu, &kode, &1,
-          pointer(cy,1), pointer(cy,2),
-          pointer(ae,1), pointer(wrk,1),
-          pointer(wrk,2), pointer(ae,2))
-    if ae[2] == 0 || ae[2] == 3
-        return complex(cy[1],cy[2])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESY(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, wrk1, wrk2, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae[2]))
+        throw(AmosException(ierr))
     end
 end
 
