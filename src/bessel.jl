@@ -1,5 +1,7 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
+include("amos/amos.jl")
+
 using Base.Math: nan_dom_err
 
 struct AmosException <: Exception
@@ -27,36 +29,24 @@ end
 
 ## Airy functions
 function _airy(z::Complex128, id::Int32, kode::Int32)
-    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
-    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+    nz = ierr = Int32(0)
+    (air,aii,nz,ierr) = Amos.ZAIRY(real(z), imag(z), id, kode, 0., 0.,
+                                   nz, ierr)
 
-    ccall((:zairy_,openspecfun), Void,
-          (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
-           real(z), imag(z), id, kode,
-           ai1, ai2, ae1, ae2)
-
-    if ae2[] == 0 || ae2[] == 3 # ignore underflow and less than half machine accuracy loss
-        return complex(ai1[], ai2[])
+    if ierr == 0 || ierr == 3 # ignore underflow and less than half machine accuracy loss
+        return complex(air,aii)
     else
-        throw(AmosException(ae2[]))
+        throw(AmosException(ierr))
     end
 end
 
 function _biry(z::Complex128, id::Int32, kode::Int32)
-    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
-    ae1 = Ref{Int32}()
+    (air,aii,ierr) = Amos.ZBIRY(real(z), imag(z), id, kode, 0., 0., Int32(0))
 
-    ccall((:zbiry_,openspecfun), Void,
-          (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ref{Float64}, Ref{Float64}, Ref{Int32}),
-           real(z), imag(z), id, kode,
-           ai1, ai2, ae1)
-
-    if ae1[] == 0 || ae1[] == 3 # ignore less than half machine accuracy loss
-        return complex(ai1[], ai2[])
+    if ierr == 0 || ierr == 3 # ignore less than half machine accuracy loss
+        return complex(air,aii)
     else
-        throw(AmosException(ae1[]))
+        throw(AmosException(ierr))
     end
 end
 
@@ -171,90 +161,58 @@ for jy in ("j","y"), nu in (0,1)
     end
 end
 
+const cy1 = Float64[0.]
+const cy2 = Float64[0.]
+const wrk1 = Float64[0.]
+const wrk2 = Float64[0.]
 
 function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
-    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
-    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-
-    ccall((:zbesh_,openspecfun), Void,
-           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int},
-            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
-            real(z), imag(z), nu, kode, k, 1,
-            ai1, ai2, ae1, ae2)
-
-    if ae2[] == 0 || ae2[] == 3
-        return complex(ai1[], ai2[])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESH(real(z), imag(z), nu, kode, k, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae2[]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besseli(nu::Float64, z::Complex128, kode::Int32)
-    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
-    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-  
-    ccall((:zbesi_,openspecfun), Void,
-          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
-           real(z), imag(z), nu, kode, 1,
-           ai1, ai2, ae1, ae2)
-
-    if ae2[] == 0 || ae2[] == 3
-        return complex(ai1[], ai2[])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESI(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae2[]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besselj(nu::Float64, z::Complex128, kode::Int32)
-    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
-    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-
-    ccall((:zbesj_,openspecfun), Void,
-          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
-           real(z), imag(z), nu, kode, 1,
-           ai1, ai2, ae1, ae2)
-    
-    if ae2[] == 0 || ae2[] == 3
-        return complex(ai1[], ai2[])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESJ(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae2[]))
+        throw(AmosException(ierr))
     end
 end
 
 function _besselk(nu::Float64, z::Complex128, kode::Int32)
-    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
-    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-
-    ccall((:zbesk_,openspecfun), Void,
-          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
-           real(z), imag(z), nu, kode, 1,
-           ai1, ai2, ae1, ae2)
-
-    if ae2[] == 0 || ae2[] == 3
-        return complex(ai1[], ai2[])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESK(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae2[]))
+        throw(AmosException(ierr))
     end
 end
 
 function _bessely(nu::Float64, z::Complex128, kode::Int32)
-    ai1, ai2 = Ref{Float64}(), Ref{Float64}()
-    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-    wrk1, wrk2 = Ref{Float64}(), Ref{Float64}()
-
-    ccall((:zbesy_,openspecfun), Void,
-          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Float64}, Ref{Float64}, Ref{Int32}),
-           real(z), imag(z), nu, kode, 1,
-           ai1, ai2, ae1, wrk1, wrk2, ae2)
-
-    if ae2[] == 0 || ae2[] == 3
-        return complex(ai1[], ai2[])
+    nz = ierr = Int32(0)
+    (nz,ierr) = Amos.ZBESY(real(z), imag(z), nu, kode, Int32(1), cy1, cy2, nz, wrk1, wrk2, ierr)
+    if ierr == 0 || ierr == 3
+        return complex(cy1[1],cy2[1])
     else
-        throw(AmosException(ae2[]))
+        throw(AmosException(ierr))
     end
 end
 
