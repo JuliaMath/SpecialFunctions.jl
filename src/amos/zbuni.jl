@@ -1,18 +1,18 @@
-const _ZBUNI_CYR = Array(Float64,2)
-const _ZBUNI_CYI = Array(Float64,2)
-const _ZBUNI_BRY = Array(Float64,3)
+ _ZBUNI_CYR = Array{Float64}(2)
+ _ZBUNI_CYI = Array{Float64}(2)
+ _ZBUNI_BRY = Array{Float64}(3)
 function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,NUI::Int32,NLAST::Int32,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
     ASCLE::Float64 = zero(Float64)
     AX::Float64 = zero(Float64)
     AY::Float64 = zero(Float64)
-    const BRY = _ZBUNI_BRY
+     BRY = _ZBUNI_BRY
     C1I::Float64 = zero(Float64)
     C1M::Float64 = zero(Float64)
     C1R::Float64 = zero(Float64)
     CSCLR::Float64 = zero(Float64)
     CSCRR::Float64 = zero(Float64)
-    const CYI = _ZBUNI_CYI
-    const CYR = _ZBUNI_CYR
+     CYI = _ZBUNI_CYI
+     CYR = _ZBUNI_CYR
     DFNU::Float64 = zero(Float64)
     FNUI::Float64 = zero(Float64)
     GNU::Float64 = zero(Float64)

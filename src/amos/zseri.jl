@@ -1,5 +1,5 @@
-const _ZSERI_WR = Array(Float64,2)
-const _ZSERI_WI = Array(Float64,2)
+ _ZSERI_WR = Array{Float64}(2)
+ _ZSERI_WI = Array{Float64}(2)
 function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,TOL::Float64,ELIM::Float64,ALIM::Float64)
     AA::Float64 = zero(Float64)
     ACZ::Float64 = zero(Float64)
@@ -46,8 +46,8 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     SS::Float64 = zero(Float64)
     STI::Float64 = zero(Float64)
     STR::Float64 = zero(Float64)
-    const WI = _ZSERI_WI
-    const WR = _ZSERI_WR
+     WI = _ZSERI_WI
+     WR = _ZSERI_WR
     ZEROI::Float64 = zero(Float64)
     ZEROR::Float64 = zero(Float64)
     begin 

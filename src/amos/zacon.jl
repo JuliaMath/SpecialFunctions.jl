@@ -1,14 +1,14 @@
-const _ZACON_CYR = Array(Float64,2)
-const _ZACON_CYI = Array(Float64,2)
-const _ZACON_CSSR = Array(Float64,3)
-const _ZACON_CSRR = Array(Float64,3)
-const _ZACON_BRY = Array(Float64,3)
+ _ZACON_CYR = Array{Float64}(2)
+ _ZACON_CYI = Array{Float64}(2)
+ _ZACON_CSSR = Array{Float64}(3)
+ _ZACON_CSRR = Array{Float64}(3)
+ _ZACON_BRY = Array{Float64}(3)
 function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,RL::Float64,FNUL::Float64,TOL::Float64,ELIM::Float64,ALIM::Float64)
     ARG::Float64 = zero(Float64)
     AS2::Float64 = zero(Float64)
     ASCLE::Float64 = zero(Float64)
     AZN::Float64 = zero(Float64)
-    const BRY = _ZACON_BRY
+     BRY = _ZACON_BRY
     BSCLE::Float64 = zero(Float64)
     C1I::Float64 = zero(Float64)
     C1M::Float64 = zero(Float64)
@@ -26,10 +26,10 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     CSPNI::Float64 = zero(Float64)
     CSPNR::Float64 = zero(Float64)
     CSR::Float64 = zero(Float64)
-    const CSRR = _ZACON_CSRR
-    const CSSR = _ZACON_CSSR
-    const CYI = _ZACON_CYI
-    const CYR = _ZACON_CYR
+     CSRR = _ZACON_CSRR
+     CSSR = _ZACON_CSSR
+     CYI = _ZACON_CYI
+     CYR = _ZACON_CYR
     FMR::Float64 = zero(Float64)
     FN::Float64 = zero(Float64)
     I::Int32 = zero(Int32)

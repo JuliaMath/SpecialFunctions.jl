@@ -61,8 +61,8 @@ type FortranRoutine
     globals::Vector{Expr}
 end
 
-const GLOBALS = Set([:D1MACH,:I1MACH])
-const INTRINSICS = Set([:COMPLEX,:DABS,:DATAN,:DBLE,:DCOS,:DCOSH,:DEXP,
+ GLOBALS = Set([:D1MACH,:I1MACH])
+ INTRINSICS = Set([:COMPLEX,:DABS,:DATAN,:DBLE,:DCOS,:DCOSH,:DEXP,
     :DLOG,:DMAX1,:DMIN1,:DSIGN,:DSIN,:DSINH,:DSQRT,:FLOAT,:IABS,:INT,
     :MAX0,:MIN0,:MOD,:SNGL])
 
@@ -189,8 +189,8 @@ function main()
             if haskey(routine.dims,v)
                 d = routine.dims[v]
                 gv = symbol("_$(name)_$v")
-                push!(routine.globals, :(const $gv = Array($t,$(d...))))
-                e = :(const $v = $gv)
+                push!(routine.globals, :( $gv = Array($t,$(d...))))
+                e = :( $v = $gv)
             else
                 e = :($v::$t = zero($t))
             end

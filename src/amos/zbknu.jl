@@ -1,9 +1,9 @@
-const _ZBKNU_CYR = Array(Float64,2)
-const _ZBKNU_CYI = Array(Float64,2)
-const _ZBKNU_CSSR = Array(Float64,3)
-const _ZBKNU_CSRR = Array(Float64,3)
-const _ZBKNU_CC = Array(Float64,8)
-const _ZBKNU_BRY = Array(Float64,3)
+ _ZBKNU_CYR = Array{Float64}(2)
+ _ZBKNU_CYI = Array{Float64}(2)
+ _ZBKNU_CSSR = Array{Float64}(3)
+ _ZBKNU_CSRR = Array{Float64}(3)
+ _ZBKNU_CC = Array{Float64}(8)
+ _ZBKNU_BRY = Array{Float64}(3)
 function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,TOL::Float64,ELIM::Float64,ALIM::Float64)
     A1::Float64 = zero(Float64)
     A2::Float64 = zero(Float64)
@@ -14,11 +14,11 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     ASCLE::Float64 = zero(Float64)
     BB::Float64 = zero(Float64)
     BK::Float64 = zero(Float64)
-    const BRY = _ZBKNU_BRY
+     BRY = _ZBKNU_BRY
     CAZ::Float64 = zero(Float64)
     CBI::Float64 = zero(Float64)
     CBR::Float64 = zero(Float64)
-    const CC = _ZBKNU_CC
+     CC = _ZBKNU_CC
     CCHI::Float64 = zero(Float64)
     CCHR::Float64 = zero(Float64)
     CELMR::Float64 = zero(Float64)
@@ -34,11 +34,11 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     CSHR::Float64 = zero(Float64)
     CSI::Float64 = zero(Float64)
     CSR::Float64 = zero(Float64)
-    const CSRR = _ZBKNU_CSRR
-    const CSSR = _ZBKNU_CSSR
+     CSRR = _ZBKNU_CSRR
+     CSSR = _ZBKNU_CSSR
     CTWOR::Float64 = zero(Float64)
-    const CYI = _ZBKNU_CYI
-    const CYR = _ZBKNU_CYR
+     CYI = _ZBKNU_CYI
+     CYR = _ZBKNU_CYR
     CZEROI::Float64 = zero(Float64)
     CZEROR::Float64 = zero(Float64)
     CZI::Float64 = zero(Float64)

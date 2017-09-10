@@ -1,12 +1,12 @@
-const _DGAMLN_GLN = Array(Float64,100)
-const _DGAMLN_CF = Array(Float64,22)
+ _DGAMLN_GLN = Array{Float64}(100)
+ _DGAMLN_CF = Array{Float64}(22)
 function DGAMLN(Z::Float64,IERR::Int32)
     __DGAMLN__::Float64 = zero(Float64)
-    const CF = _DGAMLN_CF
+     CF = _DGAMLN_CF
     CON::Float64 = zero(Float64)
     FLN::Float64 = zero(Float64)
     FZ::Float64 = zero(Float64)
-    const GLN = _DGAMLN_GLN
+     GLN = _DGAMLN_GLN
     I::Int32 = zero(Int32)
     I1M::Int32 = zero(Int32)
     K::Int32 = zero(Int32)

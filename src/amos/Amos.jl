@@ -1,58 +1,58 @@
 module Amos
 
-const int = Int
-const int32 = Int32
-const float32 = Float32
-const float64 = Float64
-const complex64 = Complex64
-const complex128 = Complex128
+ int = Int
+ int32 = Int32
+ float32 = Float32
+ float64 = Float64
+ complex64 = Complex64
+ complex128 = Complex128
 itrunc(x) = trunc(Int,x)
 
-const D1MACH1 = 2.23e-308
-const D1MACH2 = 1.79e-308
-const D1MACH3 = 1.11e-16
-const D1MACH4 = 2.22e-16
-const D1MACH5 = 0.3010299956639812
+ D1MACH1 = 2.23e-308
+ D1MACH2 = 1.79e-308
+ D1MACH3 = 1.11e-16
+ D1MACH4 = 2.22e-16
+ D1MACH5 = 0.3010299956639812
 
-const I1MACH1 = int32(5)
-const I1MACH2 = int32(6)
-const I1MACH3 = int32(0)
-const I1MACH4 = int32(0)
-const I1MACH5 = int32(32)
-const I1MACH6 = int32(4)
-const I1MACH7 = int32(2)
-const I1MACH8 = int32(31)
-const I1MACH9 = int32(2147483647)
-const I1MACH10 = int32(2)
-const I1MACH11 = int32(24)
-const I1MACH12 = int32(-125)
-const I1MACH13 = int32(127)
-const I1MACH14 = int32(53)
-const I1MACH15 = int32(-1021)
-const I1MACH16 = int32(1023)
+ I1MACH1 = int32(5)
+ I1MACH2 = int32(6)
+ I1MACH3 = int32(0)
+ I1MACH4 = int32(0)
+ I1MACH5 = int32(32)
+ I1MACH6 = int32(4)
+ I1MACH7 = int32(2)
+ I1MACH8 = int32(31)
+ I1MACH9 = int32(2147483647)
+ I1MACH10 = int32(2)
+ I1MACH11 = int32(24)
+ I1MACH12 = int32(-125)
+ I1MACH13 = int32(127)
+ I1MACH14 = int32(53)
+ I1MACH15 = int32(-1021)
+ I1MACH16 = int32(1023)
 
 # fortran intrinsics
-const DABS = abs
-const DATAN = atan
-const DBLE = float64
-const DCOS = cos
-const DCOSH = cosh
-const DEXP = exp
-const DLOG = log
-const DMAX1 = max
-const DMIN1 = min
-const DSIGN = copysign
-const DSIN = sin
-const DSINH = sinh
-const DSQRT = sqrt
-const COMPLEX = complex128
-const FLOAT = float32
-const IABS = abs
-const INT = itrunc
-const MAX0 = max
-const MIN0 = min
-const MOD = mod
-const SNGL = float32
+ DABS = abs
+ DATAN = atan
+ DBLE = float64
+ DCOS = cos
+ DCOSH = cosh
+ DEXP = exp
+ DLOG = log
+ DMAX1 = max
+ DMIN1 = min
+ DSIGN = copysign
+ DSIN = sin
+ DSINH = sinh
+ DSQRT = sqrt
+ COMPLEX = complex128
+ FLOAT = float32
+ IABS = abs
+ INT = itrunc
+ MAX0 = max
+ MIN0 = min
+ MOD = mod
+ SNGL = float32
 
 include("dgamln.jl")
 include("zabs.jl")

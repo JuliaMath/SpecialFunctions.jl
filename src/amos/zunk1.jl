@@ -1,25 +1,25 @@
-const _ZUNK1_ZETA2R = Array(Float64,2)
-const _ZUNK1_ZETA2I = Array(Float64,2)
-const _ZUNK1_ZETA1R = Array(Float64,2)
-const _ZUNK1_ZETA1I = Array(Float64,2)
-const _ZUNK1_SUMR = Array(Float64,2)
-const _ZUNK1_SUMI = Array(Float64,2)
-const _ZUNK1_PHIR = Array(Float64,2)
-const _ZUNK1_PHII = Array(Float64,2)
-const _ZUNK1_INIT = Array(Int32,2)
-const _ZUNK1_CYR = Array(Float64,2)
-const _ZUNK1_CYI = Array(Float64,2)
-const _ZUNK1_CWRKR = Array(Float64,16,3)
-const _ZUNK1_CWRKI = Array(Float64,16,3)
-const _ZUNK1_CSSR = Array(Float64,3)
-const _ZUNK1_CSRR = Array(Float64,3)
-const _ZUNK1_BRY = Array(Float64,3)
+ _ZUNK1_ZETA2R = Array{Float64}(2)
+ _ZUNK1_ZETA2I = Array{Float64}(2)
+ _ZUNK1_ZETA1R = Array{Float64}(2)
+ _ZUNK1_ZETA1I = Array{Float64}(2)
+ _ZUNK1_SUMR = Array{Float64}(2)
+ _ZUNK1_SUMI = Array{Float64}(2)
+ _ZUNK1_PHIR = Array{Float64}(2)
+ _ZUNK1_PHII = Array{Float64}(2)
+ _ZUNK1_INIT = Array{Int32}(2)
+ _ZUNK1_CYR = Array{Float64}(2)
+ _ZUNK1_CYI = Array{Float64}(2)
+ _ZUNK1_CWRKR = Array{Float64}(16,3)
+ _ZUNK1_CWRKI = Array{Float64}(16,3)
+ _ZUNK1_CSSR = Array{Float64}(3)
+ _ZUNK1_CSRR = Array{Float64}(3)
+ _ZUNK1_BRY = Array{Float64}(3)
 function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int32,YR::AbstractArray{Float64},YI::AbstractArray{Float64},NZ::Int32,TOL::Float64,ELIM::Float64,ALIM::Float64)
     ANG::Float64 = zero(Float64)
     APHI::Float64 = zero(Float64)
     ASC::Float64 = zero(Float64)
     ASCLE::Float64 = zero(Float64)
-    const BRY = _ZUNK1_BRY
+     BRY = _ZUNK1_BRY
     C1I::Float64 = zero(Float64)
     C1R::Float64 = zero(Float64)
     C2I::Float64 = zero(Float64)
@@ -34,12 +34,12 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     CSPNI::Float64 = zero(Float64)
     CSPNR::Float64 = zero(Float64)
     CSR::Float64 = zero(Float64)
-    const CSRR = _ZUNK1_CSRR
-    const CSSR = _ZUNK1_CSSR
-    const CWRKI = _ZUNK1_CWRKI
-    const CWRKR = _ZUNK1_CWRKR
-    const CYI = _ZUNK1_CYI
-    const CYR = _ZUNK1_CYR
+     CSRR = _ZUNK1_CSRR
+     CSSR = _ZUNK1_CSSR
+     CWRKI = _ZUNK1_CWRKI
+     CWRKR = _ZUNK1_CWRKR
+     CYI = _ZUNK1_CYI
+     CYR = _ZUNK1_CYR
     FMR::Float64 = zero(Float64)
     FN::Float64 = zero(Float64)
     FNF::Float64 = zero(Float64)
@@ -49,7 +49,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     IFLAG::Int32 = zero(Int32)
     IFN::Int32 = zero(Int32)
     IL::Int32 = zero(Int32)
-    const INIT = _ZUNK1_INIT
+     INIT = _ZUNK1_INIT
     INITD::Int32 = zero(Int32)
     INU::Int32 = zero(Int32)
     IPARD::Int32 = zero(Int32)
@@ -62,8 +62,8 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     NW::Int32 = zero(Int32)
     PHIDI::Float64 = zero(Float64)
     PHIDR::Float64 = zero(Float64)
-    const PHII = _ZUNK1_PHII
-    const PHIR = _ZUNK1_PHIR
+     PHII = _ZUNK1_PHII
+     PHIR = _ZUNK1_PHIR
     PI::Float64 = zero(Float64)
     RAST::Float64 = zero(Float64)
     RAZR::Float64 = zero(Float64)
@@ -79,26 +79,26 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     STR::Float64 = zero(Float64)
     SUMDI::Float64 = zero(Float64)
     SUMDR::Float64 = zero(Float64)
-    const SUMI = _ZUNK1_SUMI
-    const SUMR = _ZUNK1_SUMR
+     SUMI = _ZUNK1_SUMI
+     SUMR = _ZUNK1_SUMR
     ZEROI::Float64 = zero(Float64)
     ZEROR::Float64 = zero(Float64)
     ZET1DI::Float64 = zero(Float64)
     ZET1DR::Float64 = zero(Float64)
     ZET2DI::Float64 = zero(Float64)
     ZET2DR::Float64 = zero(Float64)
-    const ZETA1I = _ZUNK1_ZETA1I
-    const ZETA1R = _ZUNK1_ZETA1R
-    const ZETA2I = _ZUNK1_ZETA2I
-    const ZETA2R = _ZUNK1_ZETA2R
+     ZETA1I = _ZUNK1_ZETA1I
+     ZETA1R = _ZUNK1_ZETA1R
+     ZETA2I = _ZUNK1_ZETA2I
+     ZETA2R = _ZUNK1_ZETA2R
     ZRI::Float64 = zero(Float64)
     ZRR::Float64 = zero(Float64)
-    begin 
+    begin
         ZEROR = 0.0
         ZEROI = 0.0
         CONER = 1.0
     end
-    begin 
+    begin
         PI = 3.141592653589793
     end
     KDFLG = int32(1)

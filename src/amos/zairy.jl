@@ -1,5 +1,5 @@
-const _ZAIRY_CYR = Array(Float64,1)
-const _ZAIRY_CYI = Array(Float64,1)
+ _ZAIRY_CYR = Array{Float64}(1)
+ _ZAIRY_CYI = Array{Float64}(1)
 function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::Float64,NZ::Int32,IERR::Int32)
     AA::Float64 = zero(Float64)
     AD::Float64 = zero(Float64)
@@ -20,8 +20,8 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     CONER::Float64 = zero(Float64)
     CSQI::Float64 = zero(Float64)
     CSQR::Float64 = zero(Float64)
-    const CYI = _ZAIRY_CYI
-    const CYR = _ZAIRY_CYR
+     CYI = _ZAIRY_CYI
+     CYR = _ZAIRY_CYR
     D1::Float64 = zero(Float64)
     D2::Float64 = zero(Float64)
     DIG::Float64 = zero(Float64)
