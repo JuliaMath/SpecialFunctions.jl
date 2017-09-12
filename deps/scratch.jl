@@ -17,7 +17,7 @@ if libm == "libopenlibm"
 
     # Copy over the OpenLibm .so
     cp(openlibm_so, joinpath(libdir(openspecfun), basename(openlibm_so)),
-       remove_destination=true, follow_symlinks=true)
+       remove_destination=true)
 
     if !isdir(srcdir(openspecfun))
         mkpath(srcdir(openspecfun))
@@ -43,12 +43,12 @@ if libm == "libopenlibm"
     end
     for f in readdir(joinpath(openlibm_src, "include"))
         cp(joinpath(openlibm_src, "include", f), joinpath(openlibm_include, f),
-           remove_destination=true, follow_symlinks=true)
+           remove_destination=true)
     end
     for f in readdir(joinpath(openlibm_src, "src"))
         if endswith(f, ".h")
             cp(joinpath(openlibm_src, "src", f), joinpath(openlibm_include, f),
-               remove_destination=true, follow_symlinks=true)
+               remove_destination=true)
         end
     end
 else
