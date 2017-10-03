@@ -4,13 +4,16 @@ module SpecialFunctions
 
 using Compat
 
-let depsfile = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
+if VERSION >= v"0.7.0-DEV.1760"
+    depsfile = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
     if isfile(depsfile)
         include(depsfile)
     else
         error("SpecialFunctions is not properly installed. Please run " *
               "Pkg.build(\"SpecialFunctions\") and restart Julia.")
     end
+else
+    using Base.Math: openspecfun
 end
 
 if isdefined(Base, :airyai) && VERSION < v"0.7.0-DEV.986" #22763

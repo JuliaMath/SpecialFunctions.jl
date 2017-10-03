@@ -1,6 +1,15 @@
 # Building OpenSpecFun from scratch
 
+using BinDeps
+using BinDeps: libdir, srcdir, includedir, depsdir, builddir
 using Base.Math: libm
+
+# Don't call setup again if we're being included from binaries.jl
+if !did_setup
+    BinDeps.@setup
+    const OSF_VERS = v"0.5.3"
+    openspecfun = library_dependency("libopenspecfun")
+end
 
 # If Julia is built with OpenLibm, we want to build OpenSpecFun with it as well.
 # Unfortunately this requires a fair bit more work, as we need to link to the .so
@@ -110,3 +119,9 @@ provides(BuildProcess,
                 end)
         end
     end), openspecfun)
+
+# If we're being included, the installation step happens once we return back
+# to binaries.jl
+if !did_setup
+    BinDeps.@install Dict(:libopenspecfun => :openspecfun)
+end
