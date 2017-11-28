@@ -25,8 +25,11 @@ if libm == "libopenlibm"
     openlibm_so = Libdl.dlpath(libm)
 
     # Copy over the OpenLibm .so
-    cp(openlibm_so, joinpath(libdir(openspecfun), basename(openlibm_so)),
-       remove_destination=true, follow_symlinks=true)
+    for lib in readdir(dirname(openlibm_so))
+        startswith(lib, "libopenlibm") || continue
+        cp(joinpath(dirname(openlibm_so), lib), joinpath(libdir(openspecfun), lib),
+           remove_destination=true, follow_symlinks=false)
+    end
 
     if !isdir(srcdir(openspecfun))
         mkpath(srcdir(openspecfun))
@@ -83,39 +86,35 @@ elseif Sys.ARCH === :x86_64
     fc *= " -m64"
 end
 
-flags = [
-    # OpenSpecFun build flags
-    "ARCH=\"$(Sys.ARCH)\"",
-    "CC=\"$cc\"",
-    "FC=\"$fc\"",
-    "USECLANG=$(Int(use_clang))",
-    "USEGCC=$(Int(!use_clang))",
-    "USE_OPENLIBM=$(Int(use_openlibm))",
-    "CFLAGS=\"-O3 -std=c99\"",
-    "FFLAGS=\"-O2 -fPIC\"",
-    "LDFLAGS=\"-L$(libdir(openspecfun)) -Wl,-rpath,'\$\$ORIGIN' -Wl,-z,origin\"",
-    # Make flags
-    "DESTDIR=\"\"",
-    "prefix=$(depsdir(openspecfun))",
-    "libdir=$(libdir(openspecfun))",
-    "shlibdir=$(libdir(openspecfun))",
-    "includedir=$(includedir(openspecfun))",
-    "O="
-]
-
 provides(Sources, URI("https://github.com/JuliaLang/openspecfun/archive/v$OSF_VERS.tar.gz"),
-         openspecfun)
+         openspecfun, unpacked_dir="openspecfun-$OSF_VERS")
 
 provides(BuildProcess,
     (@build_steps begin
         GetSources(openspecfun)
         CreateDirectory(builddir(openspecfun))
         @build_steps begin
-            ChangeDirectory(builddir(openspecfun))
+            ChangeDirectory(joinpath(srcdir(openspecfun), "openspecfun-$OSF_VERS"))
             FileRule(joinpath(libdir(openspecfun), "libopenspecfun." * Libdl.dlext),
                 @build_steps begin
                     CreateDirectory(libdir(openspecfun))
-                    `$MAKE_CMD install $flags`
+                    ```
+                    $MAKE_CMD install
+                        ARCH="$(Sys.ARCH)"
+                        CC="$cc"
+                        FC="$fc"
+                        USECLANG=$(Int(use_clang))
+                        USEGCC=$(Int(!use_clang))
+                        USE_OPENLIBM=$(Int(use_openlibm))
+                        CFLAGS="-O3 -std=c99"
+                        FFLAGS="-O2 -fPIC"
+                        LDFLAGS="-L$(libdir(openspecfun)) -Wl,-rpath,'\$\$ORIGIN' -Wl,-z,origin"
+                        DESTDIR=""
+                        prefix=""
+                        libdir="$(libdir(openspecfun))"
+                        includedir="$(includedir(openspecfun))"
+                        O=
+                    ```
                 end)
         end
     end), openspecfun)
