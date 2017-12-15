@@ -47,7 +47,6 @@ MOD(x::Int32,  y::Int32)::Int32 = mod(x, y)
 MAX0(x::Int32, y::Int32)::Int32 = max(x, y)
 MIN0(x::Int32, y::Int32)::Int32 = min(x, y)
 
-include("dgamln.jl")
 include("zacai.jl")
 include("zacon.jl")
 include("zairy.jl")

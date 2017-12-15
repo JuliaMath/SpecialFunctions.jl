@@ -145,7 +145,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     P2I = ZEROI
     FNF = FNU - DBLE(FLOAT(IFNU))
     TFNF = FNF + FNF
-    BK = (DGAMLN(FKK + TFNF + 1.0,IDUM) - DGAMLN(FKK + 1.0,IDUM)) - DGAMLN(TFNF + 1.0,IDUM)
+    BK = (lgamma(FKK + TFNF + 1.0) - lgamma(FKK + 1.0)) - lgamma(TFNF + 1.0)
     BK = DEXP(BK)
     SUMR = ZEROR
     SUMI = ZEROI
@@ -216,7 +216,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     (STR,STI,IDUM) = ZLOG(RZR,RZI,STR,STI,IDUM)
     P1R = -FNF * STR + PTR
     P1I = -FNF * STI + PTI
-    AP = DGAMLN(1.0 + FNF,IDUM)
+    AP = lgamma(1.0 + FNF)
     PTR = P1R - AP
     PTI = P1I
     P2R = P2R + SUMR

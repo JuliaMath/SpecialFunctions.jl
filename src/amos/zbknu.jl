@@ -182,7 +182,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     SMUI = CSHI / DNU
     @label line10
     A2 = 1.0 + DNU
-    T2 = DEXP(-(DGAMLN(A2,IDUM)))
+    T2 = 1/gamma(A2)
     T1 = 1.0 / (T2 * FC)
     if DABS(DNU) > 0.1
         @goto line40

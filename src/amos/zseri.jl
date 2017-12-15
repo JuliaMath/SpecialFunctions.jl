@@ -85,7 +85,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     FNUP = DFNU + 1.0
     AK1R = CKR * DFNU
     AK1I = CKI * DFNU
-    AK = DGAMLN(FNUP,IDUM)
+    AK = lgamma(FNUP)
     AK1R = AK1R - AK
     if KODE == Int32(2)
         AK1R = AK1R - ZR
