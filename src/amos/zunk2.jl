@@ -205,7 +205,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         end
         STR = ZBR + ZETA2R[J]
         STI = ZBI + ZETA2I[J]
-        RAST = FN / ZABS(COMPLEX(STR,STI))
+        RAST = FN / abs(COMPLEX(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = ZETA1R[J] - STR
@@ -225,8 +225,8 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if DABS(RS1) < ALIM
             @goto line50
         end
-        APHI = ZABS(COMPLEX(PHIR[J],PHII[J]))
-        AARG = ZABS(COMPLEX(ARGR[J],ARGI[J]))
+        APHI = abs(COMPLEX(PHIR[J],PHII[J]))
+        AARG = abs(COMPLEX(ARGR[J],ARGI[J]))
         RS1 = ((RS1 + DLOG(APHI)) - 0.25 * DLOG(AARG)) - AIC
         if DABS(RS1) > ELIM
             @goto line70
@@ -311,7 +311,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     I = N
     @label line85
-    RAZR = 1.0 / ZABS(COMPLEX(ZRR,ZRI))
+    RAZR = 1.0 / abs(COMPLEX(ZRR,ZRI))
     STR = ZRR * RAZR
     STI = -ZRI * RAZR
     RZR = (STR + STR) * RAZR
@@ -333,7 +333,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     STR = ZBR + ZET2DR
     STI = ZBI + ZET2DI
-    RAST = FN / ZABS(COMPLEX(STR,STI))
+    RAST = FN / abs(COMPLEX(STR,STI))
     STR = STR * RAST * RAST
     STI = -STI * RAST * RAST
     S1R = ZET1DR - STR
@@ -350,7 +350,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     if DABS(RS1) < ALIM
         @goto line120
     end
-    APHI = ZABS(COMPLEX(PHIDR,PHIDI))
+    APHI = abs(COMPLEX(PHIDR,PHIDI))
     RS1 = RS1 + DLOG(APHI)
     if DABS(RS1) < ELIM
         @goto line120
@@ -480,7 +480,7 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         end
         STR = ZBR + ZET2DR
         STI = ZBI + ZET2DI
-        RAST = FN / ZABS(COMPLEX(STR,STI))
+        RAST = FN / abs(COMPLEX(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = -ZET1DR + STR
@@ -500,8 +500,8 @@ function ZUNK2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if DABS(RS1) < ALIM
             @goto line240
         end
-        APHI = ZABS(COMPLEX(PHIDR,PHIDI))
-        AARG = ZABS(COMPLEX(ARGDR,ARGDI))
+        APHI = abs(COMPLEX(PHIDR,PHIDI))
+        AARG = abs(COMPLEX(ARGDR,ARGDI))
         RS1 = ((RS1 + DLOG(APHI)) - 0.25 * DLOG(AARG)) - AIC
         if DABS(RS1) > ELIM
             @goto line280

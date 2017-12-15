@@ -41,7 +41,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         S1I = YI[I]
         CYR[I] = S1R
         CYI[I] = S1I
-        AS = ZABS(COMPLEX(S1R,S1I))
+        AS = abs(COMPLEX(S1R,S1I))
         ACS = -ZRR + DLOG(AS)
         NZ = NZ + Int32(1)
         YR[I] = ZEROR
@@ -103,7 +103,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         S1I = CSI
         CKR = CKR + RZR
         CKI = CKI + RZI
-        AS = ZABS(COMPLEX(S2R,S2I))
+        AS = abs(COMPLEX(S2R,S2I))
         ALAS = DLOG(AS)
         ACS = -ZDR + ALAS
         NZ = NZ + Int32(1)

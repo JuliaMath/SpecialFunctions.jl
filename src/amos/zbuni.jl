@@ -58,7 +58,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if NW != Int32(0)
         @goto line90
     end
-    STR = ZABS(COMPLEX(CYR[Int32(1)],CYI[Int32(1)]))
+    STR = abs(COMPLEX(CYR[Int32(1)],CYI[Int32(1)]))
     BRY[Int32(1)] = (1000.0D1MACH1) / TOL
     BRY[Int32(2)] = 1.0 / BRY[Int32(1)]
     BRY[Int32(3)] = BRY[Int32(2)]
@@ -85,7 +85,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     S1I = CYI[Int32(2)] * CSCLR
     S2R = CYR[Int32(1)] * CSCLR
     S2I = CYI[Int32(1)] * CSCLR
-    RAZ = 1.0 / ZABS(COMPLEX(ZR,ZI))
+    RAZ = 1.0 / abs(COMPLEX(ZR,ZI))
     STR = ZR * RAZ
     STI = -ZI * RAZ
     RZR = (STR + STR) * RAZ

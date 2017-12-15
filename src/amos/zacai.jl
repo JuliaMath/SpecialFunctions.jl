@@ -31,7 +31,7 @@ function ZACAI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     NZ = Int32(0)
     ZNR = -ZR
     ZNI = -ZI
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     NN = N
     DFNU = FNU + DBLE(FLOAT(N - Int32(1)))
     if AZ <= 2.0

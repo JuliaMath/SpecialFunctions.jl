@@ -57,7 +57,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         CONEI = 0.0
     end
     NZ = Int32(0)
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     if AZ == 0.0
         @goto line160
     end
@@ -77,7 +77,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     end
     (CZR,CZI) = ZMLT(HZR,HZI,HZR,HZI,CZR,CZI)
     @label line10
-    ACZ = ZABS(COMPLEX(CZR,CZI))
+    ACZ = abs(COMPLEX(CZR,CZI))
     NN = N
     (CKR,CKI,IDUM) = ZLOG(HZR,HZI,CKR,CKI,IDUM)
     @label line20
@@ -214,7 +214,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         YI[K] = CKI
         AK = AK - 1.0
         K = K - Int32(1)
-        if ZABS(COMPLEX(CKR,CKI)) > ASCLE
+        if abs(COMPLEX(CKR,CKI)) > ASCLE
             @goto line140
         end
         @label line130

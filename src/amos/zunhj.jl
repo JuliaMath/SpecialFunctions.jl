@@ -751,7 +751,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     RFN13 = 1.0 / FN13
     W2R = (CONER - ZBR * ZBR) + ZBI * ZBI
     W2I = (CONEI - ZBR * ZBI) - ZBR * ZBI
-    AW2 = ZABS(COMPLEX(W2R,W2I))
+    AW2 = abs(COMPLEX(W2R,W2I))
     if AW2 > 0.25
         @goto line130
     end
@@ -905,7 +905,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     ZETA1I = ZCI * FNU
     ZETA2R = WR * FNU
     ZETA2I = WI * FNU
-    AZTH = ZABS(COMPLEX(ZTHR,ZTHI))
+    AZTH = abs(COMPLEX(ZTHR,ZTHI))
     ANG = THPI
     if ZTHR >= 0.0 && ZTHI < 0.0
         @goto line140

@@ -48,7 +48,7 @@ function ZLOG(AR::Float64,AI::Float64,BR::Float64,BI::Float64,IERR::Int32)
         DTHETA = DTHETA + DPI
     end
     @label line50
-    ZM = ZABS(COMPLEX(AR,AI))
+    ZM = abs(COMPLEX(AR,AI))
     BR = DLOG(ZM)
     BI = DTHETA
     return (BR,BI,IERR)

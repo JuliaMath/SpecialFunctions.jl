@@ -136,7 +136,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         CC[Int32(7)] = 1.133027231981696e-6
         CC[Int32(8)] = 6.116095104481416e-9
     end
-    CAZ = ZABS(COMPLEX(ZR,ZI))
+    CAZ = abs(COMPLEX(ZR,ZI))
     CSCLR = 1.0 / TOL
     CRSCR = TOL
     CSSR[Int32(1)] = CSCLR
@@ -424,7 +424,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         FK = FK - CONER
         @label line190
     end
-    TM = ZABS(COMPLEX(CSR,CSI))
+    TM = abs(COMPLEX(CSR,CSI))
     PTR = 1.0 / TM
     S1R = P2R * PTR
     S1I = P2I * PTR
@@ -442,7 +442,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     end
     @goto line240
     @label line200
-    TM = ZABS(COMPLEX(P2R,P2I))
+    TM = abs(COMPLEX(P2R,P2I))
     PTR = 1.0 / TM
     P1R = P1R * PTR
     P1I = P1I * PTR
@@ -598,7 +598,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         S1I = STI
         CKR = CKR + RZR
         CKI = CKI + RZI
-        AS = ZABS(COMPLEX(S2R,S2I))
+        AS = abs(COMPLEX(S2R,S2I))
         ALAS = DLOG(AS)
         P2R = -ZDR + ALAS
         if P2R < -ELIM

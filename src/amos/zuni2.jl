@@ -138,7 +138,7 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     end
     STR = ZBR + ZETA2R
     STI = ZBI + ZETA2I
-    RAST = FN / ZABS(COMPLEX(STR,STI))
+    RAST = FN / abs(COMPLEX(STR,STI))
     STR = STR * RAST * RAST
     STI = -STI * RAST * RAST
     S1R = -ZETA1R + STR
@@ -162,7 +162,7 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         end
         STR = ZBR + ZETA2R
         STI = ZBI + ZETA2I
-        RAST = FN / ZABS(COMPLEX(STR,STI))
+        RAST = FN / abs(COMPLEX(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = -ZETA1R + STR
@@ -182,8 +182,8 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if DABS(RS1) < ALIM
             @goto line70
         end
-        APHI = ZABS(COMPLEX(PHIR,PHII))
-        AARG = ZABS(COMPLEX(ARGR,ARGI))
+        APHI = abs(COMPLEX(PHIR,PHII))
+        AARG = abs(COMPLEX(ARGR,ARGI))
         RS1 = ((RS1 + DLOG(APHI)) - 0.25 * DLOG(AARG)) - AIC
         if DABS(RS1) > ELIM
             @goto line120
@@ -239,7 +239,7 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if ND <= Int32(2)
         @goto line110
     end
-    RAZ = 1.0 / ZABS(COMPLEX(ZR,ZI))
+    RAZ = 1.0 / abs(COMPLEX(ZR,ZI))
     STR = ZR * RAZ
     STI = -ZI * RAZ
     RZR = (STR + STR) * RAZ

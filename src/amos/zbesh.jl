@@ -81,7 +81,7 @@ function ZBESH(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,M::Int32,N::Int3
     FMM = DBLE(FLOAT(MM))
     ZNR = FMM * ZI
     ZNI = -FMM * ZR
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     AA = 0.5 / TOL
     BB = DBLE(FLOAT(I1MACH9)) * 0.5
     AA = DMIN1(AA,BB)

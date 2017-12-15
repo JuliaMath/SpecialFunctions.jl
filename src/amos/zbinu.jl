@@ -18,7 +18,7 @@ function ZBINU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
         ZEROI = 0.0
     end
     NZ = Int32(0)
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     NN = N
     DFNU = FNU + DBLE(FLOAT(N - Int32(1)))
     if AZ <= 2.0

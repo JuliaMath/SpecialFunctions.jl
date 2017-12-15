@@ -77,7 +77,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     if IERR != Int32(0)
         return (BIR,BII,IERR)
     end
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     TOL = DMAX1(D1MACH4,1.0e-18)
     FID = DBLE(FLOAT(ID))
     if AZ > 1.0

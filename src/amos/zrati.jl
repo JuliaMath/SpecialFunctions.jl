@@ -48,7 +48,7 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
         CONEI = 0.0
         RT2 = 1.4142135623730951
     end
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     INU = INT(SNGL(FNU))
     IDNU = (INU + N) - Int32(1)
     MAGZ = INT(SNGL(AZ))
@@ -72,8 +72,8 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
     if ID > Int32(0)
         ID = Int32(0)
     end
-    AP2 = ZABS(COMPLEX(P2R,P2I))
-    AP1 = ZABS(COMPLEX(P1R,P1I))
+    AP2 = abs(COMPLEX(P2R,P2I))
+    AP1 = abs(COMPLEX(P1R,P1I))
     ARG = (AP2 + AP2) / (AP1 * TOL)
     TEST1 = DSQRT(ARG)
     TEST = TEST1
@@ -94,14 +94,14 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
     P1I = PTI
     T1R = T1R + RZR
     T1I = T1I + RZI
-    AP2 = ZABS(COMPLEX(P2R,P2I))
+    AP2 = abs(COMPLEX(P2R,P2I))
     if AP1 <= TEST
         @goto line10
     end
     if ITIME == Int32(2)
         @goto line20
     end
-    AK = ZABS(COMPLEX(T1R,T1I) * 0.5)
+    AK = abs(COMPLEX(T1R,T1I) * 0.5)
     FLAM = AK + DSQRT(AK * AK - 1.0)
     RHO = DMIN1(AP2 / AP1,FLAM)
     TEST = TEST1 * DSQRT(RHO / (RHO * RHO - 1.0))
@@ -149,7 +149,7 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
     for I = Int32(2):N
         PTR = CDFNUR + (T1R * RZR - T1I * RZI) + CYR[K + Int32(1)]
         PTI = CDFNUI + (T1R * RZI + T1I * RZR) + CYI[K + Int32(1)]
-        AK = ZABS(COMPLEX(PTR,PTI))
+        AK = abs(COMPLEX(PTR,PTI))
         if AK != CZEROR
             @goto line50
         end

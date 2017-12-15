@@ -152,7 +152,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     CSPNR = -CSPNR
     CSPNI = -CSPNI
-    AZN = ZABS(COMPLEX(ZNR,ZNI))
+    AZN = abs(COMPLEX(ZNR,ZNI))
     RAZN = 1.0 / AZN
     STR = ZNR * RAZN
     STI = -ZNI * RAZN
@@ -172,7 +172,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     BRY[Int32(1)] = ASCLE
     BRY[Int32(2)] = 1.0 / ASCLE
     BRY[Int32(3)] = D1MACH2
-    AS2 = ZABS(COMPLEX(S2R,S2I))
+    AS2 = abs(COMPLEX(S2R,S2I))
     KFLAG = Int32(2)
     if AS2 > BRY[Int32(1)]
         @goto line50

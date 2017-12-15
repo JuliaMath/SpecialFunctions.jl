@@ -63,7 +63,7 @@ function ZBESI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
     ALIM = ELIM + DMAX1(-AA,-41.45)
     RL = 1.2DIG + 3.0
     FNUL = 10.0 + 6.0 * (DIG - 3.0)
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     FN = FNU + DBLE(FLOAT(N - Int32(1)))
     AA = 0.5 / TOL
     BB = DBLE(FLOAT(I1MACH9)) * 0.5

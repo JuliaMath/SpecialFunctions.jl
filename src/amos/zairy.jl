@@ -80,7 +80,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     if IERR != Int32(0)
         return (AIR,AII,NZ,IERR)
     end
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     TOL = DMAX1(D1MACH4,1.0e-18)
     FID = DBLE(FLOAT(ID))
     if AZ > 1.0

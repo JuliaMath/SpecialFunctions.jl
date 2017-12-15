@@ -133,7 +133,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         end
         STR = ZRR + ZETA2R[J]
         STI = ZRI + ZETA2I[J]
-        RAST = FN / ZABS(COMPLEX(STR,STI))
+        RAST = FN / abs(COMPLEX(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = ZETA1R[J] - STR
@@ -153,7 +153,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if DABS(RS1) < ALIM
             @goto line40
         end
-        APHI = ZABS(COMPLEX(PHIR[J],PHII[J]))
+        APHI = abs(COMPLEX(PHIR[J],PHII[J]))
         RS1 = RS1 + DLOG(APHI)
         if DABS(RS1) > ELIM
             @goto line60
@@ -217,7 +217,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     I = N
     @label line75
-    RAZR = 1.0 / ZABS(COMPLEX(ZRR,ZRI))
+    RAZR = 1.0 / abs(COMPLEX(ZRR,ZRI))
     STR = ZRR * RAZR
     STI = -ZRI * RAZR
     RZR = (STR + STR) * RAZR
@@ -240,7 +240,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     STR = ZRR + ZET2DR
     STI = ZRI + ZET2DI
-    RAST = FN / ZABS(COMPLEX(STR,STI))
+    RAST = FN / abs(COMPLEX(STR,STI))
     STR = STR * RAST * RAST
     STI = -STI * RAST * RAST
     S1R = ZET1DR - STR
@@ -257,7 +257,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     if DABS(RS1) < ALIM
         @goto line100
     end
-    APHI = ZABS(COMPLEX(PHIDR,PHIDI))
+    APHI = abs(COMPLEX(PHIDR,PHIDI))
     RS1 = RS1 + DLOG(APHI)
     if DABS(RS1) < ELIM
         @goto line100
@@ -378,7 +378,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         end
         STR = ZRR + ZET2DR
         STI = ZRI + ZET2DI
-        RAST = FN / ZABS(COMPLEX(STR,STI))
+        RAST = FN / abs(COMPLEX(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = -ZET1DR + STR
@@ -398,7 +398,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if DABS(RS1) < ALIM
             @goto line220
         end
-        APHI = ZABS(COMPLEX(PHIDR,PHIDI))
+        APHI = abs(COMPLEX(PHIDR,PHIDI))
         RS1 = RS1 + DLOG(APHI)
         if DABS(RS1) > ELIM
             @goto line260

@@ -15,8 +15,8 @@ function ZS1S2(ZRR::Float64,ZRI::Float64,S1R::Float64,S1I::Float64,S2R::Float64,
         ZEROI = 0.0
     end
     NZ = Int32(0)
-    AS1 = ZABS(COMPLEX(S1R,S1I))
-    AS2 = ZABS(COMPLEX(S2R,S2I))
+    AS1 = abs(COMPLEX(S1R,S1I))
+    AS2 = abs(COMPLEX(S2R,S2I))
     if S1R == 0.0 && S1I == 0.0
         @goto line10
     end
@@ -36,7 +36,7 @@ function ZS1S2(ZRR::Float64,ZRI::Float64,S1R::Float64,S1I::Float64,S2R::Float64,
     C1R = (C1R - ZRR) - ZRR
     C1I = (C1I - ZRI) - ZRI
     (S1R,S1I) = ZEXP(C1R,C1I,S1R,S1I)
-    AS1 = ZABS(COMPLEX(S1R,S1I))
+    AS1 = abs(COMPLEX(S1R,S1I))
     IUF = IUF + Int32(1)
     @label line10
     AA = DMAX1(AS1,AS2)

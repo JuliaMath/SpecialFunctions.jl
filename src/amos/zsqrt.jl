@@ -7,7 +7,7 @@ function ZSQRT(AR::Float64,AI::Float64,BR::Float64,BI::Float64)
         DRT = 0.7071067811865476
         DPI = 3.141592653589793
     end
-    ZM = ZABS(COMPLEX(AR,AI))
+    ZM = abs(COMPLEX(AR,AI))
     ZM = DSQRT(ZM)
     if AR == 0.0
         @goto line10

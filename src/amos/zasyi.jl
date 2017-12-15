@@ -67,7 +67,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         CONEI = 0.0
     end
     NZ = Int32(0)
-    AZ = ZABS(COMPLEX(ZR,ZI))
+    AZ = abs(COMPLEX(ZR,ZI))
     ARM = 1000.0D1MACH1
     RTR1 = DSQRT(ARM)
     IL = MIN0(Int32(2),N)
