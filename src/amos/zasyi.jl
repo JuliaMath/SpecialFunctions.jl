@@ -95,7 +95,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         @goto line20
     end
     KODED = Int32(0)
-    (STR,STI) = ZEXP(CZR,CZI,STR,STI)
+    (STR,STI) = reim(exp(complex(CZR,CZI)))
     (AK1R,AK1I) = ZMLT(AK1R,AK1I,STR,STI,AK1R,AK1I)
     @label line20
     FDN = 0.0
@@ -172,7 +172,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         end
         TZR = ZR + ZR
         TZI = ZI + ZI
-        (STR,STI) = ZEXP(-TZR,-TZI,STR,STI)
+        (STR,STI) = reim(exp(complex(-TZR,-TZI)))
         (STR,STI) = ZMLT(STR,STI,P1R,P1I,STR,STI)
         (STR,STI) = ZMLT(STR,STI,CS2R,CS2I,STR,STI)
         S2R = S2R + STR
@@ -207,7 +207,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if KODED == Int32(0)
         return NZ
     end
-    (CKR,CKI) = ZEXP(CZR,CZI,CKR,CKI)
+    (CKR,CKI) = reim(exp(complex(CZR,CZI)))
     for I = Int32(1):NN
         STR = YR[I] * CKR - YI[I] * CKI
         YI[I] = YR[I] * CKI + YI[I] * CKR

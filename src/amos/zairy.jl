@@ -150,7 +150,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
     ZTAR = TTH * (ZR * STR - ZI * STI)
     ZTAI = TTH * (ZR * STI + ZI * STR)
-    (STR,STI) = ZEXP(ZTAR,ZTAI,STR,STI)
+    (STR,STI) = reim(exp(complex(ZTAR,ZTAI)))
     PTR = AIR * STR - AII * STI
     AII = AIR * STI + AII * STR
     AIR = PTR
@@ -173,7 +173,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
     ZTAR = TTH * (ZR * STR - ZI * STI)
     ZTAI = TTH * (ZR * STI + ZI * STR)
-    (STR,STI) = ZEXP(ZTAR,ZTAI,STR,STI)
+    (STR,STI) = reim(exp(complex(ZTAR,ZTAI)))
     PTR = STR * AIR - STI * AII
     AII = STR * AII + STI * AIR
     AIR = PTR

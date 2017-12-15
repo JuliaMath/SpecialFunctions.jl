@@ -35,7 +35,7 @@ function ZS1S2(ZRR::Float64,ZRI::Float64,S1R::Float64,S1I::Float64,S2R::Float64,
     (C1R,C1I,IDUM) = ZLOG(S1DR,S1DI,C1R,C1I,IDUM)
     C1R = (C1R - ZRR) - ZRR
     C1I = (C1I - ZRI) - ZRI
-    (S1R,S1I) = ZEXP(C1R,C1I,S1R,S1I)
+    (S1R,S1I) = reim(exp(complex(C1R,C1I)))
     AS1 = abs(COMPLEX(S1R,S1I))
     IUF = IUF + Int32(1)
     @label line10

@@ -223,7 +223,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     P2I = P2I + SUMI
     AP = abs(COMPLEX(P2R,P2I))
     P1R = 1.0 / AP
-    (STR,STI) = ZEXP(PTR,PTI,STR,STI)
+    (STR,STI) = reim(exp(complex(PTR,PTI)))
     CKR = STR * P1R
     CKI = STI * P1R
     PTR = P2R * P1R
