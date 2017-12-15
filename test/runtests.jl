@@ -27,7 +27,7 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test SF.erfc(Float16(1)) ≈ 0.15729920705028513066
     @test SF.erfcx(1) ≈ 0.42758357615580700442
     @test SF.erfcx(Float32(1)) ≈ 0.42758357615580700442
-    @test SF.erfcx(Complex64(1)) ≈ 0.42758357615580700442
+    @test SF.erfcx(Complex{Float32}(1)) ≈ 0.42758357615580700442
     @test SF.erfi(1) ≈ 1.6504257587975428760
     @test SF.erfinv(0.84270079294971486934) ≈ 1
     @test SF.erfcinv(0.15729920705028513066) ≈ 1
@@ -104,13 +104,13 @@ end
     @test_throws SF.AmosException SF.airyai(200im)
     @test_throws SF.AmosException SF.airybi(200)
 
-    for T in [Float32, Float64, Complex64,Complex128]
+    for T in [Float32, Float64, Complex{Float32},Complex{Float64}]
         @test SF.airyai(T(1.8)) ≈ 0.0470362168668458052247
         @test SF.airyaiprime(T(1.8)) ≈ -0.0685247801186109345638
         @test SF.airybi(T(1.8)) ≈ 2.595869356743906290060
         @test SF.airybiprime(T(1.8)) ≈ 2.98554005084659907283
     end
-    for T in [Complex64, Complex128]
+    for T in [Complex{Float32}, Complex{Float64}]
         z = convert(T,1.8 + 1.0im)
         @test SF.airyaix(z) ≈ SF.airyai(z) * exp(2/3 * z * sqrt(z))
         @test SF.airyaiprimex(z) ≈ SF.airyaiprime(z) * exp(2/3 * z * sqrt(z))
@@ -172,13 +172,13 @@ end
         @test SF.besseli(-3,3) ≈ true_i33
         @test SF.besseli(3,-3) ≈ -true_i33
         @test SF.besseli(-3,-3) ≈ -true_i33
-        @test SF.besseli(Float32(-3),Complex64(-3,0)) ≈ -true_i33
+        @test SF.besseli(Float32(-3),Complex{Float32}(-3,0)) ≈ -true_i33
         true_im3p1_3 = 0.84371226532586351965
         @test SF.besseli(-3.1,3) ≈ true_im3p1_3
         for i in [-5 -3 -1 1 3 5]
             @test SF.besseli(i,0) == 0.0
             @test SF.besseli(i,Float32(0)) == 0
-            @test SF.besseli(i,Complex64(0)) == 0
+            @test SF.besseli(i,Complex{Float32}(0)) == 0
         end
         @testset "Error throwing" begin
             @test_throws SF.AmosException SF.besseli(1,1000)
@@ -194,7 +194,7 @@ end
         for i in [-5 -3 -1 1 3 5]
             @test SF.besselj(i,0) == 0
             @test SF.besselj(i,Float32(0)) == 0
-            @test SF.besselj(i,Complex64(0)) == 0
+            @test SF.besselj(i,Complex{Float32}(0)) == 0
         end
 
         j33 = SF.besselj(3,3.)
@@ -280,7 +280,7 @@ end
     end
 
     @testset "besselhx" begin
-        for elty in [Complex64,Complex128]
+        for elty in [Complex{Float32},Complex{Float64}]
             z = convert(elty, 1.0 + 1.9im)
             @test SF.besselhx(1.0, 1, z) ≈ convert(elty,-0.5949634147786144 - 0.18451272807835967im)
             @test SF.besselhx(Float32(1.0), 1, z) ≈ convert(elty,-0.5949634147786144 - 0.18451272807835967im)
@@ -294,7 +294,7 @@ end
     end
     @testset "scaled bessel[ijky] and hankelh[12]" begin
         for x in (1.0, 0.0, -1.0), y in (1.0, 0.0, -1.0), nu in (1.0, 0.0, -1.0)
-            z = Complex128(x + y * im)
+            z = Complex{Float64}(x + y * im)
             z == zero(z) || @test SF.hankelh1x(nu, z) ≈ SF.hankelh1(nu, z) * exp(-z * im)
             z == zero(z) || @test SF.hankelh2x(nu, z) ≈ SF.hankelh2(nu, z) * exp(z * im)
             (nu < 0 && z == zero(z)) || @test SF.besselix(nu, z) ≈ SF.besseli(nu, z) * exp(-abs(real(z)))
@@ -308,8 +308,8 @@ end
             @test SF.besselix(i,0) == 0
             @test SF.besseljx(i,Float32(0)) == 0
             @test SF.besselix(i,Float32(0)) == 0
-            @test SF.besseljx(i,Complex64(0)) == 0
-            @test SF.besselix(i,Complex64(0)) == 0
+            @test SF.besseljx(i,Complex{Float32}(0)) == 0
+            @test SF.besselix(i,Complex{Float32}(0)) == 0
         end
         @testset "Error throwing" begin
             @test_throws SF.AmosException SF.hankelh1x(1, 0)
@@ -325,8 +325,8 @@ end
     end
     @testset "issue #6653" begin
         @testset "$f" for f in (SF.besselj,SF.bessely,SF.besseli,SF.besselk,SF.hankelh1,SF.hankelh2)
-            @test f(0,1) ≈ f(0,Complex128(1))
-            @test f(0,1) ≈ f(0,Complex64(1))
+            @test f(0,1) ≈ f(0,Complex{Float64}(1))
+            @test f(0,1) ≈ f(0,Complex{Float32}(1))
         end
     end
 end
@@ -389,14 +389,14 @@ end
         @test SF.eta(1) ≈ log(2)
         @test SF.eta(2) ≈ pi^2/12
         @test SF.eta(Float32(2)) ≈ SF.eta(2)
-        @test SF.eta(Complex64(2)) ≈ SF.eta(2)
+        @test SF.eta(Complex{Float32}(2)) ≈ SF.eta(2)
     end
 end
 
 @testset "zeta" begin
     @test SF.zeta(0) ≈ -0.5
     @test SF.zeta(2) ≈ pi^2/6
-    @test SF.zeta(Complex64(2)) ≈ SF.zeta(2)
+    @test SF.zeta(Complex{Float32}(2)) ≈ SF.zeta(2)
     @test SF.zeta(4) ≈ pi^4/90
     @test SF.zeta(1,Float16(2.)) ≈ SF.zeta(1,2.)
     @test SF.zeta(1.,Float16(2.)) ≈ SF.zeta(1,2.)
