@@ -26,7 +26,7 @@ function Base.showerror(io::IO, ex::AmosException)
 end
 
 ## Airy functions
-function _airy(z::Complex128, id::Int32, kode::Int32)
+function _airy(z::Complex{Float64}, id::Int32, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
@@ -43,7 +43,7 @@ function _airy(z::Complex128, id::Int32, kode::Int32)
     end
 end
 
-function _biry(z::Complex128, id::Int32, kode::Int32)
+function _biry(z::Complex{Float64}, id::Int32, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1 = Ref{Int32}()
 
@@ -67,7 +67,7 @@ end
 Airy function of the first kind ``\\operatorname{Ai}(x)``.
 """
 function airyai end
-airyai(z::Complex128) = _airy(z, Int32(0), Int32(1))
+airyai(z::Complex{Float64}) = _airy(z, Int32(0), Int32(1))
 
 """
     airyaiprime(x)
@@ -75,7 +75,7 @@ airyai(z::Complex128) = _airy(z, Int32(0), Int32(1))
 Derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)``.
 """
 function airyaiprime end
-airyaiprime(z::Complex128) =  _airy(z, Int32(1), Int32(1))
+airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
 
 """
     airybi(x)
@@ -83,7 +83,7 @@ airyaiprime(z::Complex128) =  _airy(z, Int32(1), Int32(1))
 Airy function of the second kind ``\\operatorname{Bi}(x)``.
 """
 function airybi end
-airybi(z::Complex128) = _biry(z, Int32(0), Int32(1))
+airybi(z::Complex{Float64}) = _biry(z, Int32(0), Int32(1))
 
 """
     airybiprime(x)
@@ -91,7 +91,7 @@ airybi(z::Complex128) = _biry(z, Int32(0), Int32(1))
 Derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x)``.
 """
 function airybiprime end
-airybiprime(z::Complex128) = _biry(z, Int32(1), Int32(1))
+airybiprime(z::Complex{Float64}) = _biry(z, Int32(1), Int32(1))
 
 """
     airyaix(x)
@@ -100,7 +100,7 @@ Scaled Airy function of the first kind ``\\operatorname{Ai}(x) e^{\\frac{2}{3} x
 \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
 """
 function airyaix end
-airyaix(z::Complex128) = _airy(z, Int32(0), Int32(2))
+airyaix(z::Complex{Float64}) = _airy(z, Int32(0), Int32(2))
 
 """
     airyaiprimex(x)
@@ -109,7 +109,7 @@ Scaled derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x
 e^{\\frac{2}{3} x \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
 """
 function airyaiprimex end
-airyaiprimex(z::Complex128) =  _airy(z, Int32(1), Int32(2))
+airyaiprimex(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(2))
 
 """
     airybix(x)
@@ -117,7 +117,7 @@ airyaiprimex(z::Complex128) =  _airy(z, Int32(1), Int32(2))
 Scaled Airy function of the second kind ``\\operatorname{Bi}(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
 """
 function airybix end
-airybix(z::Complex128) = _biry(z, Int32(0), Int32(2))
+airybix(z::Complex{Float64}) = _biry(z, Int32(0), Int32(2))
 
 """
     airybiprimex(x)
@@ -125,14 +125,14 @@ airybix(z::Complex128) = _biry(z, Int32(0), Int32(2))
 Scaled derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
 """
 function airybiprimex end
-airybiprimex(z::Complex128) = _biry(z, Int32(1), Int32(2))
+airybiprimex(z::Complex{Float64}) = _biry(z, Int32(1), Int32(2))
 
 for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
             :airyaix, :airyaiprimex, :airybix, :airybiprimex)
     @eval begin
         $afn(z::Complex) = $afn(float(z))
         $afn(z::Complex{<:AbstractFloat}) = throw(MethodError($afn,(z,)))
-        $afn(z::Complex64) = Complex64($afn(Complex128(z)))
+        $afn(z::Complex{Float32}) = Complex{Float32}($afn(Complex{Float64}(z)))
     end
     if afn in (:airyaix, :airyaiprimex)
         @eval $afn(x::Real) = x < 0 ? throw(DomainError(x, "`x` must be nonnegative.")) : real($afn(complex(float(x))))
@@ -172,7 +172,7 @@ for jy in ("j","y"), nu in (0,1)
 end
 
 
-function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
+function _besselh(nu::Float64, k::Int32, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
@@ -189,7 +189,7 @@ function _besselh(nu::Float64, k::Int32, z::Complex128, kode::Int32)
     end
 end
 
-function _besseli(nu::Float64, z::Complex128, kode::Int32)
+function _besseli(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
   
@@ -206,7 +206,7 @@ function _besseli(nu::Float64, z::Complex128, kode::Int32)
     end
 end
 
-function _besselj(nu::Float64, z::Complex128, kode::Int32)
+function _besselj(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
@@ -223,7 +223,7 @@ function _besselj(nu::Float64, z::Complex128, kode::Int32)
     end
 end
 
-function _besselk(nu::Float64, z::Complex128, kode::Int32)
+function _besselk(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
@@ -240,7 +240,7 @@ function _besselk(nu::Float64, z::Complex128, kode::Int32)
     end
 end
 
-function _bessely(nu::Float64, z::Complex128, kode::Int32)
+function _bessely(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
     wrk1, wrk2 = Ref{Float64}(), Ref{Float64}()
@@ -268,7 +268,7 @@ selecting [`hankelh1`](@ref) or [`hankelh2`](@ref), respectively.
 """
 function besselh end
 
-function besselh(nu::Float64, k::Integer, z::Complex128)
+function besselh(nu::Float64, k::Integer, z::Complex{Float64})
     if nu < 0
         s = (k == 1) ? 1 : -1
         return _besselh(-nu,Int32(k),z,Int32(1)) * complex(cospi(nu),-s*sinpi(nu))
@@ -291,7 +291,7 @@ exponential factor (analytically), so it avoids these problems.
 """
 function besselhx end
 
-function besselhx(nu::Float64, k::Integer, z::Complex128)
+function besselhx(nu::Float64, k::Integer, z::Complex{Float64})
     if nu < 0
         s = (k == 1) ? 1 : -1
         return _besselh(-nu,Int32(k),z,Int32(2)) * complex(cospi(nu),-s*sinpi(nu))
@@ -299,7 +299,7 @@ function besselhx(nu::Float64, k::Integer, z::Complex128)
     return _besselh(nu,Int32(k),z,Int32(2))
 end
 
-function besseli(nu::Float64, z::Complex128)
+function besseli(nu::Float64, z::Complex{Float64})
     if nu < 0
         if isinteger(nu)
             return _besseli(-nu,z,Int32(1))
@@ -311,7 +311,7 @@ function besseli(nu::Float64, z::Complex128)
     end
 end
 
-function besselix(nu::Float64, z::Complex128)
+function besselix(nu::Float64, z::Complex{Float64})
     if nu < 0
         if isinteger(nu)
             return _besseli(-nu,z,Int32(2))
@@ -323,7 +323,7 @@ function besselix(nu::Float64, z::Complex128)
     end
 end
 
-function besselj(nu::Float64, z::Complex128)
+function besselj(nu::Float64, z::Complex{Float64})
     if nu < 0
         if isinteger(nu)
             return _besselj(-nu,z,Int32(1))*cospi(nu)
@@ -339,7 +339,7 @@ besselj(nu::Cint, x::Float64) = ccall((:jn, libm), Float64, (Cint, Float64), nu,
 besselj(nu::Cint, x::Float32) = ccall((:jnf, libm), Float32, (Cint, Float32), nu, x)
 
 
-function besseljx(nu::Float64, z::Complex128)
+function besseljx(nu::Float64, z::Complex{Float64})
     if nu < 0
         if isinteger(nu)
             return _besselj(-nu,z,Int32(2))*cospi(nu)
@@ -351,9 +351,9 @@ function besseljx(nu::Float64, z::Complex128)
     end
 end
 
-besselk(nu::Float64, z::Complex128) = _besselk(abs(nu), z, Int32(1))
+besselk(nu::Float64, z::Complex{Float64}) = _besselk(abs(nu), z, Int32(1))
 
-besselkx(nu::Float64, z::Complex128) = _besselk(abs(nu), z, Int32(2))
+besselkx(nu::Float64, z::Complex{Float64}) = _besselk(abs(nu), z, Int32(2))
 
 function bessely(nu::Cint, x::Float64)
     if x < 0
@@ -368,7 +368,7 @@ function bessely(nu::Cint, x::Float32)
     ccall((:ynf, libm), Float32, (Cint, Float32), nu, x)
 end
 
-function bessely(nu::Float64, z::Complex128)
+function bessely(nu::Float64, z::Complex{Float64})
     if nu < 0
         return _bessely(-nu,z,Int32(1))*cospi(nu) - _besselj(-nu,z,Int32(1))*sinpi(nu)
     else
@@ -376,7 +376,7 @@ function bessely(nu::Float64, z::Complex128)
     end
 end
 
-function besselyx(nu::Float64, z::Complex128)
+function besselyx(nu::Float64, z::Complex{Float64})
     if nu < 0
         return _bessely(-nu,z,Int32(2))*cospi(nu) - _besselj(-nu,z,Int32(2))*sinpi(nu)
     else
@@ -500,7 +500,7 @@ for f in ("i", "ix", "j", "jx", "k", "kx", "y", "yx")
             $bfn(Tf(nu), Complex{Tf}(z))
         end
         $bfn(k::T, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(k,z)))
-        $bfn(nu::Float32, x::Complex64) = Complex64($bfn(Float64(nu), Complex128(x)))
+        $bfn(nu::Float32, x::Complex{Float32}) = Complex{Float32}($bfn(Float64(nu), Complex{Float64}(x)))
     end
 end
 
@@ -517,7 +517,7 @@ for bfn in (:besselh, :besselhx)
         end
 
         $bfn(nu::T, k::Integer, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(nu,k,z)))
-        $bfn(nu::Float32, k::Integer, x::Complex64) = Complex64($bfn(Float64(nu), k, Complex128(x)))
+        $bfn(nu::Float32, k::Integer, x::Complex{Float32}) = Complex{Float32}($bfn(Float64(nu), k, Complex{Float64}(x)))
     end
 end
 

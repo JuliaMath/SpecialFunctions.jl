@@ -9,7 +9,7 @@ for f in (:erf, :erfc)
         ($f)(x::Float32) = ccall(($(string(f,"f")),libm), Float32, (Float32,), x)
         ($f)(x::Real) = ($f)(float(x))
         ($f)(a::Float16) = Float16($f(Float32(a)))
-        ($f)(a::Complex32) = Complex32($f(Complex64(a)))
+        ($f)(a::Complex{Float16}) = Complex{Float16}($f(Complex{Float32}(a)))
         function ($f)(x::BigFloat)
             z = BigFloat()
             ccall(($(string(:mpfr_,f)), :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
@@ -22,9 +22,9 @@ end
 for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
     fname = (f === :Dawson) ? :dawson : f
     @eval begin
-        ($fname)(z::Complex128) = Complex128(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
-        ($fname)(z::Complex64) = Complex64(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex128(z), Float64(eps(Float32))))
-        ($fname)(z::Complex) = ($fname)(Complex128(z))
+        ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
+        ($fname)(z::Complex{Float32}) = Complex{Float32}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        ($fname)(z::Complex) = ($fname)(Complex{Float64}(z))
     end
 end
 
