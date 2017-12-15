@@ -95,8 +95,8 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         @goto line20
     end
     KODED = Int32(0)
-    (STR,STI) = reim(exp(complex(CZR,CZI)))
-    (AK1R,AK1I) = ZMLT(AK1R,AK1I,STR,STI,AK1R,AK1I)
+    st = exp(complex(CZR,CZI))
+    (AK1R,AK1I) = reim(complex(AK1R,AK1I) * st)
     @label line20
     FDN = 0.0
     if DNU2 > RTR1
@@ -172,9 +172,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         end
         TZR = ZR + ZR
         TZI = ZI + ZI
-        (STR,STI) = reim(exp(complex(-TZR,-TZI)))
-        (STR,STI) = ZMLT(STR,STI,P1R,P1I,STR,STI)
-        (STR,STI) = ZMLT(STR,STI,CS2R,CS2I,STR,STI)
+        (STR,STI) = reim(exp(complex(-TZR,-TZI)) * complex(P1R,P1I) * complex(CS2R,CS2I))
         S2R = S2R + STR
         S2I = S2I + STI
         @label line60

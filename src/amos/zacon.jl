@@ -90,9 +90,8 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         @goto line10
     end
     YY = -ZNI
-    CPN = cos(YY)
-    SPN = sin(YY)
-    (CSGNR,CSGNI) = ZMLT(CSGNR,CSGNI,CPN,SPN,CSGNR,CSGNI)
+    pn = cis(YY)
+    (CSGNR,CSGNI) = reim(complex(CSGNR,CSGNI) * pn)
     @label line10
     INU = trunc(Int32,SNGL(FNU))
     ARG = (FNU - DBLE(FLOAT(INU))) * SGN
@@ -120,8 +119,8 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     SC1R = C1R
     SC1I = C1I
     @label line30
-    (STR,STI) = ZMLT(CSPNR,CSPNI,C1R,C1I,STR,STI)
-    (PTR,PTI) = ZMLT(CSGNR,CSGNI,C2R,C2I,PTR,PTI)
+    (STR,STI) = reim(complex(CSPNR,CSPNI) * complex(C1R,C1I))
+    (PTR,PTI) = reim(complex(CSGNR,CSGNI) * complex(C2R,C2I))
     YR[Int32(1)] = STR + PTR
     YI[Int32(1)] = STI + PTI
     if N == Int32(1)
@@ -143,8 +142,8 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     SC2R = C1R
     SC2I = C1I
     @label line40
-    (STR,STI) = ZMLT(CSPNR,CSPNI,C1R,C1I,STR,STI)
-    (PTR,PTI) = ZMLT(CSGNR,CSGNI,C2R,C2I,PTR,PTI)
+    (STR,STI) = reim(complex(CSPNR,CSPNI) * complex(C1R,C1I))
+    (PTR,PTI) = reim(complex(CSGNR,CSGNI) * complex(C2R,C2I))
     YR[Int32(2)] = STR + PTR
     YI[Int32(2)] = STI + PTI
     if N == Int32(2)

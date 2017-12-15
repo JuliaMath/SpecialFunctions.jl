@@ -75,7 +75,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if AZ <= RTR1
         @goto line10
     end
-    (CZR,CZI) = ZMLT(HZR,HZI,HZR,HZI,CZR,CZI)
+    (CZR,CZI) = reim(complex(HZR,HZI) * complex(HZR,HZI))
     @label line10
     ACZ = abs(complex(CZR,CZI))
     NN = N

@@ -228,7 +228,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     CKI = STI * P1R
     PTR = P2R * P1R
     PTI = -P2I * P1R
-    (CNORMR,CNORMI) = ZMLT(CKR,CKI,PTR,PTI,CNORMR,CNORMI)
+    (CNORMR,CNORMI) = reim(complex(CKR,CKI) * complex(PTR,PTI))
     for I = Int32(1):N
         STR = YR[I] * CNORMR - YI[I] * CNORMI
         YI[I] = YR[I] * CNORMI + YI[I] * CNORMR

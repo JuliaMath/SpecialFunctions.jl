@@ -228,7 +228,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if CAZ < TOL
         @goto line70
     end
-    (CZR,CZI) = ZMLT(ZR,ZI,ZR,ZI,CZR,CZI)
+    (CZR,CZI) = reim(complex(ZR,ZI) * complex(ZR,ZI))
     CZR = 0.25CZR
     CZI = 0.25CZI
     T1 = 0.25 * CAZ * CAZ
@@ -260,13 +260,13 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         return NZ
     end
     (STR,STI) = reim(exp(complex(ZR,ZI)))
-    (YR[Int32(1)],YI[Int32(1)]) = ZMLT(S1R,S1I,STR,STI,YR[Int32(1)],YI[Int32(1)])
+    (YR[Int32(1)],YI[Int32(1)]) = reim(complex(S1R,S1I) * complex(STR,STI))
     return NZ
     @label line80
     if CAZ < TOL
         @goto line100
     end
-    (CZR,CZI) = ZMLT(ZR,ZI,ZR,ZI,CZR,CZI)
+    (CZR,CZI) = reim(complex(ZR,ZI) * complex(ZR,ZI))
     CZR = 0.25CZR
     CZI = 0.25CZI
     T1 = 0.25 * CAZ * CAZ
@@ -305,15 +305,15 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     STR = CSSR[KFLAG]
     P2R = S2R * STR
     P2I = S2I * STR
-    (S2R,S2I) = ZMLT(P2R,P2I,RZR,RZI,S2R,S2I)
+    (S2R,S2I) = reim(complex(P2R,P2I) * complex(RZR,RZI))
     S1R = S1R * STR
     S1I = S1I * STR
     if KODED == Int32(1)
         @goto line210
     end
     (FR,FI) = reim(exp(complex(ZR,ZI)))
-    (S1R,S1I) = ZMLT(S1R,S1I,FR,FI,S1R,S1I)
-    (S2R,S2I) = ZMLT(S2R,S2I,FR,FI,S2R,S2I)
+    (S1R,S1I) = reim(complex(S1R,S1I) * complex(FR,FI))
+    (S2R,S2I) = reim(complex(S2R,S2I) * complex(FR,FI))
     @goto line210
     @label line110
     (STR,STI) = reim(sqrt(complex(ZR,ZI)))
@@ -328,7 +328,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     STR = exp(-ZR) * CSSR[KFLAG]
     STI = -STR * sin(ZI)
     STR = STR * cos(ZI)
-    (COEFR,COEFI) = ZMLT(COEFR,COEFI,STR,STI,COEFR,COEFI)
+    (COEFR,COEFI) = reim(complex(COEFR,COEFI) * complex(STR,STI))
     @label line120
     if abs(DNU) == 0.5
         @goto line300
@@ -430,8 +430,8 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     S1I = P2I * PTR
     CSR = CSR * PTR
     CSI = -CSI * PTR
-    (STR,STI) = ZMLT(COEFR,COEFI,S1R,S1I,STR,STI)
-    (S1R,S1I) = ZMLT(STR,STI,CSR,CSI,S1R,S1I)
+    (STR,STI) = reim(complex(COEFR,COEFI) * complex(S1R,S1I))
+    (S1R,S1I) = reim(complex(STR,STI) * complex(CSR,CSI))
     if INU > Int32(0) || N > Int32(1)
         @goto line200
     end
@@ -448,12 +448,12 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     P1I = P1I * PTR
     P2R = P2R * PTR
     P2I = -P2I * PTR
-    (PTR,PTI) = ZMLT(P1R,P1I,P2R,P2I,PTR,PTI)
+    (PTR,PTI) = reim(complex(P1R,P1I) * complex(P2R,P2I))
     STR = (DNU + 0.5) - PTR
     STI = -PTI
     (STR,STI) = reim(complex(STR,STI) / complex(ZR,ZI))
     STR = STR + 1.0
-    (S2R,S2I) = ZMLT(STR,STI,S1R,S1I,S2R,S2I)
+    (S2R,S2I) = reim(complex(STR,STI) * complex(S1R,S1I))
     @label line210
     STR = DNU + 1.0
     CKR = STR * RZR
