@@ -168,7 +168,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if I == IL
             @goto line90
         end
-        (STR,STI) = ZDIV(COEFR,COEFI,HZR,HZI,STR,STI)
+        (STR,STI) = reim(complex(COEFR,COEFI) / complex(HZR,HZI))
         COEFR = STR * DFNU
         COEFI = STI * DFNU
         @label line90

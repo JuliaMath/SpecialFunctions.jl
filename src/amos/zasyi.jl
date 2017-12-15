@@ -144,7 +144,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         DKR = EZR
         DKI = EZI
         for J = Int32(1):JL
-            (STR,STI) = ZDIV(CKR,CKI,DKR,DKI,STR,STI)
+            (STR,STI) = reim(complex(CKR,CKI)/complex(DKR,DKI))
             CKR = STR * SQK
             CKI = STI * SQK
             CS2R = CS2R + CKR

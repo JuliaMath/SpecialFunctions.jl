@@ -888,7 +888,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     end
     STR = CONER + WR
     STI = WI
-    (ZAR,ZAI) = ZDIV(STR,STI,ZBR,ZBI,ZAR,ZAI)
+    (ZAR,ZAI) = reim(complex(STR,STI) / complex(ZBR,ZBI))
     (ZCR,ZCI) = reim(log(complex(ZAR,ZAI)))
     if ZCI < 0.0
         ZCI = 0.0
@@ -928,8 +928,8 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     end
     ARGR = ZETAR * FN23
     ARGI = ZETAI * FN23
-    (RTZTR,RTZTI) = ZDIV(ZTHR,ZTHI,ZETAR,ZETAI,RTZTR,RTZTI)
-    (ZAR,ZAI) = ZDIV(RTZTR,RTZTI,WR,WI,ZAR,ZAI)
+    (RTZTR,RTZTI) = reim(complex(ZTHR,ZTHI) / complex(ZETAR,ZETAI))
+    (ZAR,ZAI) = reim(complex(RTZTR,RTZTI) / complex(WR,WI))
     TZAR = ZAR + ZAR
     TZAI = ZAI + ZAI
     (STR,STI) = reim(sqrt(complex(TZAR,TZAI)))
@@ -1056,6 +1056,6 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     ASUMR = ASUMR + CONER
     STR = -BSUMR * RFN13
     STI = -BSUMI * RFN13
-    (BSUMR,BSUMI) = ZDIV(STR,STI,RTZTR,RTZTI,BSUMR,BSUMI)
+    (BSUMR,BSUMI) = reim(complex(STR,STI) / complex(RTZTR,RTZTI))
     @goto line120
 end

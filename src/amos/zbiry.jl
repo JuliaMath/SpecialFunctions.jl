@@ -262,7 +262,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     CYI[Int32(1)] = CYI[Int32(1)] * Z3R
     CYR[Int32(2)] = CYR[Int32(2)] * Z3R
     CYI[Int32(2)] = CYI[Int32(2)] * Z3R
-    (STR,STI) = ZDIV(CYR[Int32(1)],CYI[Int32(1)],ZTAR,ZTAI,STR,STI)
+    (STR,STI) = reim(complex(CYR[Int32(1)],CYI[Int32(1)]) / complex(ZTAR,ZTAI))
     S2R = (FNU + FNU) * STR + CYR[Int32(2)]
     S2I = (FNU + FNU) * STI + CYI[Int32(2)]
     AA = FMR * (FNU - 1.0)

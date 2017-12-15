@@ -136,7 +136,7 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
     P1R = TOL
     P1I = TOL
     @label line40
-    (CYR[N],CYI[N]) = ZDIV(P2R,P2I,P1R,P1I,CYR[N],CYI[N])
+    (CYR[N],CYI[N]) = reim(complex(P2R,P2I) / complex(P1R,P1I))
     if N == Int32(1)
         return
     end

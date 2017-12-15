@@ -210,7 +210,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     (STR,STI) = reim(exp(complex(FMUR,FMUI)))
     PR = (0.5STR) / T2
     PI = (0.5STI) / T2
-    (PTR,PTI) = ZDIV(0.5,0.0,STR,STI,PTR,PTI)
+    (PTR,PTI) = reim(inv(complex(STR,STI))/2)
     QR = PTR / T1
     QI = PTI / T1
     S1R = FR
@@ -317,7 +317,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     @goto line210
     @label line110
     (STR,STI) = reim(sqrt(complex(ZR,ZI)))
-    (COEFR,COEFI) = ZDIV(RTHPI,CZEROI,STR,STI,COEFR,COEFI)
+    (COEFR,COEFI) = reim(complex(RTHPI,CZEROI) / complex(STR,STI))
     KFLAG = Int32(2)
     if KODED == Int32(2)
         @goto line120
@@ -451,7 +451,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     (PTR,PTI) = ZMLT(P1R,P1I,P2R,P2I,PTR,PTI)
     STR = (DNU + 0.5) - PTR
     STI = -PTI
-    (STR,STI) = ZDIV(STR,STI,ZR,ZI,STR,STI)
+    (STR,STI) = reim(complex(STR,STI) / complex(ZR,ZI))
     STR = STR + 1.0
     (S2R,S2I) = ZMLT(STR,STI,S1R,S1I,S2R,S2I)
     @label line210
