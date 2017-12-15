@@ -18,7 +18,7 @@ function ZBINU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
         ZEROI = 0.0
     end
     NZ = Int32(0)
-    AZ = abs(COMPLEX(ZR,ZI))
+    AZ = abs(complex(ZR,ZI))
     NN = N
     DFNU = FNU + DBLE(FLOAT(N - Int32(1)))
     if AZ <= 2.0
@@ -29,7 +29,7 @@ function ZBINU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
     end
     @label line10
     (NW,) = ZSERI(ZR,ZI,FNU,KODE,NN,CYR,CYI,NW,TOL,ELIM,ALIM)
-    INW = IABS(NW)
+    INW = abs(NW)
     NZ = NZ + INW
     NN = NN - INW
     if NN == Int32(0)
@@ -108,8 +108,8 @@ function ZBINU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
     end
     @goto line120
     @label line110
-    NUI = INT(SNGL(FNUL - DFNU)) + Int32(1)
-    NUI = MAX0(NUI,Int32(0))
+    NUI = trunc(Int32,SNGL(FNUL - DFNU)) + Int32(1)
+    NUI = max(NUI,Int32(0))
     (NW,NLAST) = ZBUNI(ZR,ZI,FNU,KODE,NN,CYR,CYI,NW,NUI,NLAST,FNUL,TOL,ELIM,ALIM)
     if NW < Int32(0)
         @goto line130

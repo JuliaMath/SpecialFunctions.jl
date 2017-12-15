@@ -136,7 +136,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         CC[Int32(7)] = 1.133027231981696e-6
         CC[Int32(8)] = 6.116095104481416e-9
     end
-    CAZ = abs(COMPLEX(ZR,ZI))
+    CAZ = abs(complex(ZR,ZI))
     CSCLR = 1.0 / TOL
     CRSCR = TOL
     CSSR[Int32(1)] = CSCLR
@@ -156,13 +156,13 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     STI = -ZI * RCAZ
     RZR = (STR + STR) * RCAZ
     RZI = (STI + STI) * RCAZ
-    INU = INT(SNGL(FNU + 0.5))
+    INU = trunc(Int32,SNGL(FNU + 0.5))
     DNU = FNU - DBLE(FLOAT(INU))
-    if DABS(DNU) == 0.5
+    if abs(DNU) == 0.5
         @goto line110
     end
     DNU2 = 0.0
-    if DABS(DNU) > TOL
+    if abs(DNU) > TOL
         DNU2 = DNU * DNU
     end
     if CAZ > R1
@@ -177,14 +177,14 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         @goto line10
     end
     FC = DNU * DPI
-    FC = FC / DSIN(FC)
+    FC = FC / sin(FC)
     SMUR = CSHR / DNU
     SMUI = CSHI / DNU
     @label line10
     A2 = 1.0 + DNU
     T2 = 1/gamma(A2)
     T1 = 1.0 / (T2 * FC)
-    if DABS(DNU) > 0.1
+    if abs(DNU) > 0.1
         @goto line40
     end
     AK = 1.0
@@ -193,7 +193,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         AK = AK * DNU2
         TM = CC[K] * AK
         S = S + TM
-        if DABS(TM) < TOL
+        if abs(TM) < TOL
             @goto line30
         end
         @label line20
@@ -298,7 +298,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     @label line100
     KFLAG = Int32(2)
     A1 = FNU + 1.0
-    AK = A1 * DABS(SMUR)
+    AK = A1 * abs(SMUR)
     if AK > ALIM
         KFLAG = Int32(3)
     end
@@ -325,27 +325,27 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if ZR > ALIM
         @goto line290
     end
-    STR = DEXP(-ZR) * CSSR[KFLAG]
-    STI = -STR * DSIN(ZI)
-    STR = STR * DCOS(ZI)
+    STR = exp(-ZR) * CSSR[KFLAG]
+    STI = -STR * sin(ZI)
+    STR = STR * cos(ZI)
     (COEFR,COEFI) = ZMLT(COEFR,COEFI,STR,STI,COEFR,COEFI)
     @label line120
-    if DABS(DNU) == 0.5
+    if abs(DNU) == 0.5
         @goto line300
     end
-    AK = DCOS(DPI * DNU)
-    AK = DABS(AK)
+    AK = cos(DPI * DNU)
+    AK = abs(AK)
     if AK == CZEROR
         @goto line300
     end
-    FHS = DABS(0.25 - DNU2)
+    FHS = abs(0.25 - DNU2)
     if FHS == CZEROR
         @goto line300
     end
     T1 = DBLE(FLOAT(I1MACH14 - Int32(1)))
     T1 = T1 * D1MACH5 * 3.321928094
-    T1 = DMAX1(T1,12.0)
-    T1 = DMIN1(T1,60.0)
+    T1 = max(T1,12.0)
+    T1 = min(T1,60.0)
     T2 = TTH * T1 - 6.0
     if ZR != 0.0
         @goto line130
@@ -353,8 +353,8 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     T1 = HPI
     @goto line140
     @label line130
-    T1 = DATAN(ZI / ZR)
-    T1 = DABS(T1)
+    T1 = atan(ZI / ZR)
+    T1 = abs(T1)
     @label line140
     if T2 > CAZ
         @goto line170
@@ -378,7 +378,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         FKS = FKS + FK + FK + CTWOR
         FHS = FHS + FK + FK
         FK = FK + CONER
-        STR = DABS(P2R) * FK
+        STR = abs(P2R) * FK
         if ETEST < STR
             @goto line160
         end
@@ -386,18 +386,18 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     end
     @goto line310
     @label line160
-    FK = FK + SPI * T1 * DSQRT(T2 / CAZ)
-    FHS = DABS(0.25 - DNU2)
+    FK = FK + SPI * T1 * sqrt(T2 / CAZ)
+    FHS = abs(0.25 - DNU2)
     @goto line180
     @label line170
-    A2 = DSQRT(CAZ)
-    AK = (FPI * AK) / (TOL * DSQRT(A2))
+    A2 = sqrt(CAZ)
+    AK = (FPI * AK) / (TOL * sqrt(A2))
     AA = (3.0T1) / (1.0 + CAZ)
     BB = (14.7T1) / (28.0 + CAZ)
-    AK = (DLOG(AK) + (CAZ * DCOS(AA)) / (1.0 + 0.008CAZ)) / DCOS(BB)
+    AK = (log(AK) + (CAZ * cos(AA)) / (1.0 + 0.008CAZ)) / cos(BB)
     FK = (0.12125 * AK * AK) / CAZ + 1.5
     @label line180
-    K = INT(SNGL(FK))
+    K = trunc(Int32,SNGL(FK))
     FK = DBLE(FLOAT(K))
     FKS = FK * FK
     P1R = CZEROR
@@ -424,7 +424,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         FK = FK - CONER
         @label line190
     end
-    TM = abs(COMPLEX(CSR,CSI))
+    TM = abs(complex(CSR,CSI))
     PTR = 1.0 / TM
     S1R = P2R * PTR
     S1I = P2I * PTR
@@ -442,7 +442,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     end
     @goto line240
     @label line200
-    TM = abs(COMPLEX(P2R,P2I))
+    TM = abs(complex(P2R,P2I))
     PTR = 1.0 / TM
     P1R = P1R * PTR
     P1I = P1I * PTR
@@ -498,9 +498,9 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         end
         P2R = S2R * P1R
         P2I = S2I * P1R
-        STR = DABS(P2R)
-        STI = DABS(P2I)
-        P2M = DMAX1(STR,STI)
+        STR = abs(P2R)
+        STI = abs(P2I)
+        P2M = max(STR,STI)
         if P2M <= ASCLE
             @goto line230
         end
@@ -559,9 +559,9 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if KFLAG >= Int32(3)
             @goto line260
         end
-        STR = DABS(P2R)
-        STI = DABS(P2I)
-        P2M = DMAX1(STR,STI)
+        STR = abs(P2R)
+        STI = abs(P2I)
+        P2M = max(STR,STI)
         if P2M <= ASCLE
             @goto line260
         end
@@ -582,7 +582,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     return NZ
     @label line261
     HELIM = 0.5ELIM
-    ELM = DEXP(-ELIM)
+    ELM = exp(-ELIM)
     CELMR = ELM
     ASCLE = BRY[Int32(1)]
     ZDR = ZR
@@ -598,8 +598,8 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         S1I = STI
         CKR = CKR + RZR
         CKI = CKI + RZI
-        AS = abs(COMPLEX(S2R,S2I))
-        ALAS = DLOG(AS)
+        AS = abs(complex(S2R,S2I))
+        ALAS = log(AS)
         P2R = -ZDR + ALAS
         if P2R < -ELIM
             @goto line263
@@ -607,9 +607,9 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         (STR,STI) = reim(log(complex(S2R,S2I)))
         P2R = -ZDR + STR
         P2I = -ZDI + STI
-        P2M = DEXP(P2R) / TOL
-        P1R = P2M * DCOS(P2I)
-        P1I = P2M * DSIN(P2I)
+        P2M = exp(P2R) / TOL
+        P1R = P2M * cos(P2I)
+        P1I = P2M * sin(P2I)
         (NW,) = ZUCHK(P1R,P1I,NW,ASCLE,TOL)
         if NW != Int32(0)
             @goto line263

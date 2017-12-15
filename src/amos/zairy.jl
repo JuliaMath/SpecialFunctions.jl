@@ -80,8 +80,8 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     if IERR != Int32(0)
         return (AIR,AII,NZ,IERR)
     end
-    AZ = abs(COMPLEX(ZR,ZI))
-    TOL = DMAX1(D1MACH4,1.0e-18)
+    AZ = abs(complex(ZR,ZI))
+    TOL = max(D1MACH4,1.0e-18)
     FID = DBLE(FLOAT(ID))
     if AZ > 1.0
         @goto line70
@@ -113,7 +113,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     DK = 3.0 + FID + FID
     D1 = AK * DK
     D2 = BK * CK
-    AD = DMIN1(D1,D2)
+    AD = min(D1,D2)
     AK = 24.0 + 9.0FID
     BK = 30.0 - 9.0FID
     for K = Int32(1):Int32(25)
@@ -130,7 +130,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
         ATRM = (ATRM * AZ3) / AD
         D1 = D1 + AK
         D2 = D2 + BK
-        AD = DMIN1(D1,D2)
+        AD = min(D1,D2)
         if ATRM < TOL * AD
             @goto line40
         end
@@ -183,23 +183,23 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     K1 = I1MACH15
     K2 = I1MACH16
     R1M5 = D1MACH5
-    K = MIN0(IABS(K1),IABS(K2))
+    K = min(abs(K1),abs(K2))
     ELIM = 2.303 * (DBLE(FLOAT(K)) * R1M5 - 3.0)
     K1 = I1MACH14 - Int32(1)
     AA = R1M5 * DBLE(FLOAT(K1))
-    DIG = DMIN1(AA,18.0)
+    DIG = min(AA,18.0)
     AA = AA * 2.303
-    ALIM = ELIM + DMAX1(-AA,-41.45)
+    ALIM = ELIM + max(-AA,-41.45)
     RL = 1.2DIG + 3.0
-    ALAZ = DLOG(AZ)
+    ALAZ = log(AZ)
     AA = 0.5 / TOL
     BB = DBLE(FLOAT(I1MACH9)) * 0.5
-    AA = DMIN1(AA,BB)
+    AA = min(AA,BB)
     AA = AA^TTH
     if AZ > AA
         @goto line260
     end
-    AA = DSQRT(AA)
+    AA = sqrt(AA)
     if AZ > AA
         IERR = Int32(3)
     end
@@ -213,7 +213,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
         @goto line80
     end
     BK = ZTAR
-    CK = -(DABS(BK))
+    CK = -(abs(BK))
     ZTAR = CK
     ZTAI = AK
     @label line80
@@ -322,7 +322,7 @@ function ZAIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,AIR::Float64,AII::F
     @label line190
     AIR = -C2
     AII = 0.0
-    AA = DSQRT(AA)
+    AA = sqrt(AA)
     if AZ <= AA
         @goto line200
     end

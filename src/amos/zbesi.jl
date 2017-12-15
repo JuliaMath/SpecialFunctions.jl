@@ -50,31 +50,31 @@ function ZBESI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
     if IERR != Int32(0)
         return (NZ,IERR)
     end
-    TOL = DMAX1(D1MACH4,1.0e-18)
+    TOL = max(D1MACH4,1.0e-18)
     K1 = I1MACH15
     K2 = I1MACH16
     R1M5 = D1MACH5
-    K = MIN0(IABS(K1),IABS(K2))
+    K = min(abs(K1),abs(K2))
     ELIM = 2.303 * (DBLE(FLOAT(K)) * R1M5 - 3.0)
     K1 = I1MACH14 - Int32(1)
     AA = R1M5 * DBLE(FLOAT(K1))
-    DIG = DMIN1(AA,18.0)
+    DIG = min(AA,18.0)
     AA = AA * 2.303
-    ALIM = ELIM + DMAX1(-AA,-41.45)
+    ALIM = ELIM + max(-AA,-41.45)
     RL = 1.2DIG + 3.0
     FNUL = 10.0 + 6.0 * (DIG - 3.0)
-    AZ = abs(COMPLEX(ZR,ZI))
+    AZ = abs(complex(ZR,ZI))
     FN = FNU + DBLE(FLOAT(N - Int32(1)))
     AA = 0.5 / TOL
     BB = DBLE(FLOAT(I1MACH9)) * 0.5
-    AA = DMIN1(AA,BB)
+    AA = min(AA,BB)
     if AZ > AA
         @goto line260
     end
     if FN > AA
         @goto line260
     end
-    AA = DSQRT(AA)
+    AA = sqrt(AA)
     if AZ > AA
         IERR = Int32(3)
     end
@@ -90,14 +90,14 @@ function ZBESI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
     end
     ZNR = -ZR
     ZNI = -ZI
-    INU = INT(SNGL(FNU))
+    INU = trunc(Int32,SNGL(FNU))
     ARG = (FNU - DBLE(FLOAT(INU))) * PI
     if ZI < 0.0
         ARG = -ARG
     end
-    CSGNR = DCOS(ARG)
-    CSGNI = DSIN(ARG)
-    if MOD(INU,Int32(2)) == Int32(0)
+    CSGNR = cos(ARG)
+    CSGNI = sin(ARG)
+    if mod(INU,Int32(2)) == Int32(0)
         @goto line40
     end
     CSGNR = -CSGNR
@@ -120,7 +120,7 @@ function ZBESI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
         AA = CYR[I]
         BB = CYI[I]
         ATOL = 1.0
-        if DMAX1(DABS(AA),DABS(BB)) > ASCLE
+        if max(abs(AA),abs(BB)) > ASCLE
             @goto line55
         end
         AA = AA * RTOL

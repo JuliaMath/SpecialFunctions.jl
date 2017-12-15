@@ -730,10 +730,10 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     RFNU = 1.0 / FNU
     TEST = D1MACH1 * 1000.0
     AC = FNU * TEST
-    if DABS(ZR) > AC || DABS(ZI) > AC
+    if abs(ZR) > AC || abs(ZI) > AC
         @goto line15
     end
-    ZETA1R = 2.0 * DABS(DLOG(TEST)) + FNU
+    ZETA1R = 2.0 * abs(log(TEST)) + FNU
     ZETA1I = 0.0
     ZETA2R = FNU
     ZETA2I = 0.0
@@ -751,7 +751,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     RFN13 = 1.0 / FN13
     W2R = (CONER - ZBR * ZBR) + ZBI * ZBI
     W2I = (CONEI - ZBR * ZBI) - ZBR * ZBI
-    AW2 = abs(COMPLEX(W2R,W2I))
+    AW2 = abs(complex(W2R,W2I))
     if AW2 > 0.25
         @goto line130
     end
@@ -811,7 +811,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     BSUMI = SUMBI
     L1 = Int32(0)
     L2 = Int32(30)
-    BTOL = TOL * (DABS(BSUMR) + DABS(BSUMI))
+    BTOL = TOL * (abs(BSUMR) + abs(BSUMI))
     ATOL = TOL
     PP = 1.0
     IAS = Int32(0)
@@ -905,7 +905,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     ZETA1I = ZCI * FNU
     ZETA2R = WR * FNU
     ZETA2I = WI * FNU
-    AZTH = abs(COMPLEX(ZTHR,ZTHI))
+    AZTH = abs(complex(ZTHR,ZTHI))
     ANG = THPI
     if ZTHR >= 0.0 && ZTHI < 0.0
         @goto line140
@@ -914,15 +914,15 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     if ZTHR == 0.0
         @goto line140
     end
-    ANG = DATAN(ZTHI / ZTHR)
+    ANG = atan(ZTHI / ZTHR)
     if ZTHR < 0.0
         ANG = ANG + GPI
     end
     @label line140
     PP = AZTH^EX2
     ANG = ANG * EX2
-    ZETAR = PP * DCOS(ANG)
-    ZETAI = PP * DSIN(ANG)
+    ZETAR = PP * cos(ANG)
+    ZETAI = PP * sin(ANG)
     if ZETAI < 0.0
         ZETAI = 0.0
     end
@@ -938,7 +938,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     if IPMTR == Int32(1)
         @goto line120
     end
-    RAW = 1.0 / DSQRT(AW2)
+    RAW = 1.0 / sqrt(AW2)
     STR = WR * RAW
     STI = -WI * RAW
     TFNR = STR * RFNU * RAW
@@ -973,7 +973,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     UPR[Int32(1)] = CONER
     UPI[Int32(1)] = CONEI
     PP = 1.0
-    BTOL = TOL * (DABS(BSUMR) + DABS(BSUMI))
+    BTOL = TOL * (abs(BSUMR) + abs(BSUMI))
     KS = Int32(0)
     KP1 = Int32(2)
     L = Int32(3)
@@ -1023,7 +1023,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
         end
         ASUMR = ASUMR + SUMAR
         ASUMI = ASUMI + SUMAI
-        TEST = DABS(SUMAR) + DABS(SUMAI)
+        TEST = abs(SUMAR) + abs(SUMAI)
         if PP < TOL && TEST < TOL
             IAS = Int32(1)
         end
@@ -1042,7 +1042,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
         end
         BSUMR = BSUMR + SUMBR
         BSUMI = BSUMI + SUMBI
-        TEST = DABS(SUMBR) + DABS(SUMBI)
+        TEST = abs(SUMBR) + abs(SUMBI)
         if PP < BTOL && TEST < BTOL
             IBS = Int32(1)
         end

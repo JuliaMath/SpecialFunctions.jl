@@ -57,12 +57,12 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         CONEI = 0.0
     end
     NZ = Int32(0)
-    AZ = abs(COMPLEX(ZR,ZI))
+    AZ = abs(complex(ZR,ZI))
     if AZ == 0.0
         @goto line160
     end
     ARM = 1000.0D1MACH1
-    RTR1 = DSQRT(ARM)
+    RTR1 = sqrt(ARM)
     CRSCR = 1.0
     IFLAG = Int32(0)
     if AZ < ARM
@@ -77,7 +77,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     end
     (CZR,CZI) = ZMLT(HZR,HZI,HZR,HZI,CZR,CZI)
     @label line10
-    ACZ = abs(COMPLEX(CZR,CZI))
+    ACZ = abs(complex(CZR,CZI))
     NN = N
     (CKR,CKI) = reim(log(complex(HZR,HZI)))
     @label line20
@@ -114,14 +114,14 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     CRSCR = TOL
     ASCLE = ARM * SS
     @label line50
-    AA = DEXP(AK1R)
+    AA = exp(AK1R)
     if IFLAG == Int32(1)
         AA = AA * SS
     end
-    COEFR = AA * DCOS(AK1I)
-    COEFI = AA * DSIN(AK1I)
+    COEFR = AA * cos(AK1I)
+    COEFI = AA * sin(AK1I)
     ATOL = (TOL * ACZ) / FNUP
-    IL = MIN0(Int32(2),NN)
+    IL = min(Int32(2),NN)
     for I = Int32(1):IL
         DFNU = FNU + DBLE(FLOAT(NN - I))
         FNUP = DFNU + 1.0
@@ -214,7 +214,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         YI[K] = CKI
         AK = AK - 1.0
         K = K - Int32(1)
-        if abs(COMPLEX(CKR,CKI)) > ASCLE
+        if abs(complex(CKR,CKI)) > ASCLE
             @goto line140
         end
         @label line130

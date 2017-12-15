@@ -32,8 +32,8 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     STI::Float64 = zero(Float64)
     STR::Float64 = zero(Float64)
     NZ = Int32(0)
-    AX = DABS(ZR) * 1.7321
-    AY = DABS(ZI)
+    AX = abs(ZR) * 1.7321
+    AY = abs(ZI)
     IFORM = Int32(1)
     if AY > AX
         IFORM = Int32(2)
@@ -58,7 +58,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if NW != Int32(0)
         @goto line90
     end
-    STR = abs(COMPLEX(CYR[Int32(1)],CYI[Int32(1)]))
+    STR = abs(complex(CYR[Int32(1)],CYI[Int32(1)]))
     BRY[Int32(1)] = (1000.0D1MACH1) / TOL
     BRY[Int32(2)] = 1.0 / BRY[Int32(1)]
     BRY[Int32(3)] = BRY[Int32(2)]
@@ -85,7 +85,7 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     S1I = CYI[Int32(2)] * CSCLR
     S2R = CYR[Int32(1)] * CSCLR
     S2I = CYI[Int32(1)] * CSCLR
-    RAZ = 1.0 / abs(COMPLEX(ZR,ZI))
+    RAZ = 1.0 / abs(complex(ZR,ZI))
     STR = ZR * RAZ
     STI = -ZI * RAZ
     RZR = (STR + STR) * RAZ
@@ -103,9 +103,9 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         end
         STR = S2R * CSCRR
         STI = S2I * CSCRR
-        C1R = DABS(STR)
-        C1I = DABS(STI)
-        C1M = DMAX1(C1R,C1I)
+        C1R = abs(STR)
+        C1I = abs(STI)
+        C1M = max(C1R,C1I)
         if C1M <= ASCLE
             @goto line30
         end
@@ -147,9 +147,9 @@ function ZBUNI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if IFLAG >= Int32(3)
             @goto line40
         end
-        C1R = DABS(STR)
-        C1I = DABS(STI)
-        C1M = DMAX1(C1R,C1I)
+        C1R = abs(STR)
+        C1I = abs(STI)
+        C1M = max(C1R,C1I)
         if C1M <= ASCLE
             @goto line40
         end

@@ -177,10 +177,10 @@ function ZUNIK(ZRR::Float64,ZRI::Float64,FNU::Float64,IKFLG::Int32,IPMTR::Int32,
     RFN = 1.0 / FNU
     TEST = D1MACH1 * 1000.0
     AC = FNU * TEST
-    if DABS(ZRR) > AC || DABS(ZRI) > AC
+    if abs(ZRR) > AC || abs(ZRI) > AC
         @goto line15
     end
-    ZETA1R = 2.0 * DABS(DLOG(TEST)) + FNU
+    ZETA1R = 2.0 * abs(log(TEST)) + FNU
     ZETA1I = 0.0
     ZETA2R = FNU
     ZETA2I = 0.0
@@ -233,7 +233,7 @@ function ZUNIK(ZRR::Float64,ZRI::Float64,FNU::Float64,IKFLG::Int32,IPMTR::Int32,
         CWRKR[K] = CRFNR * SR - CRFNI * SI
         CWRKI[K] = CRFNR * SI + CRFNI * SR
         AC = AC * RFN
-        TEST = DABS(CWRKR[K]) + DABS(CWRKI[K])
+        TEST = abs(CWRKR[K]) + abs(CWRKI[K])
         if AC < TOL && TEST < TOL
             @goto line30
         end

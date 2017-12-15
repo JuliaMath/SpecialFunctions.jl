@@ -64,19 +64,19 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     @label line10
     ZBR = ZRR
     ZBI = ZRI
-    AX = DABS(ZR) * 1.7321
-    AY = DABS(ZI)
+    AX = abs(ZR) * 1.7321
+    AY = abs(ZI)
     IFORM = Int32(1)
     if AY > AX
         IFORM = Int32(2)
     end
-    GNU = DMAX1(FNU,1.0)
+    GNU = max(FNU,1.0)
     if IKFLG == Int32(1)
         @goto line20
     end
     FNN = DBLE(FLOAT(NN))
     GNN = (FNU + FNN) - 1.0
-    GNU = DMAX1(GNN,FNN)
+    GNU = max(GNN,FNN)
     @label line20
     if IFORM == Int32(2)
         @goto line30
@@ -97,7 +97,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,GNU,Int32(1),TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
     CZR = -ZETA1R + ZETA2R
     CZI = -ZETA1I + ZETA2I
-    AARG = abs(COMPLEX(ARGR,ARGI))
+    AARG = abs(complex(ARGR,ARGI))
     @label line50
     if KODE == Int32(1)
         @goto line60
@@ -111,7 +111,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     CZR = -CZR
     CZI = -CZI
     @label line70
-    APHI = abs(COMPLEX(PHIR,PHII))
+    APHI = abs(complex(PHIR,PHII))
     RCZ = CZR
     if RCZ > ELIM
         @goto line210
@@ -119,9 +119,9 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     if RCZ < ALIM
         @goto line80
     end
-    RCZ = RCZ + DLOG(APHI)
+    RCZ = RCZ + log(APHI)
     if IFORM == Int32(2)
-        RCZ = (RCZ - 0.25 * DLOG(AARG)) - AIC
+        RCZ = (RCZ - 0.25 * log(AARG)) - AIC
     end
     if RCZ > ELIM
         @goto line210
@@ -134,9 +134,9 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     if RCZ > -ALIM
         @goto line130
     end
-    RCZ = RCZ + DLOG(APHI)
+    RCZ = RCZ + log(APHI)
     if IFORM == Int32(2)
-        RCZ = (RCZ - 0.25 * DLOG(AARG)) - AIC
+        RCZ = (RCZ - 0.25 * log(AARG)) - AIC
     end
     if RCZ > -ELIM
         @goto line110
@@ -161,10 +161,10 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     CZR = (CZR - 0.25STR) - AIC
     CZI = CZI - 0.25STI
     @label line120
-    AX = DEXP(RCZ) / TOL
+    AX = exp(RCZ) / TOL
     AY = CZI
-    CZR = AX * DCOS(AY)
-    CZI = AX * DSIN(AY)
+    CZR = AX * cos(AY)
+    CZI = AX * sin(AY)
     (NW,) = ZUCHK(CZR,CZI,NW,ASCLE,TOL)
     if NW != Int32(0)
         @goto line90
@@ -190,7 +190,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,GNU,Int32(1),TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
     CZR = -ZETA1R + ZETA2R
     CZI = -ZETA1I + ZETA2I
-    AARG = abs(COMPLEX(ARGR,ARGI))
+    AARG = abs(complex(ARGR,ARGI))
     @label line160
     if KODE == Int32(1)
         @goto line170
@@ -198,7 +198,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     CZR = CZR - ZBR
     CZI = CZI - ZBI
     @label line170
-    APHI = abs(COMPLEX(PHIR,PHII))
+    APHI = abs(complex(PHIR,PHII))
     RCZ = CZR
     if RCZ < -ELIM
         @goto line180
@@ -206,9 +206,9 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     if RCZ > -ALIM
         return NUF
     end
-    RCZ = RCZ + DLOG(APHI)
+    RCZ = RCZ + log(APHI)
     if IFORM == Int32(2)
-        RCZ = (RCZ - 0.25 * DLOG(AARG)) - AIC
+        RCZ = (RCZ - 0.25 * log(AARG)) - AIC
     end
     if RCZ > -ELIM
         @goto line190
@@ -234,10 +234,10 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     CZR = (CZR - 0.25STR) - AIC
     CZI = CZI - 0.25STI
     @label line200
-    AX = DEXP(RCZ) / TOL
+    AX = exp(RCZ) / TOL
     AY = CZI
-    CZR = AX * DCOS(AY)
-    CZI = AX * DSIN(AY)
+    CZR = AX * cos(AY)
+    CZI = AX * sin(AY)
     (NW,) = ZUCHK(CZR,CZI,NW,ASCLE,TOL)
     if NW != Int32(0)
         @goto line180

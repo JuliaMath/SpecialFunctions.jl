@@ -35,14 +35,14 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
     end
     NZ = Int32(0)
     IC = Int32(0)
-    NN = MIN0(Int32(2),N)
+    NN = min(Int32(2),N)
     for I = Int32(1):NN
         S1R = YR[I]
         S1I = YI[I]
         CYR[I] = S1R
         CYI[I] = S1I
-        AS = abs(COMPLEX(S1R,S1I))
-        ACS = -ZRR + DLOG(AS)
+        AS = abs(complex(S1R,S1I))
+        ACS = -ZRR + log(AS)
         NZ = NZ + Int32(1)
         YR[I] = ZEROR
         YI[I] = ZEROI
@@ -52,9 +52,9 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         (CSR,CSI) = reim(log(complex(S1R,S1I)))
         CSR = CSR - ZRR
         CSI = CSI - ZRI
-        STR = DEXP(CSR) / TOL
-        CSR = STR * DCOS(CSI)
-        CSI = STR * DSIN(CSI)
+        STR = exp(CSR) / TOL
+        CSR = STR * cos(CSI)
+        CSI = STR * sin(CSI)
         (NW,) = ZUCHK(CSR,CSI,NW,ASCLE,TOL)
         if NW != Int32(0)
             @goto line10
@@ -89,7 +89,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
     S2R = CYR[Int32(2)]
     S2I = CYI[Int32(2)]
     HELIM = 0.5ELIM
-    ELM = DEXP(-ELIM)
+    ELM = exp(-ELIM)
     CELMR = ELM
     ZDR = ZRR
     ZDI = ZRI
@@ -103,8 +103,8 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         S1I = CSI
         CKR = CKR + RZR
         CKI = CKI + RZI
-        AS = abs(COMPLEX(S2R,S2I))
-        ALAS = DLOG(AS)
+        AS = abs(complex(S2R,S2I))
+        ALAS = log(AS)
         ACS = -ZDR + ALAS
         NZ = NZ + Int32(1)
         YR[I] = ZEROR
@@ -115,9 +115,9 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         (CSR,CSI) = reim(log(complex(S2R,S2I)))
         CSR = CSR - ZDR
         CSI = CSI - ZDI
-        STR = DEXP(CSR) / TOL
-        CSR = STR * DCOS(CSI)
-        CSI = STR * DSIN(CSI)
+        STR = exp(CSR) / TOL
+        CSR = STR * cos(CSI)
+        CSI = STR * sin(CSI)
         (NW,) = ZUCHK(CSR,CSI,NW,ASCLE,TOL)
         if NW != Int32(0)
             @goto line25

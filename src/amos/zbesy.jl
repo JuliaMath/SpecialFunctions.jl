@@ -49,7 +49,7 @@ function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
     if IERR != Int32(0) && IERR != Int32(3)
         @goto line170
     end
-    NZ = MIN0(NZ1,NZ2)
+    NZ = min(NZ1,NZ2)
     if KODE == Int32(2)
         @goto line60
     end
@@ -62,18 +62,18 @@ function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
     end
     return (NZ,IERR)
     @label line60
-    TOL = DMAX1(D1MACH4,1.0e-18)
+    TOL = max(D1MACH4,1.0e-18)
     K1 = I1MACH15
     K2 = I1MACH16
-    K = MIN0(IABS(K1),IABS(K2))
+    K = min(abs(K1),abs(K2))
     R1M5 = D1MACH5
     ELIM = 2.303 * (DBLE(FLOAT(K)) * R1M5 - 3.0)
-    EXR = DCOS(ZR)
-    EXI = DSIN(ZR)
+    EXR = cos(ZR)
+    EXI = sin(ZR)
     EY = 0.0
-    TAY = DABS(ZI + ZI)
+    TAY = abs(ZI + ZI)
     if TAY < ELIM
-        EY = DEXP(-TAY)
+        EY = exp(-TAY)
     end
     if ZI < 0.0
         @goto line90
@@ -90,7 +90,7 @@ function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
         AA = CWRKR[I]
         BB = CWRKI[I]
         ATOL = 1.0
-        if DMAX1(DABS(AA),DABS(BB)) > ASCLE
+        if max(abs(AA),abs(BB)) > ASCLE
             @goto line75
         end
         AA = AA * RTOL
@@ -102,7 +102,7 @@ function ZBESY(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,CYR::Ab
         AA = CYR[I]
         BB = CYI[I]
         ATOL = 1.0
-        if DMAX1(DABS(AA),DABS(BB)) > ASCLE
+        if max(abs(AA),abs(BB)) > ASCLE
             @goto line85
         end
         AA = AA * RTOL

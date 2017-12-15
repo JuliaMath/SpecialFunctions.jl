@@ -67,10 +67,10 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         CONEI = 0.0
     end
     NZ = Int32(0)
-    AZ = abs(COMPLEX(ZR,ZI))
+    AZ = abs(complex(ZR,ZI))
     ARM = 1000.0D1MACH1
-    RTR1 = DSQRT(ARM)
-    IL = MIN0(Int32(2),N)
+    RTR1 = sqrt(ARM)
+    IL = min(Int32(2),N)
     DFNU = FNU + DBLE(FLOAT(N - IL))
     RAZ = 1.0 / AZ
     STR = ZR * RAZ
@@ -86,12 +86,12 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     CZR = ZEROR
     CZI = ZI
     @label line10
-    if DABS(CZR) > ELIM
+    if abs(CZR) > ELIM
         @goto line100
     end
     DNU2 = DFNU + DFNU
     KODED = Int32(1)
-    if DABS(CZR) > ALIM && N > Int32(2)
+    if abs(CZR) > ALIM && N > Int32(2)
         @goto line20
     end
     KODED = Int32(0)
@@ -106,23 +106,23 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     EZI = ZI * 8.0
     AEZ = 8.0AZ
     S = TOL / AEZ
-    JL = INT(SNGL(RL + RL)) + Int32(2)
+    JL = trunc(Int32,SNGL(RL + RL)) + Int32(2)
     P1R = ZEROR
     P1I = ZEROI
     if ZI == 0.0
         @goto line30
     end
-    INU = INT(SNGL(FNU))
+    INU = trunc(Int32,SNGL(FNU))
     ARG = (FNU - DBLE(FLOAT(INU))) * PI
     INU = (INU + N) - IL
-    AK = -(DSIN(ARG))
-    BK = DCOS(ARG)
+    AK = -(sin(ARG))
+    BK = cos(ARG)
     if ZI < 0.0
         BK = -BK
     end
     P1R = AK
     P1I = BK
-    if MOD(INU,Int32(2)) == Int32(0)
+    if mod(INU,Int32(2)) == Int32(0)
         @goto line30
     end
     P1R = -P1R
@@ -130,7 +130,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     @label line30
     for K = Int32(1):IL
         SQK = FDN - 1.0
-        ATOL = S * DABS(SQK)
+        ATOL = S * abs(SQK)
         SGN = 1.0
         CS1R = CONER
         CS1I = CONEI
@@ -154,7 +154,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
             CS1I = CS1I + CKI * SGN
             DKR = DKR + EZR
             DKI = DKI + EZI
-            AA = (AA * DABS(SQK)) / BB
+            AA = (AA * abs(SQK)) / BB
             BB = BB + AEZ
             AK = AK + 8.0
             SQK = SQK - AK

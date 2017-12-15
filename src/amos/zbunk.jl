@@ -2,8 +2,8 @@ function ZBUNK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     AX::Float64 = zero(Float64)
     AY::Float64 = zero(Float64)
     NZ = Int32(0)
-    AX = DABS(ZR) * 1.7321
-    AY = DABS(ZI)
+    AX = abs(ZR) * 1.7321
+    AY = abs(ZI)
     if AY > AX
         @goto line10
     end

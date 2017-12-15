@@ -75,7 +75,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     if NW < Int32(0)
         @goto line90
     end
-    NN = MIN0(Int32(2),N)
+    NN = min(Int32(2),N)
     (NW,) = ZBKNU(ZNR,ZNI,FNU,KODE,NN,CYR,CYI,NW,TOL,ELIM,ALIM)
     if NW != Int32(0)
         @goto line90
@@ -83,24 +83,24 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     S1R = CYR[Int32(1)]
     S1I = CYI[Int32(1)]
     FMR = DBLE(FLOAT(MR))
-    SGN = -(DSIGN(PI,FMR))
+    SGN = -(copysign(PI,FMR))
     CSGNR = ZEROR
     CSGNI = SGN
     if KODE == Int32(1)
         @goto line10
     end
     YY = -ZNI
-    CPN = DCOS(YY)
-    SPN = DSIN(YY)
+    CPN = cos(YY)
+    SPN = sin(YY)
     (CSGNR,CSGNI) = ZMLT(CSGNR,CSGNI,CPN,SPN,CSGNR,CSGNI)
     @label line10
-    INU = INT(SNGL(FNU))
+    INU = trunc(Int32,SNGL(FNU))
     ARG = (FNU - DBLE(FLOAT(INU))) * SGN
-    CPN = DCOS(ARG)
-    SPN = DSIN(ARG)
+    CPN = cos(ARG)
+    SPN = sin(ARG)
     CSPNR = CPN
     CSPNI = SPN
-    if MOD(INU,Int32(2)) == Int32(0)
+    if mod(INU,Int32(2)) == Int32(0)
         @goto line20
     end
     CSPNR = -CSPNR
@@ -152,7 +152,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     CSPNR = -CSPNR
     CSPNI = -CSPNI
-    AZN = abs(COMPLEX(ZNR,ZNI))
+    AZN = abs(complex(ZNR,ZNI))
     RAZN = 1.0 / AZN
     STR = ZNR * RAZN
     STI = -ZNI * RAZN
@@ -172,7 +172,7 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     BRY[Int32(1)] = ASCLE
     BRY[Int32(2)] = 1.0 / ASCLE
     BRY[Int32(3)] = D1MACH2
-    AS2 = abs(COMPLEX(S2R,S2I))
+    AS2 = abs(complex(S2R,S2I))
     KFLAG = Int32(2)
     if AS2 > BRY[Int32(1)]
         @goto line50
@@ -238,9 +238,9 @@ function ZACON(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if KFLAG >= Int32(3)
             @goto line80
         end
-        PTR = DABS(C1R)
-        PTI = DABS(C1I)
-        C1M = DMAX1(PTR,PTI)
+        PTR = abs(C1R)
+        PTI = abs(C1I)
+        C1M = max(PTR,PTI)
         if C1M <= BSCLE
             @goto line80
         end

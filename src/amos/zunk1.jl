@@ -133,7 +133,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         end
         STR = ZRR + ZETA2R[J]
         STI = ZRI + ZETA2I[J]
-        RAST = FN / abs(COMPLEX(STR,STI))
+        RAST = FN / abs(complex(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = ZETA1R[J] - STR
@@ -144,18 +144,18 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         S1I = ZETA1I[J] - ZETA2I[J]
         @label line30
         RS1 = S1R
-        if DABS(RS1) > ELIM
+        if abs(RS1) > ELIM
             @goto line60
         end
         if KDFLG == Int32(1)
             KFLAG = Int32(2)
         end
-        if DABS(RS1) < ALIM
+        if abs(RS1) < ALIM
             @goto line40
         end
-        APHI = abs(COMPLEX(PHIR[J],PHII[J]))
-        RS1 = RS1 + DLOG(APHI)
-        if DABS(RS1) > ELIM
+        APHI = abs(complex(PHIR[J],PHII[J]))
+        RS1 = RS1 + log(APHI)
+        if abs(RS1) > ELIM
             @goto line60
         end
         if KDFLG == Int32(1)
@@ -170,9 +170,9 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         @label line40
         S2R = PHIR[J] * SUMR[J] - PHII[J] * SUMI[J]
         S2I = PHIR[J] * SUMI[J] + PHII[J] * SUMR[J]
-        STR = DEXP(S1R) * CSSR[KFLAG]
-        S1R = STR * DCOS(S1I)
-        S1I = STR * DSIN(S1I)
+        STR = exp(S1R) * CSSR[KFLAG]
+        S1R = STR * cos(S1I)
+        S1I = STR * sin(S1I)
         STR = S2R * S1R - S2I * S1I
         S2I = S1R * S2I + S2R * S1I
         S2R = STR
@@ -217,7 +217,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     I = N
     @label line75
-    RAZR = 1.0 / abs(COMPLEX(ZRR,ZRI))
+    RAZR = 1.0 / abs(complex(ZRR,ZRI))
     STR = ZRR * RAZR
     STI = -ZRI * RAZR
     RZR = (STR + STR) * RAZR
@@ -240,7 +240,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     STR = ZRR + ZET2DR
     STI = ZRI + ZET2DI
-    RAST = FN / abs(COMPLEX(STR,STI))
+    RAST = FN / abs(complex(STR,STI))
     STR = STR * RAST * RAST
     STI = -STI * RAST * RAST
     S1R = ZET1DR - STR
@@ -251,19 +251,19 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     S1I = ZET1DI - ZET2DI
     @label line90
     RS1 = S1R
-    if DABS(RS1) > ELIM
+    if abs(RS1) > ELIM
         @goto line95
     end
-    if DABS(RS1) < ALIM
+    if abs(RS1) < ALIM
         @goto line100
     end
-    APHI = abs(COMPLEX(PHIDR,PHIDI))
-    RS1 = RS1 + DLOG(APHI)
-    if DABS(RS1) < ELIM
+    APHI = abs(complex(PHIDR,PHIDI))
+    RS1 = RS1 + log(APHI)
+    if abs(RS1) < ELIM
         @goto line100
     end
     @label line95
-    if DABS(RS1) > 0.0
+    if abs(RS1) > 0.0
         @goto line300
     end
     if ZR < 0.0
@@ -299,9 +299,9 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if KFLAG >= Int32(3)
             @goto line120
         end
-        STR = DABS(C2R)
-        STI = DABS(C2I)
-        C2M = DMAX1(STR,STI)
+        STR = abs(C2R)
+        STI = abs(C2I)
+        C2M = max(STR,STI)
         if C2M <= ASCLE
             @goto line120
         end
@@ -324,15 +324,15 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     end
     NZ = Int32(0)
     FMR = DBLE(FLOAT(MR))
-    SGN = -(DSIGN(PI,FMR))
+    SGN = -(copysign(PI,FMR))
     CSGNI = SGN
-    INU = INT(SNGL(FNU))
+    INU = trunc(Int32,SNGL(FNU))
     FNF = FNU - DBLE(FLOAT(INU))
     IFN = (INU + N) - Int32(1)
     ANG = FNF * SGN
-    CSPNR = DCOS(ANG)
-    CSPNI = DSIN(ANG)
-    if MOD(IFN,Int32(2)) == Int32(0)
+    CSPNR = cos(ANG)
+    CSPNI = sin(ANG)
+    if mod(IFN,Int32(2)) == Int32(0)
         @goto line170
     end
     CSPNR = -CSPNR
@@ -378,7 +378,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         end
         STR = ZRR + ZET2DR
         STI = ZRI + ZET2DI
-        RAST = FN / abs(COMPLEX(STR,STI))
+        RAST = FN / abs(complex(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = -ZET1DR + STR
@@ -389,18 +389,18 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         S1I = -ZET1DI + ZET2DI
         @label line210
         RS1 = S1R
-        if DABS(RS1) > ELIM
+        if abs(RS1) > ELIM
             @goto line260
         end
         if KDFLG == Int32(1)
             IFLAG = Int32(2)
         end
-        if DABS(RS1) < ALIM
+        if abs(RS1) < ALIM
             @goto line220
         end
-        APHI = abs(COMPLEX(PHIDR,PHIDI))
-        RS1 = RS1 + DLOG(APHI)
-        if DABS(RS1) > ELIM
+        APHI = abs(complex(PHIDR,PHIDI))
+        RS1 = RS1 + log(APHI)
+        if abs(RS1) > ELIM
             @goto line260
         end
         if KDFLG == Int32(1)
@@ -417,9 +417,9 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         STI = PHIDR * SUMDI + PHIDI * SUMDR
         S2R = -CSGNI * STI
         S2I = CSGNI * STR
-        STR = DEXP(S1R) * CSSR[IFLAG]
-        S1R = STR * DCOS(S1I)
-        S1I = STR * DSIN(S1I)
+        STR = exp(S1R) * CSSR[IFLAG]
+        S1R = STR * cos(S1I)
+        S1I = STR * sin(S1I)
         STR = S2R * S1R - S2I * S1I
         S2I = S2R * S1I + S2I * S1R
         S2R = STR
@@ -513,9 +513,9 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if IFLAG >= Int32(3)
             @goto line290
         end
-        C2R = DABS(CKR)
-        C2I = DABS(CKI)
-        C2M = DMAX1(C2R,C2I)
+        C2R = abs(CKR)
+        C2I = abs(CKI)
+        C2M = max(C2R,C2I)
         if C2M <= ASCLE
             @goto line290
         end

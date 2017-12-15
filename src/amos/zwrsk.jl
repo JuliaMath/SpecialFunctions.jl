@@ -29,10 +29,10 @@ function ZWRSK(ZRR::Float64,ZRI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::A
     if KODE == Int32(1)
         @goto line10
     end
-    CINUR = DCOS(ZRI)
-    CINUI = DSIN(ZRI)
+    CINUR = cos(ZRI)
+    CINUI = sin(ZRI)
     @label line10
-    ACW = abs(COMPLEX(CWR[Int32(2)],CWI[Int32(2)]))
+    ACW = abs(complex(CWR[Int32(2)],CWI[Int32(2)]))
     ASCLE = (1000.0D1MACH1) / TOL
     CSCLR = 1.0
     if ACW > ASCLE
@@ -59,7 +59,7 @@ function ZWRSK(ZRR::Float64,ZRI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::A
     PTI = PTI + C2I
     CTR = ZRR * PTR - ZRI * PTI
     CTI = ZRR * PTI + ZRI * PTR
-    ACT = abs(COMPLEX(CTR,CTI))
+    ACT = abs(complex(CTR,CTI))
     RACT = 1.0 / ACT
     CTR = CTR * RACT
     CTI = -CTI * RACT

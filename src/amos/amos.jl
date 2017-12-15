@@ -26,26 +26,6 @@ const I1MACH16 = Int32(1023)
 const SNGL = Float32
 const DBLE = Float64
 const FLOAT = Float32
-const COMPLEX = Complex128
-
-DSIGN(x::Float64, y::Float64)::Float64 = copysign(x, y)
-DSQRT(x::Float64)::Float64 = sqrt(x)
-DABS(x::Float64)::Float64 = abs(x)
-DMAX1(x::Float64, y::Float64)::Float64 = max(x, y)
-DMIN1(x::Float64, y::Float64)::Float64 = min(x, y)
-DSIN(x::Float64)::Float64 = sin(x)
-DCOS(x::Float64)::Float64 = cos(x)
-DSINH(x::Float64)::Float64 = sinh(x)
-DCOSH(x::Float64)::Float64 = cosh(x)
-DATAN(x::Float64)::Float64 = atan(x)
-DEXP(x::Float64)::Float64 = exp(x)
-DLOG(x::Float64)::Float64 = log(x)
-
-INT(x::Float32)::Int32 = trunc(Int32, x)
-IABS(x::Int32)::Int32 = abs(x)
-MOD(x::Int32,  y::Int32)::Int32 = mod(x, y)
-MAX0(x::Int32, y::Int32)::Int32 = max(x, y)
-MIN0(x::Int32, y::Int32)::Int32 = min(x, y)
 
 include("zacai.jl")
 include("zacon.jl")

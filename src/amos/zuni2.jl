@@ -112,14 +112,14 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     ZBR = ZR
     ZBI = ZI
     CIDI = -CONER
-    INU = INT(SNGL(FNU))
+    INU = trunc(Int32,SNGL(FNU))
     ANG = HPI * (FNU - DBLE(FLOAT(INU)))
-    C2R = DCOS(ANG)
-    C2I = DSIN(ANG)
+    C2R = cos(ANG)
+    C2I = sin(ANG)
     CAR = C2R
     SAR = C2I
     IN = (INU + N) - Int32(1)
-    IN = MOD(IN,Int32(4)) + Int32(1)
+    IN = mod(IN,Int32(4)) + Int32(1)
     STR = C2R * CIPR[IN] - C2I * CIPI[IN]
     C2I = C2R * CIPI[IN] + C2I * CIPR[IN]
     C2R = STR
@@ -131,14 +131,14 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     CIDI = -CIDI
     C2I = -C2I
     @label line10
-    FN = DMAX1(FNU,1.0)
+    FN = max(FNU,1.0)
     (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,FN,Int32(1),TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
     if KODE == Int32(1)
         @goto line20
     end
     STR = ZBR + ZETA2R
     STI = ZBI + ZETA2I
-    RAST = FN / abs(COMPLEX(STR,STI))
+    RAST = FN / abs(complex(STR,STI))
     STR = STR * RAST * RAST
     STI = -STI * RAST * RAST
     S1R = -ZETA1R + STR
@@ -149,11 +149,11 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     S1I = -ZETA1I + ZETA2I
     @label line30
     RS1 = S1R
-    if DABS(RS1) > ELIM
+    if abs(RS1) > ELIM
         @goto line150
     end
     @label line40
-    NN = MIN0(Int32(2),ND)
+    NN = min(Int32(2),ND)
     for I = Int32(1):NN
         FN = FNU + DBLE(FLOAT(ND - I))
         (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI) = ZUNHJ(ZNR,ZNI,FN,Int32(0),TOL,PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
@@ -162,30 +162,30 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         end
         STR = ZBR + ZETA2R
         STI = ZBI + ZETA2I
-        RAST = FN / abs(COMPLEX(STR,STI))
+        RAST = FN / abs(complex(STR,STI))
         STR = STR * RAST * RAST
         STI = -STI * RAST * RAST
         S1R = -ZETA1R + STR
-        S1I = -ZETA1I + STI + DABS(ZI)
+        S1I = -ZETA1I + STI + abs(ZI)
         @goto line60
         @label line50
         S1R = -ZETA1R + ZETA2R
         S1I = -ZETA1I + ZETA2I
         @label line60
         RS1 = S1R
-        if DABS(RS1) > ELIM
+        if abs(RS1) > ELIM
             @goto line120
         end
         if I == Int32(1)
             IFLAG = Int32(2)
         end
-        if DABS(RS1) < ALIM
+        if abs(RS1) < ALIM
             @goto line70
         end
-        APHI = abs(COMPLEX(PHIR,PHII))
-        AARG = abs(COMPLEX(ARGR,ARGI))
-        RS1 = ((RS1 + DLOG(APHI)) - 0.25 * DLOG(AARG)) - AIC
-        if DABS(RS1) > ELIM
+        APHI = abs(complex(PHIR,PHII))
+        AARG = abs(complex(ARGR,ARGI))
+        RS1 = ((RS1 + log(APHI)) - 0.25 * log(AARG)) - AIC
+        if abs(RS1) > ELIM
             @goto line120
         end
         if I == Int32(1)
@@ -206,9 +206,9 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         STI = STI + (AIR * ASUMI + AII * ASUMR)
         S2R = PHIR * STR - PHII * STI
         S2I = PHIR * STI + PHII * STR
-        STR = DEXP(S1R) * CSSR[IFLAG]
-        S1R = STR * DCOS(S1I)
-        S1I = STR * DSIN(S1I)
+        STR = exp(S1R) * CSSR[IFLAG]
+        S1R = STR * cos(S1I)
+        S1I = STR * sin(S1I)
         STR = S2R * S1R - S2I * S1I
         S2I = S2R * S1I + S2I * S1R
         S2R = STR
@@ -239,7 +239,7 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if ND <= Int32(2)
         @goto line110
     end
-    RAZ = 1.0 / abs(COMPLEX(ZR,ZI))
+    RAZ = 1.0 / abs(complex(ZR,ZI))
     STR = ZR * RAZ
     STI = -ZI * RAZ
     RZR = (STR + STR) * RAZ
@@ -270,9 +270,9 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if IFLAG >= Int32(3)
             @goto line100
         end
-        STR = DABS(C2R)
-        STI = DABS(C2I)
-        C2M = DMAX1(STR,STI)
+        STR = abs(C2R)
+        STI = abs(C2I)
+        C2M = max(STR,STI)
         if C2M <= ASCLE
             @goto line100
         end
@@ -316,7 +316,7 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         @goto line130
     end
     IN = (INU + ND) - Int32(1)
-    IN = MOD(IN,Int32(4)) + Int32(1)
+    IN = mod(IN,Int32(4)) + Int32(1)
     C2R = CAR * CIPR[IN] - SAR * CIPI[IN]
     C2I = CAR * CIPI[IN] + SAR * CIPR[IN]
     if ZI <= 0.0

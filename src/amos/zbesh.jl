@@ -63,17 +63,17 @@ function ZBESH(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,M::Int32,N::Int3
         return (NZ,IERR)
     end
     NN = N
-    TOL = DMAX1(D1MACH4,1.0e-18)
+    TOL = max(D1MACH4,1.0e-18)
     K1 = I1MACH15
     K2 = I1MACH16
     R1M5 = D1MACH5
-    K = MIN0(IABS(K1),IABS(K2))
+    K = min(abs(K1),abs(K2))
     ELIM = 2.303 * (DBLE(FLOAT(K)) * R1M5 - 3.0)
     K1 = I1MACH14 - Int32(1)
     AA = R1M5 * DBLE(FLOAT(K1))
-    DIG = DMIN1(AA,18.0)
+    DIG = min(AA,18.0)
     AA = AA * 2.303
-    ALIM = ELIM + DMAX1(-AA,-41.45)
+    ALIM = ELIM + max(-AA,-41.45)
     FNUL = 10.0 + 6.0 * (DIG - 3.0)
     RL = 1.2DIG + 3.0
     FN = FNU + DBLE(FLOAT(NN - Int32(1)))
@@ -81,17 +81,17 @@ function ZBESH(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,M::Int32,N::Int3
     FMM = DBLE(FLOAT(MM))
     ZNR = FMM * ZI
     ZNI = -FMM * ZR
-    AZ = abs(COMPLEX(ZR,ZI))
+    AZ = abs(complex(ZR,ZI))
     AA = 0.5 / TOL
     BB = DBLE(FLOAT(I1MACH9)) * 0.5
-    AA = DMIN1(AA,BB)
+    AA = min(AA,BB)
     if AZ > AA
         @goto line260
     end
     if FN > AA
         @goto line260
     end
-    AA = DSQRT(AA)
+    AA = sqrt(AA)
     if AZ > AA
         IERR = Int32(3)
     end
@@ -115,7 +115,7 @@ function ZBESH(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,M::Int32,N::Int3
         @goto line70
     end
     ARG = 0.5AZ
-    ALN = -FN * DLOG(ARG)
+    ALN = -FN * log(ARG)
     if ALN > ELIM
         @goto line230
     end
@@ -162,15 +162,15 @@ function ZBESH(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,M::Int32,N::Int3
     end
     NZ = NZ + NW
     @label line110
-    SGN = DSIGN(HPI,-FMM)
-    INU = INT(SNGL(FNU))
+    SGN = copysign(HPI,-FMM)
+    INU = trunc(Int32,SNGL(FNU))
     INUH = div(INU,Int32(2))
     IR = INU - Int32(2) * INUH
     ARG = (FNU - DBLE(FLOAT(INU - IR))) * SGN
     RHPI = 1.0 / SGN
-    CSGNI = RHPI * DCOS(ARG)
-    CSGNR = -RHPI * DSIN(ARG)
-    if MOD(INUH,Int32(2)) == Int32(0)
+    CSGNI = RHPI * cos(ARG)
+    CSGNR = -RHPI * sin(ARG)
+    if mod(INUH,Int32(2)) == Int32(0)
         @goto line120
     end
     CSGNR = -CSGNR
@@ -183,7 +183,7 @@ function ZBESH(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,M::Int32,N::Int3
         AA = CYR[I]
         BB = CYI[I]
         ATOL = 1.0
-        if DMAX1(DABS(AA),DABS(BB)) > ASCLE
+        if max(abs(AA),abs(BB)) > ASCLE
             @goto line135
         end
         AA = AA * RTOL

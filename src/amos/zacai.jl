@@ -31,7 +31,7 @@ function ZACAI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
     NZ = Int32(0)
     ZNR = -ZR
     ZNI = -ZI
-    AZ = abs(COMPLEX(ZR,ZI))
+    AZ = abs(complex(ZR,ZI))
     NN = N
     DFNU = FNU + DBLE(FLOAT(N - Int32(1)))
     if AZ <= 2.0
@@ -63,21 +63,21 @@ function ZACAI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         @goto line80
     end
     FMR = DBLE(FLOAT(MR))
-    SGN = -(DSIGN(PI,FMR))
+    SGN = -(copysign(PI,FMR))
     CSGNR = 0.0
     CSGNI = SGN
     if KODE == Int32(1)
         @goto line50
     end
     YY = -ZNI
-    CSGNR = -CSGNI * DSIN(YY)
-    CSGNI = CSGNI * DCOS(YY)
+    CSGNR = -CSGNI * sin(YY)
+    CSGNI = CSGNI * cos(YY)
     @label line50
-    INU = INT(SNGL(FNU))
+    INU = trunc(Int32,SNGL(FNU))
     ARG = (FNU - DBLE(FLOAT(INU))) * SGN
-    CSPNR = DCOS(ARG)
-    CSPNI = DSIN(ARG)
-    if MOD(INU,Int32(2)) == Int32(0)
+    CSPNR = cos(ARG)
+    CSPNI = sin(ARG)
+    if mod(INU,Int32(2)) == Int32(0)
         @goto line60
     end
     CSPNR = -CSPNR

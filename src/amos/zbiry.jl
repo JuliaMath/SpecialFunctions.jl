@@ -77,8 +77,8 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     if IERR != Int32(0)
         return (BIR,BII,IERR)
     end
-    AZ = abs(COMPLEX(ZR,ZI))
-    TOL = DMAX1(D1MACH4,1.0e-18)
+    AZ = abs(complex(ZR,ZI))
+    TOL = max(D1MACH4,1.0e-18)
     FID = DBLE(FLOAT(ID))
     if AZ > 1.0
         @goto line70
@@ -110,7 +110,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     DK = 3.0 + FID + FID
     D1 = AK * DK
     D2 = BK * CK
-    AD = DMIN1(D1,D2)
+    AD = min(D1,D2)
     AK = 24.0 + 9.0FID
     BK = 30.0 - 9.0FID
     for K = Int32(1):Int32(25)
@@ -127,7 +127,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
         ATRM = (ATRM * AZ3) / AD
         D1 = D1 + AK
         D2 = D2 + BK
-        AD = DMIN1(D1,D2)
+        AD = min(D1,D2)
         if ATRM < TOL * AD
             @goto line40
         end
@@ -148,8 +148,8 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     ZTAR = TTH * (ZR * STR - ZI * STI)
     ZTAI = TTH * (ZR * STI + ZI * STR)
     AA = ZTAR
-    AA = -(DABS(AA))
-    EAA = DEXP(AA)
+    AA = -(abs(AA))
+    EAA = exp(AA)
     BIR = BIR * EAA
     BII = BII * EAA
     return (BIR,BII,IERR)
@@ -172,8 +172,8 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     ZTAR = TTH * (ZR * STR - ZI * STI)
     ZTAI = TTH * (ZR * STI + ZI * STR)
     AA = ZTAR
-    AA = -(DABS(AA))
-    EAA = DEXP(AA)
+    AA = -(abs(AA))
+    EAA = exp(AA)
     BIR = BIR * EAA
     BII = BII * EAA
     return (BIR,BII,IERR)
@@ -182,23 +182,23 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     K1 = I1MACH15
     K2 = I1MACH16
     R1M5 = D1MACH5
-    K = MIN0(IABS(K1),IABS(K2))
+    K = min(abs(K1),abs(K2))
     ELIM = 2.303 * (DBLE(FLOAT(K)) * R1M5 - 3.0)
     K1 = I1MACH14 - Int32(1)
     AA = R1M5 * DBLE(FLOAT(K1))
-    DIG = DMIN1(AA,18.0)
+    DIG = min(AA,18.0)
     AA = AA * 2.303
-    ALIM = ELIM + DMAX1(-AA,-41.45)
+    ALIM = ELIM + max(-AA,-41.45)
     RL = 1.2DIG + 3.0
     FNUL = 10.0 + 6.0 * (DIG - 3.0)
     AA = 0.5 / TOL
     BB = DBLE(FLOAT(I1MACH9)) * 0.5
-    AA = DMIN1(AA,BB)
+    AA = min(AA,BB)
     AA = AA^TTH
     if AZ > AA
         @goto line260
     end
-    AA = DSQRT(AA)
+    AA = sqrt(AA)
     if AZ > AA
         IERR = Int32(3)
     end
@@ -211,7 +211,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
         @goto line80
     end
     BK = ZTAR
-    CK = -(DABS(BK))
+    CK = -(abs(BK))
     ZTAR = CK
     ZTAI = AK
     @label line80
@@ -225,11 +225,11 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     if KODE == Int32(2)
         @goto line100
     end
-    BB = DABS(AA)
+    BB = abs(AA)
     if BB < ALIM
         @goto line100
     end
-    BB = BB + 0.25 * DLOG(AZ)
+    BB = BB + 0.25 * log(AZ)
     SFAC = TOL
     if BB > ELIM
         @goto line190
@@ -252,8 +252,8 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     end
     AA = FMR * FNU
     Z3R = SFAC
-    STR = DCOS(AA)
-    STI = DSIN(AA)
+    STR = cos(AA)
+    STI = sin(AA)
     S1R = (STR * CYR[Int32(1)] - STI * CYI[Int32(1)]) * Z3R
     S1I = (STR * CYI[Int32(1)] + STI * CYR[Int32(1)]) * Z3R
     FNU = (2.0 - FID) / 3.0
@@ -266,8 +266,8 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     S2R = (FNU + FNU) * STR + CYR[Int32(2)]
     S2I = (FNU + FNU) * STI + CYI[Int32(2)]
     AA = FMR * (FNU - 1.0)
-    STR = DCOS(AA)
-    STI = DSIN(AA)
+    STR = cos(AA)
+    STI = sin(AA)
     S1R = COEF * ((S1R + S2R * STR) - S2I * STI)
     S1I = COEF * (S1I + S2R * STI + S2I * STR)
     if ID == Int32(1)

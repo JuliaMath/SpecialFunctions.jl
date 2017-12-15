@@ -48,13 +48,13 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
         CONEI = 0.0
         RT2 = 1.4142135623730951
     end
-    AZ = abs(COMPLEX(ZR,ZI))
-    INU = INT(SNGL(FNU))
+    AZ = abs(complex(ZR,ZI))
+    INU = trunc(Int32,SNGL(FNU))
     IDNU = (INU + N) - Int32(1)
-    MAGZ = INT(SNGL(AZ))
+    MAGZ = trunc(Int32,SNGL(AZ))
     AMAGZ = DBLE(FLOAT(MAGZ + Int32(1)))
     FDNU = DBLE(FLOAT(IDNU))
-    FNUP = DMAX1(AMAGZ,FDNU)
+    FNUP = max(AMAGZ,FDNU)
     ID = (IDNU - MAGZ) - Int32(1)
     ITIME = Int32(1)
     K = Int32(1)
@@ -72,10 +72,10 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
     if ID > Int32(0)
         ID = Int32(0)
     end
-    AP2 = abs(COMPLEX(P2R,P2I))
-    AP1 = abs(COMPLEX(P1R,P1I))
+    AP2 = abs(complex(P2R,P2I))
+    AP1 = abs(complex(P1R,P1I))
     ARG = (AP2 + AP2) / (AP1 * TOL)
-    TEST1 = DSQRT(ARG)
+    TEST1 = sqrt(ARG)
     TEST = TEST1
     RAP1 = 1.0 / AP1
     P1R = P1R * RAP1
@@ -94,17 +94,17 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
     P1I = PTI
     T1R = T1R + RZR
     T1I = T1I + RZI
-    AP2 = abs(COMPLEX(P2R,P2I))
+    AP2 = abs(complex(P2R,P2I))
     if AP1 <= TEST
         @goto line10
     end
     if ITIME == Int32(2)
         @goto line20
     end
-    AK = abs(COMPLEX(T1R,T1I) * 0.5)
-    FLAM = AK + DSQRT(AK * AK - 1.0)
-    RHO = DMIN1(AP2 / AP1,FLAM)
-    TEST = TEST1 * DSQRT(RHO / (RHO * RHO - 1.0))
+    AK = abs(complex(T1R,T1I) * 0.5)
+    FLAM = AK + sqrt(AK * AK - 1.0)
+    RHO = min(AP2 / AP1,FLAM)
+    TEST = TEST1 * sqrt(RHO / (RHO * RHO - 1.0))
     ITIME = Int32(2)
     @goto line10
     @label line20
@@ -149,7 +149,7 @@ function ZRATI(ZR::Float64,ZI::Float64,FNU::Float64,N::Int32,CYR::AbstractArray{
     for I = Int32(2):N
         PTR = CDFNUR + (T1R * RZR - T1I * RZI) + CYR[K + Int32(1)]
         PTI = CDFNUI + (T1R * RZI + T1I * RZR) + CYI[K + Int32(1)]
-        AK = abs(COMPLEX(PTR,PTI))
+        AK = abs(complex(PTR,PTI))
         if AK != CZEROR
             @goto line50
         end

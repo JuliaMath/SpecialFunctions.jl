@@ -53,9 +53,9 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     end
     SCLE = D1MACH1 / TOL
     NZ = Int32(0)
-    AZ = abs(COMPLEX(ZR,ZI))
-    IAZ = INT(SNGL(AZ))
-    IFNU = INT(SNGL(FNU))
+    AZ = abs(complex(ZR,ZI))
+    IAZ = trunc(Int32,SNGL(AZ))
+    IFNU = trunc(Int32,SNGL(FNU))
     INU = (IFNU + N) - Int32(1)
     AT = DBLE(FLOAT(IAZ)) + 1.0
     RAZ = 1.0 / AZ
@@ -70,7 +70,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     P2R = CONER
     P2I = CONEI
     ACK = (AT + 1.0) * RAZ
-    RHO = ACK + DSQRT(ACK * ACK - 1.0)
+    RHO = ACK + sqrt(ACK * ACK - 1.0)
     RHO2 = RHO * RHO
     TST = (RHO2 + RHO2) / ((RHO2 - 1.0) * (RHO - 1.0))
     TST = TST / TOL
@@ -84,7 +84,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         P1I = PTI
         CKR = CKR + RZR
         CKI = CKI + RZI
-        AP = abs(COMPLEX(P2R,P2I))
+        AP = abs(complex(P2R,P2I))
         if AP > TST * AK * AK
             @goto line20
         end
@@ -108,7 +108,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     CKR = STR * AT * RAZ
     CKI = STI * AT * RAZ
     ACK = AT * RAZ
-    TST = DSQRT(ACK / TOL)
+    TST = sqrt(ACK / TOL)
     ITIME = Int32(1)
     for K = Int32(1):Int32(80)
         PTR = P2R
@@ -119,25 +119,25 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         P1I = PTI
         CKR = CKR + RZR
         CKI = CKI + RZI
-        AP = abs(COMPLEX(P2R,P2I))
+        AP = abs(complex(P2R,P2I))
         if AP < TST
             @goto line30
         end
         if ITIME == Int32(2)
             @goto line40
         end
-        ACK = abs(COMPLEX(CKR,CKI))
-        FLAM = ACK + DSQRT(ACK * ACK - 1.0)
-        FKAP = AP / abs(COMPLEX(P1R,P1I))
-        RHO = DMIN1(FLAM,FKAP)
-        TST = TST * DSQRT(RHO / (RHO * RHO - 1.0))
+        ACK = abs(complex(CKR,CKI))
+        FLAM = ACK + sqrt(ACK * ACK - 1.0)
+        FKAP = AP / abs(complex(P1R,P1I))
+        RHO = min(FLAM,FKAP)
+        TST = TST * sqrt(RHO / (RHO * RHO - 1.0))
         ITIME = Int32(2)
         @label line30
     end
     @goto line110
     @label line40
     K = K + Int32(1)
-    KK = MAX0(I + IAZ,K + INU)
+    KK = max(I + IAZ,K + INU)
     FKK = DBLE(FLOAT(KK))
     P1R = ZEROR
     P1I = ZEROI
@@ -146,7 +146,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     FNF = FNU - DBLE(FLOAT(IFNU))
     TFNF = FNF + FNF
     BK = (lgamma(FKK + TFNF + 1.0) - lgamma(FKK + 1.0)) - lgamma(TFNF + 1.0)
-    BK = DEXP(BK)
+    BK = exp(BK)
     SUMR = ZEROR
     SUMI = ZEROI
     KM = KK - INU
@@ -221,7 +221,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     PTI = P1I
     P2R = P2R + SUMR
     P2I = P2I + SUMI
-    AP = abs(COMPLEX(P2R,P2I))
+    AP = abs(complex(P2R,P2I))
     P1R = 1.0 / AP
     (STR,STI) = reim(exp(complex(PTR,PTI)))
     CKR = STR * P1R
