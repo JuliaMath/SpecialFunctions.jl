@@ -77,7 +77,7 @@ function ZASYI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     STI = -ZI * RAZ
     AK1R = RTPI * STR * RAZ
     AK1I = RTPI * STI * RAZ
-    (AK1R,AK1I) = ZSQRT(AK1R,AK1I,AK1R,AK1I)
+    (AK1R,AK1I) = reim(sqrt(complex(AK1R,AK1I)))
     CZR = ZR
     CZI = ZI
     if KODE != Int32(2)

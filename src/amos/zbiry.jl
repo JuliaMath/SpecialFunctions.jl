@@ -144,7 +144,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     if KODE == Int32(1)
         return (BIR,BII,IERR)
     end
-    (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
+    (STR,STI) = reim(sqrt(complex(ZR,ZI)))
     ZTAR = TTH * (ZR * STR - ZI * STI)
     ZTAI = TTH * (ZR * STI + ZI * STR)
     AA = ZTAR
@@ -168,7 +168,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     if KODE == Int32(1)
         return (BIR,BII,IERR)
     end
-    (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
+    (STR,STI) = reim(sqrt(complex(ZR,ZI)))
     ZTAR = TTH * (ZR * STR - ZI * STI)
     ZTAI = TTH * (ZR * STI + ZI * STR)
     AA = ZTAR
@@ -202,7 +202,7 @@ function ZBIRY(ZR::Float64,ZI::Float64,ID::Int32,KODE::Int32,BIR::Float64,BII::F
     if AZ > AA
         IERR = Int32(3)
     end
-    (CSQR,CSQI) = ZSQRT(ZR,ZI,CSQR,CSQI)
+    (CSQR,CSQI) = reim(sqrt(complex(ZR,ZI)))
     ZTAR = TTH * (ZR * CSQR - ZI * CSQI)
     ZTAI = TTH * (ZR * CSQI + ZI * CSQR)
     SFAC = 1.0

@@ -192,7 +192,7 @@ function ZUNIK(ZRR::Float64,ZRI::Float64,FNU::Float64,IKFLG::Int32,IPMTR::Int32,
     TI = ZRI * RFN
     SR = CONER + (TR * TR - TI * TI)
     SI = CONEI + (TR * TI + TI * TR)
-    (SRR,SRI) = ZSQRT(SR,SI,SRR,SRI)
+    (SRR,SRI) = reim(sqrt(complex(SR,SI)))
     STR = CONER + SRR
     STI = CONEI + SRI
     (ZNR,ZNI) = ZDIV(STR,STI,TR,TI,ZNR,ZNI)
@@ -204,7 +204,7 @@ function ZUNIK(ZRR::Float64,ZRI::Float64,FNU::Float64,IKFLG::Int32,IPMTR::Int32,
     (TR,TI) = ZDIV(CONER,CONEI,SRR,SRI,TR,TI)
     SRR = TR * RFN
     SRI = TI * RFN
-    (CWRKR[Int32(16)],CWRKI[Int32(16)]) = ZSQRT(SRR,SRI,CWRKR[Int32(16)],CWRKI[Int32(16)])
+    (CWRKR[Int32(16)],CWRKI[Int32(16)]) = reim(sqrt(complex(SRR,SRI)))
     PHIR = CWRKR[Int32(16)] * CON[IKFLG]
     PHII = CWRKI[Int32(16)] * CON[IKFLG]
     if IPMTR != Int32(0)

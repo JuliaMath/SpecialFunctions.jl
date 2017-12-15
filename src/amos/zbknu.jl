@@ -316,7 +316,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     (S2R,S2I) = ZMLT(S2R,S2I,FR,FI,S2R,S2I)
     @goto line210
     @label line110
-    (STR,STI) = ZSQRT(ZR,ZI,STR,STI)
+    (STR,STI) = reim(sqrt(complex(ZR,ZI)))
     (COEFR,COEFI) = ZDIV(RTHPI,CZEROI,STR,STI,COEFR,COEFI)
     KFLAG = Int32(2)
     if KODED == Int32(2)

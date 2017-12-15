@@ -782,8 +782,8 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     ZETAI = W2R * SUMAI + W2I * SUMAR
     ARGR = ZETAR * FN23
     ARGI = ZETAI * FN23
-    (ZAR,ZAI) = ZSQRT(SUMAR,SUMAI,ZAR,ZAI)
-    (STR,STI) = ZSQRT(W2R,W2I,STR,STI)
+    (ZAR,ZAI) = reim(sqrt(complex(SUMAR,SUMAI)))
+    (STR,STI) = reim(sqrt(complex(W2R,W2I)))
     ZETA2R = STR * FNU
     ZETA2I = STI * FNU
     STR = CONER + EX2 * (ZETAR * ZAR - ZETAI * ZAI)
@@ -792,7 +792,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     ZETA1I = STR * ZETA2I + STI * ZETA2R
     ZAR = ZAR + ZAR
     ZAI = ZAI + ZAI
-    (STR,STI) = ZSQRT(ZAR,ZAI,STR,STI)
+    (STR,STI) = reim(sqrt(complex(ZAR,ZAI)))
     PHIR = STR * RFN13
     PHII = STI * RFN13
     if IPMTR == Int32(1)
@@ -879,7 +879,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     @label line120
     return (PHIR,PHII,ARGR,ARGI,ZETA1R,ZETA1I,ZETA2R,ZETA2I,ASUMR,ASUMI,BSUMR,BSUMI)
     @label line130
-    (WR,WI) = ZSQRT(W2R,W2I,WR,WI)
+    (WR,WI) = reim(sqrt(complex(W2R,W2I)))
     if WR < 0.0
         WR = 0.0
     end
@@ -932,7 +932,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     (ZAR,ZAI) = ZDIV(RTZTR,RTZTI,WR,WI,ZAR,ZAI)
     TZAR = ZAR + ZAR
     TZAI = ZAI + ZAI
-    (STR,STI) = ZSQRT(TZAR,TZAI,STR,STI)
+    (STR,STI) = reim(sqrt(complex(TZAR,TZAI)))
     PHIR = STR * RFN13
     PHII = STI * RFN13
     if IPMTR == Int32(1)
