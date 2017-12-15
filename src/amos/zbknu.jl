@@ -169,7 +169,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         @goto line110
     end
     FC = 1.0
-    (SMUR,SMUI,IDUM) = ZLOG(RZR,RZI,SMUR,SMUI,IDUM)
+    (SMUR,SMUI) = reim(log(complex(RZR,RZI)))
     FMUR = SMUR * DNU
     FMUI = SMUI * DNU
     (CSHR,CSHI,CCHR,CCHI) = ZSHCH(FMUR,FMUI,CSHR,CSHI,CCHR,CCHI)
@@ -604,7 +604,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if P2R < -ELIM
             @goto line263
         end
-        (STR,STI,IDUM) = ZLOG(S2R,S2I,STR,STI,IDUM)
+        (STR,STI) = reim(log(complex(S2R,S2I)))
         P2R = -ZDR + STR
         P2I = -ZDI + STI
         P2M = DEXP(P2R) / TOL

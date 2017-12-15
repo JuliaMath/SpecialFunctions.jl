@@ -213,7 +213,7 @@ function ZMLRI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     if KODE == Int32(2)
         PTR = ZEROR
     end
-    (STR,STI,IDUM) = ZLOG(RZR,RZI,STR,STI,IDUM)
+    (STR,STI) = reim(log(complex(RZR,RZI)))
     P1R = -FNF * STR + PTR
     P1I = -FNF * STI + PTI
     AP = lgamma(1.0 + FNF)

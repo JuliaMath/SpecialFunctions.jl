@@ -49,7 +49,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         if ACS < -ELIM
             @goto line10
         end
-        (CSR,CSI,IDUM) = ZLOG(S1R,S1I,CSR,CSI,IDUM)
+        (CSR,CSI) = reim(log(complex(S1R,S1I)))
         CSR = CSR - ZRR
         CSI = CSI - ZRI
         STR = DEXP(CSR) / TOL
@@ -112,7 +112,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         if ACS < -ELIM
             @goto line25
         end
-        (CSR,CSI,IDUM) = ZLOG(S2R,S2I,CSR,CSI,IDUM)
+        (CSR,CSI) = reim(log(complex(S2R,S2I)))
         CSR = CSR - ZDR
         CSI = CSI - ZDI
         STR = DEXP(CSR) / TOL

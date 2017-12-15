@@ -32,7 +32,7 @@ function ZS1S2(ZRR::Float64,ZRI::Float64,S1R::Float64,S1I::Float64,S2R::Float64,
     if ALN < -ALIM
         @goto line10
     end
-    (C1R,C1I,IDUM) = ZLOG(S1DR,S1DI,C1R,C1I,IDUM)
+    (C1R,C1I) = reim(log(complex(S1DR,S1DI)))
     C1R = (C1R - ZRR) - ZRR
     C1I = (C1I - ZRI) - ZRI
     (S1R,S1I) = reim(exp(complex(C1R,C1I)))

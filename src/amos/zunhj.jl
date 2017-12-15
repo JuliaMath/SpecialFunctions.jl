@@ -889,7 +889,7 @@ function ZUNHJ(ZR::Float64,ZI::Float64,FNU::Float64,IPMTR::Int32,TOL::Float64,PH
     STR = CONER + WR
     STI = WI
     (ZAR,ZAI) = ZDIV(STR,STI,ZBR,ZBI,ZAR,ZAI)
-    (ZCR,ZCI,IDUM) = ZLOG(ZAR,ZAI,ZCR,ZCI,IDUM)
+    (ZCR,ZCI) = reim(log(complex(ZAR,ZAI)))
     if ZCI < 0.0
         ZCI = 0.0
     end

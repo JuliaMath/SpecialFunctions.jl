@@ -151,13 +151,13 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     return NUF
     @label line110
     ASCLE = (1000.0D1MACH1) / TOL
-    (STR,STI,IDUM) = ZLOG(PHIR,PHII,STR,STI,IDUM)
+    (STR,STI) = reim(log(complex(PHIR,PHII)))
     CZR = CZR + STR
     CZI = CZI + STI
     if IFORM == Int32(1)
         @goto line120
     end
-    (STR,STI,IDUM) = ZLOG(ARGR,ARGI,STR,STI,IDUM)
+    (STR,STI) = reim(log(complex(ARGR,ARGI)))
     CZR = (CZR - 0.25STR) - AIC
     CZI = CZI - 0.25STI
     @label line120
@@ -224,13 +224,13 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     @goto line140
     @label line190
     ASCLE = (1000.0D1MACH1) / TOL
-    (STR,STI,IDUM) = ZLOG(PHIR,PHII,STR,STI,IDUM)
+    (STR,STI) = reim(log(complex(PHIR,PHII)))
     CZR = CZR + STR
     CZI = CZI + STI
     if IFORM == Int32(1)
         @goto line200
     end
-    (STR,STI,IDUM) = ZLOG(ARGR,ARGI,STR,STI,IDUM)
+    (STR,STI) = reim(log(complex(ARGR,ARGI)))
     CZR = (CZR - 0.25STR) - AIC
     CZI = CZI - 0.25STI
     @label line200

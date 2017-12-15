@@ -79,7 +79,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     @label line10
     ACZ = abs(COMPLEX(CZR,CZI))
     NN = N
-    (CKR,CKI,IDUM) = ZLOG(HZR,HZI,CKR,CKI,IDUM)
+    (CKR,CKI) = reim(log(complex(HZR,HZI)))
     @label line20
     DFNU = FNU + DBLE(FLOAT(NN - Int32(1)))
     FNUP = DFNU + 1.0

@@ -196,7 +196,7 @@ function ZUNIK(ZRR::Float64,ZRI::Float64,FNU::Float64,IKFLG::Int32,IPMTR::Int32,
     STR = CONER + SRR
     STI = CONEI + SRI
     (ZNR,ZNI) = ZDIV(STR,STI,TR,TI,ZNR,ZNI)
-    (STR,STI,IDUM) = ZLOG(ZNR,ZNI,STR,STI,IDUM)
+    (STR,STI) = reim(log(complex(ZNR,ZNI)))
     ZETA1R = FNU * STR
     ZETA1I = FNU * STI
     ZETA2R = FNU * SRR
