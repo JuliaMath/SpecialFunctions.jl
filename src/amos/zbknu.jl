@@ -610,8 +610,7 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         P2M = exp(P2R) / TOL
         P1R = P2M * cos(P2I)
         P1I = P2M * sin(P2I)
-        (NW,) = ZUCHK(P1R,P1I,NW,ASCLE,TOL)
-        if NW != Int32(0)
+        if zuchk(complex(P1R,P1I),TOL)
             @goto line263
         end
         J = Int32(3) - J

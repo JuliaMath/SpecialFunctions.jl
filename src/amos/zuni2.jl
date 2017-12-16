@@ -215,8 +215,7 @@ function ZUNI2(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if IFLAG != Int32(1)
             @goto line80
         end
-        (NW,) = ZUCHK(S2R,S2I,NW,BRY[Int32(1)],TOL)
-        if NW != Int32(0)
+        if zuchk(complex(S2R, S2I), TOL)
             @goto line120
         end
         @label line80

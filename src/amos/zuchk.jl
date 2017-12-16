@@ -1,19 +1,19 @@
-function ZUCHK(YR::Float64,YI::Float64,NZ::Int32,ASCLE::Float64,TOL::Float64)
-    SS::Float64 = zero(Float64)
-    ST::Float64 = zero(Float64)
-    WI::Float64 = zero(Float64)
-    WR::Float64 = zero(Float64)
-    NZ = Int32(0)
-    WR = abs(YR)
-    WI = abs(YI)
-    ST = min(WR,WI)
-    if ST > ASCLE
-        return NZ
-    end
-    SS = max(WR,WI)
-    ST = ST / TOL
-    if SS < ST
-        NZ = Int32(1)
-    end
-    return NZ
+"""
+    zuchk(y::Complex, tol)
+
+Y ENTERS AS A SCALED QUANTITY WHOSE MAGNITUDE IS GREATER THAN
+EXP(-ALIM)=ASCLE=1.0E+3*D1MACH(1)/TOL. THE TEST IS MADE TO SEE
+IF THE MAGNITUDE OF THE REAL OR IMAGINARY PART WOULD UNDERFLOW
+WHEN Y IS SCALED (BY TOL) TO ITS PROPER VALUE. Y IS ACCEPTED
+IF THE UNDERFLOW IS AT LEAST ONE PRECISION BELOW THE MAGNITUDE
+OF THE LARGEST COMPONENT; OTHERWISE THE PHASE ANGLE DOES NOT HAVE
+ABSOLUTE ACCURACY AND AN UNDERFLOW IS ASSUMED.
+"""
+function zuchk(y::Complex{T}, tol::Real) where {T}
+    w_real = abs(real(y))
+    w_imag = abs(imag(y))
+    
+    s_min = min(w_real, w_imag)
+    s_max = max(w_real, w_imag)
+    return s_max/tol < s_min < 1000*realmin(T)/tol
 end

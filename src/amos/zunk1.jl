@@ -179,8 +179,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if KFLAG != Int32(1)
             @goto line50
         end
-        (NW,) = ZUCHK(S2R,S2I,NW,BRY[Int32(1)],TOL)
-        if NW != Int32(0)
+        if zuchk(complex(S2R, S2I), TOL)
             @goto line60
         end
         @label line50
@@ -426,8 +425,7 @@ function ZUNK1(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,MR::Int32,N::Int
         if IFLAG != Int32(1)
             @goto line230
         end
-        (NW,) = ZUCHK(S2R,S2I,NW,BRY[Int32(1)],TOL)
-        if NW == Int32(0)
+        if zuchk(complex(S2R, S2I), TOL)
             @goto line230
         end
         S2R = ZEROR

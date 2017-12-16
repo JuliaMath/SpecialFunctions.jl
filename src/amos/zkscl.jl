@@ -55,8 +55,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         STR = exp(CSR) / TOL
         CSR = STR * cos(CSI)
         CSI = STR * sin(CSI)
-        (NW,) = ZUCHK(CSR,CSI,NW,ASCLE,TOL)
-        if NW != Int32(0)
+        if zuchk(complex(CSR, CSI), TOL)
             @goto line10
         end
         YR[I] = CSR
@@ -118,8 +117,7 @@ function ZKSCL(ZRR::Float64,ZRI::Float64,FNU::Float64,N::Int32,YR::AbstractArray
         STR = exp(CSR) / TOL
         CSR = STR * cos(CSI)
         CSI = STR * sin(CSI)
-        (NW,) = ZUCHK(CSR,CSI,NW,ASCLE,TOL)
-        if NW != Int32(0)
+        if zuchk(complex(CSR, CSI), TOL)
             @goto line25
         end
         YR[I] = CSR

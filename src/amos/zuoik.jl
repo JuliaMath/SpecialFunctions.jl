@@ -165,8 +165,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     AY = CZI
     CZR = AX * cos(AY)
     CZI = AX * sin(AY)
-    (NW,) = ZUCHK(CZR,CZI,NW,ASCLE,TOL)
-    if NW != Int32(0)
+    if zuchk(complex(CZR, CZI), TOL)
         @goto line90
     end
     @label line130
@@ -238,8 +237,7 @@ function ZUOIK(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,IKFLG::Int32,N::
     AY = CZI
     CZR = AX * cos(AY)
     CZI = AX * sin(AY)
-    (NW,) = ZUCHK(CZR,CZI,NW,ASCLE,TOL)
-    if NW != Int32(0)
+    if zuchk(complex(CZR, CZI), TOL)
         @goto line180
     end
     return NUF

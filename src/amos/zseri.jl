@@ -157,8 +157,7 @@ function ZSERI(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
         if IFLAG == Int32(0)
             @goto line80
         end
-        (NW,) = ZUCHK(S2R,S2I,NW,ASCLE,TOL)
-        if NW != Int32(0)
+        if zuchk(complex(S2R, S2I), TOL)
             @goto line30
         end
         @label line80
