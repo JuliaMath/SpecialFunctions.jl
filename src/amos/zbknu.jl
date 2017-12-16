@@ -172,7 +172,8 @@ function ZBKNU(ZR::Float64,ZI::Float64,FNU::Float64,KODE::Int32,N::Int32,YR::Abs
     (SMUR,SMUI) = reim(log(complex(RZR,RZI)))
     FMUR = SMUR * DNU
     FMUI = SMUI * DNU
-    (CSHR,CSHI,CCHR,CCHI) = ZSHCH(FMUR,FMUI,CSHR,CSHI,CCHR,CCHI)
+    (CSHR, CSHI) = reim(sinh(complex(FMUR, FMUI)))
+    (CCHR, CCHI) = reim(cosh(complex(FMUR, FMUI)))
     if DNU == 0.0
         @goto line10
     end
