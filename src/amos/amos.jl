@@ -1,7 +1,7 @@
 module Amos
 
-const D1MACH1 = 2.23e-308
-const D1MACH2 = 1.79e-308
+const D1MACH1 = 2.23e-308 # realmin()
+const D1MACH2 = 1.79e-308 # realmax() : I think this is meant to be 1.79e+308
 const D1MACH3 = 1.11e-16
 const D1MACH4 = 2.22e-16
 const D1MACH5 = 0.3010299956639812
