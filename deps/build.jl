@@ -19,7 +19,7 @@ else # linux
     # Determine the glibc version. If the check fails, we know we're on a non-glibc
     # system, which means we can't use the binaries and need to build from source.
     # The glibc version used by the binaries is 2.6, so we need at least that.
-    libc_ptr = ccall(:jl_dlopen, Ptr{Void}, (Ptr{Void}, UInt32), C_NULL, 0)
+    libc_ptr = ccall(:jl_dlopen, Ptr{Cvoid}, (Ptr{Cvoid}, UInt32), C_NULL, 0)
     glibc_ptr = Libdl.dlsym_e(libc_ptr, :gnu_get_libc_version)
     if glibc_ptr == C_NULL
         include("scratch.jl")
