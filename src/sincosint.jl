@@ -1,4 +1,4 @@
-using Base.Math.@horner
+using Base.Math: @horner
 
 # Compute the sine integral: ∫_0^x sin(t)/t dt,
 # and the cosine integral: γ + log x + ∫_0^x (cos(t)-1)/t dt,

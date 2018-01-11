@@ -1,5 +1,4 @@
 __precompile__()
-
 module SpecialFunctions
 
 using Compat
