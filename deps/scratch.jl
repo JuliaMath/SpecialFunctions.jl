@@ -4,6 +4,10 @@ using BinDeps
 using BinDeps: libdir, srcdir, includedir, depsdir, builddir
 using Base.Math: libm
 
+if VERSION >= v"0.7.0-DEV.3382"
+    using Libdl
+end
+
 # Don't call setup again if we're being included from binaries.jl
 if !did_setup
     BinDeps.@setup
