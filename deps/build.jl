@@ -1,6 +1,10 @@
 using Compat
 using Compat.Sys: isapple, islinux, iswindows
 
+if VERSION >= v"0.7.0-DEV.3382"
+    using Libdl
+end
+
 did_setup = false
 
 if VERSION < v"0.7.0-DEV.1760"
