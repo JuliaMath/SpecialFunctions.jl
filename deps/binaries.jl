@@ -3,7 +3,7 @@ using BinDeps: libdir
 
 modified_defaults = false
 if !in(BinDeps.Binaries, BinDeps.defaults)
-    pushfront!(BinDeps.defaults, BinDeps.Binaries)
+    pushfirst!(BinDeps.defaults, BinDeps.Binaries)
     modified_defaults = true
 end
 
@@ -44,5 +44,5 @@ end
 BinDeps.@install Dict(:libopenspecfun => :openspecfun)
 
 if modified_defaults
-    popfront!(BinDeps.defaults)
+    popfirst!(BinDeps.defaults)
 end
