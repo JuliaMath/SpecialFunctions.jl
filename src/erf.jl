@@ -282,6 +282,8 @@ end
 
 erfcinv(x::Integer) = erfcinv(float(x))
 
+# MPFR has an open TODO item for this function
+# until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
 function erfcx(x::BigFloat)
     if x < 0x1p30
         # any larger gives internal overflow
@@ -291,7 +293,7 @@ function erfcx(x::BigFloat)
     else
         # asymptotic series
         # starts to diverge at around 2^60 iterations
-        # good to precision up to an O(1 exabyte) or so.
+        # good to precision up to O(1 exabyte) or so.
         ϵ = eps(BigFloat)/4
         v = 1/(2*x*x)
         k = 1
