@@ -285,7 +285,7 @@ erfcinv(x::Integer) = erfcinv(float(x))
 # MPFR has an open TODO item for this function
 # until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
 function erfcx(x::BigFloat)
-    if x <= Int == Int32 ? 0x1p15 : 0x1p30
+    if x <= (Int == Int32 ? 0x1p15 : 0x1p30)
         # any larger gives internal overflow
         return exp(x^2)*erfc(x)
     elseif !isfinite(x)
