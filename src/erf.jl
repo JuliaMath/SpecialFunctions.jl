@@ -281,3 +281,26 @@ function erfcinv(y::Float32)
 end
 
 erfcinv(x::Integer) = erfcinv(float(x))
+
+function erfcx(x::BigFloat)
+    if x < 0x1p30
+        # any larger gives internal overflow
+        return exp(x^2)*erfc(x)
+    elseif !isfinite(x)
+        return 1/x
+    else
+        # asymptotic series
+        # starts to diverge at around 2^60 iterations
+        # good to precision up to an O(1 exabyte) or so.
+        ϵ = eps(BigFloat)/4
+        v = 1/(2*x*x)
+        k = 1
+        s = w = -k*v
+        while abs(w) > ϵ
+            k += 2
+            w *= -k*v
+            s += w
+        end
+        return (1+s)/(x*sqrt(oftype(x,pi)))
+    end
+end
