@@ -45,7 +45,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.erf",
     "category": "Function",
-    "text": "erf(x)\n\nCompute the error function of x, defined by frac2sqrtpi int_0^x e^-t^2 dt for arbitrary complex x.\n\n\n\n"
+    "text": "erf(x)\n\nCompute the error function of x, defined by frac2sqrtpi int_0^x e^-t^2 dt for arbitrary complex x.\n\n\n\n\n\n"
 },
 
 {
@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.erfc",
     "category": "Function",
-    "text": "erfc(x)\n\nCompute the complementary error function of x, defined by 1 - operatornameerf(x).\n\n\n\n"
+    "text": "erfc(x)\n\nCompute the complementary error function of x, defined by 1 - operatornameerf(x).\n\n\n\n\n\n"
 },
 
 {
@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.erfcx",
     "category": "Function",
-    "text": "erfcx(x)\n\nCompute the scaled complementary error function of x, defined by e^x^2 operatornameerfc(x). Note also that operatornameerfcx(-ix) computes the Faddeeva function w(x).\n\n\n\n"
+    "text": "erfcx(x)\n\nCompute the scaled complementary error function of x, defined by e^x^2 operatornameerfc(x). Note also that operatornameerfcx(-ix) computes the Faddeeva function w(x).\n\n\n\n\n\n"
 },
 
 {
@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.erfi",
     "category": "Function",
-    "text": "erfi(x)\n\nCompute the imaginary error function of x, defined by -i operatornameerf(ix).\n\n\n\n"
+    "text": "erfi(x)\n\nCompute the imaginary error function of x, defined by -i operatornameerf(ix).\n\n\n\n\n\n"
 },
 
 {
@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.dawson",
     "category": "Function",
-    "text": "dawson(x)\n\nCompute the Dawson function (scaled imaginary error function) of x, defined by fracsqrtpi2 e^-x^2 operatornameerfi(x).\n\n\n\n"
+    "text": "dawson(x)\n\nCompute the Dawson function (scaled imaginary error function) of x, defined by fracsqrtpi2 e^-x^2 operatornameerfi(x).\n\n\n\n\n\n"
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.erfinv",
     "category": "Function",
-    "text": "erfinv(x)\n\nCompute the inverse error function of a real x, defined by operatornameerf(operatornameerfinv(x)) = x.\n\n\n\n"
+    "text": "erfinv(x)\n\nCompute the inverse error function of a real x, defined by operatornameerf(operatornameerfinv(x)) = x.\n\n\n\n\n\n"
 },
 
 {
@@ -93,7 +93,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.erfcinv",
     "category": "Function",
-    "text": "erfcinv(x)\n\nCompute the inverse error complementary function of a real x, defined by operatornameerfc(operatornameerfcinv(x)) = x.\n\n\n\n"
+    "text": "erfcinv(x)\n\nCompute the inverse error complementary function of a real x, defined by operatornameerfc(operatornameerfcinv(x)) = x.\n\n\n\n\n\n"
 },
 
 {
@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.sinint",
     "category": "Function",
-    "text": "sinint(x)\n\nCompute the sine integral function of x, defined by operatornameSi(x) = int_0^xfracsin tt dt for real x.\n\n\n\n"
+    "text": "sinint(x)\n\nCompute the sine integral function of x, defined by operatornameSi(x) = int_0^xfracsin tt dt for real x.\n\n\n\n\n\n"
 },
 
 {
@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.cosint",
     "category": "Function",
-    "text": "cosint(x)\n\nCompute the cosine integral function of x, defined by operatornameCi(x) = gamma + log x + int_0^x fraccos t - 1t dt for real x > 0, where gamma is the Euler-Mascheroni constant.\n\n\n\n"
+    "text": "cosint(x)\n\nCompute the cosine integral function of x, defined by operatornameCi(x) = gamma + log x + int_0^x fraccos t - 1t dt for real x > 0, where gamma is the Euler-Mascheroni constant.\n\n\n\n\n\n"
 },
 
 {
@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.digamma",
     "category": "Function",
-    "text": "digamma(x)\n\nCompute the digamma function of x (the logarithmic derivative of gamma(x)).\n\n\n\n"
+    "text": "digamma(x)\n\nCompute the digamma function of x (the logarithmic derivative of gamma(x)).\n\n\n\n\n\n"
 },
 
 {
@@ -125,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.invdigamma",
     "category": "Function",
-    "text": "invdigamma(x)\n\nCompute the inverse digamma function of x.\n\n\n\n"
+    "text": "invdigamma(x)\n\nCompute the inverse digamma function of x.\n\n\n\n\n\n"
 },
 
 {
@@ -133,7 +133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.trigamma",
     "category": "Function",
-    "text": "trigamma(x)\n\nCompute the trigamma function of x (the logarithmic second derivative of gamma(x)).\n\n\n\n"
+    "text": "trigamma(x)\n\nCompute the trigamma function of x (the logarithmic second derivative of gamma(x)).\n\n\n\n\n\n"
 },
 
 {
@@ -141,7 +141,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.polygamma",
     "category": "Function",
-    "text": "polygamma(m, x)\n\nCompute the polygamma function of order m of argument x (the (m+1)th derivative of the logarithm of gamma(x))\n\n\n\n"
+    "text": "polygamma(m, x)\n\nCompute the polygamma function of order m of argument x (the (m+1)th derivative of the logarithm of gamma(x))\n\n\n\n\n\n"
 },
 
 {
@@ -149,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airyai",
     "category": "Function",
-    "text": "airyai(x)\n\nAiry function of the first kind operatornameAi(x).\n\n\n\n"
+    "text": "airyai(x)\n\nAiry function of the first kind operatornameAi(x).\n\n\n\n\n\n"
 },
 
 {
@@ -157,7 +157,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airyaiprime",
     "category": "Function",
-    "text": "airyaiprime(x)\n\nDerivative of the Airy function of the first kind operatornameAi(x).\n\n\n\n"
+    "text": "airyaiprime(x)\n\nDerivative of the Airy function of the first kind operatornameAi(x).\n\n\n\n\n\n"
 },
 
 {
@@ -165,7 +165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airyaix",
     "category": "Function",
-    "text": "airyaix(x)\n\nScaled Airy function of the first kind operatornameAi(x) e^frac23 x sqrtx.  Throws DomainError for negative Real arguments.\n\n\n\n"
+    "text": "airyaix(x)\n\nScaled Airy function of the first kind operatornameAi(x) e^frac23 x sqrtx.  Throws DomainError for negative Real arguments.\n\n\n\n\n\n"
 },
 
 {
@@ -173,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airyaiprimex",
     "category": "Function",
-    "text": "airyaiprimex(x)\n\nScaled derivative of the Airy function of the first kind operatornameAi(x) e^frac23 x sqrtx.  Throws DomainError for negative Real arguments.\n\n\n\n"
+    "text": "airyaiprimex(x)\n\nScaled derivative of the Airy function of the first kind operatornameAi(x) e^frac23 x sqrtx.  Throws DomainError for negative Real arguments.\n\n\n\n\n\n"
 },
 
 {
@@ -181,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airybi",
     "category": "Function",
-    "text": "airybi(x)\n\nAiry function of the second kind operatornameBi(x).\n\n\n\n"
+    "text": "airybi(x)\n\nAiry function of the second kind operatornameBi(x).\n\n\n\n\n\n"
 },
 
 {
@@ -189,7 +189,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airybiprime",
     "category": "Function",
-    "text": "airybiprime(x)\n\nDerivative of the Airy function of the second kind operatornameBi(x).\n\n\n\n"
+    "text": "airybiprime(x)\n\nDerivative of the Airy function of the second kind operatornameBi(x).\n\n\n\n\n\n"
 },
 
 {
@@ -197,7 +197,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airybix",
     "category": "Function",
-    "text": "airybix(x)\n\nScaled Airy function of the second kind operatornameBi(x) e^- left operatornameRe left( frac23 x sqrtx right) right.\n\n\n\n"
+    "text": "airybix(x)\n\nScaled Airy function of the second kind operatornameBi(x) e^- left operatornameRe left( frac23 x sqrtx right) right.\n\n\n\n\n\n"
 },
 
 {
@@ -205,7 +205,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.airybiprimex",
     "category": "Function",
-    "text": "airybiprimex(x)\n\nScaled derivative of the Airy function of the second kind operatornameBi(x) e^- left operatornameRe left( frac23 x sqrtx right) right.\n\n\n\n"
+    "text": "airybiprimex(x)\n\nScaled derivative of the Airy function of the second kind operatornameBi(x) e^- left operatornameRe left( frac23 x sqrtx right) right.\n\n\n\n\n\n"
 },
 
 {
@@ -213,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselj0",
     "category": "Function",
-    "text": "besselj0(x)\n\nBessel function of the first kind of order 0, J_0(x).\n\n\n\n"
+    "text": "besselj0(x)\n\nBessel function of the first kind of order 0, J_0(x).\n\n\n\n\n\n"
 },
 
 {
@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselj1",
     "category": "Function",
-    "text": "besselj1(x)\n\nBessel function of the first kind of order 1, J_1(x).\n\n\n\n"
+    "text": "besselj1(x)\n\nBessel function of the first kind of order 1, J_1(x).\n\n\n\n\n\n"
 },
 
 {
@@ -229,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselj",
     "category": "Function",
-    "text": "besselj(nu, x)\n\nBessel function of the first kind of order nu, J_nu(x).\n\n\n\n"
+    "text": "besselj(nu, x)\n\nBessel function of the first kind of order nu, J_nu(x).\n\n\n\n\n\n"
 },
 
 {
@@ -237,7 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besseljx",
     "category": "Function",
-    "text": "besseljx(nu, x)\n\nScaled Bessel function of the first kind of order nu, J_nu(x) e^-  operatornameIm(x) .\n\n\n\n"
+    "text": "besseljx(nu, x)\n\nScaled Bessel function of the first kind of order nu, J_nu(x) e^-  operatornameIm(x) .\n\n\n\n\n\n"
 },
 
 {
@@ -245,7 +245,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.bessely0",
     "category": "Function",
-    "text": "bessely0(x)\n\nBessel function of the second kind of order 0, Y_0(x).\n\n\n\n"
+    "text": "bessely0(x)\n\nBessel function of the second kind of order 0, Y_0(x).\n\n\n\n\n\n"
 },
 
 {
@@ -253,7 +253,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.bessely1",
     "category": "Function",
-    "text": "bessely1(x)\n\nBessel function of the second kind of order 1, Y_1(x).\n\n\n\n"
+    "text": "bessely1(x)\n\nBessel function of the second kind of order 1, Y_1(x).\n\n\n\n\n\n"
 },
 
 {
@@ -261,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.bessely",
     "category": "Function",
-    "text": "bessely(nu, x)\n\nBessel function of the second kind of order nu, Y_nu(x).\n\n\n\n"
+    "text": "bessely(nu, x)\n\nBessel function of the second kind of order nu, Y_nu(x).\n\n\n\n\n\n"
 },
 
 {
@@ -269,7 +269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselyx",
     "category": "Function",
-    "text": "besselyx(nu, x)\n\nScaled Bessel function of the second kind of order nu, Y_nu(x) e^-  operatornameIm(x) .\n\n\n\n"
+    "text": "besselyx(nu, x)\n\nScaled Bessel function of the second kind of order nu, Y_nu(x) e^-  operatornameIm(x) .\n\n\n\n\n\n"
 },
 
 {
@@ -277,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.hankelh1",
     "category": "Function",
-    "text": "hankelh1(nu, x)\n\nBessel function of the third kind of order nu, H^(1)_nu(x).\n\n\n\n"
+    "text": "hankelh1(nu, x)\n\nBessel function of the third kind of order nu, H^(1)_nu(x).\n\n\n\n\n\n"
 },
 
 {
@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.hankelh1x",
     "category": "Function",
-    "text": "hankelh1x(nu, x)\n\nScaled Bessel function of the third kind of order nu, H^(1)_nu(x) e^-x i.\n\n\n\n"
+    "text": "hankelh1x(nu, x)\n\nScaled Bessel function of the third kind of order nu, H^(1)_nu(x) e^-x i.\n\n\n\n\n\n"
 },
 
 {
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.hankelh2",
     "category": "Function",
-    "text": "hankelh2(nu, x)\n\nBessel function of the third kind of order nu, H^(2)_nu(x).\n\n\n\n"
+    "text": "hankelh2(nu, x)\n\nBessel function of the third kind of order nu, H^(2)_nu(x).\n\n\n\n\n\n"
 },
 
 {
@@ -301,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.hankelh2x",
     "category": "Function",
-    "text": "hankelh2x(nu, x)\n\nScaled Bessel function of the third kind of order nu, H^(2)_nu(x) e^x i.\n\n\n\n"
+    "text": "hankelh2x(nu, x)\n\nScaled Bessel function of the third kind of order nu, H^(2)_nu(x) e^x i.\n\n\n\n\n\n"
 },
 
 {
@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselh",
     "category": "Function",
-    "text": "besselh(nu, [k=1,] x)\n\nBessel function of the third kind of order nu (the Hankel function). k is either 1 or 2, selecting hankelh1 or hankelh2, respectively. k defaults to 1 if it is omitted. (See also besselhx for an exponentially scaled variant.)\n\n\n\n"
+    "text": "besselh(nu, [k=1,] x)\n\nBessel function of the third kind of order nu (the Hankel function). k is either 1 or 2, selecting hankelh1 or hankelh2, respectively. k defaults to 1 if it is omitted. (See also besselhx for an exponentially scaled variant.)\n\n\n\n\n\n"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselhx",
     "category": "Function",
-    "text": "besselhx(nu, [k=1,] z)\n\nCompute the scaled Hankel function exp(iz) H_^(k)(z), where k is 1 or 2, H_^(k)(z) is besselh(nu, k, z), and  is - for k=1 and + for k=2.  k defaults to 1 if it is omitted.\n\nThe reason for this function is that H_^(k)(z) is asymptotically proportional to exp(iz)sqrtz for large z, and so the besselh function is susceptible to overflow or underflow when z has a large imaginary part.  The besselhx function cancels this exponential factor (analytically), so it avoids these problems.\n\n\n\n"
+    "text": "besselhx(nu, [k=1,] z)\n\nCompute the scaled Hankel function exp(iz) H_^(k)(z), where k is 1 or 2, H_^(k)(z) is besselh(nu, k, z), and  is - for k=1 and + for k=2.  k defaults to 1 if it is omitted.\n\nThe reason for this function is that H_^(k)(z) is asymptotically proportional to exp(iz)sqrtz for large z, and so the besselh function is susceptible to overflow or underflow when z has a large imaginary part.  The besselhx function cancels this exponential factor (analytically), so it avoids these problems.\n\n\n\n\n\n"
 },
 
 {
@@ -325,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besseli",
     "category": "Function",
-    "text": "besseli(nu, x)\n\nModified Bessel function of the first kind of order nu, I_nu(x).\n\n\n\n"
+    "text": "besseli(nu, x)\n\nModified Bessel function of the first kind of order nu, I_nu(x).\n\n\n\n\n\n"
 },
 
 {
@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselix",
     "category": "Function",
-    "text": "besselix(nu, x)\n\nScaled modified Bessel function of the first kind of order nu, I_nu(x) e^-  operatornameRe(x) .\n\n\n\n"
+    "text": "besselix(nu, x)\n\nScaled modified Bessel function of the first kind of order nu, I_nu(x) e^-  operatornameRe(x) .\n\n\n\n\n\n"
 },
 
 {
@@ -341,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselk",
     "category": "Function",
-    "text": "besselk(nu, x)\n\nModified Bessel function of the second kind of order nu, K_nu(x).\n\n\n\n"
+    "text": "besselk(nu, x)\n\nModified Bessel function of the second kind of order nu, K_nu(x).\n\n\n\n\n\n"
 },
 
 {
@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.besselkx",
     "category": "Function",
-    "text": "besselkx(nu, x)\n\nScaled modified Bessel function of the second kind of order nu, K_nu(x) e^x.\n\n\n\n"
+    "text": "besselkx(nu, x)\n\nScaled modified Bessel function of the second kind of order nu, K_nu(x) e^x.\n\n\n\n\n\n"
 },
 
 {
@@ -357,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.eta",
     "category": "Function",
-    "text": "eta(x)\n\nDirichlet eta function eta(s) = sum^infty_n=1(-1)^n-1n^s.\n\n\n\n"
+    "text": "eta(x)\n\nDirichlet eta function eta(s) = sum^infty_n=1(-1)^n-1n^s.\n\n\n\n\n\n"
 },
 
 {
@@ -365,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.zeta",
     "category": "Function",
-    "text": "zeta(s, z)\n\nGeneralized zeta function zeta(s z), defined by the sum sum_k=0^infty ((k+z)^2)^-s2, where any term with k+z=0 is excluded.  For Re z  0, this definition is equivalent to the Hurwitz zeta function sum_k=0^infty (k+z)^-s.   For z=1, it yields the Riemann zeta function zeta(s).\n\n\n\nzeta(s)\n\nRiemann zeta function zeta(s).\n\n\n\n"
+    "text": "zeta(s, z)\n\nGeneralized zeta function zeta(s z), defined by the sum sum_k=0^infty ((k+z)^2)^-s2, where any term with k+z=0 is excluded.  For Re z  0, this definition is equivalent to the Hurwitz zeta function sum_k=0^infty (k+z)^-s.   For z=1, it yields the Riemann zeta function zeta(s).\n\n\n\n\n\nzeta(s)\n\nRiemann zeta function zeta(s).\n\n\n\n\n\n"
 },
 
 {
