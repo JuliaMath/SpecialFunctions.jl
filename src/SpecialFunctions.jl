@@ -71,7 +71,10 @@ end
 export sinint,
        cosint
 
+export ellipj, jss,jsc,jsd,jsn,jcs,jcc,jcd,jcn,jds,jdc,jdd,jdn,jns,jnc,jnd,jnn
+
 include("bessel.jl")
+include("elliptic.jl")
 include("erf.jl")
 include("sincosint.jl")
 include("gamma.jl")

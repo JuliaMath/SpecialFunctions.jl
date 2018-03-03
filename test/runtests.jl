@@ -558,3 +558,5 @@ end
 end
 
 @test sprint(showerror, SF.AmosException(1)) == "AmosException with id 1: input error."
+
+include("elliptic.jl")
