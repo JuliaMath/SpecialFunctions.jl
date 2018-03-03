@@ -6,10 +6,8 @@
 #------------------------------------------------
 # Descending and ascending Landen Transformation
 
-contracting_sqrt(m) = abs(1-m) > eps(real(typeof(m))) ? sqrt(m) : one(m)
 
 descstep(m) = m/(1+sqrt(1-m))^2
-ascstep(m) = 4*contracting_sqrt(m)/(1+contracting_sqrt(m))^2
 
 @generated function shrinkm(m,::Val{N}) where {N}
     # [1, Sec 16.12]
@@ -18,18 +16,6 @@ ascstep(m) = 4*contracting_sqrt(m)/(1+contracting_sqrt(m))^2
         Base.Cartesian.@nexprs $N i->begin
             k_i = descstep(m)
             m = k_i^2
-            f *= 1+k_i
-        end
-        return (Base.Cartesian.@ntuple $N k), f, m
-    end
-end
-@generated function growm(m,::Val{N}) where {N}
-    # [1, Sec 16.14]
-    quote
-        f = one(m)
-        Base.Cartesian.@nexprs $N i->begin
-            k_i = (1-contracting_sqrt(m))/(1+contracting_sqrt(m))
-            m = ascstep(m)
             f *= 1+k_i
         end
         return (Base.Cartesian.@ntuple $N k), f, m
@@ -86,9 +72,6 @@ function ellipj_vialargem(u,m,::Val{N}) where {N}
     k,f,m1 = shrinkm(1-m,Val{N}())
     sn,cn,dn = ellipj_largem(u/f,m1)
     return ellipj_shrinkm(sn,cn,dn,k)
-    # k,f,m = growm(m,Val{N}())
-    # sn,cn,dn = ellipj_largem(u/f,m)
-    # return ellipj_shrinkm(sn,cn,dn,k)
 end
 
 
