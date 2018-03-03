@@ -6,8 +6,10 @@
 #------------------------------------------------
 # Descending and ascending Landen Transformation
 
+contracting_sqrt(m) = abs(1-m) > eps(real(typeof(m))) ? sqrt(m) : one(m)
+
 descstep(m) = m/(1+sqrt(1-m))^2
-ascstep(m) = 4*sqrt(m)/(1+sqrt(m))^2
+ascstep(m) = 4*contracting_sqrt(m)/(1+contracting_sqrt(m))^2
 
 @generated function shrinkm(m,::Val{N}) where {N}
     # [1, Sec 16.12]
@@ -26,7 +28,7 @@ end
     quote
         f = one(m)
         Base.Cartesian.@nexprs $N i->begin
-            k_i = (1-sqrt(m))/(1+sqrt(m))
+            k_i = (1-contracting_sqrt(m))/(1+contracting_sqrt(m))
             m = ascstep(m)
             f *= 1+k_i
         end
@@ -41,11 +43,11 @@ function ellipj_smallm(u,m)
     dn = 1 - m*sin(u)^2/2;
     return sn,cn,dn
 end
-function ellipj_largem(u,m)
+function ellipj_largem(u,m1)
     # [1, Sec 16.15]
-    sn = tanh(u) + (1-m)*(sinh(u)*cosh(u)-u)*sech(u)^2/4
-    cn = sech(u) - (1-m)*(sinh(u)*cosh(u)-u)*tanh(u)*sech(u)/4
-    dn = sech(u) + (1-m)*(sinh(u)*cosh(u)-u)*tanh(u)*sech(u)/4
+    sn = tanh(u) + m1*(sinh(u)*cosh(u)-u)*sech(u)^2/4
+    cn = sech(u) - m1*(sinh(u)*cosh(u)-u)*tanh(u)*sech(u)/4
+    dn = sech(u) + m1*(sinh(u)*cosh(u)+u)*tanh(u)*sech(u)/4
     return sn,cn,dn
 end
 
@@ -56,7 +58,8 @@ end
             kk = k[end-i+1]
             sn,cn,dn = (1+kk)*sn/(1+kk*sn^2),
                        cn*dn/(1+kk*sn^2),
-                       (1-kk*sn^2)/(1+kk*sn^2) # Use [1, 16.9.1]. Idea taken from [2]
+                       (1-kk*sn^2)/(1+kk*sn^2)
+                       # ^ Use [1, 16.9.1]. Idea taken from [2]
         end
         return sn,cn,dn
     end
@@ -80,16 +83,19 @@ function ellipj_viasmallm(u,m,::Val{N}) where {N}
     return ellipj_growm(sn,cn,dn,k)
 end
 function ellipj_vialargem(u,m,::Val{N}) where {N}
-    k,f,m = growm(m,Val{N}())
-    sn,cn,dn = ellipj_largem(u/f,m)
+    k,f,m1 = shrinkm(1-m,Val{N}())
+    sn,cn,dn = ellipj_largem(u/f,m1)
     return ellipj_shrinkm(sn,cn,dn,k)
+    # k,f,m = growm(m,Val{N}())
+    # sn,cn,dn = ellipj_largem(u/f,m)
+    # return ellipj_shrinkm(sn,cn,dn,k)
 end
 
 
 #----------------
-# Pick algorithm 
+# Pick algorithm
 
-Base.@pure function ndescsteps(m,ε)
+Base.@pure function nsteps(m,ε)
     i = 0
     while abs(m) > ε
         m = descstep(m)^2
@@ -97,36 +103,25 @@ Base.@pure function ndescsteps(m,ε)
     end
     return i
 end
-Base.@pure function nascsteps(m,ε)
-    i = 0
-    while abs(1-m) > ε
-        m = ascstep(m)
-        i += 1
-    end
-    return i
-end
-
 @generated function ellipj_dispatch(u,m)
-    ε = sqrt(eps(real(m)))
-    ndesc = ndescsteps(one(ε)/2,ε)
-    nasc  =  nascsteps(one(ε)/2,ε)
-    rdesc = ε
-    for i = 1:ndesc; rdesc =  ascstep(rdesc); end
-    rasc  = 1-ε
-    for i = 1:nasc ; rasc  = descstep(rasc)^2; end;
-    rasc = 1-rasc
+    T = real(m)
+    ε = sqrt(eps(T))
+    N = max(
+        nsteps(one(T)/2,ε),
+        nsteps(sqrt(Complex{T}(0,1)),ε)
+    )
     quote
-        if abs(m) < $rdesc
-            return ellipj_viasmallm(u,m, Val{$ndesc}())
-        elseif abs(1-m) < $rasc
-            return ellipj_vialargem(u,m, Val{$nasc}())
+        if abs(m) <= 1 && real(m) <= 0.5
+            return ellipj_viasmallm(u,m, Val{$N}())
+        elseif abs(1-m) <= 1
+            return ellipj_vialargem(u,m, Val{$N}())
         elseif imag(m) == 0 && real(m) < 0
             # [1, Sec 16.10]
-            sn,cn,dn = ellipj_typed(u*sqrt(1-m),-m/(1-m))
+            sn,cn,dn = ellipj_dispatch(u*sqrt(1-m),-m/(1-m))
             return sn/(dn*sqrt(1-m)), cn/dn, 1/dn
         else
             # [1, Sec 16.11]
-            sn,cn,dn = ellipj_typed(u*sqrt(m),1/m)
+            sn,cn,dn = ellipj_dispatch(u*sqrt(m),1/m)
             return sn/sqrt(m), dn, cn
         end
     end
@@ -148,10 +143,10 @@ end
 ellipj(u::Real,m::Real) = ellipj_check(promote(float(u),float(m))...)
 ellipj(u::Complex,m::Complex) = ellipj_check(promote(float(u),float(m))...)
 function ellipj(u::Complex,m::Real)
-    T = promote_type(float.(real.(typeof.((u,m))))...)
+    T = promote_type(real.(typeof.(float.((u,m))))...)
     return ellipj_check(convert(Complex{T},u), convert(T,m))
 end
 function ellipj(u::Real,m::Complex)
-    T = promote_type(float.(real.(typeof.((u,m))))...)
+    T = promote_type(real.(typeof.(float.((u,m))))...)
     return ellipj_check(convert(T,u), convert(Complex{T},m))
 end
