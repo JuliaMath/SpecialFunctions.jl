@@ -126,3 +126,29 @@ function ellipj(u::Complex,m::Real)
     return ellipj_check(convert(Complex{T},u), convert(T,m))
 end
 ellipj(u,m::Complex) = ellipj_check(promote(float(u),float(m))...)
+
+
+#-----------------------
+# Convenience functions
+
+chars = ("s","c","d")
+for (i,p) in enumerate(chars)
+    pn = Symbol("j"*p*"n")
+    np = Symbol("jn"*p)
+    @eval begin
+        $pn(u,m) = ellipj(u,m)[$i]
+        $np(u,m) = 1/$pn(u,m)
+    end
+end
+for p in (chars...,"n")
+    pp = Symbol("j"*p*p)
+    @eval $pp(u,m) = one(promote_type(typeof.(float.((u,m)))...))
+end
+
+for p in chars, q in chars
+    p == q && continue
+    pq = Symbol("j"*p*q)
+    pn = Symbol("j"*p*"n")
+    qn = Symbol("j"*q*"n")
+    @eval $pq(u::Number,m::Number) = $pn(u,m)/$qn(u,m)
+end
