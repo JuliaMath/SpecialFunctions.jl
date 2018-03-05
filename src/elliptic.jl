@@ -23,16 +23,26 @@ end
 
 function ellipj_smallm(u,m)
     # [1, Sec 16.13]
-    sn = sin(u) - m*(u-sin(u)*cos(u))*cos(u)/4
-    cn = cos(u) + m*(u-sin(u)*cos(u))*sin(u)/4
-    dn = 1 - m*sin(u)^2/2;
+    if VERSION < v"0.7-"
+        sinu = sin(u)
+        cosu = cos(u)
+    else
+        sinu, cosu = sincos(u)
+    end
+    sn = sinu - m*(u-sinu*cosu)*cosu/4
+    cn = cosu + m*(u-sinu*cosu)*sinu/4
+    dn = 1 - m*sinu^2/2;
     return sn,cn,dn
 end
 function ellipj_largem(u,m1)
     # [1, Sec 16.15]
-    sn = tanh(u) + m1*(sinh(u)*cosh(u)-u)*sech(u)^2/4
-    cn = sech(u) - m1*(sinh(u)*cosh(u)-u)*tanh(u)*sech(u)/4
-    dn = sech(u) + m1*(sinh(u)*cosh(u)+u)*tanh(u)*sech(u)/4
+    sinhu = sinh(u)
+    coshu = cosh(u)
+    tanhu = tanh(u)
+    sechu = sech(u)
+    sn = tanhu + m1*(sinhu*coshu-u)*sechu^2/4
+    cn = sechu - m1*(sinhu*coshu-u)*tanhu*sechu/4
+    dn = sechu + m1*(sinhu*coshu+u)*tanhu*sechu/4
     return sn,cn,dn
 end
 
