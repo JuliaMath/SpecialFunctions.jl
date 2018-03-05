@@ -52,9 +52,9 @@ end
         Base.Cartesian.@nexprs $N i->begin
             kk = k[end-i+1]
             sn,cn,dn = (1+kk)*sn/(1+kk*sn^2),
-                       cn*dn/(1+kk*sn^2),
-                       (1-kk*sn^2)/(1+kk*sn^2)
-                       # ^ Use [1, 16.9.1]. Idea taken from [2]
+                           cn*dn/(1+kk*sn^2),
+                     (1-kk*sn^2)/(1+kk*sn^2)
+                     # ^ Use [1, 16.9.1]. Idea taken from [2]
         end
         return sn,cn,dn
     end
@@ -65,8 +65,8 @@ end
         Base.Cartesian.@nexprs $N i->begin
             kk = k[end-i+1]
             sn,cn,dn = (1+kk)*sn*cn/dn,
-                       (cn^2-kk*sn^2)/dn, # Use [1, 16.9.1]
-                       (cn^2+kk*sn^2)/dn  # Use [1, 16.9.1]
+                     (cn^2-kk*sn^2)/dn, # Use [1, 16.9.1]
+                     (cn^2+kk*sn^2)/dn  # Use [1, 16.9.1]
         end
         return sn,cn,dn
     end
