@@ -130,7 +130,7 @@ ellipj(u,m::Complex) = ellipj_check(promote(float(u),float(m))...)
 """
     ellipj(u,m) -> sn,cn,dn
 
-Evaluate the Jacobi elliptic functions `sn`, `cn` and `dn`.
+Jacobi elliptic functions `sn`, `cn` and `dn`.
 
 Convenience function `jpq(u,m)` with `p,q ∈ {s,c,d,n}` are also
 provided, but this function is more efficient if more than one elliptic
@@ -175,7 +175,7 @@ for p in (chars...,"n"), q in (chars...,"n")
 """
     $(string($pq))(u,m)
 
-Evaluate the Jacobi elliptic function `$($p)$($q)`.
+Jacobi elliptic function `$($p)$($q)`.
 
 See also `ellipj(u,m)` if more than one Jacobi elliptic function
 with the same arguments is required.
@@ -214,23 +214,21 @@ end
 """
     iK(m1)
 
-Evaluate `K(1-m1)` with enhanced precision for small values of `m1`.
+Evaluate `K(1-m1)` with better precision for small values of `m1`.
 """
 function iK end
 
 doc"""
     K(m)
 
-Evaluate the complete elliptic integral of the first kind.
+Complete elliptic integral of the first kind.
 
 ```math
 \begin{aligned}
     K(m)
     &= \int_0^1 \big((1-t^2)\,(1-mt^2)\big)^{-1/2} \, dt \\
     &= \int_0^{π/2} (1-m \sin^2\theta)^{-1/2} \, d\theta
-\end{align}
+\end{aligned}
 ```
-
-See also `iK(m)` for evaluating `K(m)` for values close to `1`.
 """
 function K end

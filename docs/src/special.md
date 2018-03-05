@@ -46,4 +46,6 @@ SpecialFunctions.besselk
 SpecialFunctions.besselkx
 SpecialFunctions.eta
 SpecialFunctions.zeta
+SpecialFunctions.ellipj
+SpecialFunctions.K
 ```
