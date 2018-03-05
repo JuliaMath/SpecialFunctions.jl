@@ -73,7 +73,7 @@ end
                 cnref = read(f, Complex{BigFloat})
                 dnref = read(f, Complex{BigFloat})
                 sn,cn,dn = ellipj(u,m)
-                atol = eps(BigFloat)*maximum(abs.((snref,cnref,dnref)))
+                atol = sqrt(eps(BigFloat))*maximum(abs.((snref,cnref,dnref)))
                 @test sn ≈ snref atol=atol
                 @test cn ≈ cnref atol=atol
                 @test dn ≈ dnref atol=atol
@@ -84,7 +84,7 @@ end
     @testset "precision ($T)" for T in (Float16,Float32,Float64)
         n = 16
         s = @. exp(2T(π)*im*(0:n-1)/n)
-        r = T[eps(T), π*eps(T), sqrt(eps(T)), π*sqrt(eps(T)), 1/e, 0.5, e/π, 1]
+        r = T[eps(T), π*eps(T), sqrt(eps(T)), π*sqrt(eps(T)), 1/π, 0.5, 3/π, 1]
         x = Complex{T}[0; vec(s.*r')]
         for u = x
             for m0 = (0,1)
@@ -133,11 +133,11 @@ end
     @testset "precision ($T)" for T in (Float16,Float32,Float64)
         n = 16
         s = @. exp(2T(π)*im*(0:n-1)/n)
-        r = T[eps(T), π*eps(T), sqrt(eps(T)), π*sqrt(eps(T)), 1/e, 0.5, e/π, 1, e, π, 1/sqrt(eps(T)), 1/eps(T)]
+        r = T[eps(T), π*eps(T), sqrt(eps(T)), π*sqrt(eps(T)), 1/T(π), 0.5, 1, π, 1/sqrt(eps(T)), 1/eps(T)]
         x = Complex{T}[0; vec(s.*r')]
         for m0 = (0,1)
             for m = m0 .+ x
-                @test K(m) ≈ K(big(m)) rtol=2*eps(T)
+                @test K(m) ≈ K(big(m)) rtol=3*eps(T)
             end
         end
     end
