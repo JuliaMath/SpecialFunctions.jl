@@ -84,8 +84,8 @@ end
     @testset "precision ($T)" for T in (Float16,Float32,Float64)
         n = 16
         s = @. exp(2T(π)*im*(0:n-1)/n)
-        r = [eps(T), π*eps(T), sqrt(eps(T)), π*sqrt(eps(T)), 1/e, 0.5, e/π, 1]
-        x = [0; vec(s.*r')]
+        r = T[eps(T), π*eps(T), sqrt(eps(T)), π*sqrt(eps(T)), 1/e, 0.5, e/π, 1]
+        x = Complex{T}[0; vec(s.*r')]
         for u = x
             for m0 = (0,1)
                 for m = m0 .+ x
@@ -102,6 +102,45 @@ end
         end
     end
 
+end
+
+@testset "K" begin
+    @testset "type stability" begin
+        realtypes = (Int,Float32,Float64,BigFloat)
+        types = (realtypes..., complex.(realtypes)...)
+        @testset "typeof(m) = $M" for M in types
+            @inferred K(zero(M))
+        end
+    end
+
+    @testset "special values" begin
+        @test isnan(K(NaN))
+        @test K(Inf+0im) == 0.0
+        @test K(-Inf) == 0.0
+    end
+
+    @testset "mpmath" begin
+        open("elliptic/K.bin","r") do f
+            npts = ntoh(read(f,Int64))
+            for i = 1:npts
+                m = read(f, Complex{BigFloat})
+                Kref = read(f, Complex{BigFloat})
+                @test K(m) ≈ Kref
+            end
+        end
+    end
+
+    @testset "precision ($T)" for T in (Float16,Float32,Float64)
+        n = 16
+        s = @. exp(2T(π)*im*(0:n-1)/n)
+        r = T[eps(T), π*eps(T), sqrt(eps(T)), π*sqrt(eps(T)), 1/e, 0.5, e/π, 1, e, π, 1/sqrt(eps(T)), 1/eps(T)]
+        x = Complex{T}[0; vec(s.*r')]
+        for m0 = (0,1)
+            for m = m0 .+ x
+                @test K(m) ≈ K(big(m)) rtol=2*eps(T)
+            end
+        end
+    end
 end
 
 end

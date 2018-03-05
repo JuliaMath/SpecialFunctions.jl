@@ -127,6 +127,17 @@ function ellipj(u::Complex,m::Real)
 end
 ellipj(u,m::Complex) = ellipj_check(promote(float(u),float(m))...)
 
+"""
+    ellipj(u,m) -> sn,cn,dn
+
+Evaluate the Jacobi elliptic functions `sn`, `cn` and `dn`.
+
+Convenience function `jpq(u,m)` with `p,q ∈ {s,c,d,n}` are also
+provided, but this function is more efficient if more than one elliptic
+function with the same arguments is required.
+"""
+function ellipj end
+
 
 #-----------------------
 # Convenience functions
@@ -148,7 +159,78 @@ end
 for p in chars, q in chars
     p == q && continue
     pq = Symbol("j"*p*q)
-    pn = Symbol("j"*p*"n")
-    qn = Symbol("j"*q*"n")
-    @eval $pq(u::Number,m::Number) = $pn(u,m)/$qn(u,m)
+    pn = Symbol(p*"n")
+    qn = Symbol(q*"n")
+    @eval begin
+        function $pq(u::Number,m::Number)
+            sn,cn,dn = ellipj(u,m)
+            return $pn/$qn
+        end
+    end
 end
+
+for p in (chars...,"n"), q in (chars...,"n")
+    pq = Symbol("j"*p*q)
+    @eval begin
+"""
+    $(string($pq))(u,m)
+
+Evaluate the Jacobi elliptic function `$($p)$($q)`.
+
+See also `ellipj(u,m)` if more than one Jacobi elliptic function
+with the same arguments is required.
+"""
+function $pq end
+    end
+end
+
+
+#----------------------------------------------
+# Complete elliptic integral of the first kind
+
+function iK_agm(m)
+    # [1, Sec 17.6]
+    T = typeof(m)
+    m == 0 && return T(Inf)
+    isnan(m) && return T(NaN)
+    a,b = one(m),sqrt(m)
+    while abs(a-b) > 2*eps(abs(a))
+        a,b = (a+b)/2,sqrt(a*b)
+    end
+    return T(π)/(2*a) # https://github.com/JuliaLang/julia/issues/26324
+end
+iK(m) = iK_agm(float(m))
+K(m::Real) = iK(1-m)
+function K(m::Complex)
+    # Make sure we hit the "right" branch of sqrt if imag(m) == 0.
+    # Here, "right" is defined as being consistent with mpmath.
+    if imag(m) == 0
+        return iK(complex(1-real(m),imag(m)))
+    else
+        return iK(1-m)
+    end
+end
+
+"""
+    iK(m1)
+
+Evaluate `K(1-m1)` with enhanced precision for small values of `m1`.
+"""
+function iK end
+
+doc"""
+    K(m)
+
+Evaluate the complete elliptic integral of the first kind.
+
+```math
+\begin{aligned}
+    K(m)
+    &= \int_0^1 \big((1-t^2)\,(1-mt^2)\big)^{-1/2} \, dt \\
+    &= \int_0^{π/2} (1-m \sin^2\theta)^{-1/2} \, d\theta
+\end{align}
+```
+
+See also `iK(m)` for evaluating `K(m)` for values close to `1`.
+"""
+function K end

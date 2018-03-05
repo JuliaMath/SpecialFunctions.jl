@@ -54,27 +54,6 @@ def parse_mpf(x):
 def parse_mpc(x):
     return parse_mpf(x.real) + parse_mpf(x.imag)
 
-def dump_testset(name,u,m):
-    with open(name,"wb") as f:
-        f.write(parse_int64(len(u)*len(m)))
-        for ui in u:
-            for mi in m:
-                sn,cn,dn = ellipj(ui,mi)
-                f.write(parse_mpc(ui))
-                f.write(parse_mpc(mi))
-                f.write(parse_mpc(sn))
-                f.write(parse_mpc(cn))
-                f.write(parse_mpc(dn))
-
-
-
-def ellipj(u,m):
-    sn = mpmath.ellipfun("sn",u,m=m)
-    cn = mpmath.ellipfun("cn",u,m=m)
-    dn = mpmath.ellipfun("dn",u,m=m)
-    if u == 0: sn = 0*sn # https://github.com/fredrik-johansson/mpmath/issues/386
-    return sn,cn,dn
-
 
 def test_io():
     with open("io.bin","wb") as f:
@@ -91,6 +70,26 @@ def test_io():
         f.write(parse_mpf(-mpmath.mp.inf))
         f.write(parse_mpf(mpmath.mp.nan))
 test_io()
+
+
+def dump_testset(name,u,m):
+    with open(name,"wb") as f:
+        f.write(parse_int64(len(u)*len(m)))
+        for ui in u:
+            for mi in m:
+                sn,cn,dn = ellipj(ui,mi)
+                f.write(parse_mpc(ui))
+                f.write(parse_mpc(mi))
+                f.write(parse_mpc(sn))
+                f.write(parse_mpc(cn))
+                f.write(parse_mpc(dn))
+
+def ellipj(u,m):
+    sn = mpmath.ellipfun("sn",u,m=m)
+    cn = mpmath.ellipfun("cn",u,m=m)
+    dn = mpmath.ellipfun("dn",u,m=m)
+    if u == 0: sn = 0*sn # https://github.com/fredrik-johansson/mpmath/issues/386
+    return sn,cn,dn
 
 def test_ellipj():
     s = [
@@ -109,3 +108,33 @@ def test_ellipj():
     x = [mpmath.mpc(0)] + [si*ri for si in s for ri in r]
     dump_testset("ellipj.bin",x, x+[1+mi for mi in x])
 test_ellipj()
+
+
+def dump_testset(name,m):
+    with open(name,"wb") as f:
+        f.write(parse_int64(len(m)))
+        for mi in m:
+            K = mpmath.ellipk(mi)
+            f.write(parse_mpc(mi))
+            f.write(parse_mpc(K))
+
+def test_K():
+    ns = 16
+    s = [
+        mpmath.exp(2*mpmath.mp.pi*1j*i/ns)
+        for i in range(ns)
+    ]
+    r = [
+        mpmath.mpf(mpmath.mp.eps),
+        mpmath.sqrt(mpmath.mp.eps),
+        1/mpmath.mp.pi,
+        1/mpmath.mp.e,
+        mpmath.mpf("0.5"),
+        mpmath.mpf("1"),
+        mpmath.mpf("2"),
+        mpmath.mp.e,
+        mpmath.mp.pi,
+    ]
+    m = [mpmath.mpc(0)] + [si*ri for si in s for ri in r]
+    dump_testset("K.bin",m + [1+mi for mi in m])
+test_K()
