@@ -9,7 +9,7 @@
 descstep(m) = m/(1+sqrt(1-m))^2
 
 @generated function shrinkm(m,::Val{N}) where {N}
-    # [1, Sec 16.12]
+    # [1, Sec 16.12] / https://dlmf.nist.gov/22.7.i
     quote
         f = one(m)
         Base.Cartesian.@nexprs $N i->begin
@@ -22,7 +22,7 @@ descstep(m) = m/(1+sqrt(1-m))^2
 end
 
 function ellipj_smallm(u,m)
-    # [1, Sec 16.13]
+    # [1, Sec 16.13] / https://dlmf.nist.gov/22.10.ii
     if VERSION < v"0.7-"
         sinu = sin(u)
         cosu = cos(u)
@@ -35,7 +35,7 @@ function ellipj_smallm(u,m)
     return sn,cn,dn
 end
 function ellipj_largem(u,m1)
-    # [1, Sec 16.15]
+    # [1, Sec 16.15] / https://dlmf.nist.gov/22.10.ii
     sinhu = sinh(u)
     coshu = cosh(u)
     tanhu = tanh(u)
@@ -47,7 +47,7 @@ function ellipj_largem(u,m1)
 end
 
 @generated function ellipj_growm(sn,cn,dn, k::NTuple{N,<:Any}) where {N}
-    # [1, Sec 16.12]
+    # [1, Sec 16.12] / https://dlmf.nist.gov/22.7.i
     quote
         Base.Cartesian.@nexprs $N i->begin
             kk = k[end-i+1]
@@ -60,7 +60,7 @@ end
     end
 end
 @generated function ellipj_shrinkm(sn,cn,dn, k::NTuple{N,<:Any}) where {N}
-    # [1, Sec 16.14]
+    # [1, Sec 16.14] / https://dlmf.nist.gov/22.7.ii
     quote
         Base.Cartesian.@nexprs $N i->begin
             kk = k[end-i+1]
