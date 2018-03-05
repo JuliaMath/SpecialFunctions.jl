@@ -29,9 +29,9 @@ Base.read(s::IO, ::Type{Complex{BigFloat}}) =
 
 @testset "io" begin
     open("elliptic/io.bin","r") do f
-        @test ntoh(read(f,Int)) ==  0
-        @test ntoh(read(f,Int)) ==  1
-        @test ntoh(read(f,Int)) ==  -1
+        @test ntoh(read(f,Int64)) ==  0
+        @test ntoh(read(f,Int64)) ==  1
+        @test ntoh(read(f,Int64)) ==  -1
         @test read(f,BigFloat) ==  0
         @test read(f,BigFloat) ==  1
         @test read(f,BigFloat) ==  2
