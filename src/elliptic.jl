@@ -38,8 +38,8 @@ function ellipj_largem(u,m1)
     # [1, Sec 16.15] / https://dlmf.nist.gov/22.10.ii
     sinhu = sinh(u)
     coshu = cosh(u)
-    tanhu = tanh(u)
-    sechu = sech(u)
+    tanhu = sinhu/coshu
+    sechu = 1/coshu
     sn = tanhu + m1*(sinhu*coshu-u)*sechu^2/4
     cn = sechu - m1*(sinhu*coshu-u)*tanhu*sechu/4
     dn = sechu + m1*(sinhu*coshu+u)*tanhu*sechu/4
