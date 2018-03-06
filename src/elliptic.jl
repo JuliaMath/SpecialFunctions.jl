@@ -199,7 +199,7 @@ end
 #----------------------------------------------
 # Complete elliptic integral of the first kind
 
-function iK_agm(m)
+function ellipiK_agm(m)
     # [1, Sec 17.6]
     T = typeof(m)
     m == 0 && return T(Inf)
@@ -210,29 +210,29 @@ function iK_agm(m)
     end
     return T(π)/(2*a) # https://github.com/JuliaLang/julia/issues/26324
 end
-iK(m) = iK_agm(float(m))
-K(m::Real) = iK(1-m)
-function K(m::Complex)
+ellipiK(m) = ellipiK_agm(float(m))
+ellipK(m::Real) = ellipiK(1-m)
+function ellipK(m::Complex)
     # Make sure we hit the "right" branch of sqrt if imag(m) == 0.
     # Here, "right" is defined as being consistent with mpmath.
     if imag(m) == 0
-        return iK(complex(1-real(m),imag(m)))
+        return ellipiK(complex(1-real(m),imag(m)))
     else
-        return iK(1-m)
+        return ellipiK(1-m)
     end
 end
 
 """
-    iK(m1)
+    ellipiK(m1)
 
-Evaluate `K(1-m1)` with better precision for small values of `m1`.
+Evaluate `ellipK(1-m1)` with better precision for small values of `m1`.
 """
-function iK end
+function ellipiK end
 
 doc"""
-    K(m)
+    ellipK(m)
 
-Complete elliptic integral of the first kind.
+Complete elliptic integral of the first kind ``K``.
 
 ```math
 \begin{aligned}
@@ -242,4 +242,4 @@ Complete elliptic integral of the first kind.
 \end{aligned}
 ```
 """
-function K end
+function ellipK end

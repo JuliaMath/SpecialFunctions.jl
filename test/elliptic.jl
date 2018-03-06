@@ -104,28 +104,28 @@ end
 
 end
 
-@testset "K" begin
+@testset "ellipK" begin
     @testset "type stability" begin
         realtypes = (Int,Float32,Float64,BigFloat)
         types = (realtypes..., complex.(realtypes)...)
         @testset "typeof(m) = $M" for M in types
-            @inferred K(zero(M))
+            @inferred ellipK(zero(M))
         end
     end
 
     @testset "special values" begin
-        @test isnan(K(NaN))
-        @test K(Inf+0im) == 0.0
-        @test K(-Inf) == 0.0
+        @test isnan(ellipK(NaN))
+        @test ellipK(Inf+0im) == 0.0
+        @test ellipK(-Inf) == 0.0
     end
 
     @testset "mpmath" begin
-        open("elliptic/K.bin","r") do f
+        open("elliptic/ellipK.bin","r") do f
             npts = ntoh(read(f,Int64))
             for i = 1:npts
                 m = read(f, Complex{BigFloat})
-                Kref = read(f, Complex{BigFloat})
-                @test K(m) ≈ Kref
+                ellipKref = read(f, Complex{BigFloat})
+                @test ellipK(m) ≈ ellipKref
             end
         end
     end
@@ -137,7 +137,7 @@ end
         x = Complex{T}[0; vec(s.*r')]
         for m0 = (0,1)
             for m = m0 .+ x
-                @test K(m) ≈ K(big(m)) rtol=3*eps(T)
+                @test ellipK(m) ≈ ellipK(big(m)) rtol=3*eps(T)
             end
         end
     end

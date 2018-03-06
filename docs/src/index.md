@@ -42,7 +42,7 @@ libraries.
 | [`besselkx(nu,z)`](@ref SpecialFunctions.besselkx)            | scaled modified Bessel function of the second kind of order `nu` at `z`                                                                                         |
 | [`ellipj(u,m)`](@ref SpecialFunctions.ellipj)                 | Jacobi elliptic functions `sn,cn,dn`                                                                                                                            |
 | `jpq(u,m)`                                                    | Jacobi elliptic function `pq`                                                                                                                                   |
-| [`K(m)`](@ref SpecialFunctions.ellipj)                        | Complete elliptic integral of the first kind                                                                                                                    |
+| [`ellipK(m)`](@ref SpecialFunctions.ellipj)                   | Complete elliptic integral of the first kind                                                                                                                    |
 
 ## Installation
 

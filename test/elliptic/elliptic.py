@@ -118,7 +118,7 @@ def dump_testset(name,m):
             f.write(parse_mpc(mi))
             f.write(parse_mpc(K))
 
-def test_K():
+def test_ellipK():
     ns = 16
     s = [
         mpmath.exp(2*mpmath.mp.pi*1j*i/ns)
@@ -136,5 +136,5 @@ def test_K():
         mpmath.mp.pi,
     ]
     m = [mpmath.mpc(0)] + [si*ri for si in s for ri in r]
-    dump_testset("K.bin",m + [1+mi for mi in m])
-test_K()
+    dump_testset("ellipK.bin",m + [1+mi for mi in m])
+test_ellipK()

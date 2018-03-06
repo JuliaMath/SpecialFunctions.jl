@@ -73,7 +73,7 @@ export sinint,
 
 export ellipj,
        jss,jsc,jsd,jsn,jcs,jcc,jcd,jcn,jds,jdc,jdd,jdn,jns,jnc,jnd,jnn,
-       K, iK
+       ellipK, ellipiK
 
 include("bessel.jl")
 include("elliptic.jl")
