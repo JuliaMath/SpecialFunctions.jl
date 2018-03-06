@@ -46,30 +46,24 @@ function ellipj_largem(u,m1)
     return sn,cn,dn
 end
 
-@generated function ellipj_growm(sn,cn,dn, k::NTuple{N,<:Any}) where {N}
+function ellipj_growm(sn,cn,dn, k)
     # [1, Sec 16.12] / https://dlmf.nist.gov/22.7.i
-    quote
-        Base.Cartesian.@nexprs $N i->begin
-            kk = k[end-i+1]
-            sn,cn,dn = (1+kk)*sn/(1+kk*sn^2),
-                           cn*dn/(1+kk*sn^2),
-                     (1-kk*sn^2)/(1+kk*sn^2)
-                     # ^ Use [1, 16.9.1]. Idea taken from [2]
-        end
-        return sn,cn,dn
+    for kk in reverse(k)
+        sn,cn,dn = (1+kk)*sn/(1+kk*sn^2),
+                       cn*dn/(1+kk*sn^2),
+                 (1-kk*sn^2)/(1+kk*sn^2)
+                 # ^ Use [1, 16.9.1]. Idea taken from [2]
     end
+    return sn,cn,dn
 end
-@generated function ellipj_shrinkm(sn,cn,dn, k::NTuple{N,<:Any}) where {N}
+function ellipj_shrinkm(sn,cn,dn, k::NTuple{N,<:Any}) where {N}
     # [1, Sec 16.14] / https://dlmf.nist.gov/22.7.ii
-    quote
-        Base.Cartesian.@nexprs $N i->begin
-            kk = k[end-i+1]
-            sn,cn,dn = (1+kk)*sn*cn/dn,
-                     (cn^2-kk*sn^2)/dn, # Use [1, 16.9.1]
-                     (cn^2+kk*sn^2)/dn  # Use [1, 16.9.1]
-        end
-        return sn,cn,dn
+    for kk in reverse(k)
+        sn,cn,dn = (1+kk)*sn*cn/dn,
+                 (cn^2-kk*sn^2)/dn, # Use [1, 16.9.1]
+                 (cn^2+kk*sn^2)/dn  # Use [1, 16.9.1]
     end
+    return sn,cn,dn
 end
 
 function ellipj_viasmallm(u,m,::Val{N}) where {N}
@@ -87,21 +81,19 @@ end
 #----------------
 # Pick algorithm
 
-@generated function ellipj_dispatch(u,m, ::Val{N}) where {N}
-    quote
-        if abs(m) <= 1 && real(m) <= 0.5
-            return ellipj_viasmallm(u,m, Val{$N}())
-        elseif abs(1-m) <= 1
-            return ellipj_vialargem(u,m, Val{$N}())
-        elseif imag(m) == 0 && real(m) < 0
-            # [1, Sec 16.10]
-            sn,cn,dn = ellipj_dispatch(u*sqrt(1-m),-m/(1-m), Val{$N}())
-            return sn/(dn*sqrt(1-m)), cn/dn, 1/dn
-        else
-            # [1, Sec 16.11]
-            sn,cn,dn = ellipj_dispatch(u*sqrt(m),1/m, Val{$N}())
-            return sn/sqrt(m), dn, cn
-        end
+function ellipj_dispatch(u,m, ::Val{N}) where {N}
+    if abs(m) <= 1 && real(m) <= 0.5
+        return ellipj_viasmallm(u,m, Val{N}())
+    elseif abs(1-m) <= 1
+        return ellipj_vialargem(u,m, Val{N}())
+    elseif imag(m) == 0 && real(m) < 0
+        # [1, Sec 16.10]
+        sn,cn,dn = ellipj_dispatch(u*sqrt(1-m),-m/(1-m), Val{N}())
+        return sn/(dn*sqrt(1-m)), cn/dn, 1/dn
+    else
+        # [1, Sec 16.11]
+        sn,cn,dn = ellipj_dispatch(u*sqrt(m),1/m, Val{N}())
+        return sn/sqrt(m), dn, cn
     end
 end
 
@@ -118,7 +110,7 @@ Base.@pure nsteps(ε,::Type{<:Real}) = nsteps(0.5,ε) # Guarantees convergence i
 Base.@pure nsteps(ε,::Type{<:Complex}) = nsteps(0.5+sqrt(3)/2im,ε) # This is heuristic.
 function ellipj_nsteps(u,m)
     # Compute the number of Landen steps required to reach machine precision.
-    # For all FloatXX types, this can be done at compile time, while for 
+    # For all FloatXX types, this can be done at compile time, while for
     # BigFloat this has to be done at runtime.
     T = promote_type(typeof(u),typeof(m))
     ε = puresqrt(eps(real(typeof(m))))
