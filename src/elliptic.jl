@@ -87,7 +87,25 @@ end
 #----------------
 # Pick algorithm
 
-Base.@pure puresqrt(x) = sqrt(x)
+@generated function ellipj_dispatch(u,m, ::Val{N}) where {N}
+    quote
+        if abs(m) <= 1 && real(m) <= 0.5
+            return ellipj_viasmallm(u,m, Val{$N}())
+        elseif abs(1-m) <= 1
+            return ellipj_vialargem(u,m, Val{$N}())
+        elseif imag(m) == 0 && real(m) < 0
+            # [1, Sec 16.10]
+            sn,cn,dn = ellipj_dispatch(u*sqrt(1-m),-m/(1-m), Val{$N}())
+            return sn/(dn*sqrt(1-m)), cn/dn, 1/dn
+        else
+            # [1, Sec 16.11]
+            sn,cn,dn = ellipj_dispatch(u*sqrt(m),1/m, Val{$N}())
+            return sn/sqrt(m), dn, cn
+        end
+    end
+end
+
+Base.@pure puresqrt(x) = Float64(sqrt(x))
 Base.@pure function nsteps(m,ε)
     i = 0
     while abs(m) > ε
@@ -98,23 +116,14 @@ Base.@pure function nsteps(m,ε)
 end
 Base.@pure nsteps(ε,::Type{<:Real}) = nsteps(0.5,ε) # Guarantees convergence in [-1,0.5]
 Base.@pure nsteps(ε,::Type{<:Complex}) = nsteps(0.5+sqrt(3)/2im,ε) # This is heuristic.
-function ellipj_dispatch(u,m)
+function ellipj_nsteps(u,m)
+    # Compute the number of Landen steps required to reach machine precision.
+    # For all FloatXX types, this can be done at compile time, while for 
+    # BigFloat this has to be done at runtime.
     T = promote_type(typeof(u),typeof(m))
     ε = puresqrt(eps(real(typeof(m))))
     N = nsteps(ε,typeof(m))
-    if abs(m) <= 1 && real(m) <= 0.5
-        return ellipj_viasmallm(u,m, Val{N}())::NTuple{3,T}
-    elseif abs(1-m) <= 1
-        return ellipj_vialargem(u,m, Val{N}())::NTuple{3,T}
-    elseif imag(m) == 0 && real(m) < 0
-        # [1, Sec 16.10]
-        sn,cn,dn = ellipj_dispatch(u*sqrt(1-m),-m/(1-m))
-        return sn/(dn*sqrt(1-m)), cn/dn, 1/dn
-    else
-        # [1, Sec 16.11]
-        sn,cn,dn = ellipj_dispatch(u*sqrt(m),1/m)
-        return sn/sqrt(m), dn, cn
-    end
+    return ellipj_dispatch(u,m,Val{N}())::NTuple{3,T}
 end
 
 
@@ -123,7 +132,7 @@ end
 
 function ellipj_check(u,m)
     if isfinite(u) && isfinite(m)
-        return ellipj_dispatch(u,m)
+        return ellipj_nsteps(u,m)
     else
         T = promote_type(typeof(u),typeof(m))
         return (T(NaN),T(NaN),T(NaN))
