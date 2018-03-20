@@ -97,7 +97,7 @@ function ellipj_dispatch(u,m, ::Val{N}) where {N}
     end
 end
 
-Base.@pure puresqrt(x) = Float64(sqrt(x))
+Base.@pure puresqrt(x::Float64) = sqrt(x)
 Base.@pure function nsteps(m,ε)
     i = 0
     while abs(m) > ε
@@ -113,7 +113,7 @@ function ellipj_nsteps(u,m)
     # For all FloatXX types, this can be done at compile time, while for
     # BigFloat this has to be done at runtime.
     T = promote_type(typeof(u),typeof(m))
-    ε = puresqrt(eps(real(typeof(m))))
+    ε = puresqrt(Float64(eps(real(typeof(m)))))
     N = nsteps(ε,typeof(m))
     return ellipj_dispatch(u,m,Val{N}())::NTuple{3,T}
 end
