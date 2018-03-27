@@ -100,13 +100,13 @@ function cotderiv_q(m::Int)
     q₋ = cotderiv_q(m-1)
     d = length(q₋) - 1 # degree of q₋
     if isodd(m-1)
-        q = Vector{Float64}(uninitialized, length(q₋))
+        q = Vector{Float64}(undef, length(q₋))
         q[end] = d * q₋[end] * 2/m
         for i = 1:length(q)-1
             q[i] = ((i-1)*q₋[i] + i*q₋[i+1]) * 2/m
         end
     else # iseven(m-1)
-        q = Vector{Float64}(uninitialized, length(q₋) + 1)
+        q = Vector{Float64}(undef, length(q₋) + 1)
         q[1] = q₋[1] / m
         q[end] = (1 + 2d) * q₋[end] / m
         for i = 2:length(q)-1
