@@ -46,4 +46,7 @@ SpecialFunctions.besselk
 SpecialFunctions.besselkx
 SpecialFunctions.eta
 SpecialFunctions.zeta
+SpecialFunctions.lambertw
+SpecialFunctions.lambertwbp
+SpecialFunctions.omega
 ```

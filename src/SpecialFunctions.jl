@@ -71,10 +71,13 @@ end
 export sinint,
        cosint
 
+export lambertw, lambertwbp
+
 include("bessel.jl")
 include("erf.jl")
 include("sincosint.jl")
 include("gamma.jl")
+include("lambertw.jl")
 include("deprecated.jl")
 
 end # module

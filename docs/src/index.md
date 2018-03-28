@@ -40,6 +40,7 @@ libraries.
 | [`besselix(nu,z)`](@ref SpecialFunctions.besselix)            | scaled modified Bessel function of the first kind of order `nu` at `z`                                                                                          |
 | [`besselk(nu,z)`](@ref SpecialFunctions.besselk)              | modified [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the second kind of order `nu` at `z`                                               |
 | [`besselkx(nu,z)`](@ref SpecialFunctions.besselkx)            | scaled modified Bessel function of the second kind of order `nu` at `z`                                                                                         |
+| [`lambertw(z,k)`](@ref SpecialFunctions.lambertw)            | `k`th branch of the Lambert W function at `z`                                                                                         |
 
 ## Installation
 

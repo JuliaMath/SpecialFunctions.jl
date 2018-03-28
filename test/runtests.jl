@@ -20,6 +20,10 @@ relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
 relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 ≅(a,b) = relerrc(a,b) ≤ 1e-13
 
+@testset "Lambert W" begin
+    include("lambertw_test.jl")
+end
+
 @testset "error functions" begin
     @test SF.erf(Float16(1)) ≈ 0.84270079294971486934
     @test SF.erf(1) ≈ 0.84270079294971486934
