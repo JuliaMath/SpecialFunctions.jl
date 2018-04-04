@@ -2,11 +2,8 @@
 
 using SpecialFunctions
 
-if isdefined(Base, :Test) && !Base.isdeprecated(Base, :Test)
-    using Base.Test
-else
-    using Test
-end
+import Compat
+using Compat.Test
 
 const SF = SpecialFunctions
 
@@ -40,7 +37,7 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test SF.dawson(1+2im) ≈ -13.388927316482919244-11.828715103889593303im
 
     for elty in [Float32,Float64]
-        for x in logspace(-200, -0.01)
+        for x in exp10.(Compat.range(-200, stop=-0.01, length=50))
             @test isapprox(SF.erf(SF.erfinv(x)), x, atol=1e-12*x)
             @test isapprox(SF.erf(SF.erfinv(-x)), -x, atol=1e-12*x)
             @test isapprox(SF.erfc(SF.erfcinv(2*x)), 2*x, atol=1e-12*x)
