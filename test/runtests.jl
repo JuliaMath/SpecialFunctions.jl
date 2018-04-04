@@ -1,6 +1,6 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using SpecialFunctions
+using Compat, SpecialFunctions
 
 if isdefined(Base, :Test) && !Base.isdeprecated(Base, :Test)
     using Base.Test
