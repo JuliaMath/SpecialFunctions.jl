@@ -29,7 +29,7 @@ for ff in (:erf, :erfc, :erfcx, :erfi, (:dawson, :Dawson), (:faddeeva_w, :w))
     end
 end
 
-for ff in (:erfcx, :erfi, (:dawson, :Dawson), (:faddeeva_w, :w))
+for ff in (:erfcx, :erfi, (:dawson, :Dawson))
     (fname, f) = isa(ff, Tuple) ? ff : (ff, ff)
     @eval begin
         ($fname)(x::Float64) = ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), x)
@@ -37,6 +37,11 @@ for ff in (:erfcx, :erfi, (:dawson, :Dawson), (:faddeeva_w, :w))
         ($fname)(x::Integer) = ($fname)(float(x))
     end
 end
+
+faddeeva_w(x::Float64) = faddeeva_w(Complex{Float64}(x))
+faddeeva_w(x::Float32) = faddeeva_w(Complex{Float32}(x))
+faddeeva_w(x::Integer) = faddeeva_w(float(x))
+
 
 """
     erf(x)
