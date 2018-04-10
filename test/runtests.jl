@@ -35,7 +35,8 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test SF.erfcx(1+2im) ≈ 0.14023958136627794370-0.22221344017989910261im
     @test SF.erfi(1+2im) ≈ -0.011259006028815025076+1.0036063427256517509im
     @test SF.dawson(1+2im) ≈ -13.388927316482919244-11.828715103889593303im
-
+    @test SF.faddeeva_w(1+2im) ≈ 0.21849261527489066692+0.09299780939260188228im
+    
     for elty in [Float32,Float64]
         for x in exp10.(Compat.range(-200, stop=-0.01, length=50))
             @test isapprox(SF.erf(SF.erfinv(x)), x, atol=1e-12*x)

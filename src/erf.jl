@@ -19,8 +19,9 @@ for f in (:erf, :erfc)
     end
 end
 
-for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
-    fname = (f === :Dawson) ? :dawson : f
+
+for ff in (:erf, :erfc, :erfcx, :erfi, (:dawson, :Dawson), (:faddeeva_w, :w))
+    (fname, f) = isa(ff, Tuple) ? ff : (ff, ff)
     @eval begin
         ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
         ($fname)(z::Complex{Float32}) = Complex{Float32}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
@@ -28,8 +29,8 @@ for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
     end
 end
 
-for f in (:erfcx, :erfi, :Dawson)
-    fname = (f === :Dawson) ? :dawson : f
+for ff in (:erfcx, :erfi, (:dawson, :Dawson), (:faddeeva_w, :w))
+    (fname, f) = isa(ff, Tuple) ? ff : (ff, ff)
     @eval begin
         ($fname)(x::Float64) = ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), x)
         ($fname)(x::Float32) = Float32(ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), Float64(x)))
@@ -72,6 +73,15 @@ Compute the Dawson function (scaled imaginary error function) of `x`, defined by
 ``\\frac{\\sqrt{\\pi}}{2} e^{-x^2} \\operatorname{erfi}(x)``.
 """
 dawson
+
+"""
+    faddeeva_w(x)
+
+Compute the Faddeeva function of `x`, defined by
+``e^{-x^2} \\operatorname{erfc}(x)``.
+"""
+faddeeva_w
+
 
 # Compute the inverse of the error function: erf(erfinv(x)) == x,
 # using the rational approximants tabulated in:
