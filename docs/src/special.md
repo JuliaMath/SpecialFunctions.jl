@@ -9,6 +9,7 @@ SpecialFunctions.erf
 SpecialFunctions.erfc
 SpecialFunctions.erfcx
 SpecialFunctions.erfi
+SpecialFunctions.faddeeva
 SpecialFunctions.dawson
 SpecialFunctions.erfinv
 SpecialFunctions.erfcinv

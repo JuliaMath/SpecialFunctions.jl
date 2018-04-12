@@ -20,7 +20,7 @@ for f in (:erf, :erfc)
 end
 
 
-for ff in (:erf, :erfc, :erfcx, :erfi, (:dawson, :Dawson), (:faddeeva_w, :w))
+for ff in (:erf, :erfc, :erfcx, :erfi, (:dawson, :Dawson), (:faddeeva, :w))
     (fname, f) = isa(ff, Tuple) ? ff : (ff, ff)
     @eval begin
         ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
@@ -38,9 +38,9 @@ for ff in (:erfcx, :erfi, (:dawson, :Dawson))
     end
 end
 
-faddeeva_w(x::Float64) = faddeeva_w(Complex{Float64}(x))
-faddeeva_w(x::Float32) = faddeeva_w(Complex{Float32}(x))
-faddeeva_w(x::Integer) = faddeeva_w(float(x))
+faddeeva(x::Float64) = faddeeva(Complex{Float64}(x))
+faddeeva(x::Float32) = faddeeva(Complex{Float32}(x))
+faddeeva(x::Integer) = faddeeva(float(x))
 
 
 """
@@ -60,7 +60,6 @@ erfc
     erfcx(x)
 
 Compute the scaled complementary error function of `x`, defined by ``e^{x^2} \\operatorname{erfc}(x)``.
-Note also that ``\\operatorname{erfcx}(-ix)`` computes the Faddeeva function ``w(x)``.
 """
 erfcx
 
@@ -80,12 +79,14 @@ Compute the Dawson function (scaled imaginary error function) of `x`, defined by
 dawson
 
 """
-    faddeeva_w(x)
+    faddeeva(z)
 
-Compute the Faddeeva function of `x`, defined by
-``e^{-x^2} \\operatorname{erfc}(x)``.
+Compute the Faddeeva function of complex `z`, defined by
+``e^{-z^2} \\operatorname{erfc}(-iz)``.
+Note that this function, also named `w` (original Faddeeva package) or `wofz` (Scilab package)
+is equivalent to``\\operatorname{erfcx}(-ix)``.
 """
-faddeeva_w
+faddeeva
 
 
 # Compute the inverse of the error function: erf(erfinv(x)) == x,
