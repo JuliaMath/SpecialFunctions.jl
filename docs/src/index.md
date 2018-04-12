@@ -12,7 +12,7 @@ libraries.
 | [`erfcinv(x)`](@ref SpecialFunctions.erfcinv)                 | inverse function to [`erfc()`](@ref SpecialFunctions.erfc)                                                                                                       |
 | [`erfi(x)`](@ref SpecialFunctions.erfi)                       | imaginary error function defined as `-im * erf(x * im)`, where `im` is the imaginary unit                                                                       |
 | [`erfcx(x)`](@ref SpecialFunctions.erfcx)                     | scaled complementary error function, i.e. accurate `exp(x^2) * erfc(x)` for large `x`                                                                           |
-| [`faddeeva(x)`](@ref SpecialFunctions.faddeeva)               | faddeva function `exp(-x^2) * erfc(-ix)`                                                                           |
+| [`faddeeva(x)`](@ref SpecialFunctions.faddeeva)               | faddeva function `exp(-x^2) * erfc(-ix) = erfcx(-ix)`                                                                           |
 | [`dawson(x)`](@ref SpecialFunctions.dawson)                   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate `exp(-x^2) * erfi(x) * sqrt(pi) / 2` for large `x`                                       |
 | [`sinint(x)`](@ref SpecialFunctions.sinint)                   | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
 | [`cosint(x)`](@ref SpecialFunctions.cosint)                   | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
