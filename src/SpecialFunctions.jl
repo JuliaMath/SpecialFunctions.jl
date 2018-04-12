@@ -21,7 +21,7 @@ if isdefined(Base, :airyai) && VERSION < v"0.7.0-DEV.986" #22763
                  besselh, besselhx, besseli, besselix, besselj, besselj0, besselj1,
                  besseljx, besselk, besselkx, bessely, bessely0, bessely1, besselyx,
                  hankelh1, hankelh1x, hankelh2, hankelh2x,
-                 dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv,
+                 dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv, faddeeva,
                  eta, digamma, invdigamma, polygamma, trigamma, zeta,
                  # deprecated
                  airy, airyx, airyprime
@@ -56,6 +56,7 @@ else
         erfcx,
         erfi,
         erfinv,
+        faddeeva,
         eta,
         digamma,
         invdigamma,

@@ -38,9 +38,7 @@ for ff in (:erfcx, :erfi, (:dawson, :Dawson))
     end
 end
 
-faddeeva(x::Float64) = faddeeva(Complex{Float64}(x))
-faddeeva(x::Float32) = faddeeva(Complex{Float32}(x))
-faddeeva(x::Integer) = faddeeva(float(x))
+faddeeva(x::Real) = faddeeva(complex(x))
 
 
 """
