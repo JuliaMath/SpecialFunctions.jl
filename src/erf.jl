@@ -4,7 +4,7 @@ using Base.Math: @horner, libm
 using Base.MPFR: ROUNDING_MODE
 
 for f in (:erf, :erfc)
-    @eval begin
+    @eval beginhttps://github.com/discourse/discourse/tree/master/config/locales
         ($f)(x::Float64) = ccall(($(string(f)),libm), Float64, (Float64,), x)
         ($f)(x::Float32) = ccall(($(string(f,"f")),libm), Float32, (Float32,), x)
         ($f)(x::Real) = ($f)(float(x))
@@ -81,7 +81,7 @@ dawson
 
 Compute the Faddeeva function of complex `z`, defined by
 ``e^{-z^2} \\operatorname{erfc}(-iz)``.
-Note that this function, also named `w` (original Faddeeva package) or `wofz` (Scilab package)
+Note that this function, also named `w` (original Faddeeva package) or `wofz` (Scilab package),
 is equivalent to``\\operatorname{erfcx}(-iz)``.
 """
 faddeeva
