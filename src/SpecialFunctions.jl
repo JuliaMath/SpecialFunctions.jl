@@ -25,6 +25,7 @@ if isdefined(Base, :airyai) && VERSION < v"0.7.0-DEV.986" #22763
                  eta, digamma, invdigamma, polygamma, trigamma, zeta,
                  # deprecated
                  airy, airyx, airyprime
+    export faddeeva
 else
     export
         airyai,
