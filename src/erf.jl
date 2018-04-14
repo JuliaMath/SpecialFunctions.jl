@@ -4,7 +4,7 @@ using Base.Math: @horner, libm
 using Base.MPFR: ROUNDING_MODE
 
 for f in (:erf, :erfc)
-    @eval beginhttps://github.com/discourse/discourse/tree/master/config/locales
+    @eval begin
         ($f)(x::Float64) = ccall(($(string(f)),libm), Float64, (Float64,), x)
         ($f)(x::Float32) = ccall(($(string(f,"f")),libm), Float32, (Float32,), x)
         ($f)(x::Real) = ($f)(float(x))
