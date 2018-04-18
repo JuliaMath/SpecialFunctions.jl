@@ -81,6 +81,13 @@ export
     lambertw,
     lambertwbp
 
+const omega_const_bf_ = Ref{BigFloat}()
+function __init__()
+    # allocate storage for this BigFloat constant each time this module is loaded
+    omega_const_bf_[] =
+        parse(BigFloat,"0.5671432904097838729999686622103555497538157871865125081351310792230457930866845666932194")
+end
+
 include("bessel.jl")
 include("erf.jl")
 include("ellip.jl")

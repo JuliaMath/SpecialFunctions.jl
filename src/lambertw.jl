@@ -1,65 +1,47 @@
 import Base: convert
-#export lambertw, lambertwbp
+
 using Compat
-
-const euler =
-if isdefined(Base, :MathConstants)
-    Base.MathConstants.e
-else
-    e
-end
-
-const omega_const_bf_ = Ref{BigFloat}()
-
-function __init__()
-    omega_const_bf_[] =
-        parse(BigFloat,"0.5671432904097838729999686622103555497538157871865125081351310792230457930866845666932194")
-end
+import Compat.MathConstants  # For clarity, we use MathConstants.e for Euler's number
 
 #### Lambert W function ####
 
-const LAMBERTW_USE_NAN = false
-
-macro baddomain(v)
-    if LAMBERTW_USE_NAN
-        return :(return(NaN))
-    else
-        return esc(:(throw(DomainError($v))))
-    end
-end
-
-# Use Halley's root-finding method to find x = lambertw(z) with
-# initial point x.
-function _lambertw(z::T, x::T) where T <: Number
+# Use Halley's root-finding method to find
+# x = lambertw(z) with initial point x.
+function _lambertw(z::T, x::T, maxits) where T <: Number
     two_t = convert(T,2)
     lastx = x
     lastdiff = zero(T)
-    for i in 1:100
+    converged::Bool = false
+    for i in 1:maxits
         ex = exp(x)
         xexz = x * ex - z
         x1 = x + 1
-        x = x - xexz / (ex * x1 - (x + two_t) * xexz / (two_t * x1 ) )
+        x -= xexz / (ex * x1 - (x + two_t) * xexz / (two_t * x1 ) )
         xdiff = abs(lastx - x)
-        xdiff <= 2*eps(abs(lastx)) && break
-        lastdiff == diff && break
+        if xdiff <= 3*eps(abs(lastx)) || lastdiff == xdiff  # second condition catches two-value cycle
+            converged = true
+            break
+        end
         lastx = x
         lastdiff = xdiff
     end
-    x
+    converged || warn("lambertw with z=", z, " did not converge in ", maxits, " iterations.")
+    return x
 end
 
 ### Real z ###
 
 # Real x, k = 0
-
+# This appears to be inferrable with T=Float64 and T=BigFloat, including if x=Inf.
 # The fancy initial condition selection does not seem to help speed, but we leave it for now.
-function lambertwk0(x::T)::T where T<:AbstractFloat
-    x == Inf && return Inf
+function lambertwk0(x::T, maxits)::T where T<:AbstractFloat
+    isnan(x) && return(NaN)
+    x == Inf && return Inf # appears to return convert(BigFloat,Inf) for x == BigFloat(Inf)
     one_t = one(T)
-    oneoe = -one_t/convert(T,euler)
+    oneoe = -one_t/convert(T,MathConstants.e)  # The branch point
     x == oneoe && return -one_t
+    oneoe <= x || throw(DomainError(x))
     itwo_t = 1/convert(T,2)
-    oneoe <= x || @baddomain(x)
     if x > one_t
         lx = log(x)
         llx = log(lx)
@@ -67,28 +49,28 @@ function lambertwk0(x::T)::T where T<:AbstractFloat
     else
         x1 = (567//1000) * x
     end
-    _lambertw(x,x1)
+    return _lambertw(x, x1, maxits)
 end
 
 # Real x, k = -1
-function _lambertwkm1(x::T) where T<:Real
-    oneoe = -one(T)/convert(T,euler)
-    x == oneoe && return -one(T)
-    oneoe <= x || @baddomain(x)
-    x == zero(T) && return -convert(T,Inf)
-    x < zero(T) || @baddomain(x)
-    _lambertw(x,log(-x))
+function lambertwkm1(x::T, maxits) where T<:Real
+    oneoe = -one(T)/convert(T,MathConstants.e)
+    x == oneoe && return -one(T) # W approaches -1 as x -> -1/e from above
+    oneoe <= x || throw(DomainError(x))  # branch domain exludes x < -1/e
+    x == zero(T) && return -convert(T,Inf) # W decreases w/o bound as x -> 0 from below
+    x < zero(T) || throw(DomainError(x))
+    return _lambertw(x, log(-x), maxits)
 end
 
-
 """
-    lambertw(z::Complex{T}, k::V=0) where {T<:Real, V<:Integer}
-    lambertw(z::T, k::V=0) where {T<:Real, V<:Integer}
+    lambertw(z::Complex{T}, k::V=0, maxits=1000) where {T<:Real, V<:Integer}
+    lambertw(z::T, k::V=0, maxits=1000) where {T<:Real, V<:Integer}
 
 Compute the `k`th branch of the Lambert W function of `z`. If `z` is real, `k` must be
 either `0` or `-1`. For `Real` `z`, the domain of the branch `k = -1` is `[-1/e,0]` and the
 domain of the branch `k = 0` is `[-1/e,Inf]`. For `Complex` `z`, and all `k`, the domain is
-the complex plane.
+the complex plane. When using root finding to compute `W`, a value for `W` is returned
+with a warning if it has not converged after `maxits` iterations.
 
 ```jldoctest
 julia> lambertw(-1/e,-1)
@@ -107,33 +89,31 @@ julia> lambertw(Complex(-10.0,3.0), 4)
 -0.9274337508660128 + 26.37693445371142im
 ```
 
-!!! note
-    The constant `LAMBERTW_USE_NAN` at the top of the source file controls whether arguments
-    outside the domain throw `DomainError` or return `NaN`. The default is `DomainError`.
 """
-function lambertw(x::Real, k::Integer)
-    k == 0 && return lambertwk0(x)
-    k == -1 && return _lambertwkm1(x)
-    @baddomain(k)  # more informative message like below ?
-#    error("lambertw: real x must have k == 0 or k == -1")
+lambertw(z, k::Integer=0, maxits::Integer=1000) = lambertw_(z, k, maxits)
+
+function lambertw_(x::Real, k, maxits)
+    k == 0 && return lambertwk0(x, maxits)
+    k == -1 && return lambertwkm1(x, maxits)
+    throw(DomainError(k, "lambertw: real x must have branch k == 0 or k == -1"))
 end
 
-function lambertw(x::Union{Integer,Rational}, k::Integer)
+function lambertw_(x::Union{Integer,Rational}, k, maxits)
     if k == 0
         x == 0 && return float(zero(x))
-        x == 1 && return convert(typeof(float(x)),omega) # must be more efficient way
+        x == 1 && return convert(typeof(float(x)), omega) # must be a more efficient way
     end
-    lambertw(float(x),k)
+    return lambertw_(float(x), k, maxits)
 end
 
 ### Complex z ###
 
 # choose initial value inside correct branch for root finding
-function lambertw(z::Complex{T}, k::Integer) where T<:Real
+function lambertw_(z::Complex{T}, k, maxits) where T<:Real
     one_t = one(T)
     local w::Complex{T}
     pointseven = 7//10
-    if abs(z) <= one_t/convert(T,euler)
+    if abs(z) <= one_t/convert(T,MathConstants.e)
         if z == 0
             k == 0 && return z
             return complex(-convert(T,Inf),zero(T))
@@ -157,26 +137,18 @@ function lambertw(z::Complex{T}, k::Integer) where T<:Real
         w = log(z)
         k != 0 ? w += complex(0, 2*k*pi) : nothing
     end
-    _lambertw(z,w)
+    return _lambertw(z, w, maxits)
 end
 
-lambertw(z::Complex{T}, k::Integer) where T<:Integer = lambertw(float(z),k)
+lambertw_(z::Complex{T}, k, maxits) where T<:Integer = lambertw_(float(z), k, maxits)
+lambertw_(n::Irrational, k, maxits) = lambertw_(float(n), k, maxits)
 
 # lambertw(e + 0im,k) is ok for all k
-#function lambertw(::Irrational{:e}, k::T) where T<:Integer
-function lambertw(::typeof(euler), k::T) where T<:Integer
+# Maybe this should return a float. But, this should cause no type instability in any case
+function lambertw_(::typeof(MathConstants.e), k, maxits)
     k == 0 && return 1
-    @baddomain(k)
+    throw(DomainError(k))
 end
-
-# Maybe this should return a float
-lambertw(::typeof(euler)) = 1
-#lambertw(::Irrational{:e}) = 1
-
-#lambertw{T<:Number}(x::T) = lambertw(x,0)
-lambertw(x::Number) = lambertw(x,0)
-
-lambertw(n::Irrational, args::Integer...) = lambertw(float(n),args...)
 
 ### omega constant ###
 
@@ -185,7 +157,7 @@ const omega_const_ = 0.567143290409783872999968662210355
 
 # maybe compute higher precision. converges very quickly
 function omega_const(::Type{BigFloat})
-  @compat  precision(BigFloat) <= 256 && return omega_const_bf_[]
+    precision(BigFloat) <= 256 && return omega_const_bf_[]
     myeps = eps(BigFloat)
     oc = omega_const_bf_[]
     for i in 1:100
@@ -200,7 +172,7 @@ end
     omega
     ω
 
-A constant defined by `ω exp(ω) = 1`.
+The constant defined by `ω exp(ω) = 1`.
 
 ```jldoctest
 julia> ω
@@ -219,7 +191,7 @@ julia> big(omega)
 const ω = Irrational{:ω}()
 @doc (@doc ω) omega = ω
 
-# The following three lines may be removed when support for v0.6 is dropped
+# The following two lines may be removed when support for v0.6 is dropped
 Base.convert(::Type{AbstractFloat}, o::Irrational{:ω}) = Float64(o)
 Base.convert(::Type{Float16}, o::Irrational{:ω}) = Float16(o)
 Base.convert(::Type{T}, o::Irrational{:ω}) where T <:Number = T(o)
@@ -236,7 +208,7 @@ Base.BigFloat(o::Irrational{:ω}) = omega_const(BigFloat)
 # (4.23) and (4.24) for all μ are also given. This code implements the
 # recursion relations.
 
-# (4.23) and (4.24) give zero based coefficients
+# (4.23) and (4.24) give zero based coefficients.
 cset(a,i,v) = a[i+1] = v
 cget(a,i) = a[i+1]
 
@@ -247,7 +219,7 @@ function compa(k,m,a)
         sum0 += cget(m,j) * cget(m,k+1-j)
     end
     cset(a,k,sum0)
-    sum0
+    return sum0
 end
 
 # (4.23)
@@ -256,7 +228,7 @@ function compm(k,m,a)
     mk = (kt-1)/(kt+1) *(cget(m,k-2)/2 + cget(a,k-2)/4) -
         cget(a,k)/2 - cget(m,k-1)/(kt+1)
     cset(m,k,mk)
-    mk
+    return mk
 end
 
 # We plug the known value μ₂ == -1//3 for (4.22) into (4.23) and
@@ -283,19 +255,21 @@ end
 
 const LAMWMU_FLOAT64 = lamwcoeff(Float64,500)
 
-function horner(x, p::AbstractArray,n)
+# Base.Math.@horner requires literal coefficients
+# But, we have an array `p` of computed coefficients
+function horner(x, p::AbstractArray, n)
     n += 1
     ex = p[n]
     for i = n-1:-1:2
-        ex = :($(p[i]) + t * $ex)
+        ex = :(muladd(t, $ex, $(p[i])))
     end
     ex = :( t * $ex)
-    Expr(:block, :(t = $x), ex)
+    return Expr(:block, :(t = $x), ex)
 end
 
 function mkwser(name, n)
     iex = horner(:x,LAMWMU_FLOAT64,n)
-    :(function ($name)(x) $iex  end)
+    return :(function ($name)(x) $iex  end)
 end
 
 eval(mkwser(:wser3, 3))
@@ -320,7 +294,7 @@ function wser(p,x)
     x < 5e-2 && return wser32(p)
     x < 1e-1 && return wser50(p)
     x < 1.9e-1 && return wser100(p)
-    x > 1/euler && @baddomain(x)  # radius of convergence
+    x > 1/MathConstants.e && throw(DomainError(x))  # radius of convergence
     return wser290(p)  # good for x approx .32
 end
 
@@ -335,28 +309,28 @@ function wser(p::Complex{T},z) where T<:Real
     x < 5e-2 && return wser32(p)
     x < 1e-1 && return wser50(p)
     x < 1.9e-1 && return wser100(p)
-    x > 1/euler && @baddomain(x)  # radius of convergence
+    x > 1/MathConstants.e && throw(DomainError(x))  # radius of convergence
     return wser290(p)
 end
 
 @inline function _lambertw0(x) # 1 + W(-1/e + x)  , k = 0
-    ps = 2*euler*x;
+    ps = 2*MathConstants.e*x;
     p = sqrt(ps)
-    wser(p,x)
+    return  wser(p,x)
 end
 
 @inline function _lambertwm1(x) # 1 + W(-1/e + x)  , k = -1
-    ps = 2*euler*x;
+    ps = 2*MathConstants.e*x;
     p = -sqrt(ps)
-    wser(p,x)
+    return wser(p,x)
 end
 
 """
     lambertwbp(z,k=0)
 
-Accurate value of `1 + W(-1/e + z)`, for `abs(z)` in `[0,1/e]` for `k` either `0` or `-1`.
-Accurate to Float64 precision for abs(z) < 0.32.
-If `k=-1` and `imag(z) < 0`, the value on the branch `k=1` is returned. `lambertwbp` is vectorized.
+Compute accurate value of `1 + W(-1/e + z)`, for `abs(z)` in `[0,1/e]` for `k` either `0` or `-1`.
+The result is accurate to Float64 precision for abs(z) < 0.32.
+If `k=-1` and `imag(z) < 0`, the value on the branch `k=1` is returned.
 
 ```jldoctest
 julia> lambertw(-1/e + 1e-18, -1)
@@ -378,9 +352,7 @@ julia> convert(Float64,(lambertw(-BigFloat(1)/e + BigFloat(10)^(-18),-1) + 1))
 function lambertwbp(x::Number,k::Integer)
     k == 0 && return _lambertw0(x)
     k == -1 && return _lambertwm1(x)
-    error("expansion about branch point only implemented for k = 0 and -1")
+    throw(ArgumentError("expansion about branch point only implemented for k = 0 and -1."))
 end
 
 lambertwbp(x::Number) = _lambertw0(x)
-
-nothing
