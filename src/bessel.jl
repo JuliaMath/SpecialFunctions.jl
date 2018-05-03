@@ -192,7 +192,7 @@ end
 function _besseli(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-  
+
     ccall((:zbesi_,openspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
@@ -215,7 +215,7 @@ function _besselj(nu::Float64, z::Complex{Float64}, kode::Int32)
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
            ai1, ai2, ae1, ae2)
-    
+
     if ae2[] == 0 || ae2[] == 3
         return complex(ai1[], ai2[])
     else
@@ -613,3 +613,47 @@ hankelh1x(nu, z) = besselhx(nu, 1, z)
 Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i}``.
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
+
+function besseljs(nu::Integer, z)
+    nu ≥ 0 || error("nu must be an integer ≥ 0")
+    N = Int32(nu + 1)
+    ai1, ai2 = Array{Float64}(N), Array{Float64}(N)
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+
+    ccall((:zbesj_,openspecfun), Cvoid,
+          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
+           Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}),
+           real(z), imag(z), Float64(0), Int32(1), N,
+           ai1, ai2, ae1, ae2)
+
+   if ae2[] == 0
+       return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
+   elseif ae2[] == 3
+       warn("besselhs: loss of precision")
+       return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
+   else
+       throw(AmosException(ae2[]))
+   end
+end
+
+function besselhs(nu::Integer, k::Integer, z)
+    nu ≥ 0 || error("nu must be an integer ≥ 0")
+    N = Int32(nu + 1)
+    ai1, ai2 = Array{Float64}(N), Array{Float64}(N)
+    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
+
+    ccall((:zbesh_,openspecfun), Cvoid,
+           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int},
+            Ptr{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
+            real(z), imag(z), Float64(0), Int32(1), Int32(k), N,
+            ai1, ai2, ae1, ae2)
+
+    if ae2[] == 0
+        return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
+    elseif ae2[] == 3
+        warn("besselhs: loss of precision")
+        return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
+    else
+        throw(AmosException(ae2[]))
+    end
+end
