@@ -77,6 +77,4 @@ include("sincosint.jl")
 include("gamma.jl")
 include("deprecated.jl")
 
-export besseljs,
-       besselhs
 end # module
