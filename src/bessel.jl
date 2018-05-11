@@ -642,4 +642,4 @@ end
 
 besselh(nu::UnitRange{Int}, k::Integer, x::Real) = besselh(nu, k, float(x))
 besselh(nu::UnitRange{Int}, k::Integer, x::AbstractFloat) = besselh(nu, k, complex(x))
-besselh(nu::UnitRange{Int}, k::Integer, x::Complex{Float32}) = Complex{Float32}(besselh(nu, k, Complex{Float64}(x)))
+besselh(nu::UnitRange{Int}, k::Integer, x::Complex{Float32}) = Complex{Float32}.(besselh(nu, k, Complex{Float64}(x)))
