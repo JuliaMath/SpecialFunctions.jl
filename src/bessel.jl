@@ -614,46 +614,32 @@ Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
 
-function besseljs(nu::Integer, z)
+function _besselhs(nu::Integer, k::Int32, z::Complex{Float64}, N::Integer)
     nu ≥ 0 || error("nu must be an integer ≥ 0")
-    N = Int32(nu + 1)
-    ai1, ai2 = Array{Float64}(N), Array{Float64}(N)
-    ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-
-    ccall((:zbesj_,openspecfun), Cvoid,
-          (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
-           Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}),
-           real(z), imag(z), Float64(0), Int32(1), N,
-           ai1, ai2, ae1, ae2)
-
-   if ae2[] == 0
-       return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
-   elseif ae2[] == 3
-       warn("besselhs: loss of precision")
-       return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
-   else
-       throw(AmosException(ae2[]))
-   end
-end
-
-function besselhs(nu::Integer, k::Integer, z)
-    nu ≥ 0 || error("nu must be an integer ≥ 0")
-    N = Int32(nu + 1)
     ai1, ai2 = Array{Float64}(N), Array{Float64}(N)
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
     ccall((:zbesh_,openspecfun), Cvoid,
            (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int},
-            Ptr{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
-            real(z), imag(z), Float64(0), Int32(1), Int32(k), N,
+            Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}),
+            real(z), imag(z), Float64(nu), Int32(1), Int32(k), Int32(N),
             ai1, ai2, ae1, ae2)
 
     if ae2[] == 0
-        return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
+        return (N == 1 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
     elseif ae2[] == 3
-        warn("besselhs: loss of precision")
-        return (nu == 0 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
+        warn("besselh: loss of precision")
+        return (N == 1 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
     else
         throw(AmosException(ae2[]))
     end
 end
+
+function besselh(nu::UnitRange{Int}, k::Integer, z::Complex{Float64})
+    nu[1] ≥ 0 || error("nu must be an integer range ≥ 0")
+    return _besselhs(nu[1], Int32(k), z, Int32(length(nu)))
+end
+
+besselh(nu::UnitRange{Int}, k::Integer, x::Real) = besselh(nu, k, float(x))
+besselh(nu::UnitRange{Int}, k::Integer, x::AbstractFloat) = besselh(nu, k, complex(x))
+besselh(nu::UnitRange{Int}, k::Integer, x::Complex{Float32}) = Complex{Float32}(besselh(nu, k, Complex{Float64}(x)))

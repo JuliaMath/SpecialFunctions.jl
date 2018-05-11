@@ -330,6 +330,15 @@ end
             @test f(0,1) ≈ f(0,Complex{Float32}(1))
         end
     end
+    @testset "besselh order range" begin
+        true_h114 = -0.066043328023549136143 + 0.397925710557100005254im
+        true_h124 =  0.364128145852072804215 + 0.215903594603614994531im
+        true_h134 =  0.430171473875621940358 - 0.182022115953485010723im
+        h1n4 = SF.besselh(1:3,1,4)
+        @test all(h1n4 .≈ [true_h114; true_h124; true_h134])
+        @test all(SF.besselh(1:3,2,4) .≈ conj(h1n4))
+        @test all(SF.besselh(1:3,1,4.0) .≈ h1n4)
+    end
 end
 
 @testset "gamma and friends" begin
