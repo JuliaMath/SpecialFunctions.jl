@@ -614,15 +614,14 @@ Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
 
-function _besselhs(nu::Integer, k::Int32, z::Complex{Float64}, N::Integer)
-    nu ≥ 0 || error("nu must be an integer ≥ 0")
+function _besselhs(nu::Float64, k::Int32, z::Complex{Float64}, N::Int32)
     ai1, ai2 = Array{Float64}(N), Array{Float64}(N)
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
     ccall((:zbesh_,openspecfun), Cvoid,
-           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int},
+           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int32},
             Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}),
-            real(z), imag(z), Float64(nu), Int32(1), Int32(k), Int32(N),
+            real(z), imag(z), nu, Int32(1), k, N,
             ai1, ai2, ae1, ae2)
 
     if ae2[] == 0
@@ -635,11 +634,16 @@ function _besselhs(nu::Integer, k::Int32, z::Complex{Float64}, N::Integer)
     end
 end
 
-function besselh(nu::UnitRange{Int}, k::Integer, z::Complex{Float64})
-    nu[1] ≥ 0 || error("nu must be an integer range ≥ 0")
-    return _besselhs(nu[1], Int32(k), z, Int32(length(nu)))
+function besselh(nu::Range{T} where T <: Real, k::Integer, z::Complex{Float64})
+    (nu[1] ≥ 0 && step(nu) == 1) || error("nu must be a range with unit step ≥ 0")
+    return _besselhs(Float64(nu[1]), Int32(k), z, Int32(length(nu)))
 end
 
-besselh(nu::UnitRange{Int}, k::Integer, x::Real) = besselh(nu, k, float(x))
-besselh(nu::UnitRange{Int}, k::Integer, x::AbstractFloat) = besselh(nu, k, complex(x))
-besselh(nu::UnitRange{Int}, k::Integer, x::Complex{Float32}) = Complex{Float32}.(besselh(nu, k, Complex{Float64}(x)))
+besselh(nu::Range{T} where T <: Real, k::Integer, x::Real) =
+    besselh(nu, k, float(x))
+besselh(nu::Range{T} where T <: Real, k::Integer, x::AbstractFloat) =
+    besselh(nu, k, complex(x))
+besselh(nu::Range{T} where T <: Real, k::Integer, x::Complex{Float32}) =
+    Complex{Float32}.(besselh(nu, k, Complex{Float64}(x)))
+besselh(nu::Range{T} where T <: Real, k::Integer, z::Complex) =
+    besselh(nu, k, float(z))
