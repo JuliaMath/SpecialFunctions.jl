@@ -263,7 +263,8 @@ end
 
 Bessel function of the third kind of order `nu` (the Hankel function). `k` is either 1 or 2,
 selecting [`hankelh1`](@ref) or [`hankelh2`](@ref), respectively.
-`k` defaults to 1 if it is omitted.
+`k` defaults to 1 if it is omitted. 
+`nu` is either `Real` or a non-negative `Range` with `step == 1`, such as `0.5:3.5` or `0:1`.
 (See also [`besselhx`](@ref) for an exponentially scaled variant.)
 """
 function besselh end
