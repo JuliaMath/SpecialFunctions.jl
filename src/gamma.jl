@@ -720,14 +720,14 @@ function gamma(x::BigFloat)
 end
 
 # log of absolute value of gamma function
-const lgamma_signp = Ref{Cint}()
-function lgamma(x::BigFloat)
+function lgamma_r(x::BigFloat)
     z = BigFloat()
+    lgamma_signp = Ref{Cint}()
     ccall((:mpfr_lgamma,:libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
-    return z
+    return z, lgamma_signp[]
 end
 
-lgamma_r(x::BigFloat) = (lgamma(x), lgamma_signp[])
+lgamma(x::BigFloat) = lgamma_r(x)[1]
 
 if Base.MPFR.version() >= v"4.0.0"
     function beta(y::BigFloat, x::BigFloat)
