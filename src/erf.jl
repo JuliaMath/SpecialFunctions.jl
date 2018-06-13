@@ -3,10 +3,12 @@
 using Base.Math: @horner, libm
 using Base.MPFR: ROUNDING_MODE
 
+include("erf_openspecfun.jl")
+include("erf_libm.jl")
+
 for f in (:erf, :erfc)
     @eval begin
-        ($f)(x::Float64) = ccall(($(string(f)),libm), Float64, (Float64,), x)
-        ($f)(x::Float32) = ccall(($(string(f,"f")),libm), Float32, (Float32,), x)
+        ($f)(x::Float32) = Float32(($f)(Float64(x)))
         ($f)(x::Real) = ($f)(float(x))
         ($f)(a::Float16) = Float16($f(Float32(a)))
         ($f)(a::Complex{Float16}) = Complex{Float16}($f(Complex{Float32}(a)))
@@ -22,8 +24,7 @@ end
 for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
     fname = (f === :Dawson) ? :dawson : f
     @eval begin
-        ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
-        ($fname)(z::Complex{Float32}) = Complex{Float32}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        ($fname)(z::Complex{Float32}) = Complex{Float32}(($fname)(Float64(z)))
         ($fname)(z::Complex) = ($fname)(Complex{Float64}(z))
     end
 end
@@ -31,8 +32,7 @@ end
 for f in (:erfcx, :erfi, :Dawson)
     fname = (f === :Dawson) ? :dawson : f
     @eval begin
-        ($fname)(x::Float64) = ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), x)
-        ($fname)(x::Float32) = Float32(ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), Float64(x)))
+        ($fname)(x::Float32) = Float32(($fname)(Float64(x)))
         ($fname)(x::Integer) = ($fname)(float(x))
     end
 end
