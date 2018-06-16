@@ -4,13 +4,12 @@ module SpecialFunctions
 using Compat
 
 if VERSION >= v"0.7.0-DEV.1760"
-    depsfile = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
-    if isfile(depsfile)
-        include(depsfile)
-    else
-        error("SpecialFunctions is not properly installed. Please run " *
-              "Pkg.build(\"SpecialFunctions\") and restart Julia.")
+    # Load openspecfun libraries from our deps.jl
+    const depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
+    if !isfile(depsjl_path)
+        error("SpecialFunctions not installed properly, run Pkg.build(\"SpecialFunctions\"), restart Julia and try again")
     end
+    include(depsjl_path)
 else
     using Base.Math: openspecfun
 end
