@@ -340,6 +340,7 @@ end
         @test all(SF.besselh(1:3,1,4.0) .≈ h1n4)
         @test SF.besselh(1//2:5//2, 1im)[2] ≈ SF.besselh(1.5, 1.0im)
         @test_throws SF.AmosException SF.besselh(1//2:3.5, 1e10im)
+        @test_throws ArgumentError besselh(-1:1,1)
     end
 end
 

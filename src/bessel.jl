@@ -625,10 +625,7 @@ function _besselhs(nu::Float64, k::Int32, z::Complex{Float64}, N::Int32)
             real(z), imag(z), nu, Int32(1), k, N,
             ai1, ai2, ae1, ae2)
 
-    if ae2[] == 0
-        return (N == 1 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
-    elseif ae2[] == 3
-        warn("besselh: loss of precision")
+    if ae2[] == 0 || ae2[] == 3
         return (N == 1 ? complex(ai1[1], ai2[1]) : complex.(ai1, ai2))
     else
         throw(AmosException(ae2[]))
@@ -636,7 +633,7 @@ function _besselhs(nu::Float64, k::Int32, z::Complex{Float64}, N::Int32)
 end
 
 function besselh(nu::Range{T} where T <: Real, k::Integer, z::Complex{Float64})
-    (nu[1] ≥ 0 && step(nu) == 1) || error("nu must be a range with unit step ≥ 0")
+    (nu[1] ≥ 0 && step(nu) == 1) || throw(ArgumentError("nu must be a range with unit step ≥ 0"))
     return _besselhs(Float64(nu[1]), Int32(k), z, Int32(length(nu)))
 end
 
