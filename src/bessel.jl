@@ -263,7 +263,7 @@ end
 
 Bessel function of the third kind of order `nu` (the Hankel function). `k` is either 1 or 2,
 selecting [`hankelh1`](@ref) or [`hankelh2`](@ref), respectively.
-`k` defaults to 1 if it is omitted. 
+`k` defaults to 1 if it is omitted.
 `nu` is either `Real` or a non-negative `Range` with `step == 1`, such as `0.5:3.5` or `0:1`.
 (See also [`besselhx`](@ref) for an exponentially scaled variant.)
 """
@@ -616,7 +616,7 @@ Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i
 hankelh2x(nu, z) = besselhx(nu, 2, z)
 
 function _besselhs(nu::Float64, k::Int32, z::Complex{Float64}, N::Int32)
-    ai1, ai2 = Array{Float64}(N), Array{Float64}(N)
+    ai1, ai2 = Vector{Float64}(undef, N), Vector{Float64}(undef, N)
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
     ccall((:zbesh_,openspecfun), Cvoid,
@@ -632,7 +632,7 @@ function _besselhs(nu::Float64, k::Int32, z::Complex{Float64}, N::Int32)
     end
 end
 
-function besselh(nu::Range{T} where T <: Real, k::Integer, z::Complex{Float64})
+function besselh(nu::AbstractRange{<:Real}, k::Integer, z::Complex{Float64})
     (nu[1] ≥ 0 && step(nu) == 1) || throw(ArgumentError("nu must be a range with unit step ≥ 0"))
     return _besselhs(Float64(nu[1]), Int32(k), z, Int32(length(nu)))
 end
