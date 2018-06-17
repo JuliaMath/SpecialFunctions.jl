@@ -40,6 +40,9 @@ else
             install(url, tarball_hash; prefix=prefix, force=true, verbose=verbose)
             unsatisfied = any(!satisfied(p; verbose=verbose) for p in products)
         end
+        if unsatisfied
+            rm(joinpath(@__DIR__, "usr", "lib"); force=true, recursive=true)
+        end
     end
 
     if unsatisfied || forcecompile
