@@ -2,9 +2,21 @@ language: julia
 os:
   - linux
   - osx
+addons:
+  apt_packages:
+    - gfortran
+before_install:
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+        brew cask uninstall oclint;
+        brew install gcc;
+    fi
 julia:
   - 0.6
   - nightly
+env:
+  matrix:
+    - JULIA_SPECIALFUNCTIONS_BUILD_SOURCE=true
+    - JULIA_SPECIALFUNCTIONS_BUILD_SOURCE=false
 notifications:
   email: false
 #script: # the default script is equivalent to the following

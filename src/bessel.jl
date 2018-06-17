@@ -192,7 +192,7 @@ end
 function _besseli(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
-  
+
     ccall((:zbesi_,openspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
@@ -215,7 +215,7 @@ function _besselj(nu::Float64, z::Complex{Float64}, kode::Int32)
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
            ai1, ai2, ae1, ae2)
-    
+
     if ae2[] == 0 || ae2[] == 3
         return complex(ai1[], ai2[])
     else
