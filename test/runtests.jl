@@ -636,3 +636,15 @@ end
 
     @test beta(big(1.0),big(1.2)) ≈ beta(1.0,1.2) rtol=4*eps()
 end
+
+@testset "lbinomial" begin
+    @test lbinomial(10, -1) == -Inf
+    @test lbinomial(10, 11) == -Inf
+    @test lbinomial(10,  0) == 0.0
+    @test lbinomial(10, 10) == 0.0
+
+    @test lbinomial(10,  1)      ≈ log(10)
+    @test lbinomial(-6, 10)      ≈ log(binomial(-6, 10))
+    @test lbinomial(-6, 11)      ≈ log(abs(binomial(-6, 11)))
+    @test lbinomial.(200, 0:200) ≈ log.(binomial.(BigInt(200), (0:200)))
+end
