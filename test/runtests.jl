@@ -571,9 +571,9 @@ end
         @test lgamma(1.4+3.7im) ≈ -3.7094025330996841898 + 2.4568090502768651184im
         @test lgamma(1.4+3.7im) ≈ log(gamma(1.4+3.7im))
         @test lgamma(-4.2+0im) ≈ lgamma(-4.2)-5pi*im
-        @test factorial(3.0) == gamma(4.0) == factorial(3)
+        @test SpecialFunctions.factorial(3.0) == gamma(4.0) == factorial(3)
         for x in (3.2, 2+1im, 3//2, 3.2+0.1im)
-            @test factorial(x) == gamma(1+x)
+            @test SpecialFunctions.factorial(x) == gamma(1+x)
         end
         @test lfactorial(0) == lfactorial(1) == 0
         @test lfactorial(2) == lgamma(3)
