@@ -714,7 +714,7 @@ lbeta(x::Number, w::Number) = lgamma(x)+lgamma(w)-lgamma(x+w)
 function gamma(x::BigFloat)
     isnan(x) && return x
     z = BigFloat()
-    ccall((:mpfr_lgamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_gamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     isnan(z) && throw(DomainError(x, "NaN result for non-NaN input."))
     return z
 end

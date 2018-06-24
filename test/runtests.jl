@@ -520,6 +520,11 @@ end
         @test typeof(SF.erf(a)) == BigFloat
         @test typeof(SF.erfc(a)) == BigFloat
     end
+
+    # issue #101
+    for i in 0:5
+        @test gamma(big(i)) == gamma(i)
+    end
 end
 
 @testset "Base Julia issue #17474" begin
