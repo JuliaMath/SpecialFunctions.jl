@@ -641,3 +641,18 @@ end
 
     @test beta(big(1.0),big(1.2)) ≈ beta(1.0,1.2) rtol=4*eps()
 end
+
+@static if isdefined(Base, :missing)
+    @testset "missing data" begin
+        for f in (digamma, erf, erfc, erfcinv, erfcx, erfi, erfinv, eta, gamma,
+                  invdigamma, lfactorial, lgamma, trigamma)
+            @test f(missing) === missing
+        end
+        for f in (beta, lbeta)
+            @test f(1.0, missing) === missing
+            @test f(missing, 1.0) === missing
+            @test f(missing, missing) === missing
+        end
+        @test polygamma(4, missing) === missing
+    end
+end
