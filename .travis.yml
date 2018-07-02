@@ -12,6 +12,7 @@ before_install:
     fi
 julia:
   - 0.6
+  - 0.7
   - nightly
 env:
   matrix:
