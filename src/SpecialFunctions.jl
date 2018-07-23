@@ -77,4 +77,17 @@ include("sincosint.jl")
 include("gamma.jl")
 include("deprecated.jl")
 
+@static if isdefined(Base, :missing)
+    for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
+              :eta, :gamma, :invdigamma, :lfactorial, :lgamma, :trigamma)
+        @eval $(f)(::Missing) = missing
+    end
+    for f in (:beta, :lbeta)
+        @eval $(f)(::Number, ::Missing) = missing
+        @eval $(f)(::Missing, ::Number) = missing
+        @eval $(f)(::Missing, ::Missing) = missing
+    end
+    polygamma(m::Integer, x::Missing) = missing
+end
+
 end # module

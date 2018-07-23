@@ -520,6 +520,11 @@ end
         @test typeof(SF.erf(a)) == BigFloat
         @test typeof(SF.erfc(a)) == BigFloat
     end
+
+    # issue #101
+    for i in 0:5
+        @test gamma(big(i)) == gamma(i)
+    end
 end
 
 @testset "Base Julia issue #17474" begin
@@ -571,9 +576,9 @@ end
         @test lgamma(1.4+3.7im) ≈ -3.7094025330996841898 + 2.4568090502768651184im
         @test lgamma(1.4+3.7im) ≈ log(gamma(1.4+3.7im))
         @test lgamma(-4.2+0im) ≈ lgamma(-4.2)-5pi*im
-        @test factorial(3.0) == gamma(4.0) == factorial(3)
+        @test SpecialFunctions.factorial(3.0) == gamma(4.0) == factorial(3)
         for x in (3.2, 2+1im, 3//2, 3.2+0.1im)
-            @test factorial(x) == gamma(1+x)
+            @test SpecialFunctions.factorial(x) == gamma(1+x)
         end
         @test lfactorial(0) == lfactorial(1) == 0
         @test lfactorial(2) == lgamma(3)
@@ -647,4 +652,19 @@ end
     @test lbinomial(-6, 10)      ≈ log(binomial(-6, 10))
     @test lbinomial(-6, 11)      ≈ log(abs(binomial(-6, 11)))
     @test lbinomial.(200, 0:200) ≈ log.(binomial.(BigInt(200), (0:200)))
+end
+
+@static if isdefined(Base, :missing)
+    @testset "missing data" begin
+        for f in (digamma, erf, erfc, erfcinv, erfcx, erfi, erfinv, eta, gamma,
+                  invdigamma, lfactorial, lgamma, trigamma)
+            @test f(missing) === missing
+        end
+        for f in (beta, lbeta)
+            @test f(1.0, missing) === missing
+            @test f(missing, 1.0) === missing
+            @test f(missing, missing) === missing
+        end
+        @test polygamma(4, missing) === missing
+    end
 end

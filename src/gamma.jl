@@ -714,7 +714,7 @@ lbeta(x::Number, w::Number) = lgamma(x)+lgamma(w)-lgamma(x+w)
 function gamma(x::BigFloat)
     isnan(x) && return x
     z = BigFloat()
-    ccall((:mpfr_lgamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_gamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     isnan(z) && throw(DomainError(x, "NaN result for non-NaN input."))
     return z
 end
@@ -754,8 +754,13 @@ end
 @inline lgamma(x::Real) = lgamma(float(x))
 
 ## from base/numbers.jl
-# TODO: deprecate instead of doing this type-piracy here?
-Base.factorial(x::Number) = gamma(x + 1) # fallback for x not Integer
+
+# this trickery is needed while the deprecated method in Base exists
+@static if !hasmethod(Base.factorial, Tuple{Number})
+    import Base: factorial
+end
+factorial(x) = Base.factorial(x) # to make SpecialFunctions.factorial work unconditionally
+factorial(x::Number) = gamma(x + 1) # fallback for x not Integer
 
 else # @static if
 
