@@ -48,12 +48,12 @@ if libm == "libopenlibm"
     end
     for f in readdir(joinpath(openlibm_src, "include"))
         cp(joinpath(openlibm_src, "include", f), joinpath(openlibm_include, f),
-           remove_destination=true, follow_symlinks=true)
+           force=true, follow_symlinks=true)
     end
     for f in readdir(joinpath(openlibm_src, "src"))
         if endswith(f, ".h")
             cp(joinpath(openlibm_src, "src", f), joinpath(openlibm_include, f),
-               remove_destination=true, follow_symlinks=true)
+               force=true, follow_symlinks=true)
         end
     end
 else
@@ -79,7 +79,7 @@ elseif Sys.ARCH === :x86_64
     fc *= " -m64"
 end
 
-extra_ld = Sys.is_apple() ? "" : "-Wl,-rpath,'\$\$ORIGIN' -Wl,-z,origin"
+extra_ld = Sys.isapple() ? "" : "-Wl,-rpath,'\$\$ORIGIN' -Wl,-z,origin"
 
 provides(Sources, URI("https://github.com/JuliaLang/openspecfun/archive/v$OSF_VERS.tar.gz"),
          openspecfun, unpacked_dir="openspecfun-$OSF_VERS")
