@@ -44,7 +44,7 @@ libraries.
 | [`lgamma(x)`](@ref SpecialFunctions.lgamma)                                           | accurate `log(gamma(x))` for large `x`                                                                                                                          |
 | [`lfact(x)`](@ref SpecialFunctions.lfact)                                            | accurate `log(factorial(x))` for large `x`; same as `lgamma(x+1)` for `x > 1`, zero otherwise                                                                   |
 | [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
-| [`lbeta(x,y)`](@ref SpecialFunctions.lbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      
+| [`lbeta(x,y)`](@ref SpecialFunctions.lbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 
 ## Installation
 
