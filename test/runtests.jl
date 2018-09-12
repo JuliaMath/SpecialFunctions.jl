@@ -62,6 +62,9 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test SF.erfcx(1.8) ≈ SF.erfcx(big(1.8)) rtol=4*eps()
     @test SF.erfcx(1.8e8) ≈ SF.erfcx(big(1.8e8)) rtol=4*eps()
     @test SF.erfcx(1.8e88) ≈ SF.erfcx(big(1.8e88)) rtol=4*eps()
+
+    @test_throws MethodError erf(big(1.0)*im)
+    @test_throws MethodError erfi(big(1.0))    
 end
 
 @testset "sine and cosine integrals" begin
