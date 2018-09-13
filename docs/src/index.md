@@ -40,6 +40,11 @@ libraries.
 | [`besselix(nu,z)`](@ref SpecialFunctions.besselix)            | scaled modified Bessel function of the first kind of order `nu` at `z`                                                                                          |
 | [`besselk(nu,z)`](@ref SpecialFunctions.besselk)              | modified [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the second kind of order `nu` at `z`                                               |
 | [`besselkx(nu,z)`](@ref SpecialFunctions.besselkx)            | scaled modified Bessel function of the second kind of order `nu` at `z`                                                                                         |
+| [`gamma(x)`](@ref SpecialFunctions.gamma)                                            | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) at `x`                                                                                           |
+| [`lgamma(x)`](@ref SpecialFunctions.lgamma)                                           | accurate `log(gamma(x))` for large `x`                                                                                                                          |
+| [`lfact(x)`](@ref SpecialFunctions.lfact)                                            | accurate `log(factorial(x))` for large `x`; same as `lgamma(x+1)` for `x > 1`, zero otherwise                                                                   |
+| [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
+| [`lbeta(x,y)`](@ref SpecialFunctions.lbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 
 ## Installation
 
