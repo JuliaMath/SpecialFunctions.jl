@@ -111,3 +111,17 @@ provides(BuildProcess,
     end), openspecfun)
 
 BinDeps.@install Dict(:libopenspecfun => :openspecfun)
+
+# BinDeps doesn't give us a `check_deps` function in the generated deps.jl file like
+# BinaryProvider does. Instead, it uses a macro and checks immediately whether the
+# library can be loaded. So let's just fake one.
+depsjl = joinpath(depsdir(openspecfun), "deps.jl")
+@assert isfile(depsjl)
+if !any(line->occursin("check_deps", line), eachline(depsjl))
+    open(depsjl, "a") do fh
+        println(fh, """
+            # NOTE: This function is a compatibility shim for BinaryProvider-based builds
+            check_deps() = nothing
+            """)
+    end
+end
