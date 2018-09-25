@@ -540,8 +540,6 @@ function polygamma(m::Integer, z::Number)
     polygamma(m, x)
 end
 
-@static if VERSION >= v"0.7.0-alpha.69"
-
 export gamma, lgamma, beta, lbeta, lfactorial
 
 ## from base/special/gamma.jl
@@ -761,14 +759,7 @@ end
 end
 factorial(x) = Base.factorial(x) # to make SpecialFunctions.factorial work unconditionally
 factorial(x::Number) = gamma(x + 1) # fallback for x not Integer
-
-else # @static if
-
-import Base: gamma, lgamma, beta, lbeta, lfact
-const lfactorial = lfact
-export lfactorial
-
-end # @static if
+ # @static if
 
 """
     lbinomial(n, k) = log(abs(binomial(n, k)))
