@@ -759,7 +759,6 @@ end
 end
 factorial(x) = Base.factorial(x) # to make SpecialFunctions.factorial work unconditionally
 factorial(x::Number) = gamma(x + 1) # fallback for x not Integer
- # @static if
 
 """
     lbinomial(n, k) = log(abs(binomial(n, k)))
