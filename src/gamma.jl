@@ -402,14 +402,24 @@ function zeta(s::ComplexOrReal{Float64})
         end
         return NaN*zero(s) # NaN + NaN*im
     elseif real(s) < 0.5
-        if abs(real(s)) + abs(imag(s)) < 1e-3 # Taylor series for small |s|
+        absim = abs(imag(s))
+        if abs(real(s)) + absim < 1e-3 # Taylor series for small |s|
             return @evalpoly(s, -0.5,
                              -0.918938533204672741780329736405617639861,
                              -1.0031782279542924256050500133649802190,
                              -1.00078519447704240796017680222772921424,
                              -0.9998792995005711649578008136558752359121)
         end
-        return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * (2π)^s / π
+        if absim > 12 # amplitude of sinpi(s/2) ≈ exp(imag(s)*π/2)
+            # avoid overflow/underflow (issue #128)
+            lg = lgamma(1 - s)
+            ln2pi = 1.83787706640934548356 # log(2pi) to double precision
+            rehalf = real(s)*0.5
+            return zeta(1 - s) * exp(lg + absim*(pi/2) + s*ln2pi) * (0.5/π) *
+                Complex(sinpi(rehalf), copysign(cospi(rehalf), imag(s)))
+        else
+            return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * (2π)^s / π
+        end
     end
 
     m = s - 1
@@ -417,6 +427,7 @@ function zeta(s::ComplexOrReal{Float64})
     # shift using recurrence formula:
     #   n is a semi-empirical cutoff for the Stirling series, based
     #   on the error term ~ (|m|/n)^18 / n^real(m)
+    # FIXME: slow for large imag(s) and small real(s)
     n = ceil(Int,6 + 0.7*abs(imag(s-1))^inv(1 + real(m)*0.05))
     ζ = one(s)
     for ν = 2:n
