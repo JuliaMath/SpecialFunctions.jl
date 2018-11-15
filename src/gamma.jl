@@ -555,8 +555,10 @@ export gamma, lgamma, beta, lbeta, lfactorial
 
 ## from base/special/gamma.jl
 
-gamma(x::Float64) = nan_dom_err(ccall((:tgamma,libm),  Float64, (Float64,), x), x)
-gamma(x::Float32) = nan_dom_err(ccall((:tgammaf,libm),  Float32, (Float32,), x), x)
+gamma(x::Float64) = nan_dom_err(ccall((:tgamma, libm), Float64, (Float64,), x), x)
+gamma(x::Float32) = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x), x)
+gamma(x::Float16) = Float16(gamma(Float32(x)))
+gamma(x::AbstractFloat) = throw(MethodError(gamma, x))
 
 """
     gamma(x)
@@ -760,7 +762,9 @@ end
 
 @inline lgamma(x::Float64) = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
 @inline lgamma(x::Float32) = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
+@inline lgamma(x::Float16) = Float16(lgamma(Float32(x)))
 @inline lgamma(x::Real) = lgamma(float(x))
+lgamma(x::AbstractFloat) = throw(MethodError(lgamma, x))
 
 ## from base/numbers.jl
 
