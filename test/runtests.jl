@@ -63,18 +63,18 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.
-	@test ellipk(0) ≈ 1.570796326794896619231322
-	@test ellipk(0.92) ≈ 2.683551406315229344
-	@test ellipk(0.5) ≈ 1.854074677301371918
-	@test ellipk(0.01) ≈ 1.57474556151735595
-	@test ellipk(0.45) ≈ 1.81388393681698264
+	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
+	@test ellipk(0.92) ≈ 2.683551406315229344 rtol=2*eps()
+	@test ellipk(0.5) ≈ 1.854074677301371918 rtol=2*eps()
+	@test ellipk(0.01) ≈ 1.57474556151735595 rtol=2*eps()
+	@test ellipk(0.45) ≈ 1.81388393681698264 rtol=2*eps()
 	@test ellipk(-0.5) ≈ 1.41573720842595619 rtol=2*eps()
 	@test ellipk(0.75) ≈ 2.15651564749964323 rtol=2*eps()
-	@test ellipe(0) ≈ 1.570796326794896619231322
-	@test ellipe(0.8) ≈ 1.17848992432783852
+	@test ellipe(0) ≈ 1.570796326794896619231322 rtol=2*eps()
+	@test ellipe(0.8) ≈ 1.17848992432783852 rtol=2*eps()
 	@test ellipe(0.5) ≈ 1.3506438810476755 rtol=2*eps()
-	@test ellipe(0.01) ≈ 1.5668619420216682
-	@test ellipe(0.99) ≈ 1.0159935450252239
+	@test ellipe(0.01) ≈ 1.5668619420216682 rtol=2*eps()
+	@test ellipe(0.99) ≈ 1.0159935450252239 rtol=2*eps()
 	@test ellipe(-0.1) ≈ 1.6093590249375295 rtol=2*eps()
 	@test ellipe(0.3) ≈ 1.4453630644126652 rtol=2*eps()
 	@test_throws MethodError ellipk(BigFloat(0.5))
