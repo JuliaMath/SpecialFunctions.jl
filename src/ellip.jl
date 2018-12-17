@@ -9,6 +9,8 @@ using Base.Math: @horner
 #For m<0 , followed  Fukushima, Toshio. (2014). Precise, compact, and fast computation of complete elliptic integrals by piecewise minimax rational function approximation. Journal of Computational and Applied Mathematics. 282. 10.13140/2.1.1946.6245.   
 # Link:  https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
 #Also suggested in this paper that we should consider domain only from (-inf,1].
+#Wiki : https://en.wikipedia.org/wiki/Elliptic_integral 
+#DLMF:  https://dlmf.nist.gov/19
 
 """
    elliptic1(x)
@@ -101,6 +103,8 @@ end
 #For m<0 , followed  Fukushima, Toshio. (2014). Precise, compact, and fast computation of complete elliptic integrals by piecewise minimax rational function approximation. Journal of Computational and Applied Mathematics. 282. 10.13140/2.1.1946.6245.   
 # Link:  https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
 #Also suggested in this paper that we should consider domain only from (-inf,1].
+#Wiki : https://en.wikipedia.org/wiki/Elliptic_integral 
+#DLMF:  https://dlmf.nist.gov/19
 
 """
    elliptic2(x)
