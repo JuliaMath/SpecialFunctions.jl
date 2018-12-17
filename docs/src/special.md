@@ -44,8 +44,8 @@ SpecialFunctions.besseli
 SpecialFunctions.besselix
 SpecialFunctions.besselk
 SpecialFunctions.besselkx
-SpecialFunctions.elliptic1
-SpecialFunctions.elliptic2
+SpecialFunctions.ellipk
+SpecialFunctions.ellipe
 SpecialFunctions.eta
 SpecialFunctions.zeta
 SpecialFunctions.gamma

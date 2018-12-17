@@ -9,15 +9,17 @@ using Base.Math: @horner
 #For m<0 , followed  Fukushima, Toshio. (2014). Precise, compact, and fast computation of complete elliptic integrals by piecewise minimax rational function approximation. Journal of Computational and Applied Mathematics. 282. 10.13140/2.1.1946.6245.   
 # Link:  https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
 #Also suggested in this paper that we should consider domain only from (-inf,1].
-#Wiki : https://en.wikipedia.org/wiki/Elliptic_integral 
-#DLMF:  https://dlmf.nist.gov/19
+
+
 
 """
-   elliptic1(x)
+   ellipk(x)
 
+ DLMF : https://dlmf.nist.gov/19.2#E4  , https://dlmf.nist.gov/19.2#E8 
+ Wiki : https://en.wikipedia.org/wiki/Elliptic_integral 
 Computes Complete Elliptic Integral of 1st kind at `x`-> K(x)--- given by: ``\\int_{0}^{\\pi/2} \\frac{1}{\\sqrt{1 - x(\\sin \\theta )^{2}}} d\\theta`` 
 """
-function elliptic1(a::Float64)
+function ellipk(a::Float64)
     flag = false 
     if a<0.0
         x=a/(a-1)   #dealing with negative args
@@ -103,14 +105,16 @@ end
 #For m<0 , followed  Fukushima, Toshio. (2014). Precise, compact, and fast computation of complete elliptic integrals by piecewise minimax rational function approximation. Journal of Computational and Applied Mathematics. 282. 10.13140/2.1.1946.6245.   
 # Link:  https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
 #Also suggested in this paper that we should consider domain only from (-inf,1].
-#Wiki : https://en.wikipedia.org/wiki/Elliptic_integral 
-#DLMF:  https://dlmf.nist.gov/19
+
 
 """
-   elliptic2(x)
+   ellipe(x)
+
+ DLMF : https://dlmf.nist.gov/19.2#E5  , https://dlmf.nist.gov/19.2#E8 
+ Wiki : https://en.wikipedia.org/wiki/Elliptic_integral
 Computes the Complete Elliptic Integral of 2nd kind at `x` ->E(x)---gven by: ``\\int_{0}^{\\pi/2} \\sqrt{1 - x(\\sin \\theta )^{2}} d\\theta``
 """
-function elliptic2(a::Float64)
+function ellipe(a::Float64)
     flag=false
     if a<0.0
         x=a/(a-1)    #for dealing with negative args
@@ -175,7 +179,7 @@ function elliptic2(a::Float64)
         kdm = @horner(td1 , 1.591003453790792180 , 0.416000743991786912 , 0.245791514264103415  , 0.179481482914906162  , 0.144556057087555150 , 0.123200993312427711,0.108938811574293531 , 0.098853409871592910  ,0.091439629201749751  ,0.085842591595413900  ,0.081541118718303215)
         edm =  @horner(td1  ,+1.550973351780472328  ,-0.400301020103198524  ,-0.078498619442941939  ,-0.034318853117591992,-0.019718043317365499  ,-0.013059507731993309  ,-0.009442372874146547  ,-0.007246728512402157  ,-0.005807424012956090  ,-0.004809187786009338)
         hdm = kdm -edm 
-        km = elliptic1(Float64(x))
+        km = ellipk(Float64(x))
         #em =  km + (pi/2 - km*edm)/kdm 
         em = (pi/2 + km*hdm)/kdm   #to avoid precision loss near 1
         t= em
@@ -188,9 +192,11 @@ function elliptic2(a::Float64)
     end
 end
     
-for f in (:elliptic1,:elliptic2)
+for f in (:ellipk,:ellipe)
     @eval begin
-        ($f)(x::AbstractFloat) = throw(MethodError($f,(x,"")))
+        ($f)(x::Float16) = Float16(($f)(Float64(x)))
+	($f)(x::Float32) = Float32(($f)(Float64(x)))        
         ($f)(x::Real) = ($f)(float(x))
+	($f)(x::AbstractFloat) = throw(MethodError($f,(x,"")))
     end
 end
