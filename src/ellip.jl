@@ -1,23 +1,19 @@
-using Base.Math: @horner, libm
-using Base.MPFR: ROUNDING_MODE
+using Base.Math: @horner
+
+#Using piecewise approximation polynomial as given in
+#'Fast Computation of Complete Elliptic Integrals and Jacobian Elliptic Functions'
+#                          Fukushima, Toshio. (2014). F09-FastEI. Celest Mech Dyn Astr
+#                                                            DOI 10.1007/s10569-009-9228-z
+#Link : https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf
+#
+#For m<0 , followed  Fukushima, Toshio. (2014). Precise, compact, and fast computation of complete elliptic integrals by piecewise minimax rational function approximation. Journal of Computational and Applied Mathematics. 282. 10.13140/2.1.1946.6245.   
+# Link:  https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
+#Also suggested in this paper that we should consider domain only from (-inf,1].
+
 """
-Computes Complete Elliptic function of 1st kind.------- K(m)  ; 
+   elliptic1(x)
 
-Principal domain : 0<=m<=1
-
-Integral: from 0 to pi/2  1
-                        -----------------------    d(theta)
-                        (1-m*(sin theta)^2)^1/2 
-
-Using piecewise approximation polynomial as given in
-
-'Fast Computation of Complete Elliptic Integrals and
-Jacobian Elliptic Functions'
-                              by Toshio Fukushima
-Link : https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf
-
-For m<0 , followed: https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
-Also suggested in this paper that we should consider domain only from (-inf,1].
+Computes Complete Elliptic Integral of 1st kind at `x`-> K(x)--- given by: ``\\int_{0}^{\\pi/2} \\frac{1}{\\sqrt{1 - x(\\sin \\theta )^{2}}} d\\theta`` 
 """
 function elliptic1(a::Float64)
     flag = false 
@@ -92,29 +88,24 @@ function elliptic1(a::Float64)
         ans = t / sqrt(1.0-a)
         return ans
     end
-        
-        
 end
  
+
+
+#Using piecewise approximation polynomial as given in
+#'Fast Computation of Complete Elliptic Integrals and Jacobian Elliptic Functions'
+#                          Fukushima, Toshio. (2014). F09-FastEI. Celest Mech Dyn Astr
+#                                                            DOI 10.1007/s10569-009-9228-z
+#Link : https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf
+#
+#For m<0 , followed  Fukushima, Toshio. (2014). Precise, compact, and fast computation of complete elliptic integrals by piecewise minimax rational function approximation. Journal of Computational and Applied Mathematics. 282. 10.13140/2.1.1946.6245.   
+# Link:  https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
+#Also suggested in this paper that we should consider domain only from (-inf,1].
+
 """
-Computes Complete Elliptic function of 2nd kind ------ E(m)
-
-Principal domain: 0<=m<=1
-
-Integral: from 0 to pi/2:  (1 - m* (sin  theta)^2)^1/2  d(theta)   = E(m)
-
-
-Using piecewise approximation polynomial as given in
-
-'Fast Computation of Complete Elliptic Integrals and
-Jacobian Elliptic Functions'
-                              by Toshio Fukushima
-Link : https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf
-
-For m<0 , followed: https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
-Also suggested in this paper that we should consider domain only from (-inf,1].
+   elliptic2(x)
+Computes the Complete Elliptic Integral of 2nd kind at `x` ->E(x)---gven by: ``\\int_{0}^{\\pi/2} \\sqrt{1 - x(\\sin \\theta )^{2}} d\\theta``
 """
-
 function elliptic2(a::Float64)
     flag=false
     if a<0.0
@@ -181,7 +172,7 @@ function elliptic2(a::Float64)
         edm =  @horner(td1  ,+1.550973351780472328  ,-0.400301020103198524  ,-0.078498619442941939  ,-0.034318853117591992,-0.019718043317365499  ,-0.013059507731993309  ,-0.009442372874146547  ,-0.007246728512402157  ,-0.005807424012956090  ,-0.004809187786009338)
         hdm = kdm -edm 
         km = elliptic1(Float64(x))
-        #em =  km + (pi/2 - km*edm)/kdm
+        #em =  km + (pi/2 - km*edm)/kdm 
         em = (pi/2 + km*hdm)/kdm   #to avoid precision loss near 1
         t= em
     end
@@ -195,16 +186,7 @@ end
     
 for f in (:elliptic1,:elliptic2)
     @eval begin
-        ($f)(x::Float32) = Float32($f(Float64(x)))
+        ($f)(x::AbstractFloat) = throw(MethodError($f,(x,"")))
         ($f)(x::Real) = ($f)(float(x))
-        ($f)(a::Float16) = Float16($f(Float32(a)))
-        ($f)(a::Integer) = ($f(Float64(a)))
-        #($f)(a::Complex{Float64}) = throw(DomainError(a,"Currently , only (-inf,1] domain is supported"))
     end
 end
-        
-        
-        
-    
-    
-    
