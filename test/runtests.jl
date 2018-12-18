@@ -70,6 +70,17 @@ end
 	@test ellipk(0.45) ≈ 1.81388393681698264 rtol=2*eps()
 	@test ellipk(-0.5) ≈ 1.41573720842595619 rtol=2*eps()
 	@test ellipk(0.75) ≈ 2.15651564749964323 rtol=2*eps()
+	@test ellipk(0.15) ≈ 1.635256732264579 rtol=2*eps()
+	@test ellipk(0.25) ≈ 1.685750354812596 rtol=2*eps()
+	@test ellipk(0.69) ≈ 2.0608816467301313 rtol=2*eps()
+	@test ellipk(0.84) ≈ 2.3592635547450067 rtol=2*eps()
+	@test ellipk(Float32(0.899)) ≈ 2.573411 rtol=2*eps()
+	@test ellipe(0.15) ≈ 1.5101218320928197 rtol=2*eps()
+	@test ellipe(0.21) ≈ 1.4847605813318776 rtol=2*eps()
+	@test ellipe(0.42) ≈ 1.3898829914929717 rtol=2*eps()
+	@test ellipe(0.66) ≈ 1.2650125751607508 rtol=2*eps()
+	@test ellipe(0.76) ≈ 1.2047136418292115 rtol=2*eps()
+	@test ellipe(0.865) ≈ 1.1322436887003925 rtol=2*eps()
 	@test ellipe(0) ≈ 1.570796326794896619231322 rtol=2*eps()
 	@test ellipe(0.8) ≈ 1.17848992432783852 rtol=2*eps()
 	@test ellipe(0.5) ≈ 1.3506438810476755 rtol=2*eps()
@@ -77,8 +88,11 @@ end
 	@test ellipe(0.99) ≈ 1.0159935450252239 rtol=2*eps()
 	@test ellipe(-0.1) ≈ 1.6093590249375295 rtol=2*eps()
 	@test ellipe(0.3) ≈ 1.4453630644126652 rtol=2*eps()
+	@test ellipe(1.0) ≈ 1.00
+	@test ellipk(1.0)==Inf
 	@test_throws MethodError ellipk(BigFloat(0.5))
 	@test_throws MethodError ellipe(BigFloat(-1))
+	@test_throws DomainError ellipe(Float16(2.0))
 end    
 @testset "sine and cosine integrals" begin
     # Computed via wolframalpha.com: SinIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]] and CosIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]]
