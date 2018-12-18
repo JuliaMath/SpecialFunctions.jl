@@ -337,7 +337,7 @@ end
 
 besselj(nu::Cint, x::Float64) = ccall((:jn, libm), Float64, (Cint, Float64), nu, x)
 besselj(nu::Cint, x::Float32) = ccall((:jnf, libm), Float32, (Cint, Float32), nu, x)
-
+besselj(nu::Cint, x::Float16) = besselj(nu, Float32(x))
 
 function besseljx(nu::Float64, z::Complex{Float64})
     if nu < 0
@@ -366,6 +366,12 @@ function bessely(nu::Cint, x::Float32)
         throw(DomainError(x, "`x` must be nonnegative."))
     end
     ccall((:ynf, libm), Float32, (Cint, Float32), nu, x)
+end
+function bessely(nu::Cint, x::Float16)
+    if x < 0
+        throw(DomainError(x, "`x` must be nonnegative."))
+    end
+    bessely(nu, Float32(x))
 end
 
 function bessely(nu::Float64, z::Complex{Float64})
