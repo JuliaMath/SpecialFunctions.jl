@@ -35,6 +35,8 @@ export
     bessely1,
     besselyx,
     dawson,
+    ellipk,
+    ellipe,
     erf,
     erfc,
     erfcinv,
@@ -57,12 +59,13 @@ export
 
 include("bessel.jl")
 include("erf.jl")
+include("ellip.jl")
 include("sincosint.jl")
 include("gamma.jl")
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
-          :eta, :gamma, :invdigamma, :lfactorial, :lgamma, :trigamma)
+          :eta, :gamma, :invdigamma, :lfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end
 for f in (:beta, :lbeta)
