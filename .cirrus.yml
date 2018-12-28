@@ -2,9 +2,14 @@ freebsd_instance:
   image: freebsd-12-0-release-amd64
 freebsd_test_task:
   env:
-    JULIA_VERSION: "1.0"
+    matrix:
+      - JULIA_SPECIALFUNCTIONS_BUILD_SOURCE: "false"
+        JULIA_VERSION: "1.0"
+      - JULIA_SPECIALFUNCTIONS_BUILD_SOURCE: "true"
+        JULIA_VERSION: "1.0"
   install_script:
     - pkg install -y curl
+    - if [ "${JULIA_SPECIALFUNCTIONS_BUILD_SOURCE}" = "true" ]; then pkg install -y gmake gcc; fi
     - mkdir -p ~/julia
     - curl -s -L --retry 7 "https://julialang-s3.julialang.org/bin/freebsd/x64/${JULIA_VERSION}/julia-${JULIA_VERSION}-latest-freebsd-x86_64.tar.gz" | tar -C ~/julia -x -z --strip-components=1 -f -
     - ln -s "${HOME}/julia/bin/julia" /usr/local/bin/julia
