@@ -751,11 +751,8 @@ end
 ## from base/combinatorics.jl'
 
 function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64,Int128,UInt128})
-    n < 0 && throw(DomainError(n, "`n` must not be negative."))
-    n == 0 && return Inf
-    n <= 2 && return 1.0
     n > 20 && return gamma(Float64(n))
-    return Float64(Base.factorial(n-1))
+    return Float64(Base.factorial(Int64(n-1)))
 end
 
 ## from base/math.jl
