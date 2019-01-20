@@ -748,7 +748,7 @@ if Base.MPFR.version() >= v"4.0.0"
     end
 end
 
-const _shifted_gamma_fact_table = gamma.(collect(1.0:171.0))
+const _shifted_gamma_fact_table = [Inf; gamma.(collect(1.0:171.0))]
 
 function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64,Int128,UInt128})
     if !(0 <= n <= 171) 
