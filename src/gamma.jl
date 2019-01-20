@@ -748,11 +748,15 @@ if Base.MPFR.version() >= v"4.0.0"
     end
 end
 
-## originally from base/combinatorics.jl (and now optimized and changed to handle upcoming change in Julia)
+const _shifted_gamma_fact_table = [gamma.(collect(1.0:171.0))]
 
 function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64,Int128,UInt128})
-    1 <= n <= 21 && return Float64(factorial(n-1))
-    return gamma(Float64(n))
+    if !(0 <= n <= 171) 
+        0 <= n && return Inf
+    else
+        return @inbounds _shifted_gamma_fact_table[(n+1)]
+    end
+    throw(DomainError(n, "`n` must not be negative."))
 end
 
 ## from base/math.jl
