@@ -751,7 +751,7 @@ end
 ## originally from base/combinatorics.jl (and now optimized and changed to handle upcoming change in Julia)
 
 function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64,Int128,UInt128})
-    1 <= n <= 21 && return Float64(factorial(Int64(n-1)))
+    1 <= n <= 21 && return Float64(factorial(n-1))
     return gamma(Float64(n))
 end
 
