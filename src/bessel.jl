@@ -131,8 +131,8 @@ for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
             :airyaix, :airyaiprimex, :airybix, :airybiprimex)
     @eval begin
         $afn(z::Complex) = $afn(float(z))
-	$afn(z::Complex{Float16}) = Complex{Float16}($afn(Complex{Float32}(z)))        
-        $afn(z::Complex{Float32}) = Complex{Float32}($afn(Complex{Float64}(z)))
+	$afn(z::Complex{Float16}) = Complex{Float16}($afn(Complex{Float32}(z)))
+	$afn(z::Complex{Float32}) = Complex{Float32}($afn(Complex{Float64}(z)))
 	$afn(z::Complex{<:AbstractFloat}) = throw(MethodError($afn,(z,)))
     end
     if afn in (:airyaix, :airyaiprimex)
