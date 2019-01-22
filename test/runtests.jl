@@ -172,7 +172,7 @@ end
     @testset "$z, $o" for (z, o, f) in bessel_funcs
         @test z(Float32(2.0)) ≈ z(Float64(2.0))
         @test o(Float32(2.0)) ≈ o(Float64(2.0))
-	@test z(Float16(2.0)) ≈ z(Float64(2.0))
+        @test z(Float16(2.0)) ≈ z(Float64(2.0))
         @test o(Float16(2.0)) ≈ o(Float64(2.0))
         @test z(2) ≈ z(2.0)
         @test o(2) ≈ o(2.0)
@@ -189,8 +189,8 @@ end
         true_h133 = 0.30906272225525164362 - 0.53854161610503161800im
         @test besselh(3,1,3) ≈ true_h133
         @test besselh(-3,1,3) ≈ -true_h133
-	@test besselh(Float32(3),1,Float32(3)) ≈ true_h133	
-	@test besselh(Float16(3),1,Float16(3)) ≈ true_h133
+        @test besselh(Float32(3),1,Float32(3)) ≈ true_h133	
+        @test besselh(Float16(3),1,Float16(3)) ≈ true_h133
         @test besselh(3,2,3) ≈ conj(true_h133)
         @test besselh(-3,2,3) ≈ -conj(true_h133)
         @testset "Error throwing" begin
@@ -208,7 +208,7 @@ end
         @test besseli(3,-3) ≈ -true_i33
         @test besseli(-3,-3) ≈ -true_i33
         @test besseli(Float32(-3),Complex{Float32}(-3,0)) ≈ -true_i33
-	@test besseli(Float16(-3),Complex{Float16}(-3,0)) ≈ -true_i33
+        @test besseli(Float16(-3),Complex{Float16}(-3,0)) ≈ -true_i33
         true_im3p1_3 = 0.84371226532586351965
         @test besseli(-3.1,3) ≈ true_im3p1_3
         for i in [-5 -3 -1 1 3 5]
@@ -264,7 +264,7 @@ end
 
         true_jm3p1_3 = -0.45024252862270713882
         @test besselj(-3.1,3) ≈ true_jm3p1_3
-	@test besselj(Float16(-3.1),Float16(3)) ≈ true_jm3p1_3
+        @test besselj(Float16(-3.1),Float16(3)) ≈ true_jm3p1_3
 
         @testset "Error throwing" begin
             @test_throws DomainError    besselj(0.1, -0.4)
@@ -276,8 +276,8 @@ end
     @testset "besselk" begin
         true_k33 = 0.12217037575718356792
         @test besselk(3,3) ≈ true_k33
-	@test besselk(Float32(3),Float32(3)) ≈ true_k33
-	@test besselk(Float16(3),Float16(3)) ≈ true_k33
+        @test besselk(Float32(3),Float32(3)) ≈ true_k33
+        @test besselk(Float16(3),Float16(3)) ≈ true_k33
         @test besselk(-3,3) ≈ true_k33
         true_k3m3 = -0.1221703757571835679 - 3.0151549516807985776im
         @test besselk(3,complex(-3)) ≈ true_k3m3
