@@ -611,6 +611,9 @@ end
 end
 
 @test sprint(showerror, AmosException(1)) == "AmosException with id 1: input error."
+# Used to check method existence below
+struct NotAFloat <: AbstractFloat
+end
 
 @testset "gamma and friends" begin
     @testset "gamma, lgamma (complex argument)" begin
@@ -674,6 +677,16 @@ end
         @test lgamma(Inf*im) === -Inf + Inf*im
         @test lgamma(-Inf*im) === -Inf - Inf*im
         @test lgamma(Inf + Inf*im) === lgamma(NaN + 0im) === lgamma(NaN*im) === NaN + NaN*im
+    end
+    @testset "Other float types" begin
+        let x = one(Float16)
+            @test gamma(x) ≈ one(Float16)
+            @test gamma(x) isa Float16
+            @test lgamma(x) ≈ zero(Float16)
+            @test lgamma(x) isa Float16
+        end
+        @test_throws MethodError gamma(NotAFloat())
+        @test_throws MethodError lgamma(NotAFloat())
     end
 end
 
