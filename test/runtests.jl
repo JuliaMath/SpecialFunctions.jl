@@ -61,39 +61,7 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test_throws MethodError erf(big(1.0)*im)
     @test_throws MethodError erfi(big(1.0))
 end
-@testset "elliptic integrals" begin
-#Computed using Wolframalpha EllipticK and EllipticE functions.
-	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipk(0.92) ≈ 2.683551406315229344 rtol=2*eps()
-	@test ellipk(0.5) ≈ 1.854074677301371918 rtol=2*eps()
-	@test ellipk(0.01) ≈ 1.57474556151735595 rtol=2*eps()
-	@test ellipk(0.45) ≈ 1.81388393681698264 rtol=2*eps()
-	@test ellipk(-0.5) ≈ 1.41573720842595619 rtol=2*eps()
-	@test ellipk(0.75) ≈ 2.15651564749964323 rtol=2*eps()
-	@test ellipk(0.17) ≈ 1.6448064907988806 rtol=2*eps()
-	@test ellipk(0.25) ≈ 1.685750354812596 rtol=2*eps()
-	@test ellipk(0.69) ≈ 2.0608816467301313 rtol=2*eps()
-	@test ellipk(0.84) ≈ 2.3592635547450067 rtol=2*eps()
-	@test ellipe(0.15) ≈ 1.5101218320928197 rtol=2*eps()
-	@test ellipe(0.21) ≈ 1.4847605813318776 rtol=2*eps()
-	@test ellipe(0.42) ≈ 1.3898829914929717 rtol=2*eps()
-	@test ellipe(0.66) ≈ 1.2650125751607508 rtol=2*eps()
-	@test ellipe(0.76) ≈ 1.2047136418292115 rtol=2*eps()
-	@test ellipe(0.865) ≈ 1.1322436887003925 rtol=2*eps()
-	@test ellipe(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipe(0.8) ≈ 1.17848992432783852 rtol=2*eps()
-	@test ellipe(0.5) ≈ 1.3506438810476755 rtol=2*eps()
-	@test ellipe(0.01) ≈ 1.5668619420216682 rtol=2*eps()
-	@test ellipe(0.99) ≈ 1.0159935450252239 rtol=2*eps()
-	@test ellipe(-0.1) ≈ 1.6093590249375295 rtol=2*eps()
-	@test ellipe(0.3) ≈ 1.4453630644126652 rtol=2*eps()
-	@test ellipe(1.0) ≈ 1.00
-	@test ellipk(1.0)==Inf
-	@test_throws MethodError ellipk(BigFloat(0.5))
-	@test_throws MethodError ellipe(BigFloat(-1))
-	@test_throws DomainError ellipe(Float16(2.0))
-	@test_throws DomainError ellipe(Float32(2.5))
-end    
+
 @testset "sine and cosine integrals" begin
     # Computed via wolframalpha.com: SinIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]] and CosIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]]
     sinintvals = [0.9460830703671830149, 1.605412976802694849, 1.848652527999468256, 1.75820313894905306, 1.54993124494467414, 1.4246875512805065, 1.4545966142480936, 1.5741868217069421, 1.665040075829602, 1.658347594218874, 1.578306806945727416, 1.504971241526373371, 1.499361722862824564, 1.556211050077665054, 1.618194443708368739, 1.631302268270032886, 1.590136415870701122, 1.536608096861185462, 1.518630031769363932, 1.548241701043439840]
@@ -135,13 +103,13 @@ end
     @test_throws AmosException airyai(200im)
     @test_throws AmosException airybi(200)
 
-    for T in [Float32, Float64, Complex{Float32},Complex{Float64}]
+    for T in [Float16, Float32, Float64,Complex{Float16}, Complex{Float32},Complex{Float64}]
         @test airyai(T(1.8)) ≈ 0.0470362168668458052247
         @test airyaiprime(T(1.8)) ≈ -0.0685247801186109345638
         @test airybi(T(1.8)) ≈ 2.595869356743906290060
         @test airybiprime(T(1.8)) ≈ 2.98554005084659907283
     end
-    for T in [Complex{Float32}, Complex{Float64}]
+    for T in [Complex{Float16}, Complex{Float32}, Complex{Float64}]
         z = convert(T,1.8 + 1.0im)
         @test airyaix(z) ≈ airyai(z) * exp(2/3 * z * sqrt(z))
         @test airyaiprimex(z) ≈ airyaiprime(z) * exp(2/3 * z * sqrt(z))
@@ -172,6 +140,8 @@ end
     @testset "$z, $o" for (z, o, f) in bessel_funcs
         @test z(Float32(2.0)) ≈ z(Float64(2.0))
         @test o(Float32(2.0)) ≈ o(Float64(2.0))
+	@test z(Float16(2.0)) ≈ z(Float64(2.0))
+        @test o(Float16(2.0)) ≈ o(Float64(2.0))
         @test z(2) ≈ z(2.0)
         @test o(2) ≈ o(2.0)
         @test z(2.0 + im) ≈ f(0, 2.0 + im)
@@ -187,6 +157,8 @@ end
         true_h133 = 0.30906272225525164362 - 0.53854161610503161800im
         @test besselh(3,1,3) ≈ true_h133
         @test besselh(-3,1,3) ≈ -true_h133
+	@test besselh(Float32(3),1,Float32(3)) ≈ true_h133	
+	@test besselh(Float16(3),1,Float16(3)) ≈ true_h133
         @test besselh(3,2,3) ≈ conj(true_h133)
         @test besselh(-3,2,3) ≈ -conj(true_h133)
         @testset "Error throwing" begin
@@ -204,12 +176,15 @@ end
         @test besseli(3,-3) ≈ -true_i33
         @test besseli(-3,-3) ≈ -true_i33
         @test besseli(Float32(-3),Complex{Float32}(-3,0)) ≈ -true_i33
+	@test besseli(Float16(-3),Complex{Float16}(-3,0)) ≈ -true_i33
         true_im3p1_3 = 0.84371226532586351965
         @test besseli(-3.1,3) ≈ true_im3p1_3
         for i in [-5 -3 -1 1 3 5]
             @test besseli(i,0) == 0.0
             @test besseli(i,Float32(0)) == 0
             @test besseli(i,Complex{Float32}(0)) == 0
+            @test besseli(i,Float16(0)) == 0
+            @test besseli(i,Complex{Float16}(0)) == 0
         end
         @testset "Error throwing" begin
             @test_throws AmosException besseli(1,1000)
@@ -225,7 +200,7 @@ end
         for i in [-5 -3 -1 1 3 5]
             @test besselj(i,0) == 0
             @test besselj(i,Float32(0)) == 0
-            @test besselj(i,Complex{Float32}(0)) == 0
+            @test besselj(i,Complex{Float32}(0)) == 0.0
         end
 
         j33 = besselj(3,3.)
@@ -257,6 +232,7 @@ end
 
         true_jm3p1_3 = -0.45024252862270713882
         @test besselj(-3.1,3) ≈ true_jm3p1_3
+	@test besselj(Float16(-3.1),Float16(3)) ≈ true_jm3p1_3
 
         @testset "Error throwing" begin
             @test_throws DomainError    besselj(0.1, -0.4)
@@ -268,6 +244,8 @@ end
     @testset "besselk" begin
         true_k33 = 0.12217037575718356792
         @test besselk(3,3) ≈ true_k33
+	@test besselk(Float32(3),Float32(3)) ≈ true_k33
+	@test besselk(Float16(3),Float16(3)) ≈ true_k33
         @test besselk(-3,3) ≈ true_k33
         true_k3m3 = -0.1221703757571835679 - 3.0151549516807985776im
         @test besselk(3,complex(-3)) ≈ true_k3m3
@@ -311,7 +289,7 @@ end
     end
 
     @testset "besselhx" begin
-        for elty in [Complex{Float32},Complex{Float64}]
+        for elty in [Complex{Float16},Complex{Float32},Complex{Float64}]
             z = convert(elty, 1.0 + 1.9im)
             @test besselhx(1.0, 1, z) ≈ convert(elty,-0.5949634147786144 - 0.18451272807835967im)
             @test besselhx(Float32(1.0), 1, z) ≈ convert(elty,-0.5949634147786144 - 0.18451272807835967im)
@@ -341,6 +319,10 @@ end
             @test besselix(i,Float32(0)) == 0
             @test besseljx(i,Complex{Float32}(0)) == 0
             @test besselix(i,Complex{Float32}(0)) == 0
+            @test besseljx(i,Float16(0)) == 0
+            @test besselix(i,Float16(0)) == 0
+            @test besseljx(i,Complex{Float16}(0)) == 0
+            @test besselix(i,Complex{Float16}(0)) == 0
         end
         @testset "Error throwing" begin
             @test_throws AmosException hankelh1x(1, 0)
@@ -358,6 +340,7 @@ end
         @testset "$f" for f in (besselj,bessely,besseli,besselk,hankelh1,hankelh2)
             @test f(0,1) ≈ f(0,Complex{Float64}(1))
             @test f(0,1) ≈ f(0,Complex{Float32}(1))
+            @test f(0,1) ≈ f(0,Complex{Float16}(1))
         end
     end
 end
@@ -597,10 +580,6 @@ end
 
 @test sprint(showerror, AmosException(1)) == "AmosException with id 1: input error."
 
-# Used to check method existence below
-struct NotAFloat <: AbstractFloat
-end
-
 @testset "gamma and friends" begin
     @testset "gamma, lgamma (complex argument)" begin
         if Base.Math.libm == "libopenlibm"
@@ -663,17 +642,6 @@ end
         @test lgamma(Inf*im) === -Inf + Inf*im
         @test lgamma(-Inf*im) === -Inf - Inf*im
         @test lgamma(Inf + Inf*im) === lgamma(NaN + 0im) === lgamma(NaN*im) === NaN + NaN*im
-    end
-
-    @testset "Other float types" begin
-        let x = one(Float16)
-            @test gamma(x) ≈ one(Float16)
-            @test gamma(x) isa Float16
-            @test lgamma(x) ≈ zero(Float16)
-            @test lgamma(x) isa Float16
-        end
-        @test_throws MethodError gamma(NotAFloat())
-        @test_throws MethodError lgamma(NotAFloat())
     end
 end
 

@@ -131,8 +131,9 @@ for afn in (:airyai, :airyaiprime, :airybi, :airybiprime,
             :airyaix, :airyaiprimex, :airybix, :airybiprimex)
     @eval begin
         $afn(z::Complex) = $afn(float(z))
-        $afn(z::Complex{<:AbstractFloat}) = throw(MethodError($afn,(z,)))
+	$afn(z::Complex{Float16}) = Complex{Float16}($afn(Complex{Float32}(z)))        
         $afn(z::Complex{Float32}) = Complex{Float32}($afn(Complex{Float64}(z)))
+	$afn(z::Complex{<:AbstractFloat}) = throw(MethodError($afn,(z,)))
     end
     if afn in (:airyaix, :airyaiprimex)
         @eval $afn(x::Real) = x < 0 ? throw(DomainError(x, "`x` must be nonnegative.")) : real($afn(complex(float(x))))
@@ -158,11 +159,13 @@ for jy in ("j","y"), nu in (0,1)
         @eval begin
             $bjynu(x::Float64) = nan_dom_err(ccall(($jynu,libm),  Float64, (Float64,), x), x)
             $bjynu(x::Float32) = nan_dom_err(ccall(($jynuf,libm), Float32, (Float32,), x), x)
+	    $bjynu(x::Float16) = Float16($bjynu(Float32(x)))
         end
     else
         @eval begin
             $bjynu(x::Float64) = ccall(($jynu,libm),  Float64, (Float64,), x)
             $bjynu(x::Float32) = ccall(($jynuf,libm), Float32, (Float32,), x)
+	    $bjynu(x::Float16) = Float16($bjynu(Float32(x)))
         end
     end
     @eval begin
@@ -499,8 +502,9 @@ for f in ("i", "ix", "j", "jx", "k", "kx", "y", "yx")
             Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
             $bfn(Tf(nu), Complex{Tf}(z))
         end
-        $bfn(k::T, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(k,z)))
-        $bfn(nu::Float32, x::Complex{Float32}) = Complex{Float32}($bfn(Float64(nu), Complex{Float64}(x)))
+	$bfn(nu::Float16, x::Complex{Float16}) = Complex{Float16}($bfn(Float32(nu), Complex{Float32}(x)))        
+	$bfn(nu::Float32, x::Complex{Float32}) = Complex{Float32}($bfn(Float64(nu), Complex{Float64}(x)))
+	$bfn(k::T, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(k,z)))
     end
 end
 
@@ -515,9 +519,9 @@ for bfn in (:besselh, :besselhx)
             Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
             $bfn(Tf(nu), k, Complex{Tf}(z))
         end
-
-        $bfn(nu::T, k::Integer, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(nu,k,z)))
+	$bfn(nu::Float16, k::Integer, x::Complex{Float16}) = Complex{Float16}($bfn(Float32(nu), k, Complex{Float32}(x)))
         $bfn(nu::Float32, k::Integer, x::Complex{Float32}) = Complex{Float32}($bfn(Float64(nu), k, Complex{Float64}(x)))
+	$bfn(nu::T, k::Integer, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(nu,k,z)))
     end
 end
 
