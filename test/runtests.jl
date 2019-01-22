@@ -61,7 +61,39 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test_throws MethodError erf(big(1.0)*im)
     @test_throws MethodError erfi(big(1.0))
 end
-
+@testset "elliptic integrals" begin
+#Computed using Wolframalpha EllipticK and EllipticE functions.
+	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
+	@test ellipk(0.92) ≈ 2.683551406315229344 rtol=2*eps()
+	@test ellipk(0.5) ≈ 1.854074677301371918 rtol=2*eps()
+	@test ellipk(0.01) ≈ 1.57474556151735595 rtol=2*eps()
+	@test ellipk(0.45) ≈ 1.81388393681698264 rtol=2*eps()
+	@test ellipk(-0.5) ≈ 1.41573720842595619 rtol=2*eps()
+	@test ellipk(0.75) ≈ 2.15651564749964323 rtol=2*eps()
+	@test ellipk(0.17) ≈ 1.6448064907988806 rtol=2*eps()
+	@test ellipk(0.25) ≈ 1.685750354812596 rtol=2*eps()
+	@test ellipk(0.69) ≈ 2.0608816467301313 rtol=2*eps()
+	@test ellipk(0.84) ≈ 2.3592635547450067 rtol=2*eps()
+	@test ellipe(0.15) ≈ 1.5101218320928197 rtol=2*eps()
+	@test ellipe(0.21) ≈ 1.4847605813318776 rtol=2*eps()
+	@test ellipe(0.42) ≈ 1.3898829914929717 rtol=2*eps()
+	@test ellipe(0.66) ≈ 1.2650125751607508 rtol=2*eps()
+	@test ellipe(0.76) ≈ 1.2047136418292115 rtol=2*eps()
+	@test ellipe(0.865) ≈ 1.1322436887003925 rtol=2*eps()
+	@test ellipe(0) ≈ 1.570796326794896619231322 rtol=2*eps()
+	@test ellipe(0.8) ≈ 1.17848992432783852 rtol=2*eps()
+	@test ellipe(0.5) ≈ 1.3506438810476755 rtol=2*eps()
+	@test ellipe(0.01) ≈ 1.5668619420216682 rtol=2*eps()
+	@test ellipe(0.99) ≈ 1.0159935450252239 rtol=2*eps()
+	@test ellipe(-0.1) ≈ 1.6093590249375295 rtol=2*eps()
+	@test ellipe(0.3) ≈ 1.4453630644126652 rtol=2*eps()
+	@test ellipe(1.0) ≈ 1.00
+	@test ellipk(1.0)==Inf
+	@test_throws MethodError ellipk(BigFloat(0.5))
+	@test_throws MethodError ellipe(BigFloat(-1))
+	@test_throws DomainError ellipe(Float16(2.0))
+	@test_throws DomainError ellipe(Float32(2.5))
+end 
 @testset "sine and cosine integrals" begin
     # Computed via wolframalpha.com: SinIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]] and CosIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]]
     sinintvals = [0.9460830703671830149, 1.605412976802694849, 1.848652527999468256, 1.75820313894905306, 1.54993124494467414, 1.4246875512805065, 1.4545966142480936, 1.5741868217069421, 1.665040075829602, 1.658347594218874, 1.578306806945727416, 1.504971241526373371, 1.499361722862824564, 1.556211050077665054, 1.618194443708368739, 1.631302268270032886, 1.590136415870701122, 1.536608096861185462, 1.518630031769363932, 1.548241701043439840]
