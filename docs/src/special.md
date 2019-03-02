@@ -50,6 +50,8 @@ SpecialFunctions.eta
 SpecialFunctions.zeta
 SpecialFunctions.gamma
 SpecialFunctions.lgamma
+SpecialFunctions.gamma_p
+SpecialFunctions.gamma_q
 SpecialFunctions.lfact
 SpecialFunctions.beta
 SpecialFunctions.lbeta

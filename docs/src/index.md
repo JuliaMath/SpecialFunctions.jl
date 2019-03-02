@@ -19,6 +19,8 @@ libraries.
 | [`invdigamma(x)`](@ref SpecialFunctions.invdigamma)   | [invdigamma function](http://bariskurt.com/calculating-the-inverse-of-digamma-function/) (i.e. inverse of `digamma` function at `x` using fixed-point iteration algorithm) |
 | [`trigamma(x)`](@ref SpecialFunctions.trigamma)     | [trigamma function](https://en.wikipedia.org/wiki/Trigamma_function) (i.e the logarithmic second derivative of `gamma` at `x`) |
 | [`polygamma(m,x)`](@ref SpecialFunctions.polygamma)  | [polygamma function](https://en.wikipedia.org/wiki/Polygamma_function) (i.e the (m+1)-th derivative of the `lgamma` function at `x`) |
+| [`gamma_p(a,x,IND)`](@ref SpecialFunctions.gamma_p)  | [incomplete gamma function ratio P(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates P(a,x) for accuracy specified by IND) |
+| [`gamma_q(a,x,IND)`](@ref SpecialFunctions.gamma_q)  | [incomplete gamma function ratio Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates Q(a,x)=1-P(a,x) for accuracy specified by IND) |
 | [`ellipk(x)`](@ref SpecialFunctions.ellipk)    | [complete elliptic integral of 1st kind](https://en.wikipedia.org/wiki/Elliptic_integral) (i.e evaluates complete elliptic integral of 1st kind at `x`)  |
 | [`ellipe(x)`](@ref SpecialFunctions.ellipe)    | [complete elliptic integral of 2nd kind](https://en.wikipedia.org/wiki/Elliptic_integral) (i.e evaluates complete elliptic integral of 2nd kind at `x`)  |
 | [`eta(x)`](@ref SpecialFunctions.eta)                         | [Dirichlet eta function](https://en.wikipedia.org/wiki/Dirichlet_eta_function) at `x`                                                                           |
