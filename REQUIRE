@@ -1,3 +1,4 @@
 julia 0.7
 BinaryProvider 0.5
 BinDeps
+StatsFuns
