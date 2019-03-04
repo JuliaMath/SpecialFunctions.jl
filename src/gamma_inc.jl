@@ -1,5 +1,4 @@
 using Base.Math: @horner
-using StatsFuns
 #useful constants
 const acc0 = [5.0e-15 , 5.0e-7 , 5.0e-4] #accuracy options
 const big1 = [25.0 , 14.0, 10.0]
@@ -49,6 +48,42 @@ d60 = .531307936463992E-03
 d6=[-.592166437353694E-03]
 d70 = .344367606892378E-03
 d80 = -.652623918595309E-03
+
+# The kernel of log1pmx
+# Accuracy within ~2ulps for -0.227 < x < 0.315
+function _log1pmx_ker(x::Float64)
+    r = x/(x+2.0)
+    t = r*r
+    w = @horner(t,
+                6.66666666666666667e-1, # 2/3
+                4.00000000000000000e-1, # 2/5
+                2.85714285714285714e-1, # 2/7
+                2.22222222222222222e-1, # 2/9
+                1.81818181818181818e-1, # 2/11
+                1.53846153846153846e-1, # 2/13
+                1.33333333333333333e-1, # 2/15
+                1.17647058823529412e-1) # 2/17
+    hxsq = 0.5*x*x
+    r*(hxsq+w*t)-hxsq
+end
+"""
+    logmxp1(x::Float64)
+Return `log(x) - x + 1` carefully evaluated.
+"""
+function logmxp1(x::Float64)
+    if x <= 0.3
+        return (log(x) + 1.0) - x
+    elseif x <= 0.4
+        u = (x-0.375)/0.375
+        return _log1pmx_ker(u) - 3.55829253011726237e-1 + 0.625*u
+    elseif x <= 0.6
+        u = 2.0*(x-0.5)
+        return _log1pmx_ker(u) - 1.93147180559945309e-1 + 0.5*u
+    else
+        return log1pmx(x - 1.0)
+    end
+end
+
 """
    rgamma1pm1(a)
 

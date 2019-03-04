@@ -10,7 +10,6 @@ let depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
 end
 
 __init__() = check_deps()
-using StatsFuns
 export
     airyai,
     airyaiprime,
