@@ -48,7 +48,7 @@ d60 = .531307936463992E-03
 d6=[-.592166437353694E-03]
 d70 = .344367606892378E-03
 d80 = -.652623918595309E-03
-
+#Source of logmxp1(x): https://github.com/JuliaStats/StatsFuns.jl
 # The kernel of log1pmx
 # Accuracy within ~2ulps for -0.227 < x < 0.315
 function _log1pmx_ker(x::Float64)
@@ -88,67 +88,53 @@ end
    rgamma1pm1(a)
 
    Computation of 1/Gamma(a+1) - 1 for -0.5<=a<=1.5 : ``1/\\Gamma (a+1) - 1``
+   Uses the relation gamma(a+1) = a*gamma(a)
 """
 function rgamma1pm1(a::Float64)
     t=a
-    d = a - 0.5
-    if d > 0.0
-        t = d - 0.5
-    end
+    rangereduce = a > 0.5
+    t = rangereduce ? a-1 : a #-0.5<= t <= 0.5
     if t == 0.0
         return 0.0
-    elseif t < 0.0
-     top = @horner(t , -.422784335098468E+00 , -.771330383816272E+00 , -.244757765222226E+00 , .118378989872749E+00 , .930357293360349E-03 , -.118290993445146E-01 , .223047661158249E-02 , .266505979058923E-03 , -.132674909766242E-03)
-     bot = @horner(t , 1.0 , .273076135303957E+00 , .559398236957378E-01)
-     w = top/bot
-     if d > 0.0
-        return t*w/a
-     else
-        return a*(w + 1.0)
-     end
+    elseif t < 0.0        
+        top = @horner(t , -.422784335098468E+00 , -.771330383816272E+00 , -.244757765222226E+00 , .118378989872749E+00 , .930357293360349E-03 , -.118290993445146E-01 , .223047661158249E-02 , .266505979058923E-03 , -.132674909766242E-03)
+        bot = @horner(t , 1.0 , .273076135303957E+00 , .559398236957378E-01)
+        w = top/bot
+        return rangereduce ? t*w/a : a*(w+1)
     else
-     top = @horner(t , .577215664901533E+00 , -.409078193005776E+00 , -.230975380857675E+00 , .597275330452234E-01 , .766968181649490E-02 , -.514889771323592E-02 , .589597428611429E-03)
-     bot = @horner(t , 1.0 , .427569613095214E+00 , .158451672430138E+00 , .261132021441447E-01 , .423244297896961E-02) 
-     w = top/bot
-     if d > 0.0
-        return (t/a)*(w - 1.0)
-     else
-        return a*w
-     end
+        top = @horner(t , .577215664901533E+00 , -.409078193005776E+00 , -.230975380857675E+00 , .597275330452234E-01 , .766968181649490E-02 , -.514889771323592E-02 , .589597428611429E-03)
+        bot = @horner(t , 1.0 , .427569613095214E+00 , .158451672430138E+00 , .261132021441447E-01 , .423244297896961E-02) 
+        w = top/bot
+        return rangereduce ? (t/a)*(w - 1.0) : a*w
     end
 end
 """
-    exp1xgamma1(a,x)
+    rgammax(a,x)
 
 Evaluation of exp(-x)*x^a/gamma(a) : ``1/\\Gamma(a) e^{-x} x^{a}``
 """
-function exp1xgamma1(a::Float64,x::Float64)
-    ans = 0.0
+function rgammax(a::Float64,x::Float64)
     if x == 0.0
-        return ans
+        return 0.0
     elseif a >= 20.0
-     u =x/a
-     if u == 0.0
-        return ans
-     end
-     t = (1.0/a)^2
-     t1 = (((0.75*t - 1.0)*t + 3.5)*t - 105.0)/(a*1260.0)
-     t1 = t1 + a*logmxp1(u)
-     if t1 >= exparg
-        ans = rt2pin*sqrt(a)*exp(t1)
-     end
-     return ans
+        u =x/a
+        if u == 0.0
+            return 0.0
+        end
+        t = (1.0/a)^2
+        t1 = (((0.75*t - 1.0)*t + 3.5)*t - 105.0)/(a*1260.0) #Using Stirling Series : https://dlmf.nist.gov/5.11.1
+        t1 = t1 + a*logmxp1(u)
+        if t1 >= exparg
+            return rt2pin*sqrt(a)*exp(t1)
+        end
     else
         t = a*log(x) - x
         if t < exparg
-            return ans
-        end
-        if a >= 1.0
-            ans = exp(t)/gamma(a)
-            return ans
+            return 0.0
+        elseif a >= 1.0
+            return exp(t)/gamma(a)
         else
-            ans = (a*exp(t))*(1.0 + rgamma1pm1(a))
-            return ans
+            return (a*exp(t))*(1.0 + rgamma1pm1(a))
         end
     end
 end   
@@ -192,7 +178,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     elseif x < 1.1
         @goto l110     
     end
-    r = exp1xgamma1(a,x)
+    r = rgammax(a,x)
     if r == 0.0
         ans=1.0
         return ans
@@ -244,7 +230,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      end
     
     @label l30
-      r = exp1xgamma1(a,x)
+      r = rgammax(a,x)
       if r == 0.0
         if x <= a
             ans=0.0
