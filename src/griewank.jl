@@ -1,5 +1,4 @@
 using Base.Math: @horner
-
 # Computes Griewank Scores
 # Griewank Function is used in testing of optimization. 
 # Defined in: https://en.wikipedia.org/wiki/Griewank_function
