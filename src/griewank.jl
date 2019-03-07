@@ -63,3 +63,6 @@ function griewankmn(A::Array{Float64, 2})
     end
     resultant
 end
+
+griewankm
+griewankmn
