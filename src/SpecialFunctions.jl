@@ -55,8 +55,8 @@ export
     zeta,
     sinint,
     cosint,
-    lbinomial
-    griewankm
+    lbinomial,
+    griewankm,
     griewankmn
 
 include("bessel.jl")
