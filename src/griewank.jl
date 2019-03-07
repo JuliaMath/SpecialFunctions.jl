@@ -62,7 +62,4 @@ function griewankmn(A::Array{Float64, 2})
         push!(resultant, griewankn(view(A,i,:), N))
     end
     resultant
-end
-
-griewankm
-griewankmn
+end    
