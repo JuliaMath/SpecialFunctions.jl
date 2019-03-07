@@ -156,18 +156,14 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
     if a<0.0 || x<0.0
-        ans=2.0
-        return ans
+        return 2.0
     elseif a==0.0 && x==0.0
-        ans=2.0
-        return ans
+        return 2.0
     elseif a*x==0.0 
         if x<=a
-            ans=0.0
-            return ans
+            return 0.0
         else
-            ans=1.0
-            return ans
+            return 1.0
         end               
     end
     
@@ -180,8 +176,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     end
     r = rgammax(a,x)
     if r == 0.0
-        ans=1.0
-        return ans
+        return 1.0
     else
         @goto l170    
     end
@@ -210,14 +205,12 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     @label l20
      l = x/a
      if l == 0.0
-        ans=0.0
-        return ans
+        return 0.0
      end
      s = 1.0 - l
      z = -logmxp1(x)
      if z >= 700.0/a
-        ans=0.0
-        return ans
+        return 0.0
      end
      y = a*z
      rta = sqrt(a)
@@ -233,11 +226,9 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
       r = rgammax(a,x)
       if r == 0.0
         if x <= a
-            ans=0.0
-            return ans
+            return 0.0
         else
-            ans=1.0
-            return ans
+            return 1.0
         end
       end 
       if x <= max(a,alog10)
@@ -284,8 +275,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         loop = loop - 1
         sum = sum + wk[loop]
      end
-    ans = (r/a)*(1.0 + sum)
-    return ans
+    return (r/a)*(1.0 + sum)
     
     #----ASYMPTOTIC EXPANSION-----
     @label l80
@@ -322,9 +312,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         loop=loop-1
         sum=sum+wk[loop]
      end
-    qans = (r/x)*(1.0 + sum)
-    ans = 1.0-qans
-    return ans
+    return 1.0 - (r/x)*(1.0 + sum)
     
     #---TAYLOR SERIES FOR P(A,X)/X**A---
 
@@ -363,18 +351,12 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      end
     @label l130
      w = exp(z)
-     ans = w*g*(1.0 - temp)
-     return ans
+     return w*g*(1.0 - temp)
     @label l135
      l = expm1(z)
      w = 1.0-l
-     qans = (w*temp - l)*g - h
-     if qans < 0.0
-        ans=1.0
-        return ans
-     end
-     ans = 1.0 - qans
-     return ans
+     rangered = ((w*temp - l)*g - h < 0.0)
+     return rangered ? 1.0 : (1.0 - ((w*temp - l)*g - h))
     
     #---FINITE SUMS FOR Q WHEN A>=1 && 2A IS INTEGER----
     @label l140
@@ -404,9 +386,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         sum = sum + t
      end
     @label l161
-     qans = sum
-     ans = 1.0 - qans
-     return ans
+     return 1.0 - sum
      
     #----CONTINUED FRACTION EXPANSION-----
     @label l170
@@ -431,9 +411,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
             break
         end
      end
-     qans = r*a2n
-     ans = 1.0 - qans
-     return ans
+     return 1.0 - r*a2n
     
     @label l200
      #Skipping invalid check
@@ -482,15 +460,9 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
     @label l240
      if l < 1.0
-        @goto l241
+        return c*(w - rt2pin*t/rta)
      end
-     qans = c*(w + rt2pin*t/rta)
-     ans = 1.0 - qans
-     return ans
-    @label l241
-     ans = c*(w - rt2pin*t/rta)
-     qans = 1.0 - ans
-     return ans
+     return 1.0 - c*(w + rt2pin*t/rta)
     
     #----TEMME EXPANSION FOR L = 1----
     @label l250
@@ -534,26 +506,15 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     
     @label l240rep
      if l < 1.0
-        @goto l241rep
+        return c*(w - rt2pin*t/rta)
      end
-     qans = c*(w + rt2pin*t/rta)
-     ans = 1.0 - qans
-     return ans
-    @label l241rep
-     ans = c*(w - rt2pin*t/rta)
-     qans = 1.0 - ans
-     return ans
+     return 1.0 - c*(w + rt2pin*t/rta)
     
     @label l320
      if x >= 0.25
-        @goto l321
+        return 1.0 - erfc(sqrt(x))
      end
-     ans = erf(sqrt(x))
-     return ans
-    @label l321
-     qans = erfc(sqrt(x))
-     ans = 1.0 - qans
-     return ans
+     return erf(sqrt(x))
 end
 
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
