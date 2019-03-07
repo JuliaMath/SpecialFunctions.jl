@@ -56,6 +56,8 @@ export
     sinint,
     cosint,
     lbinomial
+    griewankm
+    griewankmn
 
 include("bessel.jl")
 include("erf.jl")
@@ -63,6 +65,7 @@ include("ellip.jl")
 include("sincosint.jl")
 include("gamma.jl")
 include("deprecated.jl")
+include("griewank.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
           :eta, :gamma, :invdigamma, :lfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
