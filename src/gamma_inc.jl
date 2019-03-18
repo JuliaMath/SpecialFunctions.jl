@@ -1,4 +1,5 @@
 using Base.Math: @horner
+using Base.MPFR: ROUNDING_MODE
 #useful constants
 const acc0 = [5.0e-15 , 5.0e-7 , 5.0e-4] #accuracy options
 const big1 = [25.0 , 14.0, 10.0]
@@ -156,9 +157,9 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
     if a<0.0 || x<0.0
-        return 2.0
+        throw(DomainError((a,x,ind,"`a` and `x` must be greater than 0 ---- Domain : (0,inf)")))
     elseif a==0.0 && x==0.0
-        return 2.0
+        throw(DomainError((a,x,ind,"`a` and `x` must be greater than 0 ---- Domain : (0,inf)")))
     elseif a*x==0.0 
         if x<=a
             return 0.0
@@ -541,6 +542,11 @@ for f in (:gamma_p,:gamma_q)
         $f(a::Float16,x::Float16,ind::Integer) = Float16($f(Float64(a),Float64(x),ind))
         $f(a::Real,x::Real,ind::Integer) = ($f(float(a),float(x),ind))
         $f(a::Integer,x::Integer,ind::Integer) = $f(Float64(a),Float64(x),ind)
+        function ($f)(a::BigFloat,x::BigFloat,ind::Integer)
+            z = BigFloat()
+            ccall((:mpfr_gamma_inc, :libmpfr), Float64 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Float64) , z , a , x , ROUNDING_MODE[])
+            return ($f == gamma_q) ? z/gamma(a) : z/gamma(a) - 1.0
+        end
         $f(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError($f,(a,x,ind,"")))        
     end
 end
