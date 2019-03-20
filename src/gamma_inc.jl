@@ -68,6 +68,30 @@ function _log1pmx_ker(x::Float64)
     r*(hxsq+w*t)-hxsq
 end
 """
+    log1pmx(x::Float64)
+Return `log(1 + x) - x`
+Use naive calculation or range reduction outside kernel range.  Accurate ~2ulps for all `x`.
+"""
+function log1pmx(x::Float64)
+    if !(-0.7 < x < 0.9)
+        return log1p(x) - x
+    elseif x > 0.315
+        u = (x-0.5)/1.5
+        return _log1pmx_ker(u) - 9.45348918918356180e-2 - 0.5*u
+    elseif x > -0.227
+        return _log1pmx_ker(x)
+    elseif x > -0.4
+        u = (x+0.25)/0.75
+        return _log1pmx_ker(u) - 3.76820724517809274e-2 + 0.25*u
+    elseif x > -0.6
+        u = (x+0.5)*2.0
+        return _log1pmx_ker(u) - 1.93147180559945309e-1 + 0.5*u
+    else
+        u = (x+0.625)/0.375
+        return _log1pmx_ker(u) - 3.55829253011726237e-1 + 0.625*u
+    end
+end
+"""
     logmxp1(x::Float64)
 Return `log(x) - x + 1` carefully evaluated.
 """
@@ -355,7 +379,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      return w*g*(1.0 - temp)
     @label l135
      l = expm1(z)
-     w = 1.0-l
+     w = 1.0+l
      rangered = ((w*temp - l)*g - h < 0.0)
      return rangered ? 1.0 : (1.0 - ((w*temp - l)*g - h))
     
@@ -528,7 +552,7 @@ end
     
     DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
     Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
-    IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 digit accuracy suffices.
+    IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 s.f. digit accuracy suffices.
     gamma_q(a,x) or Q(a,x) is the Incomplete gamma function ratio given by : 1 - P(a,x) ->  ``1/\\Gamma (a) \\int_{x}^{\\infty} e^{-t}t^{a-1} dt``
 """
 function gamma_q(a::Float64,x::Float64,ind::Integer)
@@ -538,15 +562,15 @@ end
 
 for f in (:gamma_p,:gamma_q)
     @eval begin
+        function ($f)(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
+            z = BigFloat()
+            ccall((:mpfr_gamma_inc, :libmpfr), Float64 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Float64) , z , a , x , ROUNDING_MODE[])
+            return ($f == gamma_q) ? z/gamma(a) : 1.0 - z/gamma(a)
+        end
         $f(a::Float32,x::Float32,ind::Integer) = Float32($f(Float64(a),Float64(x),ind))
         $f(a::Float16,x::Float16,ind::Integer) = Float16($f(Float64(a),Float64(x),ind))
         $f(a::Real,x::Real,ind::Integer) = ($f(float(a),float(x),ind))
         $f(a::Integer,x::Integer,ind::Integer) = $f(Float64(a),Float64(x),ind)
-        function ($f)(a::BigFloat,x::BigFloat,ind::Integer)
-            z = BigFloat()
-            ccall((:mpfr_gamma_inc, :libmpfr), Float64 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Float64) , z , a , x , ROUNDING_MODE[])
-            return ($f == gamma_q) ? z/gamma(a) : z/gamma(a) - 1.0
-        end
         $f(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError($f,(a,x,ind,"")))        
     end
 end

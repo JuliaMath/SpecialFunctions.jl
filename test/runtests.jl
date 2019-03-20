@@ -61,6 +61,28 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test_throws MethodError erf(big(1.0)*im)
     @test_throws MethodError erfi(big(1.0))
 end
+@testset "incomplete gamma ratios" begin
+#Computed using Wolframalpha gamma(a,x)/gamma(a) ~ gamma_q(a,x,0) function.
+    @test gamma_q(10,10,0) ≈ 0.45792971447185221
+    @test gamma_q(1,1,0) ≈ 0.3678794411714423216
+    @test gamma_q(0.5,0.5,0) ≈ 0.31731050786291410
+    @test gamma_q(big(30.5),big(30.5),0) ≈ 2.2952030317783937635e+31
+    @test gamma_q(5.5,0.5,0) ≈ 0.9999496100513121669
+    @test gamma_q(0.5,7.4,0) ≈ 0.0001195355018130302
+    @test gamma_q(0.5,0.22,0) ≈ 0.507122455359825146
+    @test gamma_q(11.5,0.5,0) ≈ 0.999999999998406112
+    @test gamma_q(0.19,0.99,0) ≈ 0.050147247342905857
+    @test gamma_q(0.9999,0.9999,0) ≈ 0.3678730556923103
+    @test gamma_q(10,0.0001,0) ≈ 1.0000
+    @test gamma_q(0.0001,0.0001,0) ≈ 0.000862958131006599
+    @test gamma_p(0.0001,10.5,0) ≈ 0.999999999758896146
+    @test gamma_p(1,1,0) ≈ 0.63212055882855768
+    @test gamma_p(11,9,0) ≈ 0.2940116796594881834
+    @test gamma_q(15,16,0) ≈ 0.3675273597655649298
+    @test gamma_q(11.1,0.001,0) ≈ 1.0000
+    @test_throws DomainError gamma_p(-1,2,2)
+    @test_throws DomainError gamma_q(0,0,1)
+end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.
 	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
