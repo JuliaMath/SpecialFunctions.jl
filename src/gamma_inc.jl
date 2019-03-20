@@ -564,7 +564,7 @@ for f in (:gamma_p,:gamma_q)
     @eval begin
         function ($f)(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
             z = BigFloat()
-            ccall((:mpfr_gamma_inc, :libmpfr), Float64 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Float64) , z , a , x , ROUNDING_MODE[])
+            ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
             return ($f == gamma_q) ? z/gamma(a) : 1.0 - z/gamma(a)
         end
         $f(a::Float32,x::Float32,ind::Integer) = Float32($f(Float64(a),Float64(x),ind))
