@@ -233,7 +233,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         return 0.0
      end
      s = 1.0 - l
-     z = -logmxp1(x)
+     z = -logmxp1(l)
      if z >= 700.0/a
         return 0.0
      end
@@ -439,7 +439,9 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      return 1.0 - r*a2n
     
     @label l200
-     #Skipping invalid check
+     if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
+        throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+     end
      c = exp(-y)
      w = 0.5*erfcx(sqrt(y))
      u = 1.0/a
@@ -463,11 +465,11 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      c0 = @horner(z , a0[4] , a0[3] , a0[2] , a0[1])/(@horner(z , 1.0 , b0[6] , b0[5], b0[4] , b0[3] , b0[2] , b0[1]) )
      c1 = @horner(z , a1[4] , a1[3] , a1[2] , a1[1])/(@horner(z , 1.0 , b1[4] , b1[3] , b1[2] , b1[1]))
      c2 = @horner(z , a2[2] , a2[1])/(@horner(z , 1.0 , b2[5] , b2[4] , b2[3] , b2[2] , b2[1]))
-     c3 = @horner(z , A3[2] , A3[1])/(@horner(z , 1.0 , b3[5] , b3[4] , b3[3] , b3[2] , b3[1]))
+     c3 = @horner(z , a3[2] , a3[1])/(@horner(z , 1.0 , b3[5] , b3[4] , b3[3] , b3[2] , b3[1]))
      c4 = @horner(z , a4[2] , a4[1])/(@horner(z , 1.0 , b4[4] , b4[3] , b4[2] , b4[1]))
      c5 = @horner(z , a5[2] , a5[1])/(@horner(z , 1.0 , b5[3] , b5[2] , b5[1]))
-     c6 = @horner(z , a6[2] , a6[1])/(@horner(Z , 1.0 , b6[2] , b6[1]))
-     c7 = @horner(z , a7[2] , a7[1])/(@horner(Z , 1.0 , b7[2] , b7[1]))
+     c6 = @horner(z , a6[2] , a6[1])/(@horner(z , 1.0 , b6[2] , b6[1]))
+     c7 = @horner(z , a7[2] , a7[1])/(@horner(z , 1.0 , b7[2] , b7[1]))
      c8 = @horner(z , a8[2] , a8[1])
 
      t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , c7 , c8)
@@ -491,7 +493,9 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     
     #----TEMME EXPANSION FOR L = 1----
     @label l250
-     #Skipping error return
+     if a*eps()*eps() > 3.28e-3
+        throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+     end
      c = 1.0 - y
      w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
      u = 1.0/a
