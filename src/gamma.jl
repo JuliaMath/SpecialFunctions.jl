@@ -412,7 +412,7 @@ function zeta(s::ComplexOrReal{Float64})
         end
         if absim > 12 # amplitude of sinpi(s/2) ≈ exp(imag(s)*π/2)
             # avoid overflow/underflow (issue #128)
-            lg = lgamma(1 - s)
+            lg = logabsgamma(1 - s)
             ln2pi = 1.83787706640934548356 # log(2pi) to double precision
             rehalf = real(s)*0.5
             return zeta(1 - s) * exp(lg + absim*(pi/2) + s*ln2pi) * (0.5/π) *
@@ -551,7 +551,7 @@ function polygamma(m::Integer, z::Number)
     polygamma(m, x)
 end
 
-export gamma, lgamma, beta, lbeta, lfactorial
+export gamma, loggamma, logabsgamma, beta, lbeta, lfactorial
 
 ## from base/special/gamma.jl
 
@@ -578,7 +578,7 @@ function lgamma_r(x::Float32)
     return y, signp[]
 end
 lgamma_r(x::Real) = lgamma_r(float(x))
-lgamma_r(x::Number) = lgamma(x), 1 # lgamma does not take abs for non-real x
+lgamma_r(x::Number) = loggamma(x), 1 # loggamma does not take abs for non-real x
 """
     lgamma_r(x)
 
@@ -590,24 +590,46 @@ lgamma_r
     lfactorial(x)
 
 Compute the logarithmic factorial of a nonnegative integer `x`.
-Equivalent to [`lgamma`](@ref) of `x + 1`, but `lgamma` extends this function
+Equivalent to [`loggamma`](@ref) of `x + 1`, but `loggamma` extends this function
 to non-integer `x`.
 """
-lfactorial(x::Integer) = x < 0 ? throw(DomainError(x, "`x` must be non-negative.")) : lgamma(x + oneunit(x))
+lfactorial(x::Integer) = x < 0 ? throw(DomainError(x, "`x` must be non-negative.")) : loggamma(x + oneunit(x))
 Base.@deprecate lfact lfactorial
 
 """
-    lgamma(x)
+    logabsgamma(x)
 
-Compute the logarithm of the absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x`, while for [`Complex`](@ref) `x` compute the
-principal branch cut of the logarithm of `gamma(x)` (defined for negative `real(x)`
-by analytic continuation from positive `real(x)`).
+Compute the logarithm of absolute value of [`gamma`](@ref) for
+[`Real`](@ref) `x`.
 """
-function lgamma end
+function logabsgamma end
+logabsgamma(x::Real) = lgamma_r(x)
+logabsgamma(x::Number) = loggamma(x)
 
+"""
+    loggamma(x)
+
+Computes the logarithm of [`gamma`](@ref) for given `x`
+"""
+function loggamma end
+
+
+function loggamma(x::T) where {T<:Union{Float64,Float32}}
+    y, s = lgamma_r(x)
+    println(s)
+    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    return y
+end
+
+function loggamma(x::Real)
+    y, s = lgamma_r(x)
+    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    return y
+end
+loggamma(x::Number) = loggamma(float(x))
+Base.@deprecate lgamma loggamma
 # asymptotic series for log(gamma(z)), valid for sufficiently large real(z) or |imag(z)|
-@inline function lgamma_asymptotic(z::Complex{Float64})
+function loggamma_asymptotic(z::Complex{Float64})
     zinv = inv(z)
     t = zinv*zinv
     # coefficients are bernoulli[2:n+1] .// (2*(1:n).*(2*(1:n) - 1))
@@ -625,7 +647,7 @@ end
 # and similar techniques are used (in a somewhat different way) by the
 # SciPy loggamma function.  The key identities are also described
 # at http://functions.wolfram.com/GammaBetaErf/LogGamma/
-function lgamma(z::Complex{Float64})
+function loggamma(z::Complex{Float64})
     x = real(z)
     y = imag(z)
     yabs = abs(y)
@@ -638,7 +660,7 @@ function lgamma(z::Complex{Float64})
             return Complex(NaN, NaN)
         end
     elseif x > 7 || yabs > 7 # use the Stirling asymptotic series for sufficiently large x or |y|
-        return lgamma_asymptotic(z)
+        return loggamma_asymptotic(z)
     elseif x < 0.1 # use reflection formula to transform to x > 0
         if x == 0 && y == 0 # return Inf with the correct imaginary part for z == 0
             return Complex(Inf, signbit(x) ? copysign(oftype(x, pi), -y) : -y)
@@ -647,7 +669,7 @@ function lgamma(z::Complex{Float64})
         return Complex(1.1447298858494001741434262, # log(pi)
                        copysign(6.2831853071795864769252842, y) # 2pi
                        * floor(0.5*x+0.25)) -
-               log(sinpi(z)) - lgamma(1-z)
+               log(sinpi(z)) - loggamma(1-z)
     elseif abs(x - 1) + yabs < 0.1
         # taylor series around zero at z=1
         # ... coefficients are [-eulergamma; [(-1)^k * zeta(k)/k for k in 2:15]]
@@ -671,7 +693,7 @@ function lgamma(z::Complex{Float64})
                                -2.2315475845357937976132853e-04,9.9457512781808533714662972e-05,
                                -4.4926236738133141700224489e-05,2.0507212775670691553131246e-05)
     end
-    # use recurrence relation lgamma(z) = lgamma(z+1) - log(z) to shift to x > 7 for asymptotic series
+    # use recurrence relation loggamma(z) = loggamma(z+1) - log(z) to shift to x > 7 for asymptotic series
     shiftprod = Complex(x,yabs)
     x += 1
     sb = false # == signbit(imag(shiftprod)) == signbit(yabs)
@@ -692,12 +714,13 @@ function lgamma(z::Complex{Float64})
     else
         shift = Complex(real(shift), imag(shift) + signflips*6.2831853071795864769252842)
     end
-    return lgamma_asymptotic(Complex(x,y)) - shift
+    return loggamma_asymptotic(Complex(x,y)) - shift
 end
-lgamma(z::Complex{T}) where {T<:Union{Integer,Rational}} = lgamma(float(z))
-lgamma(z::Complex{T}) where {T<:Union{Float32,Float16}} = Complex{T}(lgamma(Complex{Float64}(z)))
+loggamma(z::Complex{T}) where {T<:Union{Integer,Rational}} = loggamma(float(z))
+loggamma(z::Complex{T}) where {T<:Union{Float32,Float16}} = Complex{T}(loggamma(Complex{Float64}(z)))
+loggamma(x::Float16) = Float16(loggamma(Float32(x)))
 
-gamma(z::Complex) = exp(lgamma(z))
+gamma(z::Complex) = exp(loggamma(z))
 
 """
     beta(x, y)
@@ -717,7 +740,7 @@ end
 Natural logarithm of the absolute value of the [`beta`](@ref)
 function ``\\log(|\\operatorname{B}(x,y)|)``.
 """
-lbeta(x::Number, w::Number) = lgamma(x)+lgamma(w)-lgamma(x+w)
+lbeta(x::Number, w::Number) = logabsgamma(x)+logabsgamma(w)-logabsgamma(x+w)
 
 ## from base/mpfr.jl
 
@@ -738,8 +761,12 @@ function lgamma_r(x::BigFloat)
     return z, lgamma_signp[]
 end
 
-lgamma(x::BigFloat) = lgamma_r(x)[1]
-
+logabsgamma(x::BigFloat) = lgamma_r(x)[1]
+function loggamma(x::BigFloat)
+    y, s = lgamma_r(x)
+    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    return y
+end
 if Base.MPFR.version() >= v"4.0.0"
     function beta(y::BigFloat, x::BigFloat)
         z = BigFloat()
@@ -760,12 +787,12 @@ end
 
 ## from base/math.jl
 
-@inline lgamma(x::Float64) = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
-@inline lgamma(x::Float32) = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
-@inline lgamma(x::Float16) = Float16(lgamma(Float32(x)))
-@inline lgamma(x::Real) = lgamma(float(x))
-lgamma(x::AbstractFloat) = throw(MethodError(lgamma, x))
-
+logabsgamma(x::Float64) = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
+logabsgamma(x::Float32) = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
+logabsgamma(x::Float16) = Float16(logabsgamma(Float32(x)))
+logabsgamma(x::Integer) = logabsgamma(float(x))
+logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
+loggamma(x::AbstractFloat) = throw(MethodError(loggamma, x))
 ## from base/numbers.jl
 
 # this trickery is needed while the deprecated method in Base exists
