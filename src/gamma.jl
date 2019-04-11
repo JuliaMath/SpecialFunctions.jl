@@ -412,7 +412,7 @@ function zeta(s::ComplexOrReal{Float64})
         end
         if absim > 12 # amplitude of sinpi(s/2) ≈ exp(imag(s)*π/2)
             # avoid overflow/underflow (issue #128)
-            lg = logabsgamma(1 - s)
+            lg = loggamma(1 - s)
             ln2pi = 1.83787706640934548356 # log(2pi) to double precision
             rehalf = real(s)*0.5
             return zeta(1 - s) * exp(lg + absim*(pi/2) + s*ln2pi) * (0.5/π) *
@@ -603,8 +603,7 @@ Compute the logarithm of absolute value of [`gamma`](@ref) for
 [`Real`](@ref) `x`.
 """
 function logabsgamma end
-logabsgamma(x::Real) = lgamma_r(x)
-logabsgamma(x::Number) = loggamma(x)
+logabsgamma(x::Real) = logabsgamma(float(x))
 
 """
     loggamma(x)
@@ -627,7 +626,7 @@ function loggamma(x::Real)
     return y
 end
 loggamma(x::Number) = loggamma(float(x))
-Base.@deprecate lgamma loggamma
+
 # asymptotic series for log(gamma(z)), valid for sufficiently large real(z) or |imag(z)|
 function loggamma_asymptotic(z::Complex{Float64})
     zinv = inv(z)
@@ -740,7 +739,7 @@ end
 Natural logarithm of the absolute value of the [`beta`](@ref)
 function ``\\log(|\\operatorname{B}(x,y)|)``.
 """
-lbeta(x::Number, w::Number) = logabsgamma(x)+logabsgamma(w)-logabsgamma(x+w)
+lbeta(x::Number, w::Number) = loggamma(x)+loggamma(w)-loggamma(x+w)
 
 ## from base/mpfr.jl
 

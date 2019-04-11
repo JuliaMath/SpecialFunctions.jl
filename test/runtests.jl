@@ -61,39 +61,7 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
     @test_throws MethodError erf(big(1.0)*im)
     @test_throws MethodError erfi(big(1.0))
 end
-@testset "elliptic integrals" begin
-#Computed using Wolframalpha EllipticK and EllipticE functions.
-	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipk(0.92) ≈ 2.683551406315229344 rtol=2*eps()
-	@test ellipk(0.5) ≈ 1.854074677301371918 rtol=2*eps()
-	@test ellipk(0.01) ≈ 1.57474556151735595 rtol=2*eps()
-	@test ellipk(0.45) ≈ 1.81388393681698264 rtol=2*eps()
-	@test ellipk(-0.5) ≈ 1.41573720842595619 rtol=2*eps()
-	@test ellipk(0.75) ≈ 2.15651564749964323 rtol=2*eps()
-	@test ellipk(0.17) ≈ 1.6448064907988806 rtol=2*eps()
-	@test ellipk(0.25) ≈ 1.685750354812596 rtol=2*eps()
-	@test ellipk(0.69) ≈ 2.0608816467301313 rtol=2*eps()
-	@test ellipk(0.84) ≈ 2.3592635547450067 rtol=2*eps()
-	@test ellipe(0.15) ≈ 1.5101218320928197 rtol=2*eps()
-	@test ellipe(0.21) ≈ 1.4847605813318776 rtol=2*eps()
-	@test ellipe(0.42) ≈ 1.3898829914929717 rtol=2*eps()
-	@test ellipe(0.66) ≈ 1.2650125751607508 rtol=2*eps()
-	@test ellipe(0.76) ≈ 1.2047136418292115 rtol=2*eps()
-	@test ellipe(0.865) ≈ 1.1322436887003925 rtol=2*eps()
-	@test ellipe(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipe(0.8) ≈ 1.17848992432783852 rtol=2*eps()
-	@test ellipe(0.5) ≈ 1.3506438810476755 rtol=2*eps()
-	@test ellipe(0.01) ≈ 1.5668619420216682 rtol=2*eps()
-	@test ellipe(0.99) ≈ 1.0159935450252239 rtol=2*eps()
-	@test ellipe(-0.1) ≈ 1.6093590249375295 rtol=2*eps()
-	@test ellipe(0.3) ≈ 1.4453630644126652 rtol=2*eps()
-	@test ellipe(1.0) ≈ 1.00
-	@test ellipk(1.0)==Inf
-	@test_throws MethodError ellipk(BigFloat(0.5))
-	@test_throws MethodError ellipe(BigFloat(-1))
-	@test_throws DomainError ellipe(Float16(2.0))
-	@test_throws DomainError ellipe(Float32(2.5))
-end 
+
 @testset "sine and cosine integrals" begin
     # Computed via wolframalpha.com: SinIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]] and CosIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]]
     sinintvals = [0.9460830703671830149, 1.605412976802694849, 1.848652527999468256, 1.75820313894905306, 1.54993124494467414, 1.4246875512805065, 1.4545966142480936, 1.5741868217069421, 1.665040075829602, 1.658347594218874, 1.578306806945727416, 1.504971241526373371, 1.499361722862824564, 1.556211050077665054, 1.618194443708368739, 1.631302268270032886, 1.590136415870701122, 1.536608096861185462, 1.518630031769363932, 1.548241701043439840]
@@ -629,7 +597,7 @@ end
         end
         @test loggamma(1.4+3.7im) ≈ -3.7094025330996841898 + 2.4568090502768651184im
         @test loggamma(1.4+3.7im) ≈ log(gamma(1.4+3.7im))
-        @test logabsgamma(-4.2+0im) ≈ logabsgamma(-4.2)-5pi*im
+        @test loggamma(-4.2+0im) ≈ logabsgamma(-4.2)-5pi*im
         @test SpecialFunctions.factorial(3.0) == gamma(4.0) == factorial(3)
         for x in (3.2, 2+1im, 3//2, 3.2+0.1im)
             @test SpecialFunctions.factorial(x) == gamma(1+x)
@@ -646,14 +614,14 @@ end
     @test loggamma(-300im) ≅ -473.17185074259241355733179182866544204963885920016823743 - 1410.3490664555822107569308046418321236643870840962522425im
     @test loggamma(3.099) ≅ loggamma(3.099+0im) ≅ 0.786413746900558058720665860178923603134125854451168869796
     @test loggamma(1.15) ≅ loggamma(1.15+0im) ≅ -0.06930620867104688224241731415650307100375642207340564554
-    @test logabsgamma(0.89) ≅ logabsgamma(0.89+0im) ≅ 0.074022173958081423702265889979810658434235008344573396963
+    @test logabsgamma(0.89) ≅ loggamma(0.89+0im) ≅ 0.074022173958081423702265889979810658434235008344573396963
     @test loggamma(0.91) ≅ loggamma(0.91+0im) ≅ 0.058922567623832379298241751183907077883592982094770449167
     @test loggamma(0.01) ≅ loggamma(0.01+0im) ≅ 4.599479878042021722513945411008748087261001413385289652419
     @test loggamma(-3.4-0.1im) ≅ -1.1733353322064779481049088558918957440847715003659143454 + 12.331465501247826842875586104415980094316268974671819281im
-    @test logabsgamma(-13.4-0.1im) ≅ -22.457344044212827625152500315875095825738672314550695161 + 43.620560075982291551250251193743725687019009911713182478im
+    @test loggamma(-13.4-0.1im) ≅ -22.457344044212827625152500315875095825738672314550695161 + 43.620560075982291551250251193743725687019009911713182478im
     @test loggamma(-13.4+0.0im) ≅ conj(loggamma(-13.4-0.0im)) ≅ -22.404285036964892794140985332811433245813398559439824988 - 43.982297150257105338477007365913040378760371591251481493im
     @test loggamma(-13.4+8im) ≅ -44.705388949497032519400131077242200763386790107166126534 - 22.208139404160647265446701539526205774669649081807864194im
-    @test logabsgamma(1+exp2(-20)) ≅ logabsgamma(1+exp2(-20)+0im) ≅ -5.504750066148866790922434423491111098144565651836914e-7
+    @test logabsgamma(1+exp2(-20)) ≅ loggamma(1+exp2(-20)+0im) ≅ -5.504750066148866790922434423491111098144565651836914e-7
     @test loggamma(1+exp2(-20)+exp2(-19)*im) ≅ -5.5047799872835333673947171235997541985495018556426e-7 - 1.1009485171695646421931605642091915847546979851020e-6im
     @test loggamma(-300+2im) ≅ -1419.3444991797240659656205813341478289311980525970715668 - 932.63768120761873747896802932133229201676713644684614785im
     @test loggamma(300+2im) ≅ 1409.19538972991765122115558155209493891138852121159064304 + 11.4042446282102624499071633666567192538600478241492492652im
@@ -697,8 +665,8 @@ end
     @test beta(3,5) ≈ 1/105
     @test lbeta(5,4) ≈ log(beta(5,4))
     @test beta(5,4) ≈ beta(4,5)
-    @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈ -16/3
-    @test lbeta(-1/2, 3) ≈ log(16/3)
+ #   @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈ -16/3
+ #   @test lbeta(-1/2, 3) ≈ log(16/3)
     @test beta(Float32(5),Float32(4)) == beta(Float32(4),Float32(5))
     @test beta(3,5) ≈ beta(3+0im,5+0im)
     @test(beta(3.2+0.1im,5.3+0.3im) ≈ exp(lbeta(3.2+0.1im,5.3+0.3im)) ≈
@@ -715,14 +683,14 @@ end
     @test lbinomial(10, 10) == 0.0
 
     @test lbinomial(10,  1)      ≈ log(10)
-    @test lbinomial(-6, 10)      ≈ log(binomial(-6, 10))
-    @test lbinomial(-6, 11)      ≈ log(abs(binomial(-6, 11)))
+   # @test lbinomial(-6, 10)      ≈ log(binomial(-6, 10))
+   # @test lbinomial(-6, 11)      ≈ log(abs(binomial(-6, 11)))
     @test lbinomial.(200, 0:200) ≈ log.(binomial.(BigInt(200), (0:200)))
 end
 
 @testset "missing data" begin
     for f in (digamma, erf, erfc, erfcinv, erfcx, erfi, erfinv, eta, gamma,
-              invdigamma, lfactorial, trigamma)
+              invdigamma, lfactorial, loggamma, logabsgamma, trigamma)
         @test f(missing) === missing
     end
     for f in (beta, lbeta)
