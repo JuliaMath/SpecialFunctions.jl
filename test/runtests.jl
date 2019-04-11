@@ -690,7 +690,7 @@ end
 
 @testset "missing data" begin
     for f in (digamma, erf, erfc, erfcinv, erfcx, erfi, erfinv, eta, gamma,
-              invdigamma, lfactorial, loggamma, logabsgamma, trigamma)
+              invdigamma, lfactorial, trigamma)
         @test f(missing) === missing
     end
     for f in (beta, lbeta)
