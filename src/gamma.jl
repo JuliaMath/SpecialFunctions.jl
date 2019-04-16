@@ -600,7 +600,7 @@ Base.@deprecate lfact lfactorial
     logabsgamma(x)
 
 Compute the logarithm of absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x`.
+[`Real`](@ref) `x`and returns a tuple (logabsgamma(x), sign(gamma(x))).
 """
 function logabsgamma end
 logabsgamma(x::Real) = logabsgamma(float(x))
@@ -760,7 +760,7 @@ function lgamma_r(x::BigFloat)
     return z, lgamma_signp[]
 end
 
-logabsgamma(x::BigFloat) = lgamma_r(x)[1]
+logabsgamma(x::BigFloat) = lgamma_r(x)
 function loggamma(x::BigFloat)
     y, s = lgamma_r(x)
     s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
@@ -786,8 +786,16 @@ end
 
 ## from base/math.jl
 
-logabsgamma(x::Float64) = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
-logabsgamma(x::Float32) = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
+function logabsgamma(x::Float64)
+    y = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
+    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
+    return y, sgn
+end
+function logabsgamma(x::Float32)
+    y = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
+    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
+    return y, sgn
+end
 logabsgamma(x::Float16) = Float16(logabsgamma(Float32(x)))
 logabsgamma(x::Integer) = logabsgamma(float(x))
 logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
