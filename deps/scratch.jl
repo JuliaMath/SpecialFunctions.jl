@@ -3,23 +3,20 @@
 using BinDeps
 using BinDeps: libdir, srcdir, includedir, depsdir, builddir
 using Base.Math: libm
+import BinaryProvider
+using Libdl
 
-if VERSION >= v"0.7.0-DEV.3382"
-    using Libdl
-end
-
-# Don't call setup again if we're being included from binaries.jl
-if !did_setup
-    BinDeps.@setup
-    const OSF_VERS = v"0.5.3"
-    openspecfun = library_dependency("libopenspecfun")
-end
+BinDeps.@setup
+const OSF_VERS = v"0.5.3"
+openspecfun = library_dependency("libopenspecfun")
 
 # If Julia is built with OpenLibm, we want to build OpenSpecFun with it as well.
 # Unfortunately this requires a fair bit more work, as we need to link to the .so
 # and to include the headers, which aren't readily available.
 if libm == "libopenlibm"
     const OLM_VERS = v"0.5.4"
+    const OLM_HASH = "9a8ae1d17825a4a6a4c013d36a7f4348b27c47eedb6549c521ecc9c79d021c13"
+    const OLM_URL = "https://github.com/JuliaLang/openlibm/archive/v$OLM_VERS.tar.gz"
     use_openlibm = true
 
     if !isdir(libdir(openspecfun))
@@ -32,39 +29,27 @@ if libm == "libopenlibm"
     for lib in readdir(dirname(openlibm_so))
         startswith(lib, "libopenlibm") || continue
         cp(joinpath(dirname(openlibm_so), lib), joinpath(libdir(openspecfun), lib),
-           remove_destination=true, follow_symlinks=false)
+           force=true, follow_symlinks=false)
     end
 
-    if !isdir(srcdir(openspecfun))
-        mkpath(srcdir(openspecfun))
-    end
-
-    # Grab and unpack the tarball so we can get the header files
-    openlibm_tarball = joinpath(srcdir(openspecfun), "openlibm-$OLM_VERS.tar.gz")
-    run(```
-        curl -fkL --connect-timeout 15 -y 15
-        https://github.com/JuliaLang/openlibm/archive/v$OLM_VERS.tar.gz
-        -o $openlibm_tarball
-    ```)
-    openlibm_src = joinpath(srcdir(openspecfun), "openlibm")
-    if !isdir(openlibm_src)
-        mkpath(openlibm_src)
-    end
-    run(`tar -C $openlibm_src --strip-components 1 -xf $openlibm_tarball`)
+    # Grab and unpack the tarball so we can get the header filesa
+    BinaryProvider.download_verify_unpack(OLM_URL, OLM_HASH, srcdir(openspecfun); verbose = true)
 
     # Copy over all of the OpenLibm headers
+    cp(joinpath(srcdir(openspecfun), "openlibm-$OLM_VERS"), joinpath(srcdir(openspecfun), "openlibm"); force=true)
+    openlibm_src = joinpath(srcdir(openspecfun), "openlibm")
     openlibm_include = joinpath(includedir(openspecfun), "openlibm")
     if !isdir(openlibm_include)
         mkpath(openlibm_include)
     end
     for f in readdir(joinpath(openlibm_src, "include"))
         cp(joinpath(openlibm_src, "include", f), joinpath(openlibm_include, f),
-           remove_destination=true, follow_symlinks=true)
+           force=true, follow_symlinks=true)
     end
     for f in readdir(joinpath(openlibm_src, "src"))
         if endswith(f, ".h")
             cp(joinpath(openlibm_src, "src", f), joinpath(openlibm_include, f),
-               remove_destination=true, follow_symlinks=true)
+               force=true, follow_symlinks=true)
         end
     end
 else
@@ -74,7 +59,7 @@ end
 fc = "gfortran"
 
 # macOS has precompiled binaries, so it's just FreeBSD that should default to Clang
-if Sys.KERNEL === :FreeBSD
+if Sys.KERNEL === :FreeBSD || Sys.KERNEL == :Darwin
     cc = "clang"
     use_clang = true
 else
@@ -89,6 +74,8 @@ elseif Sys.ARCH === :x86_64
     cc *= " -m64"
     fc *= " -m64"
 end
+
+extra_ld = Sys.isapple() ? "" : "-Wl,-rpath,'\$\$ORIGIN' -Wl,-z,origin"
 
 provides(Sources, URI("https://github.com/JuliaLang/openspecfun/archive/v$OSF_VERS.tar.gz"),
          openspecfun, unpacked_dir="openspecfun-$OSF_VERS")
@@ -112,7 +99,7 @@ provides(BuildProcess,
                         USE_OPENLIBM=$(Int(use_openlibm))
                         CFLAGS="-O3 -std=c99"
                         FFLAGS="-O2 -fPIC"
-                        LDFLAGS="-L$(libdir(openspecfun)) -Wl,-rpath,'\$\$ORIGIN' -Wl,-z,origin"
+                        LDFLAGS="-L$(libdir(openspecfun)) $extra_ld"
                         DESTDIR=""
                         prefix=""
                         libdir="$(libdir(openspecfun))"
@@ -123,8 +110,18 @@ provides(BuildProcess,
         end
     end), openspecfun)
 
-# If we're being included, the installation step happens once we return back
-# to binaries.jl
-if !did_setup
-    BinDeps.@install Dict(:libopenspecfun => :openspecfun)
+BinDeps.@install Dict(:libopenspecfun => :openspecfun)
+
+# BinDeps doesn't give us a `check_deps` function in the generated deps.jl file like
+# BinaryProvider does. Instead, it uses a macro and checks immediately whether the
+# library can be loaded. So let's just fake one.
+depsjl = joinpath(depsdir(openspecfun), "deps.jl")
+@assert isfile(depsjl)
+if !any(line->occursin("check_deps", line), eachline(depsjl))
+    open(depsjl, "a") do fh
+        println(fh, """
+            # NOTE: This function is a compatibility shim for BinaryProvider-based builds
+            check_deps() = nothing
+            """)
+    end
 end

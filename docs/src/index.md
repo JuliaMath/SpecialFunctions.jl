@@ -17,6 +17,11 @@ libraries.
 | [`sinint(x)`](@ref SpecialFunctions.sinint)                   | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
 | [`cosint(x)`](@ref SpecialFunctions.cosint)                   | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
 | [`digamma(x)`](@ref SpecialFunctions.digamma)                 | [digamma function](https://en.wikipedia.org/wiki/Digamma_function) (i.e. the derivative of `lgamma` at `x`)                                                     |
+| [`invdigamma(x)`](@ref SpecialFunctions.invdigamma)   | [invdigamma function](http://bariskurt.com/calculating-the-inverse-of-digamma-function/) (i.e. inverse of `digamma` function at `x` using fixed-point iteration algorithm) |
+| [`trigamma(x)`](@ref SpecialFunctions.trigamma)     | [trigamma function](https://en.wikipedia.org/wiki/Trigamma_function) (i.e the logarithmic second derivative of `gamma` at `x`) |
+| [`polygamma(m,x)`](@ref SpecialFunctions.polygamma)  | [polygamma function](https://en.wikipedia.org/wiki/Polygamma_function) (i.e the (m+1)-th derivative of the `lgamma` function at `x`) |
+| [`ellipk(x)`](@ref SpecialFunctions.ellipk)    | [complete elliptic integral of 1st kind](https://en.wikipedia.org/wiki/Elliptic_integral) (i.e evaluates complete elliptic integral of 1st kind at `x`)  |
+| [`ellipe(x)`](@ref SpecialFunctions.ellipe)    | [complete elliptic integral of 2nd kind](https://en.wikipedia.org/wiki/Elliptic_integral) (i.e evaluates complete elliptic integral of 2nd kind at `x`)  |
 | [`eta(x)`](@ref SpecialFunctions.eta)                         | [Dirichlet eta function](https://en.wikipedia.org/wiki/Dirichlet_eta_function) at `x`                                                                           |
 | [`zeta(x)`](@ref SpecialFunctions.zeta)                       | [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function) at `x`                                                                             |
 | [`airyai(z)`](@ref SpecialFunctions.airyai)                   | [Airy Ai function](https://en.wikipedia.org/wiki/Airy_function) at `z`                                                                                          |
@@ -41,6 +46,11 @@ libraries.
 | [`besselix(nu,z)`](@ref SpecialFunctions.besselix)            | scaled modified Bessel function of the first kind of order `nu` at `z`                                                                                          |
 | [`besselk(nu,z)`](@ref SpecialFunctions.besselk)              | modified [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the second kind of order `nu` at `z`                                               |
 | [`besselkx(nu,z)`](@ref SpecialFunctions.besselkx)            | scaled modified Bessel function of the second kind of order `nu` at `z`                                                                                         |
+| [`gamma(x)`](@ref SpecialFunctions.gamma)                                            | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) at `x`                                                                                           |
+| [`lgamma(x)`](@ref SpecialFunctions.lgamma)                                           | accurate `log(gamma(x))` for large `x`                                                                                                                          |
+| [`lfact(x)`](@ref SpecialFunctions.lfact)                                            | accurate `log(factorial(x))` for large `x`; same as `lgamma(x+1)` for `x > 1`, zero otherwise                                                                   |
+| [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
+| [`lbeta(x,y)`](@ref SpecialFunctions.lbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 
 ## Installation
 

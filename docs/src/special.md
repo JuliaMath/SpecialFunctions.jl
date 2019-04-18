@@ -45,6 +45,13 @@ SpecialFunctions.besseli
 SpecialFunctions.besselix
 SpecialFunctions.besselk
 SpecialFunctions.besselkx
+SpecialFunctions.ellipk
+SpecialFunctions.ellipe
 SpecialFunctions.eta
 SpecialFunctions.zeta
+SpecialFunctions.gamma
+SpecialFunctions.lgamma
+SpecialFunctions.lfact
+SpecialFunctions.beta
+SpecialFunctions.lbeta
 ```
