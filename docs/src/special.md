@@ -50,7 +50,7 @@ SpecialFunctions.eta
 SpecialFunctions.zeta
 SpecialFunctions.gamma
 SpecialFunctions.lgamma
-SpecialFunctions.lfact
+SpecialFunctions.lfactorial
 SpecialFunctions.beta
 SpecialFunctions.lbeta
 ```
