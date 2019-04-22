@@ -1,7 +1,7 @@
 var documenterSearchIndex = {"docs": [
 
 {
-    "location": "index.html#",
+    "location": "#",
     "page": "Home",
     "title": "Home",
     "category": "page",
@@ -9,15 +9,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Special-Functions-1",
+    "location": "#Special-Functions-1",
     "page": "Home",
     "title": "Special Functions",
     "category": "section",
-    "text": "This package provides a comprehensive collection of special functions based on the OpenSpecFun and OpenLibm libraries.Function Description\nerf(x) error function at x\nerfc(x) complementary error function, i.e. the accurate version of 1-erf(x) for large x\nerfinv(x) inverse function to erf()\nerfcinv(x) inverse function to erfc()\nerfi(x) imaginary error function defined as -im * erf(x * im), where im is the imaginary unit\nerfcx(x) scaled complementary error function, i.e. accurate exp(x^2) * erfc(x) for large x\ndawson(x) scaled imaginary error function, a.k.a. Dawson function, i.e. accurate exp(-x^2) * erfi(x) * sqrt(pi) / 2 for large x\nsinint(x) sine integral at x\ncosint(x) cosine integral at x\ndigamma(x) digamma function (i.e. the derivative of lgamma at x)\neta(x) Dirichlet eta function at x\nzeta(x) Riemann zeta function at x\nairyai(z) Airy Ai function at z\nairyaiprime(z) derivative of the Airy Ai function at z\nairybi(z) Airy Bi function at z\nairybiprime(z) derivative of the Airy Bi function at z\nairyaix(z), airyaiprimex(z), airybix(z), airybiprimex(z) scaled Airy Ai function and kth derivatives at z\nbesselj(nu,z) Bessel function of the first kind of order nu at z\nbesselj0(z) besselj(0,z)\nbesselj1(z) besselj(1,z)\nbesseljx(nu,z) scaled Bessel function of the first kind of order nu at z\nbessely(nu,z) Bessel function of the second kind of order nu at z\nbessely0(z) bessely(0,z)\nbessely1(z) bessely(1,z)\nbesselyx(nu,z) scaled Bessel function of the second kind of order nu at z\nbesselh(nu,k,z) Bessel function of the third kind (a.k.a. Hankel function) of order nu at z; k must be either 1 or 2\nhankelh1(nu,z) besselh(nu, 1, z)\nhankelh1x(nu,z) scaled besselh(nu, 1, z)\nhankelh2(nu,z) besselh(nu, 2, z)\nhankelh2x(nu,z) scaled besselh(nu, 2, z)\nbesseli(nu,z) modified Bessel function of the first kind of order nu at z\nbesselix(nu,z) scaled modified Bessel function of the first kind of order nu at z\nbesselk(nu,z) modified Bessel function of the second kind of order nu at z\nbesselkx(nu,z) scaled modified Bessel function of the second kind of order nu at z"
+    "text": "This package provides a comprehensive collection of special functions based on the OpenSpecFun and OpenLibm libraries.Function Description\nerf(x) error function at x\nerfc(x) complementary error function, i.e. the accurate version of 1-erf(x) for large x\nerfinv(x) inverse function to erf()\nerfcinv(x) inverse function to erfc()\nerfi(x) imaginary error function defined as -im * erf(x * im), where im is the imaginary unit\nerfcx(x) scaled complementary error function, i.e. accurate exp(x^2) * erfc(x) for large x\ndawson(x) scaled imaginary error function, a.k.a. Dawson function, i.e. accurate exp(-x^2) * erfi(x) * sqrt(pi) / 2 for large x\nsinint(x) sine integral at x\ncosint(x) cosine integral at x\ndigamma(x) digamma function (i.e. the derivative of lgamma at x)\ninvdigamma(x) invdigamma function (i.e. inverse of digamma function at x using fixed-point iteration algorithm)\ntrigamma(x) trigamma function (i.e the logarithmic second derivative of gamma at x)\npolygamma(m,x) polygamma function (i.e the (m+1)-th derivative of the lgamma function at x)\nellipk(x) complete elliptic integral of 1st kind (i.e evaluates complete elliptic integral of 1st kind at x)\nellipe(x) complete elliptic integral of 2nd kind (i.e evaluates complete elliptic integral of 2nd kind at x)\neta(x) Dirichlet eta function at x\nzeta(x) Riemann zeta function at x\nairyai(z) Airy Ai function at z\nairyaiprime(z) derivative of the Airy Ai function at z\nairybi(z) Airy Bi function at z\nairybiprime(z) derivative of the Airy Bi function at z\nairyaix(z), airyaiprimex(z), airybix(z), airybiprimex(z) scaled Airy Ai function and kth derivatives at z\nbesselj(nu,z) Bessel function of the first kind of order nu at z\nbesselj0(z) besselj(0,z)\nbesselj1(z) besselj(1,z)\nbesseljx(nu,z) scaled Bessel function of the first kind of order nu at z\nbessely(nu,z) Bessel function of the second kind of order nu at z\nbessely0(z) bessely(0,z)\nbessely1(z) bessely(1,z)\nbesselyx(nu,z) scaled Bessel function of the second kind of order nu at z\nbesselh(nu,k,z) Bessel function of the third kind (a.k.a. Hankel function) of order nu at z; k must be either 1 or 2\nhankelh1(nu,z) besselh(nu, 1, z)\nhankelh1x(nu,z) scaled besselh(nu, 1, z)\nhankelh2(nu,z) besselh(nu, 2, z)\nhankelh2x(nu,z) scaled besselh(nu, 2, z)\nbesseli(nu,z) modified Bessel function of the first kind of order nu at z\nbesselix(nu,z) scaled modified Bessel function of the first kind of order nu at z\nbesselk(nu,z) modified Bessel function of the second kind of order nu at z\nbesselkx(nu,z) scaled modified Bessel function of the second kind of order nu at z\ngamma(x) gamma function at x\nlgamma(x) accurate log(gamma(x)) for large x\nlfactorial(x) accurate log(factorial(x)) for large x; same as lgamma(x+1) for x > 1, zero otherwise\nbeta(x,y) beta function at x,y\nlbeta(x,y) accurate log(beta(x,y)) for large x or y"
 },
 
 {
-    "location": "index.html#Installation-1",
+    "location": "#Installation-1",
     "page": "Home",
     "title": "Installation",
     "category": "section",
@@ -25,7 +25,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Note-1",
+    "location": "#Note-1",
     "page": "Home",
     "title": "Note",
     "category": "section",
@@ -33,7 +33,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#",
+    "location": "special/#",
     "page": "Functions",
     "title": "Functions",
     "category": "page",
@@ -41,7 +41,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.erf",
+    "location": "special/#SpecialFunctions.erf",
     "page": "Functions",
     "title": "SpecialFunctions.erf",
     "category": "function",
@@ -49,7 +49,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.erfc",
+    "location": "special/#SpecialFunctions.erfc",
     "page": "Functions",
     "title": "SpecialFunctions.erfc",
     "category": "function",
@@ -57,7 +57,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.erfcx",
+    "location": "special/#SpecialFunctions.erfcx",
     "page": "Functions",
     "title": "SpecialFunctions.erfcx",
     "category": "function",
@@ -65,7 +65,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.erfi",
+    "location": "special/#SpecialFunctions.erfi",
     "page": "Functions",
     "title": "SpecialFunctions.erfi",
     "category": "function",
@@ -73,7 +73,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.dawson",
+    "location": "special/#SpecialFunctions.dawson",
     "page": "Functions",
     "title": "SpecialFunctions.dawson",
     "category": "function",
@@ -81,7 +81,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.erfinv",
+    "location": "special/#SpecialFunctions.erfinv",
     "page": "Functions",
     "title": "SpecialFunctions.erfinv",
     "category": "function",
@@ -89,7 +89,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.erfcinv",
+    "location": "special/#SpecialFunctions.erfcinv",
     "page": "Functions",
     "title": "SpecialFunctions.erfcinv",
     "category": "function",
@@ -97,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.sinint",
+    "location": "special/#SpecialFunctions.sinint",
     "page": "Functions",
     "title": "SpecialFunctions.sinint",
     "category": "function",
@@ -105,7 +105,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.cosint",
+    "location": "special/#SpecialFunctions.cosint",
     "page": "Functions",
     "title": "SpecialFunctions.cosint",
     "category": "function",
@@ -113,7 +113,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.digamma",
+    "location": "special/#SpecialFunctions.digamma",
     "page": "Functions",
     "title": "SpecialFunctions.digamma",
     "category": "function",
@@ -121,7 +121,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.invdigamma",
+    "location": "special/#SpecialFunctions.invdigamma",
     "page": "Functions",
     "title": "SpecialFunctions.invdigamma",
     "category": "function",
@@ -129,7 +129,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.trigamma",
+    "location": "special/#SpecialFunctions.trigamma",
     "page": "Functions",
     "title": "SpecialFunctions.trigamma",
     "category": "function",
@@ -137,7 +137,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.polygamma",
+    "location": "special/#SpecialFunctions.polygamma",
     "page": "Functions",
     "title": "SpecialFunctions.polygamma",
     "category": "function",
@@ -145,7 +145,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airyai",
+    "location": "special/#SpecialFunctions.airyai",
     "page": "Functions",
     "title": "SpecialFunctions.airyai",
     "category": "function",
@@ -153,7 +153,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airyaiprime",
+    "location": "special/#SpecialFunctions.airyaiprime",
     "page": "Functions",
     "title": "SpecialFunctions.airyaiprime",
     "category": "function",
@@ -161,7 +161,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airyaix",
+    "location": "special/#SpecialFunctions.airyaix",
     "page": "Functions",
     "title": "SpecialFunctions.airyaix",
     "category": "function",
@@ -169,7 +169,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airyaiprimex",
+    "location": "special/#SpecialFunctions.airyaiprimex",
     "page": "Functions",
     "title": "SpecialFunctions.airyaiprimex",
     "category": "function",
@@ -177,7 +177,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airybi",
+    "location": "special/#SpecialFunctions.airybi",
     "page": "Functions",
     "title": "SpecialFunctions.airybi",
     "category": "function",
@@ -185,7 +185,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airybiprime",
+    "location": "special/#SpecialFunctions.airybiprime",
     "page": "Functions",
     "title": "SpecialFunctions.airybiprime",
     "category": "function",
@@ -193,7 +193,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airybix",
+    "location": "special/#SpecialFunctions.airybix",
     "page": "Functions",
     "title": "SpecialFunctions.airybix",
     "category": "function",
@@ -201,7 +201,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.airybiprimex",
+    "location": "special/#SpecialFunctions.airybiprimex",
     "page": "Functions",
     "title": "SpecialFunctions.airybiprimex",
     "category": "function",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselj0",
+    "location": "special/#SpecialFunctions.besselj0",
     "page": "Functions",
     "title": "SpecialFunctions.besselj0",
     "category": "function",
@@ -217,7 +217,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselj1",
+    "location": "special/#SpecialFunctions.besselj1",
     "page": "Functions",
     "title": "SpecialFunctions.besselj1",
     "category": "function",
@@ -225,7 +225,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselj",
+    "location": "special/#SpecialFunctions.besselj",
     "page": "Functions",
     "title": "SpecialFunctions.besselj",
     "category": "function",
@@ -233,7 +233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besseljx",
+    "location": "special/#SpecialFunctions.besseljx",
     "page": "Functions",
     "title": "SpecialFunctions.besseljx",
     "category": "function",
@@ -241,7 +241,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.bessely0",
+    "location": "special/#SpecialFunctions.bessely0",
     "page": "Functions",
     "title": "SpecialFunctions.bessely0",
     "category": "function",
@@ -249,7 +249,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.bessely1",
+    "location": "special/#SpecialFunctions.bessely1",
     "page": "Functions",
     "title": "SpecialFunctions.bessely1",
     "category": "function",
@@ -257,7 +257,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.bessely",
+    "location": "special/#SpecialFunctions.bessely",
     "page": "Functions",
     "title": "SpecialFunctions.bessely",
     "category": "function",
@@ -265,7 +265,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselyx",
+    "location": "special/#SpecialFunctions.besselyx",
     "page": "Functions",
     "title": "SpecialFunctions.besselyx",
     "category": "function",
@@ -273,7 +273,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.hankelh1",
+    "location": "special/#SpecialFunctions.hankelh1",
     "page": "Functions",
     "title": "SpecialFunctions.hankelh1",
     "category": "function",
@@ -281,7 +281,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.hankelh1x",
+    "location": "special/#SpecialFunctions.hankelh1x",
     "page": "Functions",
     "title": "SpecialFunctions.hankelh1x",
     "category": "function",
@@ -289,7 +289,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.hankelh2",
+    "location": "special/#SpecialFunctions.hankelh2",
     "page": "Functions",
     "title": "SpecialFunctions.hankelh2",
     "category": "function",
@@ -297,7 +297,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.hankelh2x",
+    "location": "special/#SpecialFunctions.hankelh2x",
     "page": "Functions",
     "title": "SpecialFunctions.hankelh2x",
     "category": "function",
@@ -305,7 +305,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselh",
+    "location": "special/#SpecialFunctions.besselh",
     "page": "Functions",
     "title": "SpecialFunctions.besselh",
     "category": "function",
@@ -313,7 +313,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselhx",
+    "location": "special/#SpecialFunctions.besselhx",
     "page": "Functions",
     "title": "SpecialFunctions.besselhx",
     "category": "function",
@@ -321,7 +321,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besseli",
+    "location": "special/#SpecialFunctions.besseli",
     "page": "Functions",
     "title": "SpecialFunctions.besseli",
     "category": "function",
@@ -329,7 +329,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselix",
+    "location": "special/#SpecialFunctions.besselix",
     "page": "Functions",
     "title": "SpecialFunctions.besselix",
     "category": "function",
@@ -337,7 +337,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselk",
+    "location": "special/#SpecialFunctions.besselk",
     "page": "Functions",
     "title": "SpecialFunctions.besselk",
     "category": "function",
@@ -345,7 +345,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.besselkx",
+    "location": "special/#SpecialFunctions.besselkx",
     "page": "Functions",
     "title": "SpecialFunctions.besselkx",
     "category": "function",
@@ -353,7 +353,23 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.eta",
+    "location": "special/#SpecialFunctions.ellipk",
+    "page": "Functions",
+    "title": "SpecialFunctions.ellipk",
+    "category": "function",
+    "text": "ellipk(x)\n\nDLMF : https://dlmf.nist.gov/19.2#E4  , https://dlmf.nist.gov/19.2#E8   Wiki : https://en.wikipedia.org/wiki/Ellipticintegral  Computes Complete Elliptic Integral of 1st kind at x-> K(x)–- given by: ``\\int{0}^{\\pi/2} \\frac{1}{\\sqrt{1 - x(\\sin \\theta )^{2}}} d\\theta`` \n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.ellipe",
+    "page": "Functions",
+    "title": "SpecialFunctions.ellipe",
+    "category": "function",
+    "text": "ellipe(x)\n\nDLMF : https://dlmf.nist.gov/19.2#E5  , https://dlmf.nist.gov/19.2#E8   Wiki : https://en.wikipedia.org/wiki/Ellipticintegral Computes the Complete Elliptic Integral of 2nd kind at x ->E(x)–-gven by: ``\\int{0}^{\\pi/2} \\sqrt{1 - x(\\sin \\theta )^{2}} d\\theta``\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.eta",
     "page": "Functions",
     "title": "SpecialFunctions.eta",
     "category": "function",
@@ -361,7 +377,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#SpecialFunctions.zeta",
+    "location": "special/#SpecialFunctions.zeta",
     "page": "Functions",
     "title": "SpecialFunctions.zeta",
     "category": "function",
@@ -369,11 +385,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special.html#Functions-1",
+    "location": "special/#SpecialFunctions.gamma",
+    "page": "Functions",
+    "title": "SpecialFunctions.gamma",
+    "category": "function",
+    "text": "gamma(x)\n\nCompute the gamma function of x.\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.lgamma",
+    "page": "Functions",
+    "title": "SpecialFunctions.lgamma",
+    "category": "function",
+    "text": "lgamma(x)\n\nCompute the logarithm of the absolute value of gamma for Real x, while for Complex x compute the principal branch cut of the logarithm of gamma(x) (defined for negative real(x) by analytic continuation from positive real(x)).\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.lfactorial",
+    "page": "Functions",
+    "title": "SpecialFunctions.lfactorial",
+    "category": "function",
+    "text": "lfactorial(x)\n\nCompute the logarithmic factorial of a nonnegative integer x. Equivalent to lgamma of x + 1, but lgamma extends this function to non-integer x.\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.beta",
+    "page": "Functions",
+    "title": "SpecialFunctions.beta",
+    "category": "function",
+    "text": "beta(x, y)\n\nEuler integral of the first kind operatornameB(xy) = Gamma(x)Gamma(y)Gamma(x+y).\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.lbeta",
+    "page": "Functions",
+    "title": "SpecialFunctions.lbeta",
+    "category": "function",
+    "text": "lbeta(x, y)\n\nNatural logarithm of the absolute value of the beta function log(operatornameB(xy)).\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#Functions-1",
     "page": "Functions",
     "title": "Functions",
     "category": "section",
-    "text": "CurrentModule = SpecialFunctionsSpecialFunctions.erf\nSpecialFunctions.erfc\nSpecialFunctions.erfcx\nSpecialFunctions.erfi\nSpecialFunctions.dawson\nSpecialFunctions.erfinv\nSpecialFunctions.erfcinv\nSpecialFunctions.sinint\nSpecialFunctions.cosint\nSpecialFunctions.digamma\nSpecialFunctions.invdigamma\nSpecialFunctions.trigamma\nSpecialFunctions.polygamma\nSpecialFunctions.airyai\nSpecialFunctions.airyaiprime\nSpecialFunctions.airyaix\nSpecialFunctions.airyaiprimex\nSpecialFunctions.airybi\nSpecialFunctions.airybiprime\nSpecialFunctions.airybix\nSpecialFunctions.airybiprimex\nSpecialFunctions.besselj0\nSpecialFunctions.besselj1\nSpecialFunctions.besselj\nSpecialFunctions.besseljx\nSpecialFunctions.bessely0\nSpecialFunctions.bessely1\nSpecialFunctions.bessely\nSpecialFunctions.besselyx\nSpecialFunctions.hankelh1\nSpecialFunctions.hankelh1x\nSpecialFunctions.hankelh2\nSpecialFunctions.hankelh2x\nSpecialFunctions.besselh\nSpecialFunctions.besselhx\nSpecialFunctions.besseli\nSpecialFunctions.besselix\nSpecialFunctions.besselk\nSpecialFunctions.besselkx\nSpecialFunctions.eta\nSpecialFunctions.zeta"
+    "text": "CurrentModule = SpecialFunctionsSpecialFunctions.erf\nSpecialFunctions.erfc\nSpecialFunctions.erfcx\nSpecialFunctions.erfi\nSpecialFunctions.dawson\nSpecialFunctions.erfinv\nSpecialFunctions.erfcinv\nSpecialFunctions.sinint\nSpecialFunctions.cosint\nSpecialFunctions.digamma\nSpecialFunctions.invdigamma\nSpecialFunctions.trigamma\nSpecialFunctions.polygamma\nSpecialFunctions.airyai\nSpecialFunctions.airyaiprime\nSpecialFunctions.airyaix\nSpecialFunctions.airyaiprimex\nSpecialFunctions.airybi\nSpecialFunctions.airybiprime\nSpecialFunctions.airybix\nSpecialFunctions.airybiprimex\nSpecialFunctions.besselj0\nSpecialFunctions.besselj1\nSpecialFunctions.besselj\nSpecialFunctions.besseljx\nSpecialFunctions.bessely0\nSpecialFunctions.bessely1\nSpecialFunctions.bessely\nSpecialFunctions.besselyx\nSpecialFunctions.hankelh1\nSpecialFunctions.hankelh1x\nSpecialFunctions.hankelh2\nSpecialFunctions.hankelh2x\nSpecialFunctions.besselh\nSpecialFunctions.besselhx\nSpecialFunctions.besseli\nSpecialFunctions.besselix\nSpecialFunctions.besselk\nSpecialFunctions.besselkx\nSpecialFunctions.ellipk\nSpecialFunctions.ellipe\nSpecialFunctions.eta\nSpecialFunctions.zeta\nSpecialFunctions.gamma\nSpecialFunctions.lgamma\nSpecialFunctions.lfactorial\nSpecialFunctions.beta\nSpecialFunctions.lbeta"
 },
 
 ]}
