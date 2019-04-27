@@ -697,8 +697,8 @@ end
     @test beta(3,5) ≈ 1/105
     @test lbeta(5,4) ≈ log(beta(5,4))
     @test beta(5,4) ≈ beta(4,5)
- #   @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈ -16/3
- #   @test lbeta(-1/2, 3) ≈ log(16/3)
+    @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈ -16/3
+    @test lbeta(-1/2, 3) ≈ log(16/3)
     @test beta(Float32(5),Float32(4)) == beta(Float32(4),Float32(5))
     @test beta(3,5) ≈ beta(3+0im,5+0im)
     @test(beta(3.2+0.1im,5.3+0.3im) ≈ exp(lbeta(3.2+0.1im,5.3+0.3im)) ≈
@@ -715,8 +715,8 @@ end
     @test lbinomial(10, 10) == 0.0
 
     @test lbinomial(10,  1)      ≈ log(10)
-   # @test lbinomial(-6, 10)      ≈ log(binomial(-6, 10))
-   # @test lbinomial(-6, 11)      ≈ log(abs(binomial(-6, 11)))
+    @test lbinomial(-6, 10)      ≈ log(binomial(-6, 10))
+    @test lbinomial(-6, 11)      ≈ log(abs(binomial(-6, 11)))
     @test lbinomial.(200, 0:200) ≈ log.(binomial.(BigInt(200), (0:200)))
 end
 
