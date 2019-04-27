@@ -567,24 +567,22 @@ Compute the gamma function of `x`.
 """
 gamma(x::Real) = gamma(float(x))
 
-function lgamma_r(x::Float64)
-    signp = Ref{Int32}()
-    y = ccall((:lgamma_r,libm),  Float64, (Float64, Ptr{Int32}), x, signp)
-    return y, signp[]
+function logabsgamma(x::Float64)
+    y = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
+    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
+    return (y, sgn)
 end
-function lgamma_r(x::Float32)
-    signp = Ref{Int32}()
-    y = ccall((:lgammaf_r,libm),  Float32, (Float32, Ptr{Int32}), x, signp)
-    return y, signp[]
+function logabsgamma(x::Float32)
+    y = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
+    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
+    return (y, sgn)
 end
-lgamma_r(x::Real) = lgamma_r(float(x))
-lgamma_r(x::Number) = loggamma(x), 1 # loggamma does not take abs for non-real x
-"""
-    lgamma_r(x)
+logabsgamma(x::Real) = logabsgamma(float(x))
+logabsgamma(x::Float16) = Float16(logabsgamma(Float32(x)))
+logabsgamma(x::Integer) = logabsgamma(float(x))
+logabsgamma(x::Number) = loggamma(x), 1 # loggamma does not take abs for non-real x
+logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
 
-Return L,s such that `gamma(x) = s * exp(L)`
-"""
-lgamma_r
 
 """
     lfactorial(x)
@@ -603,7 +601,6 @@ Compute the logarithm of absolute value of [`gamma`](@ref) for
 [`Real`](@ref) `x`and returns a tuple (logabsgamma(x), sign(gamma(x))).
 """
 function logabsgamma end
-logabsgamma(x::Real) = logabsgamma(float(x))
 
 """
     loggamma(x)
@@ -614,14 +611,13 @@ function loggamma end
 
 
 function loggamma(x::T) where {T<:Union{Float64,Float32}}
-    y, s = lgamma_r(x)
-    println(s)
+    (y, s) = logabsgamma(x)
     s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
 
 function loggamma(x::Real)
-    y, s = lgamma_r(x)
+    (y, s) = logabsgamma(x)
     s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
@@ -718,6 +714,7 @@ end
 loggamma(z::Complex{T}) where {T<:Union{Integer,Rational}} = loggamma(float(z))
 loggamma(z::Complex{T}) where {T<:Union{Float32,Float16}} = Complex{T}(loggamma(Complex{Float64}(z)))
 loggamma(x::Float16) = Float16(loggamma(Float32(x)))
+loggamma(x::AbstractFloat) = throw(MethodError(loggamma, x))
 
 gamma(z::Complex) = exp(loggamma(z))
 
@@ -727,9 +724,9 @@ gamma(z::Complex) = exp(loggamma(z))
 Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)/\\Gamma(x+y)``.
 """
 function beta(x::Number, w::Number)
-    yx, sx = lgamma_r(x)
-    yw, sw = lgamma_r(w)
-    yxw, sxw = lgamma_r(x+w)
+    yx, sx = logabsgamma(x)
+    yw, sw = logabsgamma(w)
+    yxw, sxw = logabsgamma(x+w)
     return exp(yx + yw - yxw) * (sx*sw*sxw)
 end
 
@@ -739,7 +736,7 @@ end
 Natural logarithm of the absolute value of the [`beta`](@ref)
 function ``\\log(|\\operatorname{B}(x,y)|)``.
 """
-lbeta(x::Number, w::Number) = loggamma(x)+loggamma(w)-loggamma(x+w)
+lbeta(x::Number, w::Number) = logabsgamma(x)[1]+logabsgamma(w)[1]-logabsgamma(x+w)[1]
 
 ## from base/mpfr.jl
 
@@ -753,16 +750,15 @@ function gamma(x::BigFloat)
 end
 
 # log of absolute value of gamma function
-function lgamma_r(x::BigFloat)
+function logabsgamma(x::BigFloat)
     z = BigFloat()
     lgamma_signp = Ref{Cint}()
     ccall((:mpfr_lgamma,:libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
     return z, lgamma_signp[]
 end
 
-logabsgamma(x::BigFloat) = lgamma_r(x)
 function loggamma(x::BigFloat)
-    y, s = lgamma_r(x)
+    (y, s) = logabsgamma(x)
     s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
@@ -786,20 +782,6 @@ end
 
 ## from base/math.jl
 
-function logabsgamma(x::Float64)
-    y = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
-    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
-    return y, sgn
-end
-function logabsgamma(x::Float32)
-    y = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
-    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
-    return y, sgn
-end
-logabsgamma(x::Float16) = Float16(logabsgamma(Float32(x)))
-logabsgamma(x::Integer) = logabsgamma(float(x))
-logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
-loggamma(x::AbstractFloat) = throw(MethodError(loggamma, x))
 ## from base/numbers.jl
 
 # this trickery is needed while the deprecated method in Base exists
