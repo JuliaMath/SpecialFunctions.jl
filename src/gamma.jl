@@ -568,17 +568,17 @@ Compute the gamma function of `x`.
 gamma(x::Real) = gamma(float(x))
 
 function logabsgamma(x::Float64)
-    y = nan_dom_err(ccall((:lgamma, libm), Float64, (Float64,), x), x)
-    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
-    return (y, sgn)
+    signp = Ref{Int32}()
+    y = ccall((:lgamma_r,libm),  Float64, (Float64, Ptr{Int32}), x, signp)
+    return y, signp[]
 end
 function logabsgamma(x::Float32)
-    y = nan_dom_err(ccall((:lgammaf, libm), Float32, (Float32,), x), x)
-    sgn = (gamma(x) > 0.0) ? 1.0 : -1.0
-    return (y, sgn)
+    signp = Ref{Int32}()
+    y = ccall((:lgammaf_r,libm),  Float32, (Float32, Ptr{Int32}), x, signp)
+    return y, signp[]
 end
 logabsgamma(x::Real) = logabsgamma(float(x))
-logabsgamma(x::Float16) = Float16(logabsgamma(Float32(x)))
+logabsgamma(x::Float16) = Float16.(logabsgamma(Float32(x)))
 logabsgamma(x::Integer) = logabsgamma(float(x))
 logabsgamma(x::Number) = loggamma(x), 1 # loggamma does not take abs for non-real x
 logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
@@ -608,13 +608,6 @@ function logabsgamma end
 Computes the logarithm of [`gamma`](@ref) for given `x`
 """
 function loggamma end
-
-
-function loggamma(x::T) where {T<:Union{Float64,Float32}}
-    (y, s) = logabsgamma(x)
-    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
-    return y
-end
 
 function loggamma(x::Real)
     (y, s) = logabsgamma(x)
@@ -713,8 +706,6 @@ function loggamma(z::Complex{Float64})
 end
 loggamma(z::Complex{T}) where {T<:Union{Integer,Rational}} = loggamma(float(z))
 loggamma(z::Complex{T}) where {T<:Union{Float32,Float16}} = Complex{T}(loggamma(Complex{Float64}(z)))
-loggamma(x::Float16) = Float16(loggamma(Float32(x)))
-loggamma(x::AbstractFloat) = throw(MethodError(loggamma, x))
 
 gamma(z::Complex) = exp(loggamma(z))
 

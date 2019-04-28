@@ -5,7 +5,7 @@
 @deprecate airyprime(z::Number) airyaiprime(z)
 @deprecate lgamma(x::Real) logabsgamma(x)[1]
 @deprecate lgamma(x::Number) loggamma(x)
-@deprecate lgamma_r logabsgamma
+@deprecate lgamma_r(x) logabsgamma(x)
 
 function _airy(k::Integer, z::Complex{Float64})
     Base.depwarn("`airy(k,x)` is deprecated, use `airyai(x)`, `airyaiprime(x)`, `airybi(x)` or `airybiprime(x)` instead.",:airy)
