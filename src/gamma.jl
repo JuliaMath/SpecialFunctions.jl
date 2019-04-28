@@ -551,7 +551,7 @@ function polygamma(m::Integer, z::Number)
     polygamma(m, x)
 end
 
-export gamma, loggamma, logabsgamma, beta, lbeta, lfactorial
+export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, lfactorial
 
 ## from base/special/gamma.jl
 
@@ -580,7 +580,6 @@ end
 logabsgamma(x::Real) = logabsgamma(float(x))
 logabsgamma(x::Float16) = Float16.(logabsgamma(Float32(x)))
 logabsgamma(x::Integer) = logabsgamma(float(x))
-logabsgamma(x::Number) = loggamma(x), 1 # loggamma does not take abs for non-real x
 logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
 
 
@@ -714,21 +713,37 @@ gamma(z::Complex) = exp(loggamma(z))
 
 Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)/\\Gamma(x+y)``.
 """
-function beta(x::Number, w::Number)
+function beta end
+
+function beta(x::Real, w::Real)
     yx, sx = logabsgamma(x)
     yw, sw = logabsgamma(w)
     yxw, sxw = logabsgamma(x+w)
     return exp(yx + yw - yxw) * (sx*sw*sxw)
 end
 
+function beta(x::Number, w::Number)
+    yx = loggamma(x)
+    yw = loggamma(w)
+    yxw = loggamma(x+w)
+    return exp(yx + yw - yxw)
+end
+
 """
-    lbeta(x, y)
+    logbeta(x, y)
+
+Natural logarithm of the [`beta`](@ref)
+function ``\\log(|\\operatorname{B}(x,y)|)``.
+"""
+logbeta(x::Number, w::Number) = loggamma(x)+loggamma(w)-loggamma(x+w)
+
+"""
+    logabsbeta(x, y)
 
 Natural logarithm of the absolute value of the [`beta`](@ref)
 function ``\\log(|\\operatorname{B}(x,y)|)``.
 """
-lbeta(x::Number, w::Number) = logabsgamma(x)[1]+logabsgamma(w)[1]-logabsgamma(x+w)[1]
-
+logabsbeta(x::Real, w::Real) = logabsgamma(x)[1]+logabsgamma(w)[1]-logabsgamma(x+w)[1]
 ## from base/mpfr.jl
 
 # Functions for which NaN results are converted to DomainError, following Base
@@ -800,6 +815,6 @@ function lbinomial(n::T, k::T) where {T<:Integer}
     if k > (n>>1)
         k = n - k
     end
-    -log1p(n) - lbeta(n - k + one(T), k + one(T))
+    -log1p(n) - logabsbeta(n - k + one(T), k + one(T))[1]
 end
 lbinomial(n::Integer, k::Integer) = lbinomial(promote(n, k)...)

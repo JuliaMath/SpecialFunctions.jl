@@ -695,13 +695,13 @@ end
 @testset "beta, lbeta" begin
     @test beta(3/2,7/2) ≈ 5π/128
     @test beta(3,5) ≈ 1/105
-    @test lbeta(5,4) ≈ log(beta(5,4))
+    @test logbeta(5,4) ≈ log(beta(5,4))
     @test beta(5,4) ≈ beta(4,5)
     @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈ -16/3
-    @test lbeta(-1/2, 3) ≈ log(16/3)
+    @test logabsbeta(-1/2, 3) ≈ log(16/3)
     @test beta(Float32(5),Float32(4)) == beta(Float32(4),Float32(5))
     @test beta(3,5) ≈ beta(3+0im,5+0im)
-    @test(beta(3.2+0.1im,5.3+0.3im) ≈ exp(lbeta(3.2+0.1im,5.3+0.3im)) ≈
+    @test(beta(3.2+0.1im,5.3+0.3im) ≈ exp(logbeta(3.2+0.1im,5.3+0.3im)) ≈
           0.00634645247782269506319336871208405439180447035257028310080 -
           0.00169495384841964531409376316336552555952269360134349446910im)
 
@@ -725,10 +725,8 @@ end
               invdigamma, lfactorial, trigamma)
         @test f(missing) === missing
     end
-    for f in (beta, lbeta)
-        @test f(1.0, missing) === missing
-        @test f(missing, 1.0) === missing
-        @test f(missing, missing) === missing
-    end
+    @test beta(1.0, missing) === missing
+    @test beta(missing, 1.0) === missing
+    @test beta(missing, missing) === missing
     @test polygamma(4, missing) === missing
 end
