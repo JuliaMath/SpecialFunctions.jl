@@ -740,8 +740,7 @@ logbeta(x::Number, w::Number) = loggamma(x)+loggamma(w)-loggamma(x+w)
 """
     logabsbeta(x, y)
 
-Natural logarithm of the absolute value of the [`beta`](@ref)
-function ``\\log(|\\operatorname{B}(x,y)|)``.
+Returns a tuple of the natural logarithm of the absolute value of the [`beta`](@ref) function ``\\log(|\\operatorname{B}(x,y)|)`` and sign of the [`beta`](@ref) function .
 """
 function logabsbeta(x::Real, w::Real)
     yx, sx = logabsgamma(x)
