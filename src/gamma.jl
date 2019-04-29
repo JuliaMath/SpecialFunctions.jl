@@ -743,7 +743,12 @@ logbeta(x::Number, w::Number) = loggamma(x)+loggamma(w)-loggamma(x+w)
 Natural logarithm of the absolute value of the [`beta`](@ref)
 function ``\\log(|\\operatorname{B}(x,y)|)``.
 """
-logabsbeta(x::Real, w::Real) = logabsgamma(x)[1]+logabsgamma(w)[1]-logabsgamma(x+w)[1]
+function logabsbeta(x::Real, w::Real)
+    yx, sx = logabsgamma(x)
+    yw, sw = logabsgamma(w)
+    yxw, sxw = logabsgamma(x+w)
+    (yx + yw - yxw), (sx*sw*sxw)
+end
 ## from base/mpfr.jl
 
 # Functions for which NaN results are converted to DomainError, following Base
