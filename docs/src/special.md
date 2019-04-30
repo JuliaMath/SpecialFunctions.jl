@@ -49,8 +49,10 @@ SpecialFunctions.ellipe
 SpecialFunctions.eta
 SpecialFunctions.zeta
 SpecialFunctions.gamma
-SpecialFunctions.lgamma
+SpecialFunctions.loggamma
+SpecialFunctions.logabsgamma
 SpecialFunctions.lfact
 SpecialFunctions.beta
-SpecialFunctions.lbeta
+SpecialFunctions.logbeta
+SpecialFunctions.logabsbeta
 ```
