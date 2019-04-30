@@ -51,7 +51,7 @@ SpecialFunctions.zeta
 SpecialFunctions.gamma
 SpecialFunctions.loggamma
 SpecialFunctions.logabsgamma
-SpecialFunctions.lfact
+SpecialFunctions.lfactorial
 SpecialFunctions.beta
 SpecialFunctions.logbeta
 SpecialFunctions.logabsbeta
