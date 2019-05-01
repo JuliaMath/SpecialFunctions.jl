@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Special Functions",
     "category": "section",
-    "text": "This package provides a comprehensive collection of special functions based on the OpenSpecFun and OpenLibm libraries.Function Description\nerf(x) error function at x\nerfc(x) complementary error function, i.e. the accurate version of 1-erf(x) for large x\nerfinv(x) inverse function to erf()\nerfcinv(x) inverse function to erfc()\nerfi(x) imaginary error function defined as -im * erf(x * im), where im is the imaginary unit\nerfcx(x) scaled complementary error function, i.e. accurate exp(x^2) * erfc(x) for large x\ndawson(x) scaled imaginary error function, a.k.a. Dawson function, i.e. accurate exp(-x^2) * erfi(x) * sqrt(pi) / 2 for large x\nsinint(x) sine integral at x\ncosint(x) cosine integral at x\ndigamma(x) digamma function (i.e. the derivative of lgamma at x)\ninvdigamma(x) invdigamma function (i.e. inverse of digamma function at x using fixed-point iteration algorithm)\ntrigamma(x) trigamma function (i.e the logarithmic second derivative of gamma at x)\npolygamma(m,x) polygamma function (i.e the (m+1)-th derivative of the lgamma function at x)\nellipk(x) complete elliptic integral of 1st kind (i.e evaluates complete elliptic integral of 1st kind at x)\nellipe(x) complete elliptic integral of 2nd kind (i.e evaluates complete elliptic integral of 2nd kind at x)\neta(x) Dirichlet eta function at x\nzeta(x) Riemann zeta function at x\nairyai(z) Airy Ai function at z\nairyaiprime(z) derivative of the Airy Ai function at z\nairybi(z) Airy Bi function at z\nairybiprime(z) derivative of the Airy Bi function at z\nairyaix(z), airyaiprimex(z), airybix(z), airybiprimex(z) scaled Airy Ai function and kth derivatives at z\nbesselj(nu,z) Bessel function of the first kind of order nu at z\nbesselj0(z) besselj(0,z)\nbesselj1(z) besselj(1,z)\nbesseljx(nu,z) scaled Bessel function of the first kind of order nu at z\nbessely(nu,z) Bessel function of the second kind of order nu at z\nbessely0(z) bessely(0,z)\nbessely1(z) bessely(1,z)\nbesselyx(nu,z) scaled Bessel function of the second kind of order nu at z\nbesselh(nu,k,z) Bessel function of the third kind (a.k.a. Hankel function) of order nu at z; k must be either 1 or 2\nhankelh1(nu,z) besselh(nu, 1, z)\nhankelh1x(nu,z) scaled besselh(nu, 1, z)\nhankelh2(nu,z) besselh(nu, 2, z)\nhankelh2x(nu,z) scaled besselh(nu, 2, z)\nbesseli(nu,z) modified Bessel function of the first kind of order nu at z\nbesselix(nu,z) scaled modified Bessel function of the first kind of order nu at z\nbesselk(nu,z) modified Bessel function of the second kind of order nu at z\nbesselkx(nu,z) scaled modified Bessel function of the second kind of order nu at z\ngamma(x) gamma function at x\nlgamma(x) accurate log(gamma(x)) for large x\nlfactorial(x) accurate log(factorial(x)) for large x; same as lgamma(x+1) for x > 1, zero otherwise\nbeta(x,y) beta function at x,y\nlbeta(x,y) accurate log(beta(x,y)) for large x or y"
+    "text": "This package provides a comprehensive collection of special functions based on the OpenSpecFun and OpenLibm libraries.Function Description\nerf(x) error function at x\nerfc(x) complementary error function, i.e. the accurate version of 1-erf(x) for large x\nerfinv(x) inverse function to erf()\nerfcinv(x) inverse function to erfc()\nerfi(x) imaginary error function defined as -im * erf(x * im), where im is the imaginary unit\nerfcx(x) scaled complementary error function, i.e. accurate exp(x^2) * erfc(x) for large x\ndawson(x) scaled imaginary error function, a.k.a. Dawson function, i.e. accurate exp(-x^2) * erfi(x) * sqrt(pi) / 2 for large x\nsinint(x) sine integral at x\ncosint(x) cosine integral at x\ndigamma(x) digamma function (i.e. the derivative of lgamma at x)\ninvdigamma(x) invdigamma function (i.e. inverse of digamma function at x using fixed-point iteration algorithm)\ntrigamma(x) trigamma function (i.e the logarithmic second derivative of gamma at x)\npolygamma(m,x) polygamma function (i.e the (m+1)-th derivative of the lgamma function at x)\nellipk(x) complete elliptic integral of 1st kind (i.e evaluates complete elliptic integral of 1st kind at x)\nellipe(x) complete elliptic integral of 2nd kind (i.e evaluates complete elliptic integral of 2nd kind at x)\neta(x) Dirichlet eta function at x\nzeta(x) Riemann zeta function at x\nairyai(z) Airy Ai function at z\nairyaiprime(z) derivative of the Airy Ai function at z\nairybi(z) Airy Bi function at z\nairybiprime(z) derivative of the Airy Bi function at z\nairyaix(z), airyaiprimex(z), airybix(z), airybiprimex(z) scaled Airy Ai function and kth derivatives at z\nbesselj(nu,z) Bessel function of the first kind of order nu at z\nbesselj0(z) besselj(0,z)\nbesselj1(z) besselj(1,z)\nbesseljx(nu,z) scaled Bessel function of the first kind of order nu at z\nbessely(nu,z) Bessel function of the second kind of order nu at z\nbessely0(z) bessely(0,z)\nbessely1(z) bessely(1,z)\nbesselyx(nu,z) scaled Bessel function of the second kind of order nu at z\nbesselh(nu,k,z) Bessel function of the third kind (a.k.a. Hankel function) of order nu at z; k must be either 1 or 2\nhankelh1(nu,z) besselh(nu, 1, z)\nhankelh1x(nu,z) scaled besselh(nu, 1, z)\nhankelh2(nu,z) besselh(nu, 2, z)\nhankelh2x(nu,z) scaled besselh(nu, 2, z)\nbesseli(nu,z) modified Bessel function of the first kind of order nu at z\nbesselix(nu,z) scaled modified Bessel function of the first kind of order nu at z\nbesselk(nu,z) modified Bessel function of the second kind of order nu at z\nbesselkx(nu,z) scaled modified Bessel function of the second kind of order nu at z\ngamma(x) gamma function at x\nloggamma(x) accurate log(gamma(x)) for large x\nlogabsgamma(x) accurate log(abs(gamma(x))) for large x\nlgamma(x) accurate log(gamma(x)) for large x\nlfactorial(x) accurate log(factorial(x)) for large x; same as lgamma(x+1) for x > 1, zero otherwise\nbeta(x,y) beta function at x,y\nlogbeta(x,y) accurate log(beta(x,y)) for large x or y\nlogabsbeta(x,y) accurate log(abs(beta(x,y))) for large x or y"
 },
 
 {
@@ -393,11 +393,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special/#SpecialFunctions.lgamma",
+    "location": "special/#SpecialFunctions.loggamma",
     "page": "Functions",
-    "title": "SpecialFunctions.lgamma",
+    "title": "SpecialFunctions.loggamma",
     "category": "function",
-    "text": "lgamma(x)\n\nCompute the logarithm of the absolute value of gamma for Real x, while for Complex x compute the principal branch cut of the logarithm of gamma(x) (defined for negative real(x) by analytic continuation from positive real(x)).\n\n\n\n\n\n"
+    "text": "loggamma(x)\n\nComputes the logarithm of gamma for given x\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.logabsgamma",
+    "page": "Functions",
+    "title": "SpecialFunctions.logabsgamma",
+    "category": "function",
+    "text": "logabsgamma(x)\n\nCompute the logarithm of absolute value of gamma for Real xand returns a tuple (logabsgamma(x), sign(gamma(x))).\n\n\n\n\n\n"
 },
 
 {
@@ -405,7 +413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "SpecialFunctions.lfactorial",
     "category": "function",
-    "text": "lfactorial(x)\n\nCompute the logarithmic factorial of a nonnegative integer x. Equivalent to lgamma of x + 1, but lgamma extends this function to non-integer x.\n\n\n\n\n\n"
+    "text": "lfactorial(x)\n\nCompute the logarithmic factorial of a nonnegative integer x. Equivalent to loggamma of x + 1, but loggamma extends this function to non-integer x.\n\n\n\n\n\n"
 },
 
 {
@@ -417,11 +425,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "special/#SpecialFunctions.lbeta",
+    "location": "special/#SpecialFunctions.logbeta",
     "page": "Functions",
-    "title": "SpecialFunctions.lbeta",
+    "title": "SpecialFunctions.logbeta",
     "category": "function",
-    "text": "lbeta(x, y)\n\nNatural logarithm of the absolute value of the beta function log(operatornameB(xy)).\n\n\n\n\n\n"
+    "text": "logbeta(x, y)\n\nNatural logarithm of the beta function log(operatornameB(xy)).\n\n\n\n\n\n"
+},
+
+{
+    "location": "special/#SpecialFunctions.logabsbeta",
+    "page": "Functions",
+    "title": "SpecialFunctions.logabsbeta",
+    "category": "function",
+    "text": "logabsbeta(x, y)\n\nReturns a tuple of the natural logarithm of the absolute value of the beta function log(operatornameB(xy)) and sign of the beta function .\n\n\n\n\n\n"
 },
 
 {
@@ -429,7 +445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "Functions",
     "category": "section",
-    "text": "CurrentModule = SpecialFunctionsSpecialFunctions.erf\nSpecialFunctions.erfc\nSpecialFunctions.erfcx\nSpecialFunctions.erfi\nSpecialFunctions.dawson\nSpecialFunctions.erfinv\nSpecialFunctions.erfcinv\nSpecialFunctions.sinint\nSpecialFunctions.cosint\nSpecialFunctions.digamma\nSpecialFunctions.invdigamma\nSpecialFunctions.trigamma\nSpecialFunctions.polygamma\nSpecialFunctions.airyai\nSpecialFunctions.airyaiprime\nSpecialFunctions.airyaix\nSpecialFunctions.airyaiprimex\nSpecialFunctions.airybi\nSpecialFunctions.airybiprime\nSpecialFunctions.airybix\nSpecialFunctions.airybiprimex\nSpecialFunctions.besselj0\nSpecialFunctions.besselj1\nSpecialFunctions.besselj\nSpecialFunctions.besseljx\nSpecialFunctions.bessely0\nSpecialFunctions.bessely1\nSpecialFunctions.bessely\nSpecialFunctions.besselyx\nSpecialFunctions.hankelh1\nSpecialFunctions.hankelh1x\nSpecialFunctions.hankelh2\nSpecialFunctions.hankelh2x\nSpecialFunctions.besselh\nSpecialFunctions.besselhx\nSpecialFunctions.besseli\nSpecialFunctions.besselix\nSpecialFunctions.besselk\nSpecialFunctions.besselkx\nSpecialFunctions.ellipk\nSpecialFunctions.ellipe\nSpecialFunctions.eta\nSpecialFunctions.zeta\nSpecialFunctions.gamma\nSpecialFunctions.lgamma\nSpecialFunctions.lfactorial\nSpecialFunctions.beta\nSpecialFunctions.lbeta"
+    "text": "CurrentModule = SpecialFunctionsSpecialFunctions.erf\nSpecialFunctions.erfc\nSpecialFunctions.erfcx\nSpecialFunctions.erfi\nSpecialFunctions.dawson\nSpecialFunctions.erfinv\nSpecialFunctions.erfcinv\nSpecialFunctions.sinint\nSpecialFunctions.cosint\nSpecialFunctions.digamma\nSpecialFunctions.invdigamma\nSpecialFunctions.trigamma\nSpecialFunctions.polygamma\nSpecialFunctions.airyai\nSpecialFunctions.airyaiprime\nSpecialFunctions.airyaix\nSpecialFunctions.airyaiprimex\nSpecialFunctions.airybi\nSpecialFunctions.airybiprime\nSpecialFunctions.airybix\nSpecialFunctions.airybiprimex\nSpecialFunctions.besselj0\nSpecialFunctions.besselj1\nSpecialFunctions.besselj\nSpecialFunctions.besseljx\nSpecialFunctions.bessely0\nSpecialFunctions.bessely1\nSpecialFunctions.bessely\nSpecialFunctions.besselyx\nSpecialFunctions.hankelh1\nSpecialFunctions.hankelh1x\nSpecialFunctions.hankelh2\nSpecialFunctions.hankelh2x\nSpecialFunctions.besselh\nSpecialFunctions.besselhx\nSpecialFunctions.besseli\nSpecialFunctions.besselix\nSpecialFunctions.besselk\nSpecialFunctions.besselkx\nSpecialFunctions.ellipk\nSpecialFunctions.ellipe\nSpecialFunctions.eta\nSpecialFunctions.zeta\nSpecialFunctions.gamma\nSpecialFunctions.loggamma\nSpecialFunctions.logabsgamma\nSpecialFunctions.lfactorial\nSpecialFunctions.beta\nSpecialFunctions.logbeta\nSpecialFunctions.logabsbeta"
 },
 
 ]}
