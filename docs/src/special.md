@@ -51,8 +51,9 @@ SpecialFunctions.zeta
 SpecialFunctions.gamma
 SpecialFunctions.loggamma
 SpecialFunctions.logabsgamma
-SpecialFunctions.lfactorial
+SpecialFunctions.logfactorial
 SpecialFunctions.beta
 SpecialFunctions.logbeta
 SpecialFunctions.logabsbeta
+SpecialFunctions.logabsbinomial
 ```

@@ -65,7 +65,7 @@ include("gamma.jl")
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
-          :eta, :gamma, :invdigamma, :lfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
+          :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end
 for f in (:beta, :lbeta)

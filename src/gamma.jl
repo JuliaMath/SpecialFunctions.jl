@@ -551,7 +551,7 @@ function polygamma(m::Integer, z::Number)
     polygamma(m, x)
 end
 
-export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, lfactorial
+export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
 
 ## from base/special/gamma.jl
 
@@ -584,27 +584,31 @@ logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
 
 
 """
-    lfactorial(x)
+    logfactorial(x)
 
 Compute the logarithmic factorial of a nonnegative integer `x`.
 Equivalent to [`loggamma`](@ref) of `x + 1`, but `loggamma` extends this function
 to non-integer `x`.
 """
-lfactorial(x::Integer) = x < 0 ? throw(DomainError(x, "`x` must be non-negative.")) : loggamma(x + oneunit(x))
-Base.@deprecate lfact lfactorial
+logfactorial(x::Integer) = x < 0 ? throw(DomainError(x, "`x` must be non-negative.")) : loggamma(x + oneunit(x))
 
 """
     logabsgamma(x)
 
 Compute the logarithm of absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x`and returns a tuple (logabsgamma(x), sign(gamma(x))).
+[`Real`](@ref) `x`and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
+
+See also [`loggamma`](@ref).
 """
 function logabsgamma end
 
 """
     loggamma(x)
 
-Computes the logarithm of [`gamma`](@ref) for given `x`
+Computes the logarithm of [`gamma`](@ref) for given `x`. If `x` is a `Real`, then it
+throws a `DomainError` if `gamma(x)` is negative.
+
+See also [`logabsgamma`](@ref).
 """
 function loggamma end
 
@@ -732,15 +736,18 @@ end
 """
     logbeta(x, y)
 
-Natural logarithm of the [`beta`](@ref)
-function ``\\log(|\\operatorname{B}(x,y)|)``.
+Natural logarithm of the [`beta`](@ref) function ``\\log(|\\operatorname{B}(x,y)|)``.
+
+See also [`logabsbeta`](@ref).
 """
 logbeta(x::Number, w::Number) = loggamma(x)+loggamma(w)-loggamma(x+w)
 
 """
     logabsbeta(x, y)
 
-Returns a tuple of the natural logarithm of the absolute value of the [`beta`](@ref) function ``\\log(|\\operatorname{B}(x,y)|)`` and sign of the [`beta`](@ref) function .
+Compute the natural logarithm of the absolute value of the [`beta`](@ref) function, returning a tuple `(log(abs(beta(x,y))), sign(beta(x,y)))`
+
+See also [`logbeta`](@ref).
 """
 function logabsbeta(x::Real, w::Real)
     yx, sx = logabsgamma(x)
@@ -802,23 +809,37 @@ factorial(x) = Base.factorial(x) # to make SpecialFunctions.factorial work uncon
 factorial(x::Number) = gamma(x + 1) # fallback for x not Integer
 
 """
-    lbinomial(n, k) = log(abs(binomial(n, k)))
+    logabsbinomial(n, k)
 
 Accurate natural logarithm of the absolute value of the [`binomial`](@ref)
 coefficient `binomial(n, k)` for large `n` and `k` near `n/2`.
+
+Returns a tuple `(log(abs(binomial(n,k))), sign(binomial(n,k)))`.
 """
-function lbinomial(n::T, k::T) where {T<:Integer}
+function logabsbinomial(n::T, k::T) where {T<:Integer}
     S = float(T)
-    (k < 0) && return typemin(S)
+    s = one(S)
     if n < 0
+        # reflection formula
+        #  binomial(n,k) = (-1)^k * binomial(-n+k-1,k)
         n = -n + k - 1
+        s = isodd(k) ? -s : s
     end
-    k > n && return typemin(S)
-    (k == 0 || k == n) && return zero(S)
-    (k == 1) && return log(abs(n))
+    if k < 0 || k > n
+        # binomial(n,k) == 0
+        return (typemin(S), zero(S))
+    elseif k == 0 || k == n
+        # binomial(n,k) == ±1
+        return (zero(S), s)
+    end
     if k > (n>>1)
         k = n - k
     end
-    -log1p(n) - logabsbeta(n - k + one(T), k + one(T))[1]
+    if k == 1
+        # binomial(n,k) == ±n
+        return (log(abs(n)), s)
+    else
+        return (-log1p(n) - logabsbeta(n - k + one(T), k + one(T))[1], s)
+    end
 end
-lbinomial(n::Integer, k::Integer) = lbinomial(promote(n, k)...)
+logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)

@@ -634,12 +634,12 @@ end
         for x in (3.2, 2+1im, 3//2, 3.2+0.1im)
             @test SpecialFunctions.factorial(x) == gamma(1+x)
         end
-        @test lfactorial(0) == lfactorial(1) == 0
-        @test lfactorial(2) == loggamma(3)
-        # Ensure that the domain of lfactorial matches that of factorial (issue #21318)
-        @test_throws DomainError lfactorial(-3)
+        @test logfactorial(0) == logfactorial(1) == 0
+        @test logfactorial(2) == loggamma(3)
+        # Ensure that the domain of logfactorial matches that of factorial (issue #21318)
+        @test_throws DomainError logfactorial(-3)
         @test_throws DomainError loggamma(-4.2)
-        @test_throws MethodError lfactorial(1.0)
+        @test_throws MethodError logfactorial(1.0)
     end
 
     # loggamma & logabsgamma test cases (from Wolfram Alpha)
@@ -708,21 +708,24 @@ end
     @test beta(big(1.0),big(1.2)) ≈ beta(1.0,1.2) rtol=4*eps()
 end
 
-@testset "lbinomial" begin
-    @test lbinomial(10, -1) == -Inf
-    @test lbinomial(10, 11) == -Inf
-    @test lbinomial(10,  0) == 0.0
-    @test lbinomial(10, 10) == 0.0
+@testset "logabsbinomial" begin
+    @test logabsbinomial(10, -1) == (-Inf, 0.0)
+    @test logabsbinomial(10, 11) == (-Inf, 0.0)
+    @test logabsbinomial(10,  0) == ( 0.0, 1.0)
+    @test logabsbinomial(10, 10) == ( 0.0, 1.0)
 
-    @test lbinomial(10,  1)      ≈ log(10)
-    @test lbinomial(-6, 10)      ≈ log(binomial(-6, 10))
-    @test lbinomial(-6, 11)      ≈ log(abs(binomial(-6, 11)))
-    @test lbinomial.(200, 0:200) ≈ log.(binomial.(BigInt(200), (0:200)))
+    @test logabsbinomial(10,  1)[1]   ≈ log(10)
+    @test logabsbinomial(10,  1)[2]   == 1.0
+    @test logabsbinomial(-6, 10)[1]   ≈ log(binomial(-6, 10))
+    @test logabsbinomial(-6, 10)[2]   == 1.0
+    @test logabsbinomial(-6, 11)[1]   ≈ log(abs(binomial(-6, 11)))
+    @test logabsbinomial(-6, 11)[2]   == -1.0
+    @test first.(logabsbinomial.(200, 0:200)) ≈ log.(binomial.(BigInt(200), (0:200)))
 end
 
 @testset "missing data" begin
     for f in (digamma, erf, erfc, erfcinv, erfcx, erfi, erfinv, eta, gamma,
-              invdigamma, lfactorial, trigamma)
+              invdigamma, logfactorial, trigamma)
         @test f(missing) === missing
     end
     @test beta(1.0, missing) === missing
