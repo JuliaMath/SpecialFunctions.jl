@@ -10,7 +10,6 @@ const rt2pin = 1.0/sqrt(2*pi)
 const rtpi = sqrt(pi) 
 const exparg = -745.1
 
-wk = zeros(30)
 #---------COEFFICIENTS FOR MINIMAX APPROX.-------------------
 
 a0=[-.231272501940775E-02 , -.335378520024220E-01 , -.159840143443990E+00 , -.333333333333333E+00]
@@ -212,14 +211,10 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      elseif a > x || x >= x0[iop]
         @goto l30 
      else
-        twoa = a + a
-        m = trunc(Int,twoa)
-        if twoa != Float64(m)
+        if isinteger(2*a)
             @goto l30 
         end
-        i = a
-        i = trunc(Int,i)
-        if a == Float64(i)
+        if isinteger(a)
             @goto l140
         else
             @goto l150
@@ -266,96 +261,87 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
 
      #----TAYLOR SERIES FOR P/R---- 
     @label l50
+     wk = zeros(30)
      apn = a + 1.0
      t = x/apn
      wk[1] = t
      loop=2
-     while true
-        if loop > 20
-            break
-        end
-        
+     for indx = 2:20
         apn = apn + 1.0
         t = t*(x/apn)
         if t <= 1.0e-3
+            loop = indx
             @goto l60
         end
-        wk[loop] = t
-        loop = loop + 1
+        wk[indx] = t
      end
     loop=20
     @label l60
-     sum = t
+     sm = t
      tol = 0.5*acc #tolerance
      while true
         apn = apn+1.0
         t = t*(x/apn)
-        sum = sum + t
+        sm = sm + t
         if t <= tol
             break
         end
      end
-     maxd = loop - 1
-     for j = 1:maxd
-        loop = loop - 1
-        sum = sum + wk[loop]
+     for j = loop-1:-1:1
+        sm += wk[j]
      end
-    return (r/a)*(1.0 + sum)
+    return (r/a)*(1.0 + sm)
     
     #----ASYMPTOTIC EXPANSION-----
     @label l80
+     wk = zeros(30)
      amn = a-1.0
      t=amn/x
      wk[1]=t
      loop=2
-     while true
-        if loop > 20
-            break
-        end
+     for indx = 2 : 20
         amn = amn-1.0
         t=t*(amn/x)
         if abs(t) <= 1.0e-3
+            loop = indx
             @goto l90
         end
-        wk[loop]=t
-        loop=loop+1
+        wk[indx]=t
      end
-     loop=20
+    loop=20
     @label l90 
-     sum = t
+     sm = t
      while true
         if abs(t) < acc
             @goto l100
         end
         amn=amn-1.0
         t=t*(amn/x)
-        sum=sum+t
+        sm=sm+t
      end
     @label l100
-     maxd=loop-1
-     for j = 1:maxd
-        loop=loop-1
-        sum=sum+wk[loop]
+     for j = loop-1:-1:1
+        sm += wk[j]
      end
-    return 1.0 - (r/x)*(1.0 + sum)
+    return 1.0 - (r/x)*(1.0 + sm)
     
     #---TAYLOR SERIES FOR P(A,X)/X**A---
 
     @label l110
      l=3.0
      c=x
-     sum= x/(a + 3.0)
+     sm= x/(a + 3.0)
      tol = 3.0*acc/(a + 1.0)
      while true
         l=l+1.0
         c=-c*(x/l)
         t=c/(a+l)
-        sum=sum+t
+        sm=sm+t
         if abs(t) <= tol 
             break
         end
      end
-     temp = a*x*((sum/6.0 - 0.5/(a + 2.0))*x + 1.0/(a + 1.0))
+     temp = a*x*((sm/6.0 - 0.5/(a + 2.0))*x + 1.0/(a + 1.0))
      z = a*log(x)
      #GAM1 = 1/gamma(a+1) - 1
      h = rgamma1pm1(a)
@@ -385,15 +371,15 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     
     #---FINITE SUMS FOR Q WHEN A>=1 && 2A IS INTEGER----
     @label l140
-     sum = exp(-x)
-     t = sum
+     sm = exp(-x)
+     t = sm
      N = 1
      c=0.0
      @goto l160
     
     @label l150
      rtx = sqrt(x)
-     sum = erfc(rtx)
+     sm = erfc(rtx)
      t = exp(-x)/(rtpi*rtx)
      N=0
      c=-0.5
@@ -408,10 +394,10 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         N = N+1
         c = c+1.0
         t = (x*t)/c
-        sum = sum + t
+        sm = sm + t
      end
     @label l161
-     return 1.0 - sum
+     return 1.0 - sm
      
     #----CONTINUED FRACTION EXPANSION-----
     @label l170
