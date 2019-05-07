@@ -49,10 +49,11 @@ libraries.
 | [`loggamma(x)`](@ref SpecialFunctions.loggamma)                                           | accurate `log(gamma(x))` for large `x`                 |
 | [`logabsgamma(x)`](@ref SpecialFunctions.logabsgamma)                                           | accurate `log(abs(gamma(x)))` for large `x`                                                                                  |
 | [`lgamma(x)`](@ref SpecialFunctions.lgamma)                                           | accurate `log(gamma(x))` for large `x`                                                                                                                          |
-| [`lfactorial(x)`](@ref SpecialFunctions.lfactorial)                                            | accurate `log(factorial(x))` for large `x`; same as `lgamma(x+1)` for `x > 1`, zero otherwise                                                                   |
+| [`logfactorial(x)`](@ref SpecialFunctions.logfactorial)                                            | accurate `log(factorial(x))` for large `x`; same as `lgamma(x+1)` for `x > 1`, zero otherwise                                                                   |
 | [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
 | [`logbeta(x,y)`](@ref SpecialFunctions.logbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 | [`logabsbeta(x,y)`](@ref SpecialFunctions.logabsbeta)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
+| [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
 ## Installation
 
 The package is available for Julia versions 0.5 and up. To install it, run
