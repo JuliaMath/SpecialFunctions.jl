@@ -344,10 +344,20 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         if isinteger(2*a)
             @goto l30 
         end
-        if isinteger(a)
-            @goto l140
+        if isinteger(a)           #---FINITE SUMS FOR Q WHEN A>=1 && 2A IS INTEGER----
+            sm = exp(-x)
+            t = sm
+            N = 1
+            c=0.0
+            @goto l160
         else
-            @goto l150
+            rtx = sqrt(x)
+            sm = erfc(rtx)
+            t = exp(-x)/(rtpi*rtx)
+            N=0
+            c=-0.5
+            i = trunc(Int,a - 0.5)
+            @goto l160
         end            
 
      end
@@ -388,120 +398,6 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
       else
         return gamma_p_asym(a, x, ind)
       end
-
-     #----TAYLOR SERIES FOR P/R---- 
-    # @label l50  ---->  gamma_taylor(a,x)
-    #  wk = zeros(30)
-    #  apn = a + 1.0
-    #  t = x/apn
-    #  wk[1] = t
-    #  loop=2
-    #  for indx = 2:20
-    #     apn = apn + 1.0
-    #     t = t*(x/apn)
-    #     if t <= 1.0e-3
-    #         loop = indx
-    #         @goto l60
-    #     end
-    #     wk[indx] = t
-    #  end
-    # loop=20
-    # @label l60
-    #  sm = t
-    #  tol = 0.5*acc #tolerance
-    #  while true
-    #     apn = apn+1.0
-    #     t = t*(x/apn)
-    #     sm = sm + t
-    #     if t <= tol
-    #         break
-    #     end
-    #  end
-    #  for j = loop-1:-1:1
-    #     sm += wk[j]
-    #  end
-    # return (r/a)*(1.0 + sm)
-    
-    #----ASYMPTOTIC EXPANSION-----
-    # @label l80 ----> gamma_p_asym(a,x,ind)
-    #  wk = zeros(30)
-    #  amn = a-1.0
-    #  t=amn/x
-    #  wk[1]=t
-    #  loop=2
-    #  for indx = 2 : 20
-    #     amn = amn-1.0
-    #     t=t*(amn/x)
-    #     if abs(t) <= 1.0e-3
-    #         loop = indx
-    #         @goto l90
-    #     end
-    #     wk[indx]=t
-    #  end
-    # loop=20
-    # @label l90 
-    #  sm = t
-    #  while true
-    #     if abs(t) < acc
-    #         @goto l100
-    #     end
-    #     amn=amn-1.0
-    #     t=t*(amn/x)
-    #     sm=sm+t
-    #  end
-    # @label l100
-    #  for j = loop-1:-1:1
-    #     sm += wk[j]
-    #  end
-    # return 1.0 - (r/x)*(1.0 + sm)
-    
-    #---TAYLOR SERIES FOR P(A,X)/X**A---
-
-    # @label l110 ----> gamma_p_taylor_x(a, x, ind)
-    #  l=3.0
-    #  c=x
-    #  sm= x/(a + 3.0)
-    #  tol = 3.0*acc/(a + 1.0)
-    #  while true
-    #     l=l+1.0
-    #     c=-c*(x/l)
-    #     t=c/(a+l)
-    #     sm=sm+t
-    #     if abs(t) <= tol 
-    #         break
-    #     end
-    #  end
-    #  temp = a*x*((sm/6.0 - 0.5/(a + 2.0))*x + 1.0/(a + 1.0))
-    #  z = a*log(x)
-    #  #GAM1 = 1/gamma(a+1) - 1
-    #  h = rgamma1pm1(a)
-    #  #H = 1.0/gamma(a+1.0) - 1.0
-    #  g = 1.0 + h
-    #  if (x < 0.25 && z > -.13394) || a < x/2.59
-    #     l = expm1(z)
-    #     w = 1.0+l
-    #     rangered = ((w*temp - l)*g - h < 0.0)
-    #     return rangered ? 1.0 : (1.0 - ((w*temp - l)*g - h))
-    #  else
-    #     w = exp(z)
-    #     return w*g*(1.0 - temp)
-    #  end
-    
-    #---FINITE SUMS FOR Q WHEN A>=1 && 2A IS INTEGER----
-    @label l140
-     sm = exp(-x)
-     t = sm
-     N = 1
-     c=0.0
-     @goto l160
-    
-    @label l150
-     rtx = sqrt(x)
-     sm = erfc(rtx)
-     t = exp(-x)/(rtpi*rtx)
-     N=0
-     c=-0.5
-     i = trunc(Int,a - 0.5)
      
     @label l160
      
@@ -514,34 +410,8 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         t = (x*t)/c
         sm = sm + t
      end
-    @label l161
-     return 1.0 - sm
+    return 1.0 - sm
      
-    #----CONTINUED FRACTION EXPANSION-----
-# @label l170 ----> gamma_p_cf(a,x,ind)
-
-#     tol = 4.0*acc
-#     a2nm1 = 1.0
-#     a2n = 1.0
-#     b2nm1 = x
-#     b2n = x + (1.0 - a)
-#     c = 1.0
-#     while true
-#        a2nm1 = x*a2n + c*a2nm1
-#        b2nm1 = x*b2n + c*b2nm1
-#        c = c + 1.0
-#        t = c - a
-#        a2n = a2nm1 + t*a2n
-#        b2n = b2nm1 + t*b2n
-#        a2nm1 = a2nm1/b2n
-#        b2nm1 = b2nm1/b2n
-#        a2n = a2n/b2n
-#        b2n = 1.0
-#        if abs(a2n - a2nm1/b2nm1) < tol*a2n
-#            break
-#        end
-#     end
-#     return 1.0 - r*a2n
     
     @label l200
      if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
