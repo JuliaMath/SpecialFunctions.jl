@@ -174,6 +174,11 @@ function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
     end
     return 1.0 - r*a2n
 end
+"""
+    gamma_p_taylor(a, x, ind)
+
+Compute P(a,x) using Taylor Series for P/R.
+"""
 function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
     r = rgammax(a,x)
@@ -211,7 +216,83 @@ function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
     end
     return (r/a)*(1.0 + sm)
 end
+"""
+    gamma_p_asym(a, x, ind)
 
+Compute P(a,x) using asymptotic expansion.
+"""
+function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
+    wk = zeros(30)
+    flag = false
+    acc = acc0[ind + 1]
+    r = rgammax(a,x)
+    amn = a-1.0
+    t=amn/x
+    wk[1]=t
+    loop=2
+    for indx = 2 : 20
+       amn = amn-1.0
+       t=t*(amn/x)
+       if abs(t) <= 1.0e-3
+           loop = indx
+           flag = true
+           break
+       end
+       wk[indx]=t
+    end
+    if !flag
+        loop = 20
+    end
+    sm = t
+    while true
+       if abs(t) < acc
+           break
+       end
+       amn=amn-1.0
+       t=t*(amn/x)
+       sm=sm+t
+    end
+    for j = loop-1:-1:1
+       sm += wk[j]
+    end
+    return 1.0 - (r/x)*(1.0 + sm)
+end
+"""
+    gamma_p_taylor_x(a,x,ind)
+
+Computes P(a,x) based on Taylor expansion of P(a,x)/x**a
+"""
+function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
+    acc = acc0[ind + 1]
+    l=3.0
+    c=x
+    sm= x/(a + 3.0)
+    tol = 3.0*acc/(a + 1.0)
+    while true
+       l=l+1.0
+       c=-c*(x/l)
+       t=c/(a+l)
+       sm=sm+t
+       if abs(t) <= tol 
+           break
+       end
+    end
+    temp = a*x*((sm/6.0 - 0.5/(a + 2.0))*x + 1.0/(a + 1.0))
+    z = a*log(x)
+    #GAM1 = 1/gamma(a+1) - 1
+    h = rgamma1pm1(a)
+    #H = 1.0/gamma(a+1.0) - 1.0
+    g = 1.0 + h
+    if (x < 0.25 && z > -.13394) || a < x/2.59
+       l = expm1(z)
+       w = 1.0+l
+       rangered = ((w*temp - l)*g - h < 0.0)
+       return rangered ? 1.0 : (1.0 - ((w*temp - l)*g - h))
+    else
+       w = exp(z)
+       return w*g*(1.0 - temp)
+    end
+end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
 # Published in Journal: ACM Transactions on Mathematical Software (TOMS)
 # Volume 12 Issue 4, Dec. 1986 Pages 377-393
@@ -245,7 +326,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     elseif a == 0.5
         @goto l320
     elseif x < 1.1
-        @goto l110     
+        return gamma_p_taylor_x(a, x, ind)  
     end
     r = rgammax(a,x)
     if r == 0.0
@@ -305,7 +386,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
       elseif x < x0[iop]
         return gamma_p_cf(a, x, ind)
       else
-        @goto l80
+        return gamma_p_asym(a, x, ind)
       end
 
      #----TAYLOR SERIES FOR P/R---- 
@@ -342,69 +423,69 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     # return (r/a)*(1.0 + sm)
     
     #----ASYMPTOTIC EXPANSION-----
-    @label l80
-     wk = zeros(30)
-     amn = a-1.0
-     t=amn/x
-     wk[1]=t
-     loop=2
-     for indx = 2 : 20
-        amn = amn-1.0
-        t=t*(amn/x)
-        if abs(t) <= 1.0e-3
-            loop = indx
-            @goto l90
-        end
-        wk[indx]=t
-     end
-    loop=20
-    @label l90 
-     sm = t
-     while true
-        if abs(t) < acc
-            @goto l100
-        end
-        amn=amn-1.0
-        t=t*(amn/x)
-        sm=sm+t
-     end
-    @label l100
-     for j = loop-1:-1:1
-        sm += wk[j]
-     end
-    return 1.0 - (r/x)*(1.0 + sm)
+    # @label l80 ----> gamma_p_asym(a,x,ind)
+    #  wk = zeros(30)
+    #  amn = a-1.0
+    #  t=amn/x
+    #  wk[1]=t
+    #  loop=2
+    #  for indx = 2 : 20
+    #     amn = amn-1.0
+    #     t=t*(amn/x)
+    #     if abs(t) <= 1.0e-3
+    #         loop = indx
+    #         @goto l90
+    #     end
+    #     wk[indx]=t
+    #  end
+    # loop=20
+    # @label l90 
+    #  sm = t
+    #  while true
+    #     if abs(t) < acc
+    #         @goto l100
+    #     end
+    #     amn=amn-1.0
+    #     t=t*(amn/x)
+    #     sm=sm+t
+    #  end
+    # @label l100
+    #  for j = loop-1:-1:1
+    #     sm += wk[j]
+    #  end
+    # return 1.0 - (r/x)*(1.0 + sm)
     
     #---TAYLOR SERIES FOR P(A,X)/X**A---
 
-    @label l110
-     l=3.0
-     c=x
-     sm= x/(a + 3.0)
-     tol = 3.0*acc/(a + 1.0)
-     while true
-        l=l+1.0
-        c=-c*(x/l)
-        t=c/(a+l)
-        sm=sm+t
-        if abs(t) <= tol 
-            break
-        end
-     end
-     temp = a*x*((sm/6.0 - 0.5/(a + 2.0))*x + 1.0/(a + 1.0))
-     z = a*log(x)
-     #GAM1 = 1/gamma(a+1) - 1
-     h = rgamma1pm1(a)
-     #H = 1.0/gamma(a+1.0) - 1.0
-     g = 1.0 + h
-     if (x < 0.25 && z > -.13394) || a < x/2.59
-        l = expm1(z)
-        w = 1.0+l
-        rangered = ((w*temp - l)*g - h < 0.0)
-        return rangered ? 1.0 : (1.0 - ((w*temp - l)*g - h))
-     else
-        w = exp(z)
-        return w*g*(1.0 - temp)
-     end
+    # @label l110 ----> gamma_p_taylor_x(a, x, ind)
+    #  l=3.0
+    #  c=x
+    #  sm= x/(a + 3.0)
+    #  tol = 3.0*acc/(a + 1.0)
+    #  while true
+    #     l=l+1.0
+    #     c=-c*(x/l)
+    #     t=c/(a+l)
+    #     sm=sm+t
+    #     if abs(t) <= tol 
+    #         break
+    #     end
+    #  end
+    #  temp = a*x*((sm/6.0 - 0.5/(a + 2.0))*x + 1.0/(a + 1.0))
+    #  z = a*log(x)
+    #  #GAM1 = 1/gamma(a+1) - 1
+    #  h = rgamma1pm1(a)
+    #  #H = 1.0/gamma(a+1.0) - 1.0
+    #  g = 1.0 + h
+    #  if (x < 0.25 && z > -.13394) || a < x/2.59
+    #     l = expm1(z)
+    #     w = 1.0+l
+    #     rangered = ((w*temp - l)*g - h < 0.0)
+    #     return rangered ? 1.0 : (1.0 - ((w*temp - l)*g - h))
+    #  else
+    #     w = exp(z)
+    #     return w*g*(1.0 - temp)
+    #  end
     
     #---FINITE SUMS FOR Q WHEN A>=1 && 2A IS INTEGER----
     @label l140
