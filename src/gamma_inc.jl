@@ -150,7 +150,6 @@ Computes P(a,x) by continued fraction expansion.
 """
 function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
-    r = rgammax(a,x)
     tol = 4.0*acc
     a2nm1 = 1.0
     a2n = 1.0
@@ -172,7 +171,7 @@ function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
            break
        end
     end
-    return 1.0 - r*a2n
+    return 1.0 - rgammax(a,x)*a2n
 end
 """
     gamma_p_taylor(a, x, ind)
@@ -181,7 +180,6 @@ Compute P(a,x) using Taylor Series for P/R.
 """
 function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
-    r = rgammax(a,x)
     wk = zeros(30)
     flag = false
     apn = a + 1.0
@@ -214,7 +212,7 @@ function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    return (r/a)*(1.0 + sm)
+    return (rgammax(a,x)/a)*(1.0 + sm)
 end
 """
     gamma_p_asym(a, x, ind)
@@ -225,7 +223,6 @@ function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
     wk = zeros(30)
     flag = false
     acc = acc0[ind + 1]
-    r = rgammax(a,x)
     amn = a-1.0
     t=amn/x
     wk[1]=t
@@ -255,7 +252,7 @@ function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    return 1.0 - (r/x)*(1.0 + sm)
+    return 1.0 - (rgammax(a,x)/x)*(1.0 + sm)
 end
 """
     gamma_p_taylor_x(a,x,ind)
@@ -293,6 +290,37 @@ function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
        return w*g*(1.0 - temp)
     end
 end
+"""
+    gamma_p_fsum(a,x)
+
+Compute using Finite Sums for Q(a,x) when a >= 1 && 2a is snot integer
+"""
+function gamma_p_fsum(a::Float64, x::Float64)
+    if isinteger(a)           
+        sm = exp(-x)
+        t = sm
+        N = 1
+        c=0.0
+        i = trunc(Int,a - 0.5)
+    else
+        rtx = sqrt(x)
+        sm = erfc(rtx)
+        t = exp(-x)/(rtpi*rtx)
+        N=0
+        c=-0.5
+        i = trunc(Int,a - 0.5)
+    end
+    for lp = N : i
+        if i == 0
+            break
+        end
+        c += 1.0
+        t = (x*t)/c
+        sm += t
+    end
+    return 1.0 - sm
+
+end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
 # Published in Journal: ACM Transactions on Mathematical Software (TOMS)
 # Volume 12 Issue 4, Dec. 1986 Pages 377-393
@@ -322,9 +350,18 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     end
     
     if a >= 1.0
-        @goto l10
+        if a >= big1[iop]
+            @goto l20
+        elseif a > x || x >= x0[iop] || isinteger(2*a)
+           @goto l30 
+        else
+            return gamma_p_fsum(a, x)
+        end
     elseif a == 0.5
-        @goto l320
+        if x >= 0.25
+            return 1.0 - erfc(sqrt(x))
+        end
+        return erf(sqrt(x))
     elseif x < 1.1
         return gamma_p_taylor_x(a, x, ind)  
     end
@@ -334,33 +371,6 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     else
         return gamma_p_cf(a, x, ind)    
     end
-
-    @label l10
-     if a >= big1[iop]
-        @goto l20
-     elseif a > x || x >= x0[iop]
-        @goto l30 
-     else
-        if isinteger(2*a)
-            @goto l30 
-        end
-        if isinteger(a)           #---FINITE SUMS FOR Q WHEN A>=1 && 2A IS INTEGER----
-            sm = exp(-x)
-            t = sm
-            N = 1
-            c=0.0
-            @goto l160
-        else
-            rtx = sqrt(x)
-            sm = erfc(rtx)
-            t = exp(-x)/(rtpi*rtx)
-            N=0
-            c=-0.5
-            i = trunc(Int,a - 0.5)
-            @goto l160
-        end            
-
-     end
 
     @label l20
      l = x/a
@@ -398,20 +408,6 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
       else
         return gamma_p_asym(a, x, ind)
       end
-     
-    @label l160
-     
-     while true
-        if N == i || i == 0
-            break
-        end
-        N = N+1
-        c = c+1.0
-        t = (x*t)/c
-        sm = sm + t
-     end
-    return 1.0 - sm
-     
     
     @label l200
      if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
@@ -434,7 +430,19 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
 
     @label l210
      if abs(s) <= 1.0e-3
-        @goto l260
+        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
+        c2 = @horner(z , d20 , d2[1] , d2[2])
+        c3 = @horner(z , d30 , d3[1] , d3[2])
+        c4 = @horner(z , d40 , d4[1])
+        c5 = @horner(z , d50 , d5[1])
+        c6 = @horner(z , d60 , d6[1])
+
+        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
+        if l < 1.0
+            return c*(w - rt2pin*t/rta)
+        end
+        return 1.0 - c*(w + rt2pin*t/rta)
      end
      #---USING THE MINIMAX APPROXIMATIONS---
      c0 = @horner(z , -.333333333333333E+00 , -.159840143443990E+00 , -.335378520024220E-01 , -.231272501940775E-02)/(@horner(z , 1.0 , .729520430331981E+00 , .238549219145773E+00, .376245718289389E-01 , .239521354917408E-02 , -.939001940478355E-05 , .633763414209504E-06) )
@@ -479,46 +487,30 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         z = -z
      end
      if iop == 1
-        @goto l260
-     elseif iop == 2
-        @goto l270
-     else
-        @goto l280
-     end
-    
-    @label l260
-     c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-     c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
-     c2 = @horner(z , d20 , d2[1] , d2[2])
-     c3 = @horner(z , d30 , d3[1] , d3[2])
-     c4 = @horner(z , d40 , d4[1])
-     c5 = @horner(z , d50 , d5[1])
-     c6 = @horner(z , d60 , d6[1])
+        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
+        c2 = @horner(z , d20 , d2[1] , d2[2])
+        c3 = @horner(z , d30 , d3[1] , d3[2])
+        c4 = @horner(z , d40 , d4[1])
+        c5 = @horner(z , d50 , d5[1])
+        c6 = @horner(z , d60 , d6[1])
 
-     t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
-     @goto l240rep
-    
-    @label l270
-     c0 = @horner(d00 , d0[1] , d0[2])
-     c1 = @horner(d10 , d1[1])
-     t = @horner(u , c0 , c1 , d20)
-     @goto l240rep
-    
-    @label l280
-     t = @horner(z , d00 , d0[1])
-     @goto l240rep
-    
-    @label l240rep
+        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
+        
+     elseif iop == 2
+        c0 = @horner(d00 , d0[1] , d0[2])
+        c1 = @horner(d10 , d1[1])
+        t = @horner(u , c0 , c1 , d20)
+       
+     else
+        t = @horner(z , d00 , d0[1])
+        
+     end
      if l < 1.0
         return c*(w - rt2pin*t/rta)
      end
      return 1.0 - c*(w + rt2pin*t/rta)
-    
-    @label l320
-     if x >= 0.25
-        return 1.0 - erfc(sqrt(x))
-     end
-     return erf(sqrt(x))
+
 end
 
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
