@@ -459,9 +459,61 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     
     if a >= 1.0
         if a >= big1[iop]
-            @goto l20
+            l = x/a
+        if l == 0.0
+            return 0.0
+        end
+        s = 1.0 - l
+        z = -logmxp1(l)
+        if z >= 700.0/a
+            return 0.0
+        end
+        y = a*z
+        rta = sqrt(a)
+        if abs(s) <= e0[iop]/rta
+            z = sqrt(z + z) 
+            if l < 1.0 
+                z=-z
+            return gamma_p_temme_1(a, x, z, ind)
+            end
+        end
+
+        if abs(s) <= 0.4
+            if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
+                throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+            end
+            c = exp(-y)
+            w = 0.5*erfcx(sqrt(y))
+            u = 1.0/a
+            z = sqrt(z + z) 
+            if l < 1.0 
+            z=-z
+            end
+            if iop == 1
+            return gamma_p_minimax(a,x,z)
+            elseif iop == 2
+            return gamma_p_temme(a,x,z)
+            else
+            t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+            return gamma_p_temme_1(a, x, z, ind)
+            end
+        end
         elseif a > x || x >= x0[iop] || isinteger(2*a)  
-            @goto l30 
+            r = rgammax(a,x)
+            if r == 0.0
+                if x <= a
+                    return 0.0
+                else
+                    return 1.0
+                end
+            end 
+            if x <= max(a,alog10)
+                return gamma_p_taylor(a, x, ind)
+            elseif x < x0[iop]
+                return gamma_p_cf(a, x, ind)
+            else
+                return gamma_p_asym(a, x, ind)
+            end
        #else
        #    return gamma_p_fsum(a,x)
             
@@ -481,66 +533,7 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         return gamma_p_cf(a, x, ind)    
     end
 
-    @label l20
-     l = x/a
-     if l == 0.0
-        return 0.0
-     end
-     s = 1.0 - l
-     z = -logmxp1(l)
-     if z >= 700.0/a
-        return 0.0
-     end
-     y = a*z
-     rta = sqrt(a)
-     if abs(s) <= e0[iop]/rta
-        z = sqrt(z + z) 
-        if l < 1.0 
-            z=-z
-        return gamma_p_temme_1(a, x, z, ind)
-        end
-     end
-
-     if abs(s) <= 0.4
-        @goto l200
-     end
     
-    @label l30
-      r = rgammax(a,x)
-      if r == 0.0
-        if x <= a
-            return 0.0
-        else
-            return 1.0
-        end
-      end 
-      if x <= max(a,alog10)
-        return gamma_p_taylor(a, x, ind)
-      elseif x < x0[iop]
-        return gamma_p_cf(a, x, ind)
-      else
-        return gamma_p_asym(a, x, ind)
-      end
-    
-    @label l200
-     if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
-        throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
-     end
-     c = exp(-y)
-     w = 0.5*erfcx(sqrt(y))
-     u = 1.0/a
-     z = sqrt(z + z) 
-     if l < 1.0 
-        z=-z
-     end
-     if iop == 1
-        return gamma_p_minimax(a,x,z)
-     elseif iop == 2
-        return gamma_p_temme(a,x,z)
-     else
-        t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-        return gamma_p_temme_1(a, x, z, ind)
-     end
     
 end
 
