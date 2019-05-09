@@ -296,6 +296,70 @@ function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
     end
 end
 """
+    gamma_p_minimax(a,x,z)
+
+Compute P(a,x) using minimax approximations.
+"""
+function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
+    l = x/a
+    s = 1.0 - l
+    y = -a*logmxp1(l)
+    c = 1.0 - y
+    w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
+    if abs(s) <= 1.0e-3
+        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
+        c2 = @horner(z , d20 , d2[1] , d2[2])
+        c3 = @horner(z , d30 , d3[1] , d3[2])
+        c4 = @horner(z , d40 , d4[1])
+        c5 = @horner(z , d50 , d5[1])
+        c6 = @horner(z , d60 , d6[1])
+
+        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
+        if l < 1.0
+            return c*(w - rt2pin*t/sqrt(a))
+        end
+        return 1.0 - c*(w + rt2pin*t/sqrt(a))
+    end
+    #---USING THE MINIMAX APPROXIMATIONS---
+    c0 = @horner(z , -.333333333333333E+00 , -.159840143443990E+00 , -.335378520024220E-01 , -.231272501940775E-02)/(@horner(z , 1.0 , .729520430331981E+00 , .238549219145773E+00, .376245718289389E-01 , .239521354917408E-02 , -.939001940478355E-05 , .633763414209504E-06) )
+    c1 = @horner(z , -.185185185184291E-02 , -.491687131726920E-02 , -.587926036018402E-03 , -.398783924370770E-05)/(@horner(z , 1.0 , .780110511677243E+00 , .283344278023803E+00 , .506042559238939E-01 , .386325038602125E-02))
+    c2 = @horner(z , .413359788442192E-02 , .669564126155663E-03)/(@horner(z , 1.0 , .810647620703045E+00 , .339173452092224E+00 , .682034997401259E-01 , .650837693041777E-02 , -.421924263980656E-03))
+    c3 = @horner(z , .649434157619770E-03 , .810586158563431E-03)/(@horner(z , 1.0 , .894800593794972E+00, .406288930253881E+00 , .906610359762969E-01 , .905375887385478E-02 , -.632276587352120E-03))
+    c4 = @horner(z , -.861888301199388E-03 , -.105014537920131E-03)/(@horner(z , 1.0 , .103151890792185E+01 , .591353097931237E+00 , .178295773562970E+00 , .322609381345173E-01))
+    c5 = @horner(z , -.336806989710598E-03, -.435211415445014E-03)/(@horner(z , 1.0 , .108515217314415E+01 , .600380376956324E+00 , .178716720452422E+00))
+    c6 = @horner(z , .531279816209452E-03 , -.182503596367782E-03)/(@horner(z , 1.0 , .770341682526774E+00 , .345608222411837E+00))
+    c7 = @horner(z , .344430064306926E-03, .443219646726422E-03)/(@horner(z , 1.0 , .115029088777769E+01 , .821824741357866E+00))
+    c8 = @horner(z , -.686013280418038E-03 , .878371203603888E-03)
+
+    t = @horner(1.0/a , c0 , c1 , c2 , c3 , c4 , c5 , c6 , c7 , c8)
+    if l < 1.0
+       return c*(w - rt2pin*t/sqrt(a))
+    end
+    return 1.0 - c*(w + rt2pin*t/sqrt(a))
+end
+"""
+    gamma_p_temme(a, x, z)
+
+Compute P(a,x) using Temme's expansion given by : ``1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)`` where ``T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}``
+DLMF : https://dlmf.nist.gov/8.12#E8
+"""
+function gamma_p_temme(a::Float64, x::Float64, z::Float64)
+    l = x/a
+    s = 1.0 - l
+    y = -a*logmxp1(l)
+    c = 1.0 - y
+    w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
+    c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3] , d0[4] , d0[5] , d0[6]) 
+    c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3] , d1[4]) 
+
+    t = @horner(1.0/a , c0 , c1 , c2)
+    if l < 1.0
+       return c*(w - rt2pin*t/sqrt(a))
+    end
+    return 1.0 - c*(w + rt2pin*t/sqrt(a))
+end
+"""
     gamma_p_fsum(a,x)
 
 Compute using Finite Sums for Q(a,x) when a >= 1 && 2a is integer
@@ -427,58 +491,16 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         z=-z
      end
      if iop == 1
-        @goto l210
+        return gamma_p_minimax(a,x,z)
      elseif iop == 2
-        @goto l220
+        return gamma_p_temme(a,x,z)
      else
         @goto l230
      end
-
-    @label l210
-     if abs(s) <= 1.0e-3
-        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
-        c2 = @horner(z , d20 , d2[1] , d2[2])
-        c3 = @horner(z , d30 , d3[1] , d3[2])
-        c4 = @horner(z , d40 , d4[1])
-        c5 = @horner(z , d50 , d5[1])
-        c6 = @horner(z , d60 , d6[1])
-
-        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
-        if l < 1.0
-            return c*(w - rt2pin*t/rta)
-        end
-        return 1.0 - c*(w + rt2pin*t/rta)
-     end
-     #---USING THE MINIMAX APPROXIMATIONS---
-     c0 = @horner(z , -.333333333333333E+00 , -.159840143443990E+00 , -.335378520024220E-01 , -.231272501940775E-02)/(@horner(z , 1.0 , .729520430331981E+00 , .238549219145773E+00, .376245718289389E-01 , .239521354917408E-02 , -.939001940478355E-05 , .633763414209504E-06) )
-     c1 = @horner(z , -.185185185184291E-02 , -.491687131726920E-02 , -.587926036018402E-03 , -.398783924370770E-05)/(@horner(z , 1.0 , .780110511677243E+00 , .283344278023803E+00 , .506042559238939E-01 , .386325038602125E-02))
-     c2 = @horner(z , .413359788442192E-02 , .669564126155663E-03)/(@horner(z , 1.0 , .810647620703045E+00 , .339173452092224E+00 , .682034997401259E-01 , .650837693041777E-02 , -.421924263980656E-03))
-     c3 = @horner(z , .649434157619770E-03 , .810586158563431E-03)/(@horner(z , 1.0 , .894800593794972E+00, .406288930253881E+00 , .906610359762969E-01 , .905375887385478E-02 , -.632276587352120E-03))
-     c4 = @horner(z , -.861888301199388E-03 , -.105014537920131E-03)/(@horner(z , 1.0 , .103151890792185E+01 , .591353097931237E+00 , .178295773562970E+00 , .322609381345173E-01))
-     c5 = @horner(z , -.336806989710598E-03, -.435211415445014E-03)/(@horner(z , 1.0 , .108515217314415E+01 , .600380376956324E+00 , .178716720452422E+00))
-     c6 = @horner(z , .531279816209452E-03 , -.182503596367782E-03)/(@horner(z , 1.0 , .770341682526774E+00 , .345608222411837E+00))
-     c7 = @horner(z , .344430064306926E-03, .443219646726422E-03)/(@horner(z , 1.0 , .115029088777769E+01 , .821824741357866E+00))
-     c8 = @horner(z , -.686013280418038E-03 , .878371203603888E-03)
-
-     t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , c7 , c8)
-     @goto l240
     
-     #----TEMME EXPANSION----
-    @label l220
-     c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3] , d0[4] , d0[5] , d0[6]) 
-     c1 = @horner(Z , d10 , d1[1] , d1[2] , d1[3] , d1[4]) 
-
-     t = @horner(u , c0 , c1 , c2)
-     @goto l240
      
     @label l230
      t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-    @label l240
-     if l < 1.0
-        return c*(w - rt2pin*t/rta)
-     end
-     return 1.0 - c*(w + rt2pin*t/rta)
     
     #----TEMME EXPANSION FOR L = 1----
     @label l250
@@ -533,8 +555,7 @@ end
     gamma_q(a,x) or Q(a,x) is the Incomplete gamma function ratio given by : 1 - P(a,x) ->  ``1/\\Gamma (a) \\int_{x}^{\\infty} e^{-t}t^{a-1} dt``
 """
 function gamma_q(a::Float64,x::Float64,ind::Integer)
-    qans = 1.0 - gamma_p(a,x,ind)
-    return qans
+    return 1.0 - gamma_p(a,x,ind)
 end
 
 for f in (:gamma_p,:gamma_q)
