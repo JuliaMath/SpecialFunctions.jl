@@ -146,7 +146,8 @@ end
 """
     gamma_p_cf(a, x, ind)
 
-Computes P(a,x) by continued fraction expansion.
+Computes P(a,x) by continued fraction expansion given by : ``\\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a+4-\\frac{(a+2)z}{a+5+\\frac{3z}{a+6-\\dots}}}}}}}``.
+DLMF : https://dlmf.nist.gov/8.9#E2
 """
 function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
@@ -176,7 +177,8 @@ end
 """
     gamma_p_taylor(a, x, ind)
 
-Compute P(a,x) using Taylor Series for P/R.
+Compute P(a,x) using Taylor Series for P/R given by : ``R(a,x)/a * (1 + \\sum_{1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))``.
+DLMF : https://dlmf.nist.gov/8.11#E2
 """
 function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
@@ -217,7 +219,9 @@ end
 """
     gamma_p_asym(a, x, ind)
 
-Compute P(a,x) using asymptotic expansion.
+Compute P(a,x) using asymptotic expansion given by : ``R(a,x)/a * (1 + \\sum_{1}^{N-1}(a_{n}/x^{n} + \\Theta _{n}a_{n}/x^{n}))``
+where R(a,x) = rgammax(a,x)
+DLMF : https://dlmf.nist.gov/8.11#E2
 """
 function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
     wk = zeros(30)
@@ -257,7 +261,8 @@ end
 """
     gamma_p_taylor_x(a,x,ind)
 
-Computes P(a,x) based on Taylor expansion of P(a,x)/x**a
+Computes P(a,x) based on Taylor expansion of P(a,x)/x**a given by:
+``J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)`` and P(a,x)/x**a is given by : ``(1 - J)/ \\Gamma(a+1)`` resulting from term-by-term integration of gamma_p(a,x,ind).
 """
 function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
@@ -293,7 +298,7 @@ end
 """
     gamma_p_fsum(a,x)
 
-Compute using Finite Sums for Q(a,x) when a >= 1 && 2a is snot integer
+Compute using Finite Sums for Q(a,x) when a >= 1 && 2a is integer
 """
 function gamma_p_fsum(a::Float64, x::Float64)
     if isinteger(a)           
@@ -352,10 +357,11 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     if a >= 1.0
         if a >= big1[iop]
             @goto l20
-        elseif a > x || x >= x0[iop] || isinteger(2*a)
-           @goto l30 
-        else
-            return gamma_p_fsum(a, x)
+        elseif a > x || x >= x0[iop] || isinteger(2*a)  
+            @goto l30 
+       #else
+       #    return gamma_p_fsum(a,x)
+            
         end
     elseif a == 0.5
         if x >= 0.25

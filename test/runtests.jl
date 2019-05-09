@@ -89,6 +89,7 @@ end
     @test gamma_q(15,16,0) ≈ 0.3675273597655649298
     @test gamma_q(15.5,16,0) ≈ 0.4167440299455427811
     @test gamma_p(0.9,0.8,0) ≈ 0.59832030278768172
+    @test gamma_p(1.7,2.5,0) ≈ 0.78446115627678957
     @test gamma_q(11.1,0.001,0) ≈ 1.0000
     @test_throws DomainError gamma_p(-1,2,2)
     @test_throws DomainError gamma_q(0,0,1)
