@@ -345,9 +345,7 @@ Compute P(a,x) using Temme's expansion given by : ``1/2 * erfc(\\sqrt{y}) - e^{-
 DLMF : https://dlmf.nist.gov/8.12#E8
 """
 function gamma_p_temme(a::Float64, x::Float64, z::Float64)
-    l = x/a
-    s = 1.0 - l
-    y = -a*logmxp1(l)
+    y = -a*logmxp1(x/a)
     c = 1.0 - y
     w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
     c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3] , d0[4] , d0[5] , d0[6]) 
@@ -356,6 +354,47 @@ function gamma_p_temme(a::Float64, x::Float64, z::Float64)
     t = @horner(1.0/a , c0 , c1 , c2)
     if l < 1.0
        return c*(w - rt2pin*t/sqrt(a))
+    end
+    return 1.0 - c*(w + rt2pin*t/sqrt(a))
+end
+"""
+    gamma_p_temme_1(a, x, z, ind)
+
+Computes P(a,x) using simplified Temme expansion near y=0 by : ``E(y) - (1 - y)/\\sqrt{2\\pi*a} * T(a,\\lambda)`` where ``E(y) = 1/2 - (1 - y/3)*(\\sqrt(y/\\pi))``
+DLMF : https://dlmf.nist.gov/8.12#E8
+"""
+function gamma_p_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
+    iop = ind + 1
+    l = x/a
+    y = -a * logmxp1(l)
+    if a*eps()*eps() > 3.28e-3
+        throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+    end
+    c = 1.0 - y
+    w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
+    u = 1.0/a
+    if iop == 1
+        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
+        c2 = @horner(z , d20 , d2[1] , d2[2])
+        c3 = @horner(z , d30 , d3[1] , d3[2])
+        c4 = @horner(z , d40 , d4[1])
+        c5 = @horner(z , d50 , d5[1])
+        c6 = @horner(z , d60 , d6[1])
+
+        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
+        
+    elseif iop == 2
+        c0 = @horner(d00 , d0[1] , d0[2])
+        c1 = @horner(d10 , d1[1])
+        t = @horner(u , c0 , c1 , d20)
+    
+    else
+        t = @horner(z , d00 , d0[1])
+        
+    end
+    if l < 1.0
+        return c*(w - rt2pin*t/sqrt(a))
     end
     return 1.0 - c*(w + rt2pin*t/sqrt(a))
 end
@@ -455,7 +494,11 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      y = a*z
      rta = sqrt(a)
      if abs(s) <= e0[iop]/rta
-        @goto l250
+        z = sqrt(z + z) 
+        if l < 1.0 
+            z=-z
+        return gamma_p_temme_1(a, x, z, ind)
+        end
      end
 
      if abs(s) <= 0.4
@@ -495,50 +538,10 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
      elseif iop == 2
         return gamma_p_temme(a,x,z)
      else
-        @goto l230
+        t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+        return gamma_p_temme_1(a, x, z, ind)
      end
     
-     
-    @label l230
-     t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-    
-    #----TEMME EXPANSION FOR L = 1----
-    @label l250
-     if a*eps()*eps() > 3.28e-3
-        throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
-     end
-     c = 1.0 - y
-     w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
-     u = 1.0/a
-     z = sqrt(z + z)
-     if l < 1.0
-        z = -z
-     end
-     if iop == 1
-        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
-        c2 = @horner(z , d20 , d2[1] , d2[2])
-        c3 = @horner(z , d30 , d3[1] , d3[2])
-        c4 = @horner(z , d40 , d4[1])
-        c5 = @horner(z , d50 , d5[1])
-        c6 = @horner(z , d60 , d6[1])
-
-        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
-        
-     elseif iop == 2
-        c0 = @horner(d00 , d0[1] , d0[2])
-        c1 = @horner(d10 , d1[1])
-        t = @horner(u , c0 , c1 , d20)
-       
-     else
-        t = @horner(z , d00 , d0[1])
-        
-     end
-     if l < 1.0
-        return c*(w - rt2pin*t/rta)
-     end
-     return 1.0 - c*(w + rt2pin*t/rta)
-
 end
 
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
