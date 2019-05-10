@@ -29,7 +29,7 @@ const d60 = .531307936463992E-03
 const d6=[-.592166437353694E-03]
 const d70 = .344367606892378E-03
 const d80 = -.652623918595309E-03
-#Source of logmxp1(x): https://github.com/JuliaStats/StatsFuns.jl
+#Source of logmxp1(x): https://github.com/JuliaStats/StatsFuns.jl/blob/master/src/basicfuns.jl
 # The kernel of log1pmx
 # Accuracy within ~2ulps for -0.227 < x < 0.315
 function _log1pmx_ker(x::Float64)
@@ -146,7 +146,11 @@ end
 """
     gamma_p_cf(a, x, ind)
 
-Computes P(a,x) by continued fraction expansion given by : ``\\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a+4-\\frac{(a+2)z}{a+5+\\frac{3z}{a+6-\\dots}}}}}}}``.
+Computes P(a,x) by continued fraction expansion given by : 
+```math
+R(a,x) * \\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a+4-\\frac{(a+2)z}{a+5+\\frac{3z}{a+6-\\dots}}}}}}}
+```
+Used when 1 <= a <= BIG and x < x0.
 DLMF : https://dlmf.nist.gov/8.9#E2
 """
 function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
@@ -178,6 +182,7 @@ end
     gamma_p_taylor(a, x, ind)
 
 Compute P(a,x) using Taylor Series for P/R given by : ``R(a,x)/a * (1 + \\sum_{1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))``.
+Used when 1 <= a <= BIG and x <= max{a, ln 10}.
 DLMF : https://dlmf.nist.gov/8.11#E2
 """
 function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
@@ -220,7 +225,7 @@ end
     gamma_p_asym(a, x, ind)
 
 Compute P(a,x) using asymptotic expansion given by : ``R(a,x)/a * (1 + \\sum_{1}^{N-1}(a_{n}/x^{n} + \\Theta _{n}a_{n}/x^{n}))``
-where R(a,x) = rgammax(a,x)
+where R(a,x) = rgammax(a,x). Used when 1 <= a <= BIG and x >= x0.
 DLMF : https://dlmf.nist.gov/8.11#E2
 """
 function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
@@ -263,6 +268,7 @@ end
 
 Computes P(a,x) based on Taylor expansion of P(a,x)/x**a given by:
 ``J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)`` and P(a,x)/x**a is given by : ``(1 - J)/ \\Gamma(a+1)`` resulting from term-by-term integration of gamma_p(a,x,ind).
+This is used when a < 1 and x < 1.1 - Refer Eqn (9) in the paper.
 """
 function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
@@ -298,7 +304,10 @@ end
 """
     gamma_p_minimax(a,x,z)
 
-Compute P(a,x) using minimax approximations.
+Compute P(a,x) using minimax approximations given by : ``1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)`` where ``T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}``
+DLMF : https://dlmf.nist.gov/8.12#E8
+This is a higher accuracy approximation of Temme expansion, which deals with the region near a ≈ x with a large.
+Refer Appendix F in the paper for the extensive set of coefficients calculated using Brent's multiple precision arithmetic(set at 50 digits) in BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70 .
 """
 function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
     l = x/a
@@ -343,6 +352,7 @@ end
 
 Compute P(a,x) using Temme's expansion given by : ``1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)`` where ``T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}``
 DLMF : https://dlmf.nist.gov/8.12#E8
+This mainly solves the problem near the region when a ≈ x with a large, and is a lower accuracy version of the minimax approximation.
 """
 function gamma_p_temme(a::Float64, x::Float64, z::Float64)
     y = -a*logmxp1(x/a)
@@ -361,6 +371,7 @@ end
     gamma_p_temme_1(a, x, z, ind)
 
 Computes P(a,x) using simplified Temme expansion near y=0 by : ``E(y) - (1 - y)/\\sqrt{2\\pi*a} * T(a,\\lambda)`` where ``E(y) = 1/2 - (1 - y/3)*(\\sqrt(y/\\pi))``
+Used instead of it's previous function when ``\\sigma <= e_{0}/\\sqrt{a}``.
 DLMF : https://dlmf.nist.gov/8.12#E8
 """
 function gamma_p_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
@@ -402,6 +413,8 @@ end
     gamma_p_fsum(a,x)
 
 Compute using Finite Sums for Q(a,x) when a >= 1 && 2a is integer
+Used when a <= x <= x0 and a = n/2.
+Refer Eqn (11) in the paper.
 """
 function gamma_p_fsum(a::Float64, x::Float64)
     if isinteger(a)           
