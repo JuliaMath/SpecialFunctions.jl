@@ -181,7 +181,10 @@ end
 """
     gamma_p_taylor(a, x, ind)
 
-Compute P(a,x) using Taylor Series for P/R given by : ``R(a,x)/a * (1 + \\sum_{1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))``.
+Compute P(a,x) using Taylor Series for P/R given by : 
+```math
+R(a,x)/a * (1 + \\sum_{1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))
+```
 Used when 1 <= a <= BIG and x <= max{a, ln 10}.
 DLMF : https://dlmf.nist.gov/8.11#E2
 """
@@ -224,7 +227,10 @@ end
 """
     gamma_p_asym(a, x, ind)
 
-Compute P(a,x) using asymptotic expansion given by : ``R(a,x)/a * (1 + \\sum_{1}^{N-1}(a_{n}/x^{n} + \\Theta _{n}a_{n}/x^{n}))``
+Compute P(a,x) using asymptotic expansion given by : 
+```math
+R(a,x)/a * (1 + \\sum_{1}^{N-1}(a_{n}/x^{n} + \\Theta _{n}a_{n}/x^{n}))
+```
 where R(a,x) = rgammax(a,x). Used when 1 <= a <= BIG and x >= x0.
 DLMF : https://dlmf.nist.gov/8.11#E2
 """
@@ -267,7 +273,12 @@ end
     gamma_p_taylor_x(a,x,ind)
 
 Computes P(a,x) based on Taylor expansion of P(a,x)/x**a given by:
-``J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)`` and P(a,x)/x**a is given by : ``(1 - J)/ \\Gamma(a+1)`` resulting from term-by-term integration of gamma_p(a,x,ind).
+```math
+J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)
+``` and P(a,x)/x**a is given by :
+```math
+(1 - J)/ \\Gamma(a+1)
+``` resulting from term-by-term integration of gamma_p(a,x,ind).
 This is used when a < 1 and x < 1.1 - Refer Eqn (9) in the paper.
 """
 function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
@@ -287,9 +298,7 @@ function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
     end
     temp = a*x*((sm/6.0 - 0.5/(a + 2.0))*x + 1.0/(a + 1.0))
     z = a*log(x)
-    #GAM1 = 1/gamma(a+1) - 1
     h = rgamma1pm1(a)
-    #H = 1.0/gamma(a+1.0) - 1.0
     g = 1.0 + h
     if (x < 0.25 && z > -.13394) || a < x/2.59
        l = expm1(z)
@@ -304,7 +313,13 @@ end
 """
     gamma_p_minimax(a,x,z)
 
-Compute P(a,x) using minimax approximations given by : ``1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)`` where ``T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}``
+Compute P(a,x) using minimax approximations given by : 
+```math
+1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
+``` where 
+```math
+T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
+```
 DLMF : https://dlmf.nist.gov/8.12#E8
 This is a higher accuracy approximation of Temme expansion, which deals with the region near a ≈ x with a large.
 Refer Appendix F in the paper for the extensive set of coefficients calculated using Brent's multiple precision arithmetic(set at 50 digits) in BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70 .
@@ -350,7 +365,13 @@ end
 """
     gamma_p_temme(a, x, z)
 
-Compute P(a,x) using Temme's expansion given by : ``1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)`` where ``T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}``
+Compute P(a,x) using Temme's expansion given by : 
+```math
+1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
+``` where 
+```math
+T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
+```
 DLMF : https://dlmf.nist.gov/8.12#E8
 This mainly solves the problem near the region when a ≈ x with a large, and is a lower accuracy version of the minimax approximation.
 """
@@ -370,7 +391,13 @@ end
 """
     gamma_p_temme_1(a, x, z, ind)
 
-Computes P(a,x) using simplified Temme expansion near y=0 by : ``E(y) - (1 - y)/\\sqrt{2\\pi*a} * T(a,\\lambda)`` where ``E(y) = 1/2 - (1 - y/3)*(\\sqrt(y/\\pi))``
+Computes P(a,x) using simplified Temme expansion near y=0 by : 
+```math
+E(y) - (1 - y)/\\sqrt{2\\pi*a} * T(a,\\lambda)
+``` where 
+```math
+E(y) = 1/2 - (1 - y/3)*(\\sqrt(y/\\pi))
+```
 Used instead of it's previous function when ``\\sigma <= e_{0}/\\sqrt{a}``.
 DLMF : https://dlmf.nist.gov/8.12#E8
 """
@@ -414,7 +441,7 @@ end
 
 Compute using Finite Sums for Q(a,x) when a >= 1 && 2a is integer
 Used when a <= x <= x0 and a = n/2.
-Refer Eqn (11) in the paper.
+Refer Eqn (14) in the paper.
 """
 function gamma_p_fsum(a::Float64, x::Float64)
     if isinteger(a)           
@@ -422,17 +449,17 @@ function gamma_p_fsum(a::Float64, x::Float64)
         t = sm
         N = 1
         c=0.0
-        i = trunc(Int,a - 0.5)
+        i = trunc(Int,a )
     else
         rtx = sqrt(x)
         sm = erfc(rtx)
         t = exp(-x)/(rtpi*rtx)
         N=0
         c=-0.5
-        i = trunc(Int,a - 0.5)
+        i = trunc(Int,a )
     end
-    for lp = N : i
-        if i == 0
+    for lp = N : i-1
+        if i == 0 
             break
         end
         c += 1.0
@@ -450,10 +477,10 @@ end
 """
     gamma_p(a,x,IND)
     
-    DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
-    Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
-    IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 digit accuracy suffices.
-    gamma_p(a,x) or P(a,x) is the Incomplete gamma function ratio given by : ``1/\\Gamma (a) \\int_{0}^{x} e^{-t}t^{a-1} dt``
+DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
+Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
+IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 digit accuracy suffices.
+gamma_p(a,x) or P(a,x) is the Incomplete gamma function ratio given by : ``1/\\Gamma (a) \\int_{0}^{x} e^{-t}t^{a-1} dt``
 """
 function gamma_p(a::Float64,x::Float64,ind::Integer)
     iop = ind + 1
@@ -473,45 +500,45 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     if a >= 1.0
         if a >= big1[iop]
             l = x/a
-        if l == 0.0
-            return 0.0
-        end
-        s = 1.0 - l
-        z = -logmxp1(l)
-        if z >= 700.0/a
-            return 0.0
-        end
-        y = a*z
-        rta = sqrt(a)
-        if abs(s) <= e0[iop]/rta
-            z = sqrt(z + z) 
-            if l < 1.0 
-                z=-z
-            return gamma_p_temme_1(a, x, z, ind)
+            if l == 0.0
+                return 0.0
             end
-        end
+            s = 1.0 - l
+            z = -logmxp1(l)
+            if z >= 700.0/a
+                return 0.0
+            end
+            y = a*z
+            rta = sqrt(a)
+            if abs(s) <= e0[iop]/rta
+                z = sqrt(z + z) 
+                if l < 1.0 
+                    z=-z
+                return gamma_p_temme_1(a, x, z, ind)
+                end
+            end
 
-        if abs(s) <= 0.4
-            if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
-                throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+            if abs(s) <= 0.4
+                if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
+                    throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+                end
+                c = exp(-y)
+                w = 0.5*erfcx(sqrt(y))
+                u = 1.0/a
+                z = sqrt(z + z) 
+                if l < 1.0 
+                    z=-z
+                end
+                if iop == 1
+                    return gamma_p_minimax(a,x,z)
+                elseif iop == 2
+                    return gamma_p_temme(a,x,z)
+                else
+                    t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+                    return gamma_p_temme_1(a, x, z, ind)
+                end
             end
-            c = exp(-y)
-            w = 0.5*erfcx(sqrt(y))
-            u = 1.0/a
-            z = sqrt(z + z) 
-            if l < 1.0 
-            z=-z
-            end
-            if iop == 1
-            return gamma_p_minimax(a,x,z)
-            elseif iop == 2
-            return gamma_p_temme(a,x,z)
-            else
-            t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-            return gamma_p_temme_1(a, x, z, ind)
-            end
-        end
-        elseif a > x || x >= x0[iop] || isinteger(2*a)  
+        elseif a > x || x >= x0[iop] || !isinteger(2*a)  
             r = rgammax(a,x)
             if r == 0.0
                 if x <= a
@@ -527,13 +554,13 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
             else
                 return gamma_p_asym(a, x, ind)
             end
-       #else
-       #    return gamma_p_fsum(a,x)
+        else
+            return gamma_p_fsum(a,x)
             
         end
     elseif a == 0.5
         if x >= 0.25
-            return 1.0 - erfc(sqrt(x))
+            return erf(sqrt(x))
         end
         return erf(sqrt(x))
     elseif x < 1.1
@@ -558,10 +585,10 @@ end
 """
     gamma_q(a,x,IND)
     
-    DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
-    Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
-    IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 s.f. digit accuracy suffices.
-    gamma_q(a,x) or Q(a,x) is the Incomplete gamma function ratio given by : 1 - P(a,x) ->  ``1/\\Gamma (a) \\int_{x}^{\\infty} e^{-t}t^{a-1} dt``
+DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
+Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
+IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 s.f. digit accuracy suffices.
+gamma_q(a,x) or Q(a,x) is the Incomplete gamma function ratio given by : 1 - P(a,x) ->  ``1/\\Gamma (a) \\int_{x}^{\\infty} e^{-t}t^{a-1} dt``
 """
 function gamma_q(a::Float64,x::Float64,ind::Integer)
     return 1.0 - gamma_p(a,x,ind)
