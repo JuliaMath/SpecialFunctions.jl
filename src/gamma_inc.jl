@@ -328,8 +328,9 @@ function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
     l = x/a
     s = 1.0 - l
     y = -a*logmxp1(l)
-    c = 1.0 - y
-    w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
+    c = exp(-y)
+    w = 0.5*erfcx(sqrt(y))
+
     if abs(s) <= 1.0e-3
         c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
         c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
@@ -376,12 +377,13 @@ DLMF : https://dlmf.nist.gov/8.12#E8
 This mainly solves the problem near the region when a ≈ x with a large, and is a lower accuracy version of the minimax approximation.
 """
 function gamma_p_temme(a::Float64, x::Float64, z::Float64)
+    l = x/a
     y = -a*logmxp1(x/a)
-    c = 1.0 - y
-    w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
+    c = exp(-y)
+    w = 0.5*erfcx(sqrt(y))
     c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3] , d0[4] , d0[5] , d0[6]) 
     c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3] , d1[4]) 
-
+    c2 = @horner(z , d20 , d2[1])
     t = @horner(1.0/a , c0 , c1 , c2)
     if l < 1.0
        return c*(w - rt2pin*t/sqrt(a))
@@ -408,8 +410,8 @@ function gamma_p_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     if a*eps()*eps() > 3.28e-3
         throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
     end
-    c = 1.0 - y
-    w = (0.5 - sqrt(y)*(0.5 + (0.5 - y/3.0))/rtpi)/c
+    c = exp(-y)
+    w = 0.5*erfcx(sqrt(y))
     u = 1.0/a
     if iop == 1
         c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
