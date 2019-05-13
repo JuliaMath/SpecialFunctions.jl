@@ -176,7 +176,8 @@ function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
            break
        end
     end
-    return 1.0 - rgammax(a,x)*a2n
+    q_ans = rgammax(a,x)*a2n
+    return (1.0 - q_ans, q_ans)
 end
 """
     gamma_p_taylor(a, x, ind)
@@ -222,7 +223,8 @@ function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    return (rgammax(a,x)/a)*(1.0 + sm)
+    p_ans = (rgammax(a,x)/a)*(1.0 + sm)
+    return (p_ans, 1.0-p_ans)
 end
 """
     gamma_p_asym(a, x, ind)
@@ -267,7 +269,8 @@ function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    return 1.0 - (rgammax(a,x)/x)*(1.0 + sm)
+    q_ans = (rgammax(a,x)/x)*(1.0 + sm)
+    return (1.0 - q_ans, q_ans) 
 end
 """
     gamma_p_taylor_x(a,x,ind)
@@ -304,10 +307,10 @@ function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
        l = expm1(z)
        w = 1.0+l
        rangered = ((w*temp - l)*g - h < 0.0)
-       return rangered ? 1.0 : (1.0 - ((w*temp - l)*g - h))
+       return rangered ? (1.0,0.0) : ((1.0 - ((w*temp - l)*g - h)),((w*temp - l)*g - h))
     else
        w = exp(z)
-       return w*g*(1.0 - temp)
+       return (w*g*(1.0 - temp), 1.0 - w*g*(1.0-temp))
     end
 end
 """
@@ -342,9 +345,9 @@ function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
 
         t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
         if l < 1.0
-            return c*(w - rt2pin*t/sqrt(a))
+            return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
         end
-        return 1.0 - c*(w + rt2pin*t/sqrt(a))
+        return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
     end
     #---USING THE MINIMAX APPROXIMATIONS---
     c0 = @horner(z , -.333333333333333E+00 , -.159840143443990E+00 , -.335378520024220E-01 , -.231272501940775E-02)/(@horner(z , 1.0 , .729520430331981E+00 , .238549219145773E+00, .376245718289389E-01 , .239521354917408E-02 , -.939001940478355E-05 , .633763414209504E-06) )
@@ -359,9 +362,9 @@ function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
 
     t = @horner(1.0/a , c0 , c1 , c2 , c3 , c4 , c5 , c6 , c7 , c8)
     if l < 1.0
-       return c*(w - rt2pin*t/sqrt(a))
+       return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
     end
-    return 1.0 - c*(w + rt2pin*t/sqrt(a))
+    return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
 end
 """
     gamma_p_temme(a, x, z)
@@ -386,9 +389,9 @@ function gamma_p_temme(a::Float64, x::Float64, z::Float64)
     c2 = @horner(z , d20 , d2[1])
     t = @horner(1.0/a , c0 , c1 , c2)
     if l < 1.0
-       return c*(w - rt2pin*t/sqrt(a))
+       return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
     end
-    return 1.0 - c*(w + rt2pin*t/sqrt(a))
+    return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
 end
 """
     gamma_p_temme_1(a, x, z, ind)
@@ -434,9 +437,9 @@ function gamma_p_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
         
     end
     if l < 1.0
-        return c*(w - rt2pin*t/sqrt(a))
+        return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
     end
-    return 1.0 - c*(w + rt2pin*t/sqrt(a))
+    return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
 end
 """
     gamma_p_fsum(a,x)
@@ -468,7 +471,7 @@ function gamma_p_fsum(a::Float64, x::Float64)
         t = (x*t)/c
         sm += t
     end
-    return 1.0 - sm
+    return (1.0 - sm, sm)
 
 end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
@@ -477,14 +480,16 @@ end
 # doi>10.1145/22721.23109
 
 """
-    gamma_p(a,x,IND)
+    gamma_inc(a,x,IND)
     
 DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
-Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
+Wikipedia: https://en.wikipedia.org/wiki/Incomplete_gamma_function
 IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 digit accuracy suffices.
 gamma_p(a,x) or P(a,x) is the Incomplete gamma function ratio given by : ``1/\\Gamma (a) \\int_{0}^{x} e^{-t}t^{a-1} dt``
+gamma_q(a,x) or Q(a,x) is the Incomplete gamma function ratio given by : 1 - P(a,x) ->  ``1/\\Gamma (a) \\int_{x}^{\\infty} e^{-t}t^{a-1} dt``
+Returns a tuple (gamma_p, gamma_q) where gamma_p + gamma_q = 1.0
 """
-function gamma_p(a::Float64,x::Float64,ind::Integer)
+function gamma_inc(a::Float64,x::Float64,ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
     if a<0.0 || x<0.0
@@ -493,9 +498,9 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         throw(DomainError((a,x,ind,"`a` and `x` must be greater than 0 ---- Domain : (0,inf)")))
     elseif a*x==0.0 
         if x<=a
-            return 0.0
+            return (0.0,1.0)
         else
-            return 1.0
+            return (1.0,0.0)
         end               
     end
     
@@ -503,12 +508,12 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         if a >= big1[iop]
             l = x/a
             if l == 0.0
-                return 0.0
+                return (0.0,1.0)
             end
             s = 1.0 - l
             z = -logmxp1(l)
             if z >= 700.0/a
-                return 0.0
+                return (0.0,1.0)
             end
             y = a*z
             rta = sqrt(a)
@@ -544,9 +549,9 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
             r = rgammax(a,x)
             if r == 0.0
                 if x <= a
-                    return 0.0
+                    return (0.0,1.0)
                 else
-                    return 1.0
+                    return (1.0,0.0)
                 end
             end 
             if x <= max(a,alog10)
@@ -562,15 +567,15 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
         end
     elseif a == 0.5
         if x >= 0.25
-            return erf(sqrt(x))
+            return ( 1.0 - erfc(sqrt(x)) , erfc(sqrt(x)) )
         end
-        return erf(sqrt(x))
+        return ( erf(sqrt(x)) , 1.0 - erf(sqrt(x)) )
     elseif x < 1.1
         return gamma_p_taylor_x(a, x, ind)  
     end
     r = rgammax(a,x)
     if r == 0.0
-        return 1.0
+        return (1.0, 0.0)
     else
         return gamma_p_cf(a, x, ind)    
     end
@@ -579,34 +584,13 @@ function gamma_p(a::Float64,x::Float64,ind::Integer)
     
 end
 
-# Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
-# Published in Journal: ACM Transactions on Mathematical Software (TOMS)
-# Volume 12 Issue 4, Dec. 1986 Pages 377-393
-# doi>10.1145/22721.23109
-
-"""
-    gamma_q(a,x,IND)
-    
-DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
-Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
-IND --> Accuracy desired ; IND=0 means 14 significant digits accuracy , IND=1 means 6 significant digit and IND=2 means only 3 s.f. digit accuracy suffices.
-gamma_q(a,x) or Q(a,x) is the Incomplete gamma function ratio given by : 1 - P(a,x) ->  ``1/\\Gamma (a) \\int_{x}^{\\infty} e^{-t}t^{a-1} dt``
-"""
-function gamma_q(a::Float64,x::Float64,ind::Integer)
-    return 1.0 - gamma_p(a,x,ind)
+function gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
+    z = BigFloat()
+    ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
+    return (1.0 - z/gamma(a), z/gamma(a))
 end
-
-for f in (:gamma_p,:gamma_q)
-    @eval begin
-        function ($f)(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
-            z = BigFloat()
-            ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
-            return ($f == gamma_q) ? z/gamma(a) : 1.0 - z/gamma(a)
-        end
-        $f(a::Float32,x::Float32,ind::Integer) = Float32($f(Float64(a),Float64(x),ind))
-        $f(a::Float16,x::Float16,ind::Integer) = Float16($f(Float64(a),Float64(x),ind))
-        $f(a::Real,x::Real,ind::Integer) = ($f(float(a),float(x),ind))
-        $f(a::Integer,x::Integer,ind::Integer) = $f(Float64(a),Float64(x),ind)
-        $f(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError($f,(a,x,ind,"")))        
-    end
-end
+gamma_inc(a::Float32,x::Float32,ind::Integer) = ( Float32(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float32(gamma_inc(Float64(a),Float64(x),ind)[2]) )
+gamma_inc(a::Float16,x::Float16,ind::Integer) = ( Float16(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float16(gamma_inc(Float64(a),Float64(x),ind)[2]) )
+gamma_inc(a::Real,x::Real,ind::Integer) = (gamma_inc(float(a),float(x),ind))
+gamma_inc(a::Integer,x::Integer,ind::Integer) = gamma_inc(Float64(a),Float64(x),ind)
+gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError(gamma_inc,(a,x,ind,"")))

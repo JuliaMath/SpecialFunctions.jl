@@ -63,42 +63,42 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 end
 @testset "incomplete gamma ratios" begin
 #Computed using Wolframalpha gamma(a,x)/gamma(a) ~ gamma_q(a,x,0) function.
-    @test gamma_q(10,10,0) ≈ 0.45792971447185221
-    @test gamma_q(1,1,0) ≈ 0.3678794411714423216
-    @test gamma_q(0.5,0.5,0) ≈ 0.31731050786291410
-    @test gamma_q(BigFloat(30.5),BigFloat(30.5),0) ≈ parse(BigFloat,"0.47591691193354987004") rtol=eps()
-    @test gamma_q(5.5,0.5,0) ≈ 0.9999496100513121669
-    @test gamma_q(0.5,7.4,0) ≈ 0.0001195355018130302
-    @test gamma_q(0.5,0.22,0) ≈ 0.507122455359825146
-    @test gamma_q(0.5,0.8,0) ≈ 0.20590321073206830887
-    @test gamma_q(11.5,0.5,0) ≈ 0.999999999998406112
-    @test gamma_q(0.19,0.99,0) ≈ 0.050147247342905857
-    @test gamma_q(0.9999,0.9999,0) ≈ 0.3678730556923103
-    @test gamma_q(24,23.9999999999,0) ≈ 0.472849720555859138
-    @test gamma_q(0.5,0.55,0) ≈ 0.29426610430496289
-    @test gamma_q(Float32(0.5),Float32(0.55),0) ≈ Float32(gamma_q(0.5,0.55,0))
-    @test gamma_q(Float16(0.5),Float16(0.55),0) ≈ Float16(gamma_q(0.5,0.55,0))
-    @test gamma_q(30,29.99999,0) ≈ 0.475717712451705704
-    @test gamma_q(30,29.9,0) ≈ 0.482992166284958565
-    @test gamma_q(10,0.0001,0) ≈ 1.0000
-    @test gamma_q(0.0001,0.0001,0) ≈ 0.000862958131006599
-    @test gamma_p(0.0001,10.5,0) ≈ 0.999999999758896146
-    @test gamma_p(1,1,0) ≈ 0.63212055882855768
-    @test gamma_q(13,15.1,0) ≈ 0.25940814264863701
-    @test gamma_q(0.6,1.3,0) ≈ 0.136458554006505355
-    @test gamma_q((100),(80),0) ≈ 0.9828916869648668
-    @test gamma_q((100),(80),1) ≈ 0.9828916869
-    @test Float16(gamma_q((100),(80),2)) ≈ Float16(.983)
-    @test gamma_q(13.5,15.1,0) ≈ 0.305242642543419087  
-    @test gamma_p(11,9,0) ≈ 0.2940116796594881834
-    @test gamma_p(8,32,0) ≈ 0.99999989060651042057
-    @test gamma_q(15,16,0) ≈ 0.3675273597655649298
-    @test gamma_q(15.5,16,0) ≈ 0.4167440299455427811
-    @test gamma_p(0.9,0.8,0) ≈ 0.59832030278768172
-    @test gamma_p(1.7,2.5,0) ≈ 0.78446115627678957
-    @test gamma_q(11.1,0.001,0) ≈ 1.0000
-    @test_throws DomainError gamma_p(-1,2,2)
-    @test_throws DomainError gamma_q(0,0,1)
+    @test gamma_inc(10,10,0)[2] ≈ 0.45792971447185221
+    @test gamma_inc(1,1,0)[2] ≈ 0.3678794411714423216
+    @test gamma_inc(0.5,0.5,0)[2] ≈ 0.31731050786291410
+    @test gamma_inc(BigFloat(30.5),BigFloat(30.5),0)[2] ≈ parse(BigFloat,"0.47591691193354987004") rtol=eps()
+    @test gamma_inc(5.5,0.5,0)[2] ≈ 0.9999496100513121669
+    @test gamma_inc(0.5,7.4,0)[2] ≈ 0.0001195355018130302
+    @test gamma_inc(0.5,0.22,0)[2] ≈ 0.507122455359825146
+    @test gamma_inc(0.5,0.8,0)[2] ≈ 0.20590321073206830887
+    @test gamma_inc(11.5,0.5,0)[2] ≈ 0.999999999998406112
+    @test gamma_inc(0.19,0.99,0)[2] ≈ 0.050147247342905857
+    @test gamma_inc(0.9999,0.9999,0)[2] ≈ 0.3678730556923103
+    @test gamma_inc(24,23.9999999999,0)[2] ≈ 0.472849720555859138
+    @test gamma_inc(0.5,0.55,0)[2] ≈ 0.29426610430496289
+    @test gamma_inc(Float32(0.5),Float32(0.55),0)[2] ≈ Float32(gamma_inc(0.5,0.55,0)[2])
+    @test gamma_inc(Float16(0.5),Float16(0.55),0)[2] ≈ Float16(gamma_inc(0.5,0.55,0)[2])
+    @test gamma_inc(30,29.99999,0)[2] ≈ 0.475717712451705704
+    @test gamma_inc(30,29.9,0)[2] ≈ 0.482992166284958565
+    @test gamma_inc(10,0.0001,0)[2] ≈ 1.0000
+    @test gamma_inc(0.0001,0.0001,0)[2] ≈ 0.000862958131006599
+    @test gamma_inc(0.0001,10.5,0)[1] ≈ 0.999999999758896146
+    @test gamma_inc(1,1,0)[1] ≈ 0.63212055882855768
+    @test gamma_inc(13,15.1,0)[2] ≈ 0.25940814264863701
+    @test gamma_inc(0.6,1.3,0)[2] ≈ 0.136458554006505355
+    @test gamma_inc((100),(80),0)[2] ≈ 0.9828916869648668
+    @test gamma_inc((100),(80),1)[2] ≈ 0.9828916869
+    @test Float16(gamma_inc((100),(80),2)[2]) ≈ Float16(.983)
+    @test gamma_inc(13.5,15.1,0)[2] ≈ 0.305242642543419087  
+    @test gamma_inc(11,9,0)[1] ≈ 0.2940116796594881834
+    @test gamma_inc(8,32,0)[1] ≈ 0.99999989060651042057
+    @test gamma_inc(15,16,0)[2] ≈ 0.3675273597655649298
+    @test gamma_inc(15.5,16,0)[2] ≈ 0.4167440299455427811
+    @test gamma_inc(0.9,0.8,0)[1] ≈ 0.59832030278768172
+    @test gamma_inc(1.7,2.5,0)[1] ≈ 0.78446115627678957
+    @test gamma_inc(11.1,0.001,0)[2] ≈ 1.0000
+    @test_throws DomainError gamma_inc(-1,2,2)
+    @test_throws DomainError gamma_inc(0,0,1)
 end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.
