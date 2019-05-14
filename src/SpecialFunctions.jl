@@ -1,13 +1,13 @@
 module SpecialFunctions
 
 # Load openspecfun libraries from our deps.jl
-let depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
-    if !isfile(depsjl_path)
-        error("SpecialFunctions is not installed properly, run `Pkg.build(\"SpecialFunctions\")`," *
-              "restart Julia and try again")
-    end
-    include(depsjl_path)
-end
+# let depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
+#     if !isfile(depsjl_path)
+#         error("SpecialFunctions is not installed properly, run `Pkg.build(\"SpecialFunctions\")`," *
+#               "restart Julia and try again")
+#     end
+#     include(depsjl_path)
+# end
 
 __init__() = check_deps()
 
@@ -56,6 +56,18 @@ export
     sinint,
     cosint,
     lbinomial
+
+
+include("amos/Amos.jl")
+
+struct AmosException <: Exception
+    info::Int32
+end
+
+const cy1 = [0.]
+const cy2 = [0.]
+const wrk1 = [0.]
+const wrk2 = [0.]
 
 include("bessel.jl")
 include("erf.jl")
