@@ -144,7 +144,7 @@ function rgammax(a::Float64,x::Float64)
     end
 end   
 """
-    gamma_p_cf(a, x, ind)
+    gamma_inc_cf(a, x, ind)
 
 Computes P(a,x) by continued fraction expansion given by : 
 ```math
@@ -153,7 +153,7 @@ R(a,x) * \\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a
 Used when 1 <= a <= BIG and x < x0.
 DLMF : https://dlmf.nist.gov/8.9#E2
 """
-function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
+function gamma_inc_cf(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
     tol = 4.0*acc
     a2nm1 = 1.0
@@ -180,7 +180,7 @@ function gamma_p_cf(a::Float64, x::Float64, ind::Integer)
     return (1.0 - q_ans, q_ans)
 end
 """
-    gamma_p_taylor(a, x, ind)
+    gamma_inc_taylor(a, x, ind)
 
 Compute P(a,x) using Taylor Series for P/R given by : 
 ```math
@@ -189,7 +189,7 @@ R(a,x)/a * (1 + \\sum_{1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))
 Used when 1 <= a <= BIG and x <= max{a, ln 10}.
 DLMF : https://dlmf.nist.gov/8.11#E2
 """
-function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
+function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
     wk = zeros(30)
     flag = false
@@ -227,7 +227,7 @@ function gamma_p_taylor(a::Float64, x::Float64, ind::Integer)
     return (p_ans, 1.0-p_ans)
 end
 """
-    gamma_p_asym(a, x, ind)
+    gamma_inc_asym(a, x, ind)
 
 Compute P(a,x) using asymptotic expansion given by : 
 ```math
@@ -236,7 +236,7 @@ R(a,x)/a * (1 + \\sum_{1}^{N-1}(a_{n}/x^{n} + \\Theta _{n}a_{n}/x^{n}))
 where R(a,x) = rgammax(a,x). Used when 1 <= a <= BIG and x >= x0.
 DLMF : https://dlmf.nist.gov/8.11#E2
 """
-function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
+function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     wk = zeros(30)
     flag = false
     acc = acc0[ind + 1]
@@ -273,7 +273,7 @@ function gamma_p_asym(a::Float64, x::Float64, ind::Integer)
     return (1.0 - q_ans, q_ans) 
 end
 """
-    gamma_p_taylor_x(a,x,ind)
+    gamma_inc_taylor_x(a,x,ind)
 
 Computes P(a,x) based on Taylor expansion of P(a,x)/x**a given by:
 ```math
@@ -284,7 +284,7 @@ J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)
 ``` resulting from term-by-term integration of gamma_p(a,x,ind).
 This is used when a < 1 and x < 1.1 - Refer Eqn (9) in the paper.
 """
-function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
+function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
     l=3.0
     c=x
@@ -306,15 +306,16 @@ function gamma_p_taylor_x(a::Float64, x::Float64, ind::Integer)
     if (x < 0.25 && z > -.13394) || a < x/2.59
        l = expm1(z)
        w = 1.0+l
-       rangered = ((w*temp - l)*g - h < 0.0)
-       return rangered ? (1.0,0.0) : ((1.0 - ((w*temp - l)*g - h)),((w*temp - l)*g - h))
+       q_ans = max((w*temp - l)*g - h, 0.0)
+       return (1.0 - q_ans, q_ans)
     else
        w = exp(z)
-       return (w*g*(1.0 - temp), 1.0 - w*g*(1.0-temp))
+       p_ans = w*g*(1.0 - temp)
+       return (p_ans, 1.0 - p_ans)
     end
 end
 """
-    gamma_p_minimax(a,x,z)
+    gamma_inc_minimax(a,x,z)
 
 Compute P(a,x) using minimax approximations given by : 
 ```math
@@ -327,7 +328,7 @@ DLMF : https://dlmf.nist.gov/8.12#E8
 This is a higher accuracy approximation of Temme expansion, which deals with the region near a ≈ x with a large.
 Refer Appendix F in the paper for the extensive set of coefficients calculated using Brent's multiple precision arithmetic(set at 50 digits) in BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70 .
 """
-function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
+function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
     l = x/a
     s = 1.0 - l
     y = -a*logmxp1(l)
@@ -345,9 +346,12 @@ function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
 
         t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
         if l < 1.0
-            return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
+            p_ans = c*(w - rt2pin*t/sqrt(a))
+            return (p_ans , 1.0 - p_ans)
+        else
+            q_ans = c*(w + rt2pin*t/sqrt(a))
+            return (1.0 - q_ans , q_ans)
         end
-        return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
     end
     #---USING THE MINIMAX APPROXIMATIONS---
     c0 = @horner(z , -.333333333333333E+00 , -.159840143443990E+00 , -.335378520024220E-01 , -.231272501940775E-02)/(@horner(z , 1.0 , .729520430331981E+00 , .238549219145773E+00, .376245718289389E-01 , .239521354917408E-02 , -.939001940478355E-05 , .633763414209504E-06) )
@@ -362,12 +366,15 @@ function gamma_p_minimax(a::Float64, x::Float64, z::Float64)
 
     t = @horner(1.0/a , c0 , c1 , c2 , c3 , c4 , c5 , c6 , c7 , c8)
     if l < 1.0
-       return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
+        p_ans = c*(w - rt2pin*t/sqrt(a))
+        return (p_ans , 1.0 - p_ans)
+    else
+        q_ans = c*(w + rt2pin*t/sqrt(a))
+        return (1.0 - q_ans , q_ans)
     end
-    return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
 end
 """
-    gamma_p_temme(a, x, z)
+    gamma_inc_temme(a, x, z)
 
 Compute P(a,x) using Temme's expansion given by : 
 ```math
@@ -379,7 +386,7 @@ T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
 DLMF : https://dlmf.nist.gov/8.12#E8
 This mainly solves the problem near the region when a ≈ x with a large, and is a lower accuracy version of the minimax approximation.
 """
-function gamma_p_temme(a::Float64, x::Float64, z::Float64)
+function gamma_inc_temme(a::Float64, x::Float64, z::Float64)
     l = x/a
     y = -a*logmxp1(x/a)
     c = exp(-y)
@@ -389,12 +396,15 @@ function gamma_p_temme(a::Float64, x::Float64, z::Float64)
     c2 = @horner(z , d20 , d2[1])
     t = @horner(1.0/a , c0 , c1 , c2)
     if l < 1.0
-       return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
+        p_ans = c*(w - rt2pin*t/sqrt(a))
+        return (p_ans , 1.0 - p_ans)
+    else
+        q_ans = c*(w + rt2pin*t/sqrt(a))
+        return (1.0 - q_ans , q_ans)
     end
-    return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
 end
 """
-    gamma_p_temme_1(a, x, z, ind)
+    gamma_inc_temme_1(a, x, z, ind)
 
 Computes P(a,x) using simplified Temme expansion near y=0 by : 
 ```math
@@ -406,7 +416,7 @@ E(y) = 1/2 - (1 - y/3)*(\\sqrt(y/\\pi))
 Used instead of it's previous function when ``\\sigma <= e_{0}/\\sqrt{a}``.
 DLMF : https://dlmf.nist.gov/8.12#E8
 """
-function gamma_p_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
+function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     iop = ind + 1
     l = x/a
     y = -a * logmxp1(l)
@@ -437,18 +447,21 @@ function gamma_p_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
         
     end
     if l < 1.0
-        return (c*(w - rt2pin*t/sqrt(a)) , 1.0 - c*(w - rt2pin*t/sqrt(a)))
+        p_ans = c*(w - rt2pin*t/sqrt(a))
+        return (p_ans , 1.0 - p_ans)
+    else
+        q_ans = c*(w + rt2pin*t/sqrt(a))
+        return (1.0 - q_ans , q_ans)
     end
-    return (1.0 - c*(w + rt2pin*t/sqrt(a)) , c*(w + rt2pin*t/sqrt(a)))
 end
 """
-    gamma_p_fsum(a,x)
+    gamma_inc_fsum(a,x)
 
 Compute using Finite Sums for Q(a,x) when a >= 1 && 2a is integer
 Used when a <= x <= x0 and a = n/2.
 Refer Eqn (14) in the paper.
 """
-function gamma_p_fsum(a::Float64, x::Float64)
+function gamma_inc_fsum(a::Float64, x::Float64)
     if isinteger(a)           
         sm = exp(-x)
         t = sm
@@ -471,7 +484,8 @@ function gamma_p_fsum(a::Float64, x::Float64)
         t = (x*t)/c
         sm += t
     end
-    return (1.0 - sm, sm)
+    q_ans = sm
+    return (1.0 - q_ans, q_ans)
 
 end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
@@ -521,8 +535,8 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
                 z = sqrt(z + z) 
                 if l < 1.0 
                     z=-z
-                return gamma_p_temme_1(a, x, z, ind)
                 end
+                return gamma_inc_temme_1(a, x, z, ind)
             end
 
             if abs(s) <= 0.4
@@ -537,12 +551,12 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
                     z=-z
                 end
                 if iop == 1
-                    return gamma_p_minimax(a,x,z)
+                    return gamma_inc_minimax(a,x,z)
                 elseif iop == 2
-                    return gamma_p_temme(a,x,z)
+                    return gamma_inc_temme(a,x,z)
                 else
                     t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-                    return gamma_p_temme_1(a, x, z, ind)
+                    return gamma_inc_temme_1(a, x, z, ind)
                 end
             end
         elseif a > x || x >= x0[iop] || !isinteger(2*a)  
@@ -555,14 +569,14 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
                 end
             end 
             if x <= max(a,alog10)
-                return gamma_p_taylor(a, x, ind)
+                return gamma_inc_taylor(a, x, ind)
             elseif x < x0[iop]
-                return gamma_p_cf(a, x, ind)
+                return gamma_inc_cf(a, x, ind)
             else
-                return gamma_p_asym(a, x, ind)
+                return gamma_inc_asym(a, x, ind)
             end
         else
-            return gamma_p_fsum(a,x)
+            return gamma_inc_fsum(a,x)
             
         end
     elseif a == 0.5
@@ -571,13 +585,13 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
         end
         return ( erf(sqrt(x)) , 1.0 - erf(sqrt(x)) )
     elseif x < 1.1
-        return gamma_p_taylor_x(a, x, ind)  
+        return gamma_inc_taylor_x(a, x, ind)  
     end
     r = rgammax(a,x)
     if r == 0.0
         return (1.0, 0.0)
     else
-        return gamma_p_cf(a, x, ind)    
+        return gamma_inc_cf(a, x, ind)    
     end
 
     
