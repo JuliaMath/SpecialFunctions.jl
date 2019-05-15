@@ -176,8 +176,8 @@ function gamma_inc_cf(a::Float64, x::Float64, ind::Integer)
            break
        end
     end
-    q_ans = rgammax(a,x)*a2n
-    return (1.0 - q_ans, q_ans)
+    q = rgammax(a,x)*a2n
+    return (1.0 - q, q)
 end
 """
     gamma_inc_taylor(a, x, ind)
@@ -223,8 +223,8 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    p_ans = (rgammax(a,x)/a)*(1.0 + sm)
-    return (p_ans, 1.0-p_ans)
+    p = (rgammax(a,x)/a)*(1.0 + sm)
+    return (p, 1.0-p)
 end
 """
     gamma_inc_asym(a, x, ind)
@@ -269,8 +269,8 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    q_ans = (rgammax(a,x)/x)*(1.0 + sm)
-    return (1.0 - q_ans, q_ans) 
+    q = (rgammax(a,x)/x)*(1.0 + sm)
+    return (1.0 - q, q) 
 end
 """
     gamma_inc_taylor_x(a,x,ind)
@@ -306,12 +306,12 @@ function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
     if (x < 0.25 && z > -.13394) || a < x/2.59
        l = expm1(z)
        w = 1.0+l
-       q_ans = max((w*temp - l)*g - h, 0.0)
-       return (1.0 - q_ans, q_ans)
+       q = max((w*temp - l)*g - h, 0.0)
+       return (1.0 - q, q)
     else
        w = exp(z)
-       p_ans = w*g*(1.0 - temp)
-       return (p_ans, 1.0 - p_ans)
+       p = w*g*(1.0 - temp)
+       return (p, 1.0 - p)
     end
 end
 """
@@ -346,11 +346,11 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
 
         t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
         if l < 1.0
-            p_ans = c*(w - rt2pin*t/sqrt(a))
-            return (p_ans , 1.0 - p_ans)
+            p = c*(w - rt2pin*t/sqrt(a))
+            return (p , 1.0 - p)
         else
-            q_ans = c*(w + rt2pin*t/sqrt(a))
-            return (1.0 - q_ans , q_ans)
+            q = c*(w + rt2pin*t/sqrt(a))
+            return (1.0 - q , q)
         end
     end
     #---USING THE MINIMAX APPROXIMATIONS---
@@ -366,11 +366,11 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
 
     t = @horner(1.0/a , c0 , c1 , c2 , c3 , c4 , c5 , c6 , c7 , c8)
     if l < 1.0
-        p_ans = c*(w - rt2pin*t/sqrt(a))
-        return (p_ans , 1.0 - p_ans)
+        p = c*(w - rt2pin*t/sqrt(a))
+        return (p , 1.0 - p)
     else
-        q_ans = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q_ans , q_ans)
+        q = c*(w + rt2pin*t/sqrt(a))
+        return (1.0 - q , q)
     end
 end
 """
@@ -396,11 +396,11 @@ function gamma_inc_temme(a::Float64, x::Float64, z::Float64)
     c2 = @horner(z , d20 , d2[1])
     t = @horner(1.0/a , c0 , c1 , c2)
     if l < 1.0
-        p_ans = c*(w - rt2pin*t/sqrt(a))
-        return (p_ans , 1.0 - p_ans)
+        p = c*(w - rt2pin*t/sqrt(a))
+        return (p , 1.0 - p)
     else
-        q_ans = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q_ans , q_ans)
+        q = c*(w + rt2pin*t/sqrt(a))
+        return (1.0 - q , q)
     end
 end
 """
@@ -447,11 +447,11 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
         
     end
     if l < 1.0
-        p_ans = c*(w - rt2pin*t/sqrt(a))
-        return (p_ans , 1.0 - p_ans)
+        p = c*(w - rt2pin*t/sqrt(a))
+        return (p , 1.0 - p)
     else
-        q_ans = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q_ans , q_ans)
+        q = c*(w + rt2pin*t/sqrt(a))
+        return (1.0 - q , q)
     end
 end
 """
@@ -484,8 +484,8 @@ function gamma_inc_fsum(a::Float64, x::Float64)
         t = (x*t)/c
         sm += t
     end
-    q_ans = sm
-    return (1.0 - q_ans, q_ans)
+    q = sm
+    return (1.0 - q, q)
 
 end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
@@ -581,9 +581,11 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
         end
     elseif a == 0.5
         if x >= 0.25
-            return ( 1.0 - erfc(sqrt(x)) , erfc(sqrt(x)) )
+            q = erfc(sqrt(x))
+            return ( 1.0 - q , q )
         end
-        return ( erf(sqrt(x)) , 1.0 - erf(sqrt(x)) )
+        p = erf(sqrt(x))
+        return ( p , 1.0 - p )
     elseif x < 1.1
         return gamma_inc_taylor_x(a, x, ind)  
     end
@@ -601,7 +603,8 @@ end
 function gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
-    return (1.0 - z/gamma(a), z/gamma(a))
+    q = z/gamma(a)
+    return (1.0 - q, q)
 end
 gamma_inc(a::Float32,x::Float32,ind::Integer) = ( Float32(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float32(gamma_inc(Float64(a),Float64(x),ind)[2]) )
 gamma_inc(a::Float16,x::Float16,ind::Integer) = ( Float16(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float16(gamma_inc(Float64(a),Float64(x),ind)[2]) )
