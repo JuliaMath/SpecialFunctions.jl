@@ -49,6 +49,7 @@ SpecialFunctions.ellipe
 SpecialFunctions.eta
 SpecialFunctions.zeta
 SpecialFunctions.gamma
+SpecialFunctions.gamma_inc
 SpecialFunctions.loggamma
 SpecialFunctions.logabsgamma
 SpecialFunctions.logfactorial
