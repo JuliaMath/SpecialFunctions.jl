@@ -3,6 +3,8 @@
 using SpecialFunctions
 using Test
 using Base.MathConstants: γ
+using PyCall
+@pyimport scipy.special as sp
 
 using SpecialFunctions: AmosException, f64
 
@@ -99,6 +101,19 @@ end
     @test gamma_inc(11.1,0.001,0)[2] ≈ 1.0000
     @test_throws DomainError gamma_inc(-1,2,2)
     @test_throws DomainError gamma_inc(0,0,1)
+end
+@testset "inverse of incomplete gamma ratios" begin
+#Compared with Scipy.special.gammaincinv
+    @test gamma_inc_inv(1.0,0.5,0.5) ≈ 0.69314718055994529
+    for x = 0.01:0.01:0.99
+        @test gamma_inc_inv(0.4, x, 1.0-x) ≈ sp.gammaincinv(0.4,x)
+    end
+    for x = 0.01:0.01:0.99
+        @test gamma_inc_inv(0.8, x, 1.0-x) ≈ sp.gammaincinv(0.8,x)
+    end 
+    for x = 0.01:0.01:0.99
+        @test gamma_inc_inv(1.8, x, 1.0-x) ≈ sp.gammaincinv(1.8,x)
+    end
 end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.
