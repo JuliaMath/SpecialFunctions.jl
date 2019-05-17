@@ -155,23 +155,12 @@ function rgammax(a::Float64,x::Float64)
         end
     end
 end   
-# #EVALUATE LOG(1+A)
-# function loga1(a::Float64)
-#     if abs(a) > .375
-#         xx = 1.0 + a
-#         if a<0.0
-#             xx = a + 1.0
-#         end
-#         return log(xx)
-#     else
-#         t = a/(a + 2.0)
-#         t2 = t*t
-#         w = @horner(t2, 1.0, -.129418923021993E+01, .405303492862024E+00, -.178874546012214E-01) / @horner(t2, 1.0, -.162752256355323E+01, .747811014037616E+00, -.845104217945565E-01)
-#         return 2.0*t*w
-#     end
-# end
-#EVALUATE LOG(GAMMA(1+A)) FOR -0.2 <= A <= 1.25
-function log1gamma1(a::Float64)
+"""
+    loggamma1p(a)
+
+Compute ``log(\\Gamma(1+a))`` for -1 < a <= 1.
+"""
+function loggamma1p(a::Float64)
   
     if a >= 0.6
         x = a - 1.0
@@ -182,31 +171,14 @@ function log1gamma1(a::Float64)
         return -a*w
     end
 end
-# #EVALUATE INVERSE NORMAL DISTRIBUTION
-# function normal_inv(p::Float64, q::Float64, d::Float64)
-#     t = min(p,q)
-#     w = 1.0 - (p+q)
-#     if abs(w) > 2.0*eps()
-#         throw(DomainError())
-#     end
-#     u = abs(2*d)
-#     v = 2*t
-#     w = erfinv(u)
-#     if w < 0.0
-#         throw(DomainError)
-#     end
-#     w *= sqrt(2)
-#     if d < 0.0 
-#         w = -w
-#     end
-#     return w
-# end
+
 """
     chepolsum(n,x,a)
 
 Computes a series of Chebyshev Polynomials given by : a[0]/2 + a[1]T1(x) + .... + a[n]Tn(X)
 """
-function chepolsum(n::Integer, x::Float64, a::Array{Float64,1})
+function chepolsum(x::Float64, a::Array{Float64,1})
+    n = length(a) - 1
   
     if n == 0
         return a[1]/2.0
@@ -227,7 +199,7 @@ end
 """
     stirling(x)
 
-Stirling Series
+Compute the Stirling Series for given `x`.
 """
 function stirling(x::Float64)
   
@@ -235,11 +207,11 @@ function stirling(x::Float64)
     if x < floatmin(Float64)*1000.0
         return floatmax(Float64)/1000.0
     elseif x < 1
-        return log1gamma1(x) - (x+0.5)*log(x)+x - log(sqrt(2*pi))
+        return loggamma1p(x) - (x+0.5)*log(x)+x - log(sqrt(2*pi))
     elseif x < 2
-        return log1gamma1(x-1) - (x-0.5)*log(x)+x - log(sqrt(2*pi))
+        return loggamma1p(x-1) - (x-0.5)*log(x)+x - log(sqrt(2*pi))
     elseif x < 3
-        return log1gamma1(x-2) - (x-0.5*log(x)+x  - log(sqrt(2*pi))+log(x-1))
+        return loggamma1p(x-2) - (x-0.5*log(x)+x  - log(sqrt(2*pi))+log(x-1))
     elseif x < 12
         a[1]=1.996379051590076518221
         a[2]=-0.17971032528832887213e-2
@@ -260,7 +232,7 @@ function stirling(x::Float64)
         a[17]=0.332e-19
         a[18]=-0.58e-20
         z=18.0/(x*x)-1.0
-        return chepolsum(17,z,a)/(12.0*x)
+        return chepolsum(z,a)/(12.0*x)
     else
         c = zeros(7)
         z = 1.0/(x*x)
@@ -278,7 +250,13 @@ function stirling(x::Float64)
         end
     end
 end
-function gamstar(x::Float64)
+"""
+    gammax(x)
+
+gammax(x) = ``e^{stirling(x)}`` if x>0
+else ``\\Gamma(x)/(e^{-x + (x-0.5)*log(x)}/\\sqrt{2 \\pi}``
+"""
+function gammax(x::Float64)
     if x>=3
         return exp(stirling(x))
     elseif x>0
@@ -287,6 +265,11 @@ function gamstar(x::Float64)
         return floatmax(Float64)/1000.0
     end
 end
+"""
+    lambdaeta(eta)
+
+Function to compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-log(\\lambda)``
+"""
 function lambdaeta(eta::Float64)
   
     ak = zeros(7)
@@ -346,8 +329,14 @@ function ratfun(x::Float64, ak::Array{Float64,1}, bk::Array{Float64,1})
     q = @horner(x, bk[1], bk[2], bk[3], bk[4], bk[5])
     return p/q
 end
-
-function eps1(eta::Float64)
+"""
+Computing the first coefficient for the expansion :
+```math
+\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+```
+Refer Eqn (3.12) in the paper
+"""
+function coeff1(eta::Float64)
     ak=zeros(5)
     bk=zeros(5)
     if abs(eta) < 1.0
@@ -361,22 +350,28 @@ function eps1(eta::Float64)
         bk[3] = 2.118190062224e-1
         bk[4] = 3.048648397436e-2
         bk[5] = 1.605037988091e-3
-        eps1 = ratfun(eta,ak,bk)
+        coeff1 = ratfun(eta,ak,bk)
     else
         la = lambdaeta(eta)
-        eps1 = log(eta/(la-1.0))/eta
+        coeff1 = log(eta/(la-1.0))/eta
     end
-    return eps1
+    return coeff1
 end
-
-function eps2(eta::Float64)
+"""
+Computing the second coefficient for the expansion :
+```math
+\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+```
+Refer Eqn (3.12) in the paper
+"""
+function coeff2(eta::Float64)
     ak=zeros(5)
     bk=zeros(5)
 
     if eta < -5.0
         x=eta*eta
         lnmeta = log(-eta)
-        eps2 = (12.0 - x - 6.0*lnmeta*lnmeta)/(12.0*x*eta)
+        coeff2 = (12.0 - x - 6.0*lnmeta*lnmeta)/(12.0*x*eta)
     elseif eta < -2.0
         ak[1] = -1.72847633523e-2
         ak[2] = -1.59372646475e-2
@@ -388,7 +383,7 @@ function eps2(eta::Float64)
         bk[3] = 2.97143406325e-1
         bk[4] = 5.79490176079e-2
         bk[5] = 5.74558524851e-3
-        eps2 = ratfun(eta,ak,bk)
+        coeff2 = ratfun(eta,ak,bk)
     elseif eta < 2.0
         ak[1] = -1.72839517431e-2
         ak[2] = -1.46362417966e-2
@@ -400,7 +395,7 @@ function eps2(eta::Float64)
         bk[3] = 2.49962384741e-1
         bk[4] = 4.43843438769e-2
         bk[5] = 4.24073217211e-3
-        eps2 = ratfun(eta,ak,bk)
+        coeff2 = ratfun(eta,ak,bk)
     elseif eta < 1000.0
         ak[1] = 9.99944669480e-1
         ak[2] = 1.04649839762e+2
@@ -413,19 +408,26 @@ function eps2(eta::Float64)
         bk[4] = 3.11993802124e+3
         bk[5] = 3.97003311219e+3
         x = 1.0/eta
-        eps2 = ratfun(x,ak,bk)/(-12.0*eta)
+        coeff2 = ratfun(x,ak,bk)/(-12.0*eta)
     else
-        eps2 = -1.0/(12.0*eta)
+        coeff2 = -1.0/(12.0*eta)
     end
-    return eps2
+    return coeff2
 end
-function eps3(eta::Float64)
+"""
+Computing the third and last coefficient for the expansion :
+```math
+\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+```
+Refer Eqn (3.12) in the paper
+"""
+function coeff3(eta::Float64)
     ak=zeros(5)
     bk=zeros(5)
     if eta < -8.0
         x=eta*eta
         y = log(-eta)/eta
-        eps3=(-30.0+eta*y*(6.0*x*y*y-12.0+x))/(12.0*eta*x*x)
+        coeff3=(-30.0+eta*y*(6.0*x*y*y-12.0+x))/(12.0*eta*x*x)
     elseif eta < -4.0
         ak[1] = 4.95346498136e-2
         ak[2] = 2.99521337141e-2
@@ -437,7 +439,7 @@ function eps3(eta::Float64)
         bk[3] = 2.61547111595e-1
         bk[4] = 4.64854522477e-2
         bk[5] = 4.03751193496e-3
-        eps3 = ratfun(eta,ak,bk)/(eta*eta)
+        coeff3 = ratfun(eta,ak,bk)/(eta*eta)
     elseif eta < -2.0
         ak[1] = 4.52313583942e-3
         ak[2] = 1.20744920113e-3
@@ -449,7 +451,7 @@ function eps3(eta::Float64)
         bk[3] = 4.05368773071e-1
         bk[4] = 9.01638932349e-2
         bk[5] = 9.48935714996e-3
-        eps3 = ratfun(eta,ak,bk)
+        coeff3 = ratfun(eta,ak,bk)
     elseif eta < 2.0
         ak[1] = 4.39937562904e-3
         ak[2] = 4.87225670639e-4
@@ -461,7 +463,7 @@ function eps3(eta::Float64)
         bk[3] = 3.33094721709e-1
         bk[4] = 7.03527806143e-2
         bk[5] = 8.06110846078e-3
-        eps3 = ratfun(eta,ak,bk)
+        coeff3 = ratfun(eta,ak,bk)
     elseif eta < 10.0
         ak[1] = -1.14811912320e-3
         ak[2] = -1.12850923276e-1
@@ -474,7 +476,7 @@ function eps3(eta::Float64)
         bk[4] = 2.18938950816e+2
         bk[5] = 2.77067027185e+2
         x=1.0/eta
-        eps3 = ratfun(x,ak,bk)/(eta*eta)
+        coeff3 = ratfun(x,ak,bk)/(eta*eta)
     elseif eta < 100.0
         ak[1] = -1.45727889667e-4
         ak[2] = -2.90806748131e-1
@@ -487,12 +489,12 @@ function eps3(eta::Float64)
         bk[4] = 7.11524019009e+3
         bk[5] = 4.55746081453e+4
         x=1.0/eta
-        eps3 = ratfun(x,ak,bk)/(eta*eta)
+        coeff3 = ratfun(x,ak,bk)/(eta*eta)
     else
         eta3 = eta*eta*eta
-        eps3 = -log(eta)/(12.0*eta3)
+        coeff3 = -log(eta)/(12.0*eta3)
     end
-    return eps3
+    return coeff3
 end
 
 
@@ -1013,7 +1015,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         b=1.0-a
         b2=b*b
         b3=b2*b
-        eta=sqrt(-2/a*log(q*gamstar(a)*sqrt(2*pi)/sqrt(a)))
+        eta=sqrt(-2/a*log(q*gammax(a)*sqrt(2*pi)/sqrt(a)))
         x0 = a*lambdaeta(eta)
         l = log(x0)
 
@@ -1054,7 +1056,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         m=1
         r = erfcinv(2*porq)
         eta = s*r/sqrt(a*0.5)
-        eta += (eps1(eta)+(eps2(eta)+eps3(eta)/a)/a)/a
+        eta += (coeff1(eta)+(coeff2(eta)+coeff3(eta)/a)/a)/a
         x0 = a*lambdaeta(eta)
     end
 
@@ -1097,7 +1099,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
             end
         else
             y=eta
-            fp = -sqrt(a/(2*pi))*exp(-0.5*a*y*y)/gamstar(a)
+            fp = -sqrt(a/(2*pi))*exp(-0.5*a*y*y)/gammax(a)
             r = -(1/fp)*x
             if pcase
                 (px,qx) = gamma_inc(a,x,0)
@@ -1128,397 +1130,6 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     xr=x
     return xr
 end
-
-
-
-# function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
-#     x = 0.0
-#     if a <= 0.0
-#         @goto l500
-#     end
-#     t = p + q - 1.0
-#     if abs(t) > eps()
-#         @goto l520
-#     end
-#     if p == 0.0
-#         return 0.0
-#     end
-#     if q == 0.0
-#         @goto l400
-#     end
-#     if a == 1.0
-#         @goto l410
-#     end
-    
-#     e2 = 2*eps()
-#     EPS = max(100.0*eps(), 1.0E-10)
-#     amax = (0.4E-10)/(eps()*eps())
-#     iop = 1
-#     if eps() > 1.0E-10
-#         iop = 2
-#     end
-#     epps = eps0[iop]
-#     x=0.0
-#     xn = x
-# #-----SELECTION OF INIT. APPROX XN OF X WHEN A < 1---------
-
-#     if a > 1.0
-#         @goto l30
-#     end
-#     g = gamma(a + 1.0)
-#     qg = q*g
-#     if qg == 0.0
-#         @goto l560
-#     end
-#     b = qg/a
-#     if qg > 0.6*a
-#         @goto l20
-#     end
-#     if a >= 0.3 || b < 0.35
-#         @goto l10
-#     else
-#         t = exp(-(b+eu))
-#         u = t*exp(t)
-#         xn = t*exp(u)
-#         @goto l100
-#     end
-
-#     @label l10
-#      if b >= 0.45
-#         @goto l20
-#      end
-#      if b == 0.0
-#         @goto l560
-#      end
-#      y = -log(b)
-#      s = 1.0 - a
-#      z = log(y)
-#      t = y - s*z
-#      if b < 0.15
-#         @goto l11
-#      end
-#      xn = y - s*log(t) - log(1.0 + s/(t + 1.0))
-#      @goto l200
-
-#     @label l11
-#      if b <= 0.01
-#         @goto l12
-#      end
-#      u = ((t + 2.0*(3.0 - a))*t + (2.0 - a)*(3.0 - a))/((t + (5.0 - a))*t + 2.0)
-#      xn = y - s*log(t) - log(u)
-#      @goto l200
-     
-#     @label l12
-#      c1 = -s*z
-#      c2 = -s*(1.0 + c1)
-#      c3 =  s*((0.5*c1 + (2.0 - a))*c1 + (2.5 - 1.5*a))
-#      c4 = -s*(((c1/3.0 + (2.5 - 1.5*a))*c1 + ((a - 6.0)*a + 7.0))*c1+ ((11.0*a - 46.0)*a + 47.0)/6.0)
-#      c5 = -s*((((-c1/4.0 + (11.0*a - 17.0)/6.0)*c1 + ((-3.0*a + 13.0)*a - 13.0))*c1 + 0.5*(((2.0*a - 25.0)*a + 72.0)*a - 61.0))*c1 + (((25.0*a - 195.0)*a + 477.0)*a - 379.0)/12.0)
-#      xn = ((((c5/y + c4)/y + c3)/y + c2)/y + c1) + y
-#      if a > 1.0
-#         @goto l200
-#      end
-#      if b > bmin[iop]
-#         @goto l200
-#      end
-#      x = xn
-#      return xn
-
-#     @label l20
-#      if b*q > 1.0E-8
-#         @goto l21
-#      end
-#      xn = exp(-(q/a + eu))
-#      @goto l23
-#     @label l21
-#      if p <= 0.9
-#         @goto l22
-#      end
-#      xn = exp((loga1(-q) + log1gamma1(a))/a)
-#      @goto l23
-#     @label l22
-#      xn = exp(log(p*g)/a)
-#     @label l23
-#      if xn == 0.0
-#         @goto l510
-#         t = 1.0 - xn/(a + 1.0)
-#         xn /= t
-#         @goto l100
-#      end
-
-# #SELECTION OF INIT APPROX XN OF X WHEN A>1
-    
-#     # @label l30
-#     #  if q <= 0.5
-#     #     @goto l31
-#     #  else
-#     #     w = log(p)
-#     #     @goto l32
-#     #  end
-#     # @label l31
-#     #  w = log(q)
-#     # @label l32
-#     #  t = sqrt(-2.0*w)
-#     #  s = t - @horner(t, a0[1], a0[2], a0[3], a0[4]) / @horner(t, 1.0, b0[1], b0[2], b0[3], b0[4])
-#     #  if q > 0.5
-#     #     s = -s
-#     #  end
-#     @label l30
-#      t = p - .5
-#      if q < .5
-#         t = .5 - q
-#      end
-#      s = normal_inv(p,q,t)
-#      rta = sqrt(a)
-#      s2 = s*s
-#      xn = (((12.0*s2 - 243.0)*s2 - 923.0)*s2 + 1472.0)/204120.0
-#      xn = (xn/a + s*((9.0*s2 + 256.0)*s2 - 433.0)/(38880.0*rta)) - ((3.0*s2 + 7.0)*s2 - 16.0)/810.0
-#      xn = a + s*rta + (s2 - 1.0)/3.0 + s*(s2 - 7.0)/(36.0*rta) + xn/a
-#      xn = max(xn, 0.0)
-#      amin = 20.0
-#      if eps() < 1.0E-8
-#         amin = 250.0
-#      end
-#      if a < amin
-#         @goto l40
-#      end
-#      x = xn
-#      d = 1.0 - x/a
-#      if abs(d) <= 0.1 #ch
-#         return x
-#      end
-    
-#     @label l40
-#      if p <= 0.5
-#         @goto l50
-#      end
-#      if xn < 3.0*a
-#         @goto l200
-#      end
-#      w = log(q)
-#      y = -(w + logabsgamma(a)[1])
-#      d = max(2.0, a*(a - 1.0))
-#      if y < d*log(10)
-#         @goto l41
-#      end
-#      s = 1.0 - a
-#      z = log(y)
-#      @goto l12
-
-#     @label l41
-#      t = a - 1.0
-#      println(xn)
-#      xn = y + t*log(xn) - loga1(-t/(xn + 1.0))
-#      println(xn)
-#      xn = y + t*log(xn) - loga1(-t/(xn + 1.0))
-#      @goto l200
-    
-#     @label l50
-#      ap1 = a+1.0
-#      if xn > 0.7*ap1
-#         @goto l101
-#      end
-#      w = log(p) + logabsgamma(ap1)[1]
-#      if xn > 0.15*ap1
-#         @goto l60
-#      end
-#      ap2 = a + 2.0
-#      ap3 = a + 3.0
-#      x = exp((w+x)/a)
-#      x = exp((w + x - log(1.0 + (x/ap1)*(1.0 + x/ap2)))/a)
-#      x = exp((w + x - log(1.0 + (x/ap1)*(1.0 + x/ap2)))/a)
-#      x = exp((w + x - log(1.0 + (x/ap1)*(1.0 + (x/ap2)*(1.0 + x/ap3))))/a)
-#      xn = x
-#      if xn > 1.0E-2 * ap1
-#         @goto l60
-#      end
-#      if xn <= emin[iop]*ap1
-#         return xn
-#      end
-#      @goto l101
-
-#     @label l60
-#      apn  = ap1
-#      t = xn/apn
-#      sm = 1.0 + t
-
-#     @label l61
-#      apn += 1.0
-#      t = t*(xn/apn)
-#      sm += t
-#      if t > 1.0E-4
-#         @goto l61
-#      end
-#      t = w - log(sm)
-#      xn = exp((xn + t)/a)
-#      xn = xn*(1.0 - (a*log(xn) - xn - t)/(a - xn))
-#      @goto l101
-    
-#     #------SCHRODER ITERATION USING P--------
-
-#     @label l100
-#      if p > 0.5
-#         @goto l200
-#      end
-#     @label l101 
-#      if p <= xmin
-#         @goto l550
-#      end
-#      am1 = a - 1.0
-#     @label l102
-#      if a <= amax
-#         @goto l110
-#      end
-#      d = 1.0 - xn/a
-#      if abs(d) <= 2.0*eps()
-#         @goto l550
-#      end
-
-#     @label l110
-#      (pn,qn) = gamma_inc(a,xn,0)
-#      println(pn)
-#      if pn == 0.0 || qn == 0.0
-#         println("lol")
-#         @goto l550
-#      end
-#      r = rgammax(a, xn)
-#      if r == 0.0
-#         println("hh")
-#         @goto l550
-#      end
-#      t = (pn - p)/r
-#      w = 0.5*(am1 - xn)
-#      if abs(t) <= 0.1 && abs(w*t) <= 0.1
-#         @goto l120
-#      end
-#      x = xn*(1.0 - t)
-#      if x < 0.0
-#         @goto l540
-#      end
-#      d = abs(t)
-#      @goto l121
-
-#     @label l120
-#      h = t*(1.0 + w*t)
-#      x = xn*(1.0 - h)
-#      if x < 0.0
-#         @goto l540
-#      end
-#      if abs(w) >= 1.0 && abs(w)*t*t <= epps
-#         return x
-#      end
-#      d = abs(h)
-
-#     @label l121
-#      xn = x
-#      if d > tol
-#         @goto l102
-#      end
-#      if d <= epps
-#         return xn
-#      end
-#      if abs(p - pn) <= tol*p
-#         return xn
-#      end
-#      @goto l102
-
-# #-----SCHRODER ITERATION USING Q----------
-#     @label l200
-#      if q <= 1.0E10 * xmin
-#         @goto l550
-#      end
-#      am1 = a - 1.0
-#     @label l201 
-#      if a <= amax
-#         @goto l210
-#      end
-#      d = 1.0 - xn/a
-#      if abs(d) <= 2*eps()
-#         @goto l550
-#      end
-
-#     @label l210
-#      (pn,qn) = gamma_inc(a, xn, 0)
-#      if pn == 0.0 || qn == 0.0
-#         @goto l550
-#      end
-#      r = rgammax(a, xn)
-#      if r == 0.0
-#         @goto l550
-#      end
-#      t = (q - qn)/r
-#      w = 0.5*(am1 - xn)
-#      if abs(t) <= 0.1 && abs(w*t) <= 0.1
-#         @goto l220
-#      end
-#      x = xn*(1.0 - t)
-#      if x <= 0.0
-#         @goto l540
-#      end
-#      d = abs(t)
-#      @goto l221
-
-#     @label l220
-#      h = t*(1.0 + w*t)
-#      x = xn*(1.0 - h)
-#      if x < 0.0
-#         @goto l540
-#      end
-#      if abs(w) >= 1.0 && abs(w)*t*t <= epps
-#         return x
-#      end
-#      d = abs(h)
-
-#     @label l221
-#      xn = x
-#      if d > tol
-#         @goto l201
-#      end
-#      if d <= epps
-#         return xn
-#      end
-#      if abs(q-qn) <= tol*q
-#         return xn
-#      end
-#      @goto l201
-
-#     @label l400
-#      return xmax
-#     @label l410
-#      if q < 0.9
-#         @goto l411
-#      end
-#      x = -loga1(-p)
-#      return x
-    
-#     @label l411
-#      x = -log(q)
-#      return x
-
-#     @label l500
-#      print("-2 -- error")
-#      return 0.0
-#     @label l510
-#      print("-3 -- error")
-#      return 0.0
-#     @label l520
-#      print("-4 -- error")
-#      return 0.0
-#     @label l530
-#      print("-6 -- error")
-#      return 0.0
-#     @label l540
-#      print("-7 - error")
-#      return 0.0
-#     @label l550
-#      print("-8 - error")
-#      return xn
-#     @label l560
-#      x = xmax
-#      print("-8 - error")
-#      return x
-
-# end
 
 gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
 gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
