@@ -787,7 +787,7 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
                     z=-z
                 end
                 if iop == 1
-                    return gamma_inc_minimax(a,x,z)https://github.com/JuliaMath/SpecialFunctions.jl/pull/164/threads/MDIzOlB1bGxSZXF1ZXN0UmV2aWV3VGhyZWFkMTc0NjI2NzUwOnYy/resolve
+                    return gamma_inc_minimax(a,x,z)
                 elseif iop == 2
                     return gamma_inc_temme(a,x,z)
                 else
