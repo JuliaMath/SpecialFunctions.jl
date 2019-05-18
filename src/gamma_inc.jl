@@ -193,7 +193,7 @@ function chepolsum(x::Float64, a::Array{Float64,1})
             r=h
             h=a[k]+r*tx-s
         end
-        return a[0]/2.0 - r + h*x
+        return a[1]/2.0 - r + h*x
     end
 end
 """
@@ -787,7 +787,7 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
                     z=-z
                 end
                 if iop == 1
-                    return gamma_inc_minimax(a,x,z)
+                    return gamma_inc_minimax(a,x,z)https://github.com/JuliaMath/SpecialFunctions.jl/pull/164/threads/MDIzOlB1bGxSZXF1ZXN0UmV2aWV3VGhyZWFkMTc0NjI2NzUwOnYy/resolve
                 elseif iop == 2
                     return gamma_inc_temme(a,x,z)
                 else
@@ -853,15 +853,15 @@ gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError(ga
 # arXiv:1306.1754
 
 """
-    gamma_inc_inv(a,x,IND)
+    gamma_inc_inv(a,p,q)
     
 DLMF: https://dlmf.nist.gov/8.2#E4 , https://dlmf.nist.gov/8.2#E5
 Wiki: https://en.wikipedia.org/wiki/Incomplete_gamma_function
 
-gamma_inc(a,x) or P(a,x) is the Incomplete gamma function ratio given by : ``1/\\Gamma (a) \\int_{0}^{x} e^{-t}t^{a-1} dt``
+gamma_inc(a,x) or (P(a,x),Q(a,x)) is the Incomplete gamma function ratio given by : ``1/\\Gamma (a) \\int_{0}^{x} e^{-t}t^{a-1} dt``
+gamma_inc_inv(a,p,q) inverts the gamma_inc function, by computing `x` given `a`,`p`,`q` in P(a,x)=p and Q(a,x)=q.
 """
 function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
-    ck = zeros(20)
     if p < 0.5
         pcase = true
         porq = p
@@ -885,12 +885,12 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         ap14=ap12*ap12
         ap2 = a+2.0
         ap22 = ap2*ap2
-        ck[1]= 1.0
-        ck[2]= 1.0/(1.0+a)
-        ck[3]=0.5*(3*a+5)/(ap12*(a+2))
-        ck[4]= (1.0/3.0)*(31+8*a2+33*a)/(ap13*ap2*(a+3))
-        ck[5]= (1.0/24.0)*(2888+1179*a3+125*a4+3971*a2+5661*a)/(ap14*ap22*(a+3)*(a+4))
-        x0 = @horner(r, 0.0, ck[1], ck[2], ck[3], ck[4], ck[5])
+        ck1= 1.0
+        ck2= 1.0/(1.0+a)
+        ck3=0.5*(3*a+5)/(ap12*(a+2))
+        ck4= (1.0/3.0)*(31+8*a2+33*a)/(ap13*ap2*(a+3))
+        ck5= (1.0/24.0)*(2888+1179*a3+125*a4+3971*a2+5661*a)/(ap14*ap22*(a+3)*(a+4))
+        x0 = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
     elseif ((q < min(0.02,exp(-1.5*a)/gamma(a))) && (a<10))
         m =0
         b=1.0-a
@@ -905,16 +905,16 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
             l3 = l2*l
             l4 = l3*l
             r = 1.0/x0
-            ck[1] = l - 1.0
-            ck[2] = (3*b-2*b*l+l2-2*l+2)/2.0
-            ck[3] = (24*b*l-11*b2-24*b-6*l2+12*l-12-9*b*l2+6*b2*l+2*l3)/6.0
-            ck[4] = (-12*b3*l+84*b*l2-114*b2*l+72+36*l2+3*l4-72*l+162*b-168*b*l-12*l3+25*b3-22*b*l3+36*b2*l2+120*b2)/12.0
-            x0 = x0 - l + b * r * @horner(r,ck[1],ck[2],ck[3],ck[4])
+            ck1 = l - 1.0
+            ck2 = (3*b-2*b*l+l2-2*l+2)/2.0
+            ck3 = (24*b*l-11*b2-24*b-6*l2+12*l-12-9*b*l2+6*b2*l+2*l3)/6.0
+            ck4 = (-12*b3*l+84*b*l2-114*b2*l+72+36*l2+3*l4-72*l+162*b-168*b*l-12*l3+25*b3-22*b*l3+36*b2*l2+120*b2)/12.0
+            x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
         else
             r = 1.0/x0
             l2 = l*l
-            ck[1] = l - 1.0
-            x0 = x0 - l + b * r * ck[1]
+            ck1 = l - 1.0
+            x0 = x0 - l + b * r * ck1
         end
     elseif abs(porq - 0.5) < 1.0e-05
         m=0
@@ -922,16 +922,16 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     elseif abs(a-1.0) < 1.0e-4
         m=0
         if pcase
-            x0 = -log(1.0-p)
+            x0 = -log1p(-p)
         else
             x0 = -log(q)
         end
     elseif a < 1.0
         m=0
         if pcase
-            x0=exp((1.0/a)*(log(porq)+logabsgamma(a+1.0)[1]))
+            x0=exp((1.0/a)*(log(p)+logabsgamma(a+1.0)[1]))
         else
-            x0=exp((1.0/a)*(log(1.0-porq)+logabsgamma(a+1.0)[1]))
+            x0=exp((1.0/a)*(log1p(-q)+logabsgamma(a+1.0)[1]))
         end
     else
         m=1
@@ -946,7 +946,6 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     n=1
     a2=a*a
     a3=a2*a
-    #println(x)
    
     #Newton iteration
     while t > 1.0e-15 && n < 15
@@ -960,19 +959,19 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 r = exp(dlnr)
                 if pcase
                     (px,qx) = gamma_inc(a,x,0)
-                    ck[1] = -r*(px-p)
+                    ck1 = -r*(px-p)
                 else
                     (px,qx) = gamma_inc(a,x,0)
-                    ck[1] = r*(qx-q)
+                    ck1 = r*(qx-q)
                 end
-                ck[2] = (x-a+1.0)/(2.0*x)
-                ck[3] = (2*x2-4*x*a+4*x+2*a2-3*a+1)/(6*x2)
-                r = ck[1]
+                ck2 = (x-a+1.0)/(2.0*x)
+                ck3 = (2*x2-4*x*a+4*x+2*a2-3*a+1)/(6*x2)
+                r = ck1
                 if a > 0.1
-                    x0 = x + @horner(r,0.0,1.0,ck[2],ck[3])
+                    x0 = x + @horner(r,0.0,1.0,ck2,ck3)
                 else
                     if a > 0.05
-                        x0 = x + @horner(r,0.0,1.0,ck[2])
+                        x0 = x + @horner(r,0.0,1.0,ck2)
                     else
                         x0=x+r
                     end
@@ -984,20 +983,20 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
             r = -(1/fp)*x
             if pcase
                 (px,qx) = gamma_inc(a,x,0)
-                ck[1] = -r*(px-p)
+                ck1 = -r*(px-p)
             else
                 (px,qx) = gamma_inc(a,x,0)
-                ck[1] = r*(qx-q)
+                ck1 = r*(qx-q)
             end
-            ck[2] = (x-a+1.0)/(2.0*x)
-            ck[3] = (2*x2-4*x*a+4*x+2*a2-3*a+1.0)/(6.0*x2)
-            r = ck[1]
+            ck2 = (x-a+1.0)/(2.0*x)
+            ck3 = (2*x2-4*x*a+4*x+2*a2-3*a+1.0)/(6.0*x2)
+            r = ck1
 
             if a > 0.1
-                x0 = x + @horner(r,0.0,1.0,ck[2],ck[3])
+                x0 = x + @horner(r,0.0,1.0,ck2,ck3)
             else
                 if a > 0.05
-                    x0 = x + @horner(r,0.0,1.0,ck[2])
+                    x0 = x + @horner(r,0.0,1.0,ck2)
                 else
                     x0=x+r
                 end
