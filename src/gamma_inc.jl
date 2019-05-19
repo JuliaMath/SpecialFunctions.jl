@@ -724,6 +724,91 @@ function gamma_inc_fsum(a::Float64, x::Float64)
     return (1.0 - q, q)
 
 end
+"""
+    gamma_inc_inv_psmall(a,p)
+
+Compute x0 - initial approximation when `p` is small.
+"""
+function gamma_inc_inv_psmall(a::Float64, p::Float64)
+    logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
+    r = exp(logr)
+    m=0
+    a2=a*a
+    a3=a2*a
+    a4=a3*a
+    ap1=a + 1.0
+    ap12=(a+1.0)*ap1
+    ap13=(a+1.0)*ap12
+    ap14=ap12*ap12
+    ap2 = a+2.0
+    ap22 = ap2*ap2
+    ck1= 1.0
+    ck2= 1.0/(1.0+a)
+    ck3=0.5*(3*a+5)/(ap12*(a+2))
+    ck4= (1.0/3.0)*(31+8*a2+33*a)/(ap13*ap2*(a+3))
+    ck5= (1.0/24.0)*(2888+1179*a3+125*a4+3971*a2+5661*a)/(ap14*ap22*(a+3)*(a+4))
+    x0 = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
+    return x0
+end   
+"""
+    gamma_inc_inv_qsmall(a,q)
+
+Compute x0 - initial approximation when `q` is small.
+""" 
+function gamma_inc_inv_qsmall(a::Float64, q::Float64)
+    m =0
+    b=1.0-a
+    b2=b*b
+    b3=b2*b
+    eta=sqrt(-2/a*log(q*gammax(a)*sqrt(2*pi)/sqrt(a)))
+    x0 = a*lambdaeta(eta)
+    l = log(x0)
+
+    if a > 0.12 || x0 > 5
+        l2 = l*l
+        l3 = l2*l
+        l4 = l3*l
+        r = 1.0/x0
+        ck1 = l - 1.0
+        ck2 = (3*b-2*b*l+l2-2*l+2)/2.0
+        ck3 = (24*b*l-11*b2-24*b-6*l2+12*l-12-9*b*l2+6*b2*l+2*l3)/6.0
+        ck4 = (-12*b3*l+84*b*l2-114*b2*l+72+36*l2+3*l4-72*l+162*b-168*b*l-12*l3+25*b3-22*b*l3+36*b2*l2+120*b2)/12.0
+        x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
+    else
+        r = 1.0/x0
+        l2 = l*l
+        ck1 = l - 1.0
+        x0 = x0 - l + b * r * ck1
+    end
+    return x0
+end
+"""
+    gamma_inc_inv_asmall(a,p,q,pcase)
+
+Compute x0 - initial approximation when `a` is small.
+"""
+function gamma_inc_inv_asmall(a::Float64, p::Float64, q::Float64, pcase::Bool)
+    m=0
+    if pcase
+        x0=exp((1.0/a)*(log(p)+logabsgamma(a+1.0)[1]))
+    else
+        x0=exp((1.0/a)*(log1p(-q)+logabsgamma(a+1.0)[1]))
+    end
+    return x0
+end
+"""
+    gamma_inc_inv_alarge(a,porq,s)
+
+Compute x0 - initial approximation when `a` is large.
+"""
+function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
+    m=1
+    r = erfcinv(2*porq)
+    eta = s*r/sqrt(a*0.5)
+    eta += (coeff1(eta)+(coeff2(eta)+coeff3(eta)/a)/a)/a
+    x0 = a*lambdaeta(eta)
+    return x0
+end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
 # Published in Journal: ACM Transactions on Mathematical Software (TOMS)
 # Volume 12 Issue 4, Dec. 1986 Pages 377-393
@@ -871,51 +956,13 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         porq = q
         s=1
     end
+    m=0
 
     logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
-    if logr < log(0.2*(1+a))
-        r = exp(logr)
-        m=0
-        a2=a*a
-        a3=a2*a
-        a4=a3*a
-        ap1=a + 1.0
-        ap12=(a+1.0)*ap1
-        ap13=(a+1.0)*ap12
-        ap14=ap12*ap12
-        ap2 = a+2.0
-        ap22 = ap2*ap2
-        ck1= 1.0
-        ck2= 1.0/(1.0+a)
-        ck3=0.5*(3*a+5)/(ap12*(a+2))
-        ck4= (1.0/3.0)*(31+8*a2+33*a)/(ap13*ap2*(a+3))
-        ck5= (1.0/24.0)*(2888+1179*a3+125*a4+3971*a2+5661*a)/(ap14*ap22*(a+3)*(a+4))
-        x0 = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
-    elseif ((q < min(0.02,exp(-1.5*a)/gamma(a))) && (a<10))
-        m =0
-        b=1.0-a
-        b2=b*b
-        b3=b2*b
-        eta=sqrt(-2/a*log(q*gammax(a)*sqrt(2*pi)/sqrt(a)))
-        x0 = a*lambdaeta(eta)
-        l = log(x0)
-
-        if a > 0.12 || x0 > 5
-            l2 = l*l
-            l3 = l2*l
-            l4 = l3*l
-            r = 1.0/x0
-            ck1 = l - 1.0
-            ck2 = (3*b-2*b*l+l2-2*l+2)/2.0
-            ck3 = (24*b*l-11*b2-24*b-6*l2+12*l-12-9*b*l2+6*b2*l+2*l3)/6.0
-            ck4 = (-12*b3*l+84*b*l2-114*b2*l+72+36*l2+3*l4-72*l+162*b-168*b*l-12*l3+25*b3-22*b*l3+36*b2*l2+120*b2)/12.0
-            x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
-        else
-            r = 1.0/x0
-            l2 = l*l
-            ck1 = l - 1.0
-            x0 = x0 - l + b * r * ck1
-        end
+    if logr < log(0.2*(1+a)) #small value of p
+        x0 = gamma_inc_inv_psmall(a,p)
+    elseif ((q < min(0.02,exp(-1.5*a)/gamma(a))) && (a<10)) #small q
+        x0 = gamma_inc_inv_qsmall(a,q)
     elseif abs(porq - 0.5) < 1.0e-05
         m=0
         x0=a-1.0/3.0+(8.0/405.0+184.0/25515.0/a)/a
@@ -926,19 +973,10 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         else
             x0 = -log(q)
         end
-    elseif a < 1.0
-        m=0
-        if pcase
-            x0=exp((1.0/a)*(log(p)+logabsgamma(a+1.0)[1]))
-        else
-            x0=exp((1.0/a)*(log1p(-q)+logabsgamma(a+1.0)[1]))
-        end
-    else
-        m=1
-        r = erfcinv(2*porq)
-        eta = s*r/sqrt(a*0.5)
-        eta += (coeff1(eta)+(coeff2(eta)+coeff3(eta)/a)/a)/a
-        x0 = a*lambdaeta(eta)
+    elseif a < 1.0 # small value of a
+        x0 = gamma_inc_inv_asmall(a, p, q, pcase)
+    else    #large a
+        x0 = gamma_inc_inv_alarge(a,porq,s)
     end
 
     t=1
@@ -947,7 +985,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     a2=a*a
     a3=a2*a
    
-    #Newton iteration
+    #Newton-like higher order iteration
     while t > 1.0e-15 && n < 15
         x=x0
         x2=x*x
