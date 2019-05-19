@@ -943,7 +943,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     end
     m = 0
 
-    logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
+    logr = (1.0/a)*( log(p) + logabsgamma(a + 1.0)[1] )
     if logr < log(0.2*(1+a)) #small value of p
         x0 = gamma_inc_inv_psmall(a,p)
     elseif ((q < min(0.02,exp(-1.5*a)/gamma(a))) && (a<10)) #small q
@@ -969,13 +969,13 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     n = 1
     a² = a*a
     a³ = a²*a
-    logabsgamma = logabsgamma(a)[1]
+    logabsgam = logabsgamma(a)[1]
     #Newton-like higher order iteration
     while t > 1.0e-15 && n < 15
         x = x0
         x² = x*x
         if m==0
-            dlnr = (1.0-a)*log(x) + x + logabsgamma
+            dlnr = (1.0-a)*log(x) + x + logabsgam
             if dlnr > log(floatmax(Float64)/1000.0)
                 n=20
             else
