@@ -10,19 +10,6 @@ const rt2pin = 1.0/sqrt(2*pi)
 const rtpi = sqrt(pi) 
 const exparg = -745.1
 
-const eu = Base.MathConstants.eulergamma
-const a0 = [3.31125922108741, 11.6616720288968, 4.28342155967104, .213623493715853]
-const b0 = [6.61053765625462, 6.40691597760039, 1.27364489782223, .036117081018842]
-
-const eps0 = [1.0E-10, 1.0E-08]
-const amin = [500.0, 100.0]
-const bmin = [1.0E-28, 1.0E-13]
-const dmin = [1.0E-6, 1.0E-4]
-const emin = [2.0E-03, 6.0E-03]
-const tol = 1.0E-5
-const xmin = floatmin(Float64)
-const xmax = floatmax(Float64)
-
 #----------------COEFFICIENTS FOR TEMME EXPANSION------------------
 
 const d00 = -.333333333333333E+00
@@ -250,9 +237,9 @@ gammax(x) = ``e^{stirling(x)}`` if x>0
 else ``\\Gamma(x)/(e^{-x + (x-0.5)*log(x)}/\\sqrt{2 \\pi}``
 """
 function gammax(x::Float64)
-    if x>=3
+    if x >= 3
         return exp(stirling(x))
-    elseif x>0
+    elseif x > 0
         return gamma(x)/(exp(-x+(x-0.5)*log(x))*sqrt(2*pi))
     else
         return floatmax(Float64)/1000.0
@@ -264,8 +251,6 @@ end
 Function to compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-log(\\lambda)``
 """
 function lambdaeta(eta::Float64)
-  
-    ak = zeros(7)
     s = eta*eta*0.5
     if eta == 0.0
         la = 1
@@ -284,13 +269,13 @@ function lambdaeta(eta::Float64)
         l3=l2*l
         l4=l3*l
         l5=l4*l
-        ak[1] = 1.0
-        ak[2] = (2 - l)*0.5
-        ak[3] = (-9*l+6+2*l2)/6.0
-        ak[4] = -(3*l3+36*l-22*l2-12)/12.0
-        ak[5] = (60 + 350*l2 - 300*l -125*l3 + 12*l4)/60.0
-        ak[6] = -(-120-274*l4+900*l-1700*l2+1125*l3+20*l5)/120.0
-        la = la + l*@horner(r,0.0,ak[1],ak[2],ak[3],ak[4],ak[5],ak[6])
+        ak1 = 1.0
+        ak2 = (2 - l)*0.5
+        ak3 = (-9*l+6+2*l2)/6.0
+        ak4 = -(3*l3+36*l-22*l2-12)/12.0
+        ak5 = (60 + 350*l2 - 300*l -125*l3 + 12*l4)/60.0
+        ak6 = -(-120-274*l4+900*l-1700*l2+1125*l3+20*l5)/120.0
+        la = la + l*@horner(r,0.0, ak1, ak2, ak3, ak4, ak5, ak6)
     end
     r = 1
     if (eta>-3.5 && eta<-0.03) || (eta>0.03 && eta<40)
@@ -312,8 +297,6 @@ Computing the first coefficient for the expansion :
 Refer Eqn (3.12) in the paper
 """
 function coeff1(eta::Float64)
-    ak=zeros(5)
-    bk=zeros(5)
     if abs(eta) < 1.0
         coeff1 = @horner(eta, -3.333333333438e-1, -2.070740359969e-1, -5.041806657154e-2, -4.923635739372e-3, -4.293658292782e-5) / @horner(eta, 1.000000000000e+0, 7.045554412463e-1, 2.118190062224e-1, 3.048648397436e-2, 1.605037988091e-3)
     else
@@ -514,10 +497,12 @@ end
 Computes P(a,x) based on Taylor expansion of P(a,x)/x**a given by:
 ```math
 J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)
-``` and P(a,x)/x**a is given by :
+``` 
+and P(a,x)/x**a is given by :
 ```math
 (1 - J)/ \\Gamma(a+1)
-``` resulting from term-by-term integration of gamma_inc(a,x,ind).
+```
+resulting from term-by-term integration of gamma_inc(a,x,ind).
 This is used when a < 1 and x < 1.1 - Refer Eqn (9) in the paper.
 """
 function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
@@ -733,20 +718,20 @@ function gamma_inc_inv_psmall(a::Float64, p::Float64)
     logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
     r = exp(logr)
     m=0
-    a2=a*a
-    a3=a2*a
-    a4=a3*a
-    ap1=a + 1.0
-    ap12=(a+1.0)*ap1
-    ap13=(a+1.0)*ap12
-    ap14=ap12*ap12
+    a² = a*a
+    a³ = a²*a
+    a⁴ = a³*a
+    ap1 = a + 1.0
+    ap12 = (a+1.0)*ap1
+    ap13 = (a+1.0)*ap12
+    ap12² = ap12*ap12
     ap2 = a+2.0
-    ap22 = ap2*ap2
-    ck1= 1.0
-    ck2= 1.0/(1.0+a)
-    ck3=0.5*(3*a+5)/(ap12*(a+2))
-    ck4= (1.0/3.0)*(31+8*a2+33*a)/(ap13*ap2*(a+3))
-    ck5= (1.0/24.0)*(2888+1179*a3+125*a4+3971*a2+5661*a)/(ap14*ap22*(a+3)*(a+4))
+    ap2² = ap2*ap2
+    ck1 = 1.0
+    ck2 = 1.0/(1.0+a)
+    ck3 = 0.5*(3*a+5)/(ap12*(a+2))
+    ck4 = (1.0/3.0)*(31+8*a²+33*a)/(ap13*ap2*(a+3))
+    ck5 = (1.0/24.0)*(2888+1179*a³+125*a⁴+3971*a²+5661*a)/(ap12²*ap2²*(a+3)*(a+4))
     x0 = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
     return x0
 end   
@@ -765,18 +750,18 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
     l = log(x0)
 
     if a > 0.12 || x0 > 5
-        l2 = l*l
-        l3 = l2*l
-        l4 = l3*l
+        l² = l*l
+        l³ = l²*l
+        l⁴ = l³*l
         r = 1.0/x0
         ck1 = l - 1.0
-        ck2 = (3*b-2*b*l+l2-2*l+2)/2.0
-        ck3 = (24*b*l-11*b2-24*b-6*l2+12*l-12-9*b*l2+6*b2*l+2*l3)/6.0
-        ck4 = (-12*b3*l+84*b*l2-114*b2*l+72+36*l2+3*l4-72*l+162*b-168*b*l-12*l3+25*b3-22*b*l3+36*b2*l2+120*b2)/12.0
+        ck2 = (3*b-2*b*l+l²-2*l+2)/2.0
+        ck3 = (24*b*l-11*b2-24*b-6*l²+12*l-12-9*b*l²+6*b2*l+2*l³)/6.0
+        ck4 = (-12*b3*l+84*b*l²-114*b2*l+72+36*l²+3*l⁴-72*l+162*b-168*b*l-12*l³+25*b3-22*b*l³+36*b2*l²+120*b2)/12.0
         x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
     else
         r = 1.0/x0
-        l2 = l*l
+        l² = l*l
         ck1 = l - 1.0
         x0 = x0 - l + b * r * ck1
     end
@@ -950,13 +935,13 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     if p < 0.5
         pcase = true
         porq = p
-        s=-1
+        s = -1
     else
         pcase = false
         porq = q
-        s=1
+        s = 1
     end
-    m=0
+    m = 0
 
     logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
     if logr < log(0.2*(1+a)) #small value of p
@@ -964,10 +949,10 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     elseif ((q < min(0.02,exp(-1.5*a)/gamma(a))) && (a<10)) #small q
         x0 = gamma_inc_inv_qsmall(a,q)
     elseif abs(porq - 0.5) < 1.0e-05
-        m=0
-        x0=a-1.0/3.0+(8.0/405.0+184.0/25515.0/a)/a
+        m = 0
+        x0 = a-1.0/3.0+(8.0/405.0+184.0/25515.0/a)/a
     elseif abs(a-1.0) < 1.0e-4
-        m=0
+        m = 0
         if pcase
             x0 = -log1p(-p)
         else
@@ -979,31 +964,30 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         x0 = gamma_inc_inv_alarge(a,porq,s)
     end
 
-    t=1
-    x=x0
-    n=1
-    a2=a*a
-    a3=a2*a
-   
+    t = 1
+    x = x0
+    n = 1
+    a² = a*a
+    a³ = a²*a
+    logabsgamma = logabsgamma(a)[1]
     #Newton-like higher order iteration
     while t > 1.0e-15 && n < 15
-        x=x0
-        x2=x*x
+        x = x0
+        x² = x*x
         if m==0
-            dlnr = (1.0-a)*log(x)+x+logabsgamma(a)[1]
-            if dlnr > log(xmax/1000.0)
+            dlnr = (1.0-a)*log(x) + x + logabsgamma
+            if dlnr > log(floatmax(Float64)/1000.0)
                 n=20
             else
                 r = exp(dlnr)
-                if pcase
-                    (px,qx) = gamma_inc(a,x,0)
+                (px,qx) = gamma_inc(a,x,0)
+                if pcase                  
                     ck1 = -r*(px-p)
                 else
-                    (px,qx) = gamma_inc(a,x,0)
                     ck1 = r*(qx-q)
                 end
                 ck2 = (x-a+1.0)/(2.0*x)
-                ck3 = (2*x2-4*x*a+4*x+2*a2-3*a+1)/(6*x2)
+                ck3 = (2*x²-4*x*a+4*x+2*a²-3*a+1)/(6*x²)
                 r = ck1
                 if a > 0.1
                     x0 = x + @horner(r,0.0,1.0,ck2,ck3)
@@ -1016,18 +1000,17 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 end
             end
         else
-            y=eta
+            y = eta
             fp = -sqrt(a/(2*pi))*exp(-0.5*a*y*y)/gammax(a)
             r = -(1/fp)*x
+            (px,qx) = gamma_inc(a,x,0)
             if pcase
-                (px,qx) = gamma_inc(a,x,0)
                 ck1 = -r*(px-p)
             else
-                (px,qx) = gamma_inc(a,x,0)
                 ck1 = r*(qx-q)
             end
             ck2 = (x-a+1.0)/(2.0*x)
-            ck3 = (2*x2-4*x*a+4*x+2*a2-3*a+1.0)/(6.0*x2)
+            ck3 = (2*x²-4*x*a+4*x+2*a²-3*a+1.0)/(6.0*x²)
             r = ck1
 
             if a > 0.1
@@ -1036,7 +1019,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 if a > 0.05
                     x0 = x + @horner(r,0.0,1.0,ck2)
                 else
-                    x0=x+r
+                    x0 = x + r
                 end
             end
         end
@@ -1045,8 +1028,8 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         x=x0
        
     end
-    xr=x
-    return xr
+    xr = x
+    return x
 end
 
 gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
