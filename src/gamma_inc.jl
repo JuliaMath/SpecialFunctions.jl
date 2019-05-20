@@ -760,8 +760,8 @@ function gamma_inc_inv_psmall(a::Float64, p::Float64)
     ck1 = 1.0
     ck2 = 1.0/(1.0+a)
     ck3 = 0.5*(3*a+5)/(ap1²*(a+2))
-    ck4 = (1.0/3.0)*(31+8*a²+33*a)/(ap1³*ap2*(a+3))
-    ck5 = (1.0/24.0)*(2888+1179*a³+125*a⁴+3971*a²+5661*a)/(ap1⁴*ap2²*(a+3)*(a+4))
+    ck4 = (1.0/3.0)*(@horner(a,31,33,8))/(ap1³*ap2*(a+3))
+    ck5 = (1.0/24.0)*(@horner(a, 2888, 5661, 3971, 1179, 125))/(ap1⁴*ap2²*(a+3)*(a+4))
     x0 = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
     return x0
 end   
@@ -1031,7 +1031,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                     ck1 = r*(qx-q)
                 end
                 ck2 = (x-a+1.0)/(2.0*x)
-                ck3 = (2*x²-4*x*a+4*x+2*a²-3*a+1)/(6*x²)
+                ck3 = (@horner(x, 2*a²-3*a+1, -4*a+4, 2))/(6*x²)
                 r = ck1
                 if a > 0.1
                     x0 = x + @horner(r,0.0,1.0,ck2,ck3)
@@ -1054,7 +1054,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 ck1 = r*(qx-q)
             end
             ck2 = (x-a+1.0)/(2.0*x)
-            ck3 = (2*x²-4*x*a+4*x+2*a²-3*a+1.0)/(6.0*x²)
+            ck3 = (@horner(x, 2*a²-3*a+1, -4*a+4, 2))/(6*x²)
             r = ck1
 
             if a > 0.1
