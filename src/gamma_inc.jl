@@ -141,23 +141,47 @@ function rgammax(a::Float64,x::Float64)
             return (a*exp(t))*(1.0 + rgamma1pm1(a))
         end
     end
+end
+"""
+    auxgam(x)
+
+Compute function `g` in 1/\\Gamma(x+1) = 1+x*(x-1)*g(x), -1 <= x <= 1 
+"""
+function auxgam(x::Float64)
+    dr = zeros(18)
+    if x < 0
+        return -(1.0+(1+x)*(1+x)*auxgam(1+x))/(1.0-x)
+    else
+        dr[1] = -1.013609258009865776949
+        dr[2] = 0.784903531024782283535e-1
+        dr[3] = -0.12790434869623468120e-2
+        dr[4] = 0.67588668743258315530e-2
+        dr[5] = 0.462939838642739585e-4
+        dr[6] = 0.43381681744740352e-5
+        dr[7] = -0.5326872422618006e-6
+        dr[8] = 0.172233457410539e-7
+        dr[9] = 0.8300542107118e-9
+        dr[10] = -0.10553994239968e-9
+        dr[11] = 0.39415842851e-11
+        dr[12] = 0.362068537e-13
+        dr[13] = -0.107440229e-13
+        dr[14] = 0.5000413e-15
+        dr[15] = -0.62452e-17
+        dr[16] = -0.5185e-18
+        dr[17] = 0.347e-19
+        dr[18] = -0.9e-21
+        t = 2*x - 1.0
+        return chepolsum(t,dr)
+    end
 end   
 """
     loggamma1p(a)
 
 Compute ``log(\\Gamma(1+a))`` for -1 < a <= 1.
 """
-function loggamma1p(a::Float64)
-  
-    if a >= 0.6
-        x = a - 1.0
-        w = @horner(x, .422784335098467E+00, .848044614534529E+00, .565221050691933E+00, .156513060486551E+00, .170502484022650E-01, .497958207639485E-03) / @horner(x, 1.0, .124313399877507E+01, .548042109832463E+00, .101552187439830E+00, .713309612391000E-02, .116165475989616E-03)
-        return x*w
-    else
-        w = @horner(a, .577215664901533E+00, .844203922187225E+00, -.168860593646662E+00, -.780427615533591E+00, -.402055799310489E+00, -.673562214325671E-01, -.271935708322958E-02) / @horner(a, 1.0, .288743195473681E+01, .312755088914843E+01, .156875193295039E+01, .361951990101499E+00, .325038868253937E-01, .667465618796164E-03)
-        return -a*w
-    end
-end
+function loggamma1p(x::Float64)
+    return -log1p(x*(x-1.0)*auxgam(x))
+end 
 
 """
     chepolsum(n,x,a)
@@ -186,7 +210,8 @@ end
 """
     stirling(x)
 
-Compute the Stirling Series for given `x`.
+Compute log(gamma(x)) - (x-0.5)*log(x) + x - log(2pi)/2 using stirling series for asymptotic part 
+in https://dlmf.nist.gov/5.11.1
 """
 function stirling(x::Float64)
   
@@ -194,11 +219,11 @@ function stirling(x::Float64)
     if x < floatmin(Float64)*1000.0
         return floatmax(Float64)/1000.0
     elseif x < 1
-        return loggamma1p(x) - (x+0.5)*log(x)+x - log(sqrt(2*pi))
+        return loggamma1p(x) - (x+0.5)*log(x) + x - log((2*pi))/2.0
     elseif x < 2
-        return loggamma1p(x-1) - (x-0.5)*log(x)+x - log(sqrt(2*pi))
+        return loggamma1p(x-1) - (x-0.5)*log(x) + x - log((2*pi))/2.0
     elseif x < 3
-        return loggamma1p(x-2) - (x-0.5*log(x)+x  - log(sqrt(2*pi))+log(x-1))
+        return loggamma1p(x-2) - (x-0.5)*log(x) + x  - log((2*pi))/2.0 + log(x-1)
     elseif x < 12
         a[1]=1.996379051590076518221
         a[2]=-0.17971032528832887213e-2
@@ -221,10 +246,9 @@ function stirling(x::Float64)
         z=18.0/(x*x)-1.0
         return chepolsum(z,a)/(12.0*x)
     else
-        c = zeros(7)
         z = 1.0/(x*x)
         if x < 1000
-            return @horner(z, 0.25721014990011306473e-1, 0.82475966166999631057e-1, -0.25328157302663562668e-2, 0.60992926669463371e-3, -0.33543297638406e-3, 0.250505279903e-3)/((0.30865217988013567769 + z)/x)
+            return @horner(z, 0.25721014990011306473e-1, 0.82475966166999631057e-1, -0.25328157302663562668e-2, 0.60992926669463371e-3, -0.33543297638406e-3, 0.250505279903e-3)/((0.30865217988013567769 + z)*x)
         else
             return (((-z/1680.0+1.0/1260.0)*z-1.0/360.0)*z+1.0/12.0)/x
         end
@@ -265,16 +289,16 @@ function lambdaeta(eta::Float64)
         l = log(r)
         la = r+l
         r = 1.0/r
-        l2=l*l
-        l3=l2*l
-        l4=l3*l
-        l5=l4*l
+        l²=l*l
+        l³=l²*l
+        l⁴=l³*l
+        l⁵=l⁴*l
         ak1 = 1.0
         ak2 = (2 - l)*0.5
-        ak3 = (-9*l+6+2*l2)/6.0
-        ak4 = -(3*l3+36*l-22*l2-12)/12.0
-        ak5 = (60 + 350*l2 - 300*l -125*l3 + 12*l4)/60.0
-        ak6 = -(-120-274*l4+900*l-1700*l2+1125*l3+20*l5)/120.0
+        ak3 = (-9*l+6+2*l²)/6.0
+        ak4 = -(3*l³+36*l-22*l²-12)/12.0
+        ak5 = (60 + 350*l² - 300*l -125*l³ + 12*l⁴)/60.0
+        ak6 = -(-120-274*l⁴+900*l-1700*l²+1125*l³+20*l⁵)/120.0
         la = la + l*@horner(r,0.0, ak1, ak2, ak3, ak4, ak5, ak6)
     end
     r = 1
@@ -722,16 +746,16 @@ function gamma_inc_inv_psmall(a::Float64, p::Float64)
     a³ = a²*a
     a⁴ = a³*a
     ap1 = a + 1.0
-    ap12 = (a+1.0)*ap1
-    ap13 = (a+1.0)*ap12
-    ap12² = ap12*ap12
+    ap1² = (ap1)*ap1
+    ap1³ = (ap1)*ap1²
+    ap1⁴ = ap1²*ap1²
     ap2 = a+2.0
     ap2² = ap2*ap2
     ck1 = 1.0
     ck2 = 1.0/(1.0+a)
-    ck3 = 0.5*(3*a+5)/(ap12*(a+2))
-    ck4 = (1.0/3.0)*(31+8*a²+33*a)/(ap13*ap2*(a+3))
-    ck5 = (1.0/24.0)*(2888+1179*a³+125*a⁴+3971*a²+5661*a)/(ap12²*ap2²*(a+3)*(a+4))
+    ck3 = 0.5*(3*a+5)/(ap1²*(a+2))
+    ck4 = (1.0/3.0)*(31+8*a²+33*a)/(ap1³*ap2*(a+3))
+    ck5 = (1.0/24.0)*(2888+1179*a³+125*a⁴+3971*a²+5661*a)/(ap1⁴*ap2²*(a+3)*(a+4))
     x0 = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
     return x0
 end   
@@ -774,11 +798,8 @@ Compute x0 - initial approximation when `a` is small.
 """
 function gamma_inc_inv_asmall(a::Float64, p::Float64, q::Float64, pcase::Bool)
     m=0
-    if pcase
-        x0=exp((1.0/a)*(log(p)+logabsgamma(a+1.0)[1]))
-    else
-        x0=exp((1.0/a)*(log1p(-q)+logabsgamma(a+1.0)[1]))
-    end
+    logp = (pcase) ? log(p) : log1p(-q)
+    x0=exp((1.0/a)*(logp +loggamma1p(a)))
     return x0
 end
 """
