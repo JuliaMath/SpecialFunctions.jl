@@ -145,7 +145,7 @@ end
 """
     auxgam(x)
 
-Compute function `g` in 1/\\Gamma(x+1) = 1+x*(x-1)*g(x), -1 <= x <= 1 
+Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, -1 <= x <= 1 
 """
 function auxgam(x::Float64)
     dr = zeros(18)
@@ -737,6 +737,12 @@ end
     gamma_inc_inv_psmall(a,p)
 
 Compute x0 - initial approximation when `p` is small.
+Here we invert the series in Eqn (2.20) in the paper and write the inversion problem as:
+```math
+x = r(1 + \\sum_{1}^{\\infty}a(-1)^{n}x^{n}/(a+n)n!)^{-1/a}
+```
+where ``r = (p\\Gamma(1+a))^{1/a}``
+Inverting this relation we obtain ``x = r + \\sum_{2}^{\\infty}c_{k}r^{k}``
 """
 function gamma_inc_inv_psmall(a::Float64, p::Float64)
     logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
@@ -762,13 +768,18 @@ end
 """
     gamma_inc_inv_qsmall(a,q)
 
-Compute x0 - initial approximation when `q` is small.
+Compute x0 - initial approximation when `q` is small from ``e^{-x_{0}} x_{0}^{a} = q \\Gamma(a)``.
+Asymptotic expansions Eqn (2.29) in the paper is used here and higher approximations are obtained using 
+```math
+x \\sim x_{0} - L + b* \\sum_{1}^{\\infty} d_{k}/x_{0}^{k} 
+```
+where b = 1-a, L = ln(x0)
 """ 
 function gamma_inc_inv_qsmall(a::Float64, q::Float64)
     m =0
     b=1.0-a
-    b2=b*b
-    b3=b2*b
+    b²=b*b
+    b³=b²*b
     eta=sqrt(-2/a*log(q*gammax(a)*sqrt(2*pi)/sqrt(a)))
     x0 = a*lambdaeta(eta)
     l = log(x0)
@@ -779,9 +790,9 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
         l⁴ = l³*l
         r = 1.0/x0
         ck1 = l - 1.0
-        ck2 = (3*b-2*b*l+l²-2*l+2)/2.0
-        ck3 = (24*b*l-11*b2-24*b-6*l²+12*l-12-9*b*l²+6*b2*l+2*l³)/6.0
-        ck4 = (-12*b3*l+84*b*l²-114*b2*l+72+36*l²+3*l⁴-72*l+162*b-168*b*l-12*l³+25*b3-22*b*l³+36*b2*l²+120*b2)/12.0
+        ck2 = (@horner(l, 3*b+2, -2*b-2, 1))/2.0       
+        ck3 = (@horner(l, -11*b²-24*b-12, 24*b+12+6*b², -6-9*b, 2))/6.0
+        ck4 = (@horner(l, 162*b+25*b³+120*b²+72, -12*b³-114*b²-72-168*b, 84*b+36+36*b², -12-22*b, 3))/12.0
         x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
     else
         r = 1.0/x0
@@ -795,6 +806,8 @@ end
     gamma_inc_inv_asmall(a,p,q,pcase)
 
 Compute x0 - initial approximation when `a` is small.
+Here the solution `x` of P(a,x)=p satisfies ``x_{l} < x < x_{u}``
+where ``x_{l} = (p\\Gamma(a+1))^{1/a}`` and ``x_{u} = -log(1 - p\\Gamma(a+1))`` and is used as starting value for Newton iteration.
 """
 function gamma_inc_inv_asmall(a::Float64, p::Float64, q::Float64, pcase::Bool)
     m=0
@@ -806,6 +819,16 @@ end
     gamma_inc_inv_alarge(a,porq,s)
 
 Compute x0 - initial approximation when `a` is large.
+The inversion problem is rewritten as : 
+```math
+0.5 erfc(\\eta \\sqrt{a/2}) + R_{a}(\\eta) = q
+```
+For large values of `a` we can write: ``\\eta(q,a) = \\eta_{0}(q,a) + \\epsilon(\\eta_{0},a)``
+and it is possible to expand:
+```math
+\\epsilon(\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3} + ...
+```
+which is calculated by coeff1, coeff2 and coeff3 functions below.
 """
 function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
     m=1
