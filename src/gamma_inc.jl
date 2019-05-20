@@ -295,10 +295,10 @@ function lambdaeta(eta::Float64)
         l⁵=l⁴*l
         ak1 = 1.0
         ak2 = (2 - l)*0.5
-        ak3 = (-9*l+6+2*l²)/6.0
-        ak4 = -(3*l³+36*l-22*l²-12)/12.0
-        ak5 = (60 + 350*l² - 300*l -125*l³ + 12*l⁴)/60.0
-        ak6 = -(-120-274*l⁴+900*l-1700*l²+1125*l³+20*l⁵)/120.0
+        ak3 = (@horner(l,6,-9,2))/6.0
+        ak4 = -(@horner(l,-12,36,-22,3))/12.0
+        ak5 = (@horner(l,60,-300,350,-125,12))/60.0
+        ak6 = -(@horner(l,-120,900,-1700,1125,-274,20))/120.0
         la = la + l*@horner(r,0.0, ak1, ak2, ak3, ak4, ak5, ak6)
     end
     r = 1
@@ -747,7 +747,6 @@ Inverting this relation we obtain ``x = r + \\sum_{2}^{\\infty}c_{k}r^{k}``
 function gamma_inc_inv_psmall(a::Float64, p::Float64)
     logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
     r = exp(logr)
-    m=0
     a² = a*a
     a³ = a²*a
     a⁴ = a³*a
@@ -776,7 +775,6 @@ x \\sim x_{0} - L + b* \\sum_{1}^{\\infty} d_{k}/x_{0}^{k}
 where b = 1-a, L = ln(x0)
 """ 
 function gamma_inc_inv_qsmall(a::Float64, q::Float64)
-    m =0
     b=1.0-a
     b²=b*b
     b³=b²*b
@@ -791,8 +789,8 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
         r = 1.0/x0
         ck1 = l - 1.0
         ck2 = (@horner(l, 3*b+2, -2*b-2, 1))/2.0       
-        ck3 = (@horner(l, -11*b²-24*b-12, 24*b+12+6*b², -6-9*b, 2))/6.0
-        ck4 = (@horner(l, 162*b+25*b³+120*b²+72, -12*b³-114*b²-72-168*b, 84*b+36+36*b², -12-22*b, 3))/12.0
+        ck3 = (@horner(l, @horner(b,-12,-24,-11), @horner(b,12,24,6), -6-9*b, 2))/6.0
+        ck4 = (@horner(l, @horner(b,72,162,120,25), @horner(b,-72,-168,-114,-12), @horner(b,36,84,36), -12-22*b, 3))/12.0
         x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
     else
         r = 1.0/x0
@@ -810,10 +808,8 @@ Here the solution `x` of P(a,x)=p satisfies ``x_{l} < x < x_{u}``
 where ``x_{l} = (p\\Gamma(a+1))^{1/a}`` and ``x_{u} = -log(1 - p\\Gamma(a+1))`` and is used as starting value for Newton iteration.
 """
 function gamma_inc_inv_asmall(a::Float64, p::Float64, q::Float64, pcase::Bool)
-    m=0
     logp = (pcase) ? log(p) : log1p(-q)
-    x0=exp((1.0/a)*(logp +loggamma1p(a)))
-    return x0
+    return exp((1.0/a)*(logp +loggamma1p(a)))
 end
 """
     gamma_inc_inv_alarge(a,porq,s)
@@ -831,7 +827,6 @@ and it is possible to expand:
 which is calculated by coeff1, coeff2 and coeff3 functions below.
 """
 function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
-    m=1
     r = erfcinv(2*porq)
     eta = s*r/sqrt(a*0.5)
     eta += (coeff1(eta)+(coeff2(eta)+coeff3(eta)/a)/a)/a
@@ -997,14 +992,11 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         x0 = a-1.0/3.0+(8.0/405.0+184.0/25515.0/a)/a
     elseif abs(a-1.0) < 1.0e-4
         m = 0
-        if pcase
-            x0 = -log1p(-p)
-        else
-            x0 = -log(q)
-        end
+        x0 = pcase ? -log1p(-p) : -log(q)
     elseif a < 1.0 # small value of a
         x0 = gamma_inc_inv_asmall(a, p, q, pcase)
     else    #large a
+        m = 1
         x0 = gamma_inc_inv_alarge(a,porq,s)
     end
 
@@ -1014,7 +1006,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     a² = a*a
     a³ = a²*a
     logabsgam = logabsgamma(a)[1]
-    #Newton-like higher order iteration
+    #Newton-like higher order iteration with upper limit as 15.
     while t > 1.0e-15 && n < 15
         x = x0
         x² = x*x
@@ -1031,7 +1023,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                     ck1 = r*(qx-q)
                 end
                 ck2 = (x-a+1.0)/(2.0*x)
-                ck3 = (@horner(x, 2*a²-3*a+1, -4*a+4, 2))/(6*x²)
+                ck3 = (@horner(x, @horner(a,1,-3,2), -4*a+4, 2))/(6*x²)
                 r = ck1
                 if a > 0.1
                     x0 = x + @horner(r,0.0,1.0,ck2,ck3)
@@ -1054,7 +1046,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 ck1 = r*(qx-q)
             end
             ck2 = (x-a+1.0)/(2.0*x)
-            ck3 = (@horner(x, 2*a²-3*a+1, -4*a+4, 2))/(6*x²)
+            ck3 = (@horner(x, @horner(a,1,-3,2), -4*a+4, 2))/(6*x²)
             r = ck1
 
             if a > 0.1
