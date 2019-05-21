@@ -117,6 +117,9 @@ end
         @test gamma_inc_inv(88.6, x, 1.0-x) ≈ ans5[ctr]#scipy.special.gammaincinv(88.6,x)
         ctr+=1
     end
+    for x=-.5:.5:.9
+        @test loggamma1p(x) ≈ loggamma(1.0+x)
+    end
     
 end
 @testset "elliptic integrals" begin
