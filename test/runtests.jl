@@ -120,7 +120,9 @@ end
     for x=-.5:.5:.9
         @test SpecialFunctions.loggamma1p(x) ≈ loggamma(1.0+x)
     end
-    
+    for x = .5:5.0:100.0
+        @test SpecialFunctions.stirling(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
+    end
 end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.
