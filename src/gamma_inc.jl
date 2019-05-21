@@ -154,8 +154,8 @@ function auxgam(x::Float64)
     else
         dr[1] = -1.013609258009865776949
         dr[2] = 0.784903531024782283535e-1
-        dr[3] = -0.12790434869623468120e-2
-        dr[4] = 0.67588668743258315530e-2
+        dr[3] = 0.67588668743258315530e-2
+        dr[4] = -0.12790434869623468120e-2
         dr[5] = 0.462939838642739585e-4
         dr[6] = 0.43381681744740352e-5
         dr[7] = -0.5326872422618006e-6
@@ -787,7 +787,7 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
         l⁴ = l³*l
         r = 1.0/x0
         ck1 = l - 1.0
-        ck2 = (@horner(l, 3*b+2, -2*b-2, 1))/2.0       
+        ck2 = (@horner(l, @horner(b,2,3), @horner(b,-2,-2), 1))/2.0       
         ck3 = (@horner(l, @horner(b,-12,-24,-11), @horner(b,12,24,6), -6-9*b, 2))/6.0
         ck4 = (@horner(l, @horner(b,72,162,120,25), @horner(b,-72,-168,-114,-12), @horner(b,36,84,36), -12-22*b, 3))/12.0
         x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
@@ -1022,7 +1022,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                     ck1 = r*(qx-q)
                 end
                 ck2 = (x-a+1.0)/(2.0*x)
-                ck3 = (@horner(x, @horner(a,1,-3,2), -4*a+4, 2))/(6*x²)
+                ck3 = (@horner(x, @horner(a,1,-3,2), @horner(a,4,-4), 2))/(6*x²)
                 r = ck1
                 if a > 0.1
                     x0 = x + @horner(r,0.0,1.0,ck2,ck3)
@@ -1045,7 +1045,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 ck1 = r*(qx-q)
             end
             ck2 = (x-a+1.0)/(2.0*x)
-            ck3 = (@horner(x, @horner(a,1,-3,2), -4*a+4, 2))/(6*x²)
+            ck3 = (@horner(x, @horner(a,1,-3,2), @horner(a,4,-4), 2))/(6*x²)
             r = ck1
 
             if a > 0.1
