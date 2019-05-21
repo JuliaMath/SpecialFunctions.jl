@@ -189,17 +189,16 @@ end
 Computes a series of Chebyshev Polynomials given by : a[0]/2 + a[1]T1(x) + .... + a[n]Tn(X)
 """
 function chepolsum(x::Float64, a::Array{Float64,1})
-    n = length(a) - 1
-  
-    if n == 0
+    n = length(a)
+    if n == 1
         return a[1]/2.0
-    elseif n == 1
-        return a[1]/2.0 + a[1]*x
+    elseif n == 2
+        return a[1]/2.0 + a[2]*x
     else
         tx = 2*x
         r = a[n]
         h = a[n-1] + r*tx
-        for k = n-2:-1:1
+        for k = n-2:-1:2
             s=r
             r=h
             h=a[k]+r*tx-s
@@ -831,7 +830,7 @@ function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
     eta = s*r/sqrt(a*0.5)
     eta += (coeff1(eta)+(coeff2(eta)+coeff3(eta)/a)/a)/a
     x0 = a*lambdaeta(eta)
-    return x0
+    return (x0,eta)
 end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
 # Published in Journal: ACM Transactions on Mathematical Software (TOMS)
@@ -997,7 +996,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         x0 = gamma_inc_inv_asmall(a, p, q, pcase)
     else    #large a
         m = 1
-        x0 = gamma_inc_inv_alarge(a,porq,s)
+        (x0,eta) = gamma_inc_inv_alarge(a,porq,s)
     end
 
     t = 1
@@ -1064,7 +1063,6 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         x=x0
        
     end
-    xr = x
     return x
 end
 
