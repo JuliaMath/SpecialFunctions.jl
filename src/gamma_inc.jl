@@ -169,7 +169,7 @@ end
 """
     chepolsum(n,x,a)
 
-Computes a series of Chebyshev Polynomials given by : a[0]/2 + a[1]T1(x) + .... + a[n]Tn(X)
+Computes a series of Chebyshev Polynomials given by : a[1]/2 + a[2]T1(x) + .... + a[n]T{n-1}(X)
 """
 function chepolsum(x::Float64, a::Array{Float64,1})
     n = length(a)
@@ -775,13 +775,16 @@ and it is possible to expand:
 \\epsilon(\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3} + ...
 ```
 which is calculated by coeff1, coeff2 and coeff3 functions below.
+This returns a tuple of (x0,fp) where `fp` is computed since it's an approximation for the coefficient after inverting the original power series.
+`fp` is computed using `eta` which comes from the original inversion problem mentioned above and is computed using `lambdaeta(eta)`.
 """
 function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
     r = erfcinv(2*porq)
     eta = s*r/sqrt(a*0.5)
     eta += (coeff1(eta) + (coeff2(eta) + coeff3(eta)/a)/a)/a
     x0 = a*lambdaeta(eta)
-    return (x0,eta)
+    fp = -sqrt(a/(2*pi))*exp(-0.5*a*eta*eta)/gammax(a)
+    return (x0,fp)
 end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
 # Published in Journal: ACM Transactions on Mathematical Software (TOMS)
@@ -930,7 +933,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         porq = q
         s = 1
     end
-    m = 0
+    haseta = false
 
     logr = (1.0/a)*( log(p) + logabsgamma(a + 1.0)[1] )
     if logr < log(0.2*(1+a)) #small value of p
@@ -938,16 +941,14 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     elseif ((q < min(0.02, exp(-1.5*a)/gamma(a))) && (a < 10)) #small q
         x0 = gamma_inc_inv_qsmall(a, q)
     elseif abs(porq - 0.5) < 1.0e-05
-        m = 0
         x0 = a - 1.0/3.0 + (8.0/405.0 + 184.0/25515.0/a) / a
     elseif abs(a-1.0) < 1.0e-4
-        m = 0
         x0 = pcase ? -log1p(-p) : -log(q)
     elseif a < 1.0 # small value of a
         x0 = gamma_inc_inv_asmall(a, p, q, pcase)
     else    #large a
-        m = 1
-        (x0,eta) = gamma_inc_inv_alarge(a,porq,s)
+        haseta = true
+        (x0,fp) = gamma_inc_inv_alarge(a,porq,s)
     end
 
     t = 1
@@ -958,7 +959,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     while t > 1.0e-15 && n < 15
         x = x0
         x² = x*x
-        if m==0
+        if !haseta
             dlnr = (1.0-a)*log(x) + x + logabsgam
             if dlnr > log(floatmax(Float64)/1000.0)
                 n=20
@@ -966,8 +967,6 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 r = exp(dlnr)
             end
         else
-            y = eta
-            fp = -sqrt(a/(2*pi))*exp(-0.5*a*y*y)/gammax(a)
             r = -(1/fp)*x
         end
 
@@ -985,7 +984,7 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 x0 = x + r
             end
         end
-        
+
         t=abs(x/x0 - 1.0)
         n+=1
         x=x0
