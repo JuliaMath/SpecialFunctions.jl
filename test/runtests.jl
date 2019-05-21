@@ -118,7 +118,7 @@ end
         ctr+=1
     end
     for x=-.5:.5:.9
-        @test loggamma1p(x) ≈ loggamma(1.0+x)
+        @test SpecialFunctions.loggamma1p(x) ≈ loggamma(1.0+x)
     end
     
 end
