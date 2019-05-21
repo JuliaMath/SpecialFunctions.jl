@@ -150,7 +150,6 @@ end
 Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, -1 <= x <= 1 
 """
 function auxgam(x::Float64)
-    dr = zeros(18)
     if x < 0
         return -(1.0+(1+x)*(1+x)*auxgam(1+x))/(1.0-x)
     else
@@ -197,8 +196,6 @@ Compute log(gamma(x)) - (x-0.5)*log(x) + x - log(2pi)/2 using stirling series fo
 in https://dlmf.nist.gov/5.11.1
 """
 function stirling_chebyshev(x::Float64)
-  
-    a = zeros(18) 
     if x < floatmin(Float64)*1000.0
         return floatmax(Float64)/1000.0
     elseif x < 1
