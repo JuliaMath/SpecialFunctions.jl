@@ -9,8 +9,8 @@ const alog10 = log(10)
 const rt2pin = 1.0/sqrt(2*pi)
 const rtpi = sqrt(pi) 
 const exparg = -745.1
-const a = [1.996379051590076518221, -0.17971032528832887213e-2, 0.131292857963846713e-4, -0.2340875228178749e-6, 0.72291210671127e-8, -0.3280997607821e-9, 0.198750709010e-10, -0.15092141830e-11, 0.1375340084e-12, -0.145728923e-13, 0.17532367e-14, -0.2351465e-15, 0.346551e-16, -0.55471e-17, 0.9548e-18, -0.1748e-18, 0.332e-19, -0.58e-20]
-const dr = [-1.013609258009865776949, 0.784903531024782283535e-1, 0.67588668743258315530e-2, -0.12790434869623468120e-2, 0.462939838642739585e-4, 0.43381681744740352e-5, -0.5326872422618006e-6, 0.172233457410539e-7, 0.8300542107118e-9, -0.10553994239968e-9, 0.39415842851e-11, 0.362068537e-13, -0.107440229e-13, 0.5000413e-15, -0.62452e-17, -0.5185e-18, 0.347e-19, -0.9e-21]
+const stirling_coef = [1.996379051590076518221, -0.17971032528832887213e-2, 0.131292857963846713e-4, -0.2340875228178749e-6, 0.72291210671127e-8, -0.3280997607821e-9, 0.198750709010e-10, -0.15092141830e-11, 0.1375340084e-12, -0.145728923e-13, 0.17532367e-14, -0.2351465e-15, 0.346551e-16, -0.55471e-17, 0.9548e-18, -0.1748e-18, 0.332e-19, -0.58e-20]
+const auxgam_coef = [-1.013609258009865776949, 0.784903531024782283535e-1, 0.67588668743258315530e-2, -0.12790434869623468120e-2, 0.462939838642739585e-4, 0.43381681744740352e-5, -0.5326872422618006e-6, 0.172233457410539e-7, 0.8300542107118e-9, -0.10553994239968e-9, 0.39415842851e-11, 0.362068537e-13, -0.107440229e-13, 0.5000413e-15, -0.62452e-17, -0.5185e-18, 0.347e-19, -0.9e-21]
 
 #----------------COEFFICIENTS FOR TEMME EXPANSION------------------
 
@@ -154,7 +154,7 @@ function auxgam(x::Float64)
         return -(1.0+(1+x)*(1+x)*auxgam(1+x))/(1.0-x)
     else
         t = 2*x - 1.0
-        return chepolsum(t,dr)
+        return chepolsum(t, auxgam_coef)
     end
 end   
 """
@@ -190,12 +190,12 @@ function chepolsum(x::Float64, a::Array{Float64,1})
     end
 end
 """
-    stirling_chebyshev(x)
+    stirling(x)
 
 Compute log(gamma(x)) - (x-0.5)*log(x) + x - log(2pi)/2 using stirling series for asymptotic part 
 in https://dlmf.nist.gov/5.11.1
 """
-function stirling_chebyshev(x::Float64)
+function stirling(x::Float64)
     if x < floatmin(Float64)*1000.0
         return floatmax(Float64)/1000.0
     elseif x < 1
@@ -206,7 +206,7 @@ function stirling_chebyshev(x::Float64)
         return loggamma1p(x-2) - (x-0.5)*log(x) + x  - log((2*pi))/2.0 + log(x-1)
     elseif x < 12
         z=18.0/(x*x)-1.0
-        return chepolsum(z,a)/(12.0*x)
+        return chepolsum(z, stirling_coef)/(12.0*x)
     else
         z = 1.0/(x*x)
         if x < 1000
@@ -219,12 +219,12 @@ end
 """
     gammax(x)
 
-gammax(x) = ``e^{stirling_chebyshev(x)}`` if x>0
+gammax(x) = ``e^{stirling(x)}`` if x>0
 else ``\\Gamma(x)/(e^{-x + (x-0.5)*log(x)}/\\sqrt{2 \\pi}``
 """
 function gammax(x::Float64)
     if x >= 3
-        return exp(stirling_chebyshev(x))
+        return exp(stirling(x))
     elseif x > 0
         return gamma(x)/(exp(-x+(x-0.5)*log(x))*sqrt(2*pi))
     else
@@ -964,41 +964,28 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
                 n=20
             else
                 r = exp(dlnr)
-                (px,qx) = gamma_inc(a,x,0)
-                ck1 = (pcase) ? -r*(px-p) : r*(qx-q)
-                ck2 = (x-a+1.0)/(2.0*x)
-                ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
-                r = ck1
-                if a > 0.1
-                    x0 = @horner(r, x, 1.0, ck2, ck3)
-                else
-                    if a > 0.05
-                        x0 = @horner(r, x, 1.0, ck2)
-                    else
-                        x0 = x + r
-                    end
-                end
             end
         else
             y = eta
             fp = -sqrt(a/(2*pi))*exp(-0.5*a*y*y)/gammax(a)
             r = -(1/fp)*x
-            (px,qx) = gamma_inc(a,x,0)
-            ck1 = (pcase) ? -r*(px-p) : r*(qx-q)
-            ck2 = (x-a+1.0)/(2.0*x)
-            ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
-            r = ck1
+        end
 
-            if a > 0.1
-                x0 = @horner(r, x, 1.0, ck2, ck3)
+        (px,qx) = gamma_inc(a,x,0)
+        ck1 = (pcase) ? -r*(px-p) : r*(qx-q)
+        ck2 = (x-a+1.0)/(2.0*x)
+        ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
+        r = ck1
+        if a > 0.1
+            x0 = @horner(r, x, 1.0, ck2, ck3)
+        else
+            if a > 0.05
+                x0 = @horner(r, x, 1.0, ck2)
             else
-                if a > 0.05
-                    x0 = @horner(r, x, 1.0, ck2)
-                else
-                    x0 = x + r
-                end
+                x0 = x + r
             end
         end
+        
         t=abs(x/x0 - 1.0)
         n+=1
         x=x0
@@ -1011,4 +998,4 @@ gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32( gamma_inc_inv(Float
 gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
 gamma_inc_inv(a::Real, p::Real, q::Real) = ( gamma_inc_inv(float(a), float(p), float(q)) )
 gamma_inc_inv(a::Integer, p::Integer, q::Integer) = ( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
-gamma_inc_inv(a::Float32, p::Float32, q::Float32) = throw(MethodError(gamma_inc_inv,(a,p,q,"")))
+gamma_inc_inv(a::AbstractFloat, p::AbstractFloat, q::AbstractFloat) = throw(MethodError(gamma_inc_inv,(a,p,q,"")))
