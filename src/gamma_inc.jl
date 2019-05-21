@@ -788,8 +788,8 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
         r = 1.0/x0
         ck1 = l - 1.0
         ck2 = (@horner(l, @horner(b,2,3), @horner(b,-2,-2), 1))/2.0       
-        ck3 = (@horner(l, @horner(b,-12,-24,-11), @horner(b,12,24,6), -6-9*b, 2))/6.0
-        ck4 = (@horner(l, @horner(b,72,162,120,25), @horner(b,-72,-168,-114,-12), @horner(b,36,84,36), -12-22*b, 3))/12.0
+        ck3 = (@horner(l, @horner(b,-12,-24,-11), @horner(b,12,24,6), @horner(b,-6,-9), 2))/6.0
+        ck4 = (@horner(l, @horner(b,72,162,120,25), @horner(b,-72,-168,-114,-12), @horner(b,36,84,36), @horner(b,-12,-22), 3))/12.0
         x0 = x0 - l + b * r * @horner(r,ck1,ck2,ck3,ck4)
     else
         r = 1.0/x0
