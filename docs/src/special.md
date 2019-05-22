@@ -50,6 +50,7 @@ SpecialFunctions.eta
 SpecialFunctions.zeta
 SpecialFunctions.gamma
 SpecialFunctions.gamma_inc
+SpecialFunctions.gamma_inc_inv
 SpecialFunctions.loggamma
 SpecialFunctions.logabsgamma
 SpecialFunctions.logfactorial

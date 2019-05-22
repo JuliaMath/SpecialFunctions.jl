@@ -48,6 +48,7 @@ export
     polygamma,
     trigamma,
     gamma_inc,
+    gamma_inc_inv,
     hankelh1,
     hankelh1x,
     hankelh2,
