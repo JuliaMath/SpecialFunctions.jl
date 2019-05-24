@@ -48,6 +48,7 @@ export
     polygamma,
     trigamma,
     gamma_inc,
+    beta_inc,
     gamma_inc_inv,
     hankelh1,
     hankelh1x,
@@ -64,6 +65,7 @@ include("ellip.jl")
 include("sincosint.jl")
 include("gamma.jl")
 include("gamma_inc.jl")
+include("beta_inc.jl")
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
