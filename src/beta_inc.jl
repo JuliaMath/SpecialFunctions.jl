@@ -406,7 +406,7 @@ function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps:
      u = loggammadiv(b,a) + b*log(nu)
      u = r*exp(-u)
      if u == 0.0
-        @goto l10
+        @goto l100
      end
      (p, q) = gamma_inc(b,z,0)
      v = 0.25*(1.0/nu)^2.0
@@ -446,7 +446,7 @@ function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps:
          end
      end
     @label l30
-      return w+u*sum
+      return w+u*sm
     @label l100
      print("error")
      return 0.0
@@ -624,7 +624,7 @@ end
 function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64)
     apb = a + b
     ap1 = a + 1.0
-    mu = 0
+    mu = 0.0
     d = 1.0
     if n == 1 || a < 1.0
         @goto l10
@@ -866,7 +866,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      ans_y = bup(b0,a0,y0,x0,n,epps)
      b0 += n
     @label l131
-     ans_y = bgrat(b0,a0,y0,x0,15.0*eps())
+     ans_y = bgrat(b0,a0,y0,x0,ans_y,15.0*eps())
      ans_x = 1.0 - ans_y
      @goto l220
     
