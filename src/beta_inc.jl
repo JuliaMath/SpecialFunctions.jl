@@ -5,42 +5,42 @@ const exparg_p =  707.5
 
 #COMPUTE log(gamma(b)/gamma(a+b)) when b >= 8
 function loggammadiv(a::Float64, b::Float64)
-    if a <= b
-        @goto l10
+    if a > b
+        h = b/a
+        c = 1.0/(1.0 + h)
+        x = h/(1.0 + h)
+        d = a + (b - 0.5)
+        x² = x*x
+        s₃ = 1.0 + (x + x²)
+        s₅ = 1.0 + (x + x²*s₃)
+        s₇ = 1.0 + (x + x²*s₅)
+        s₉ = 1.0 + (x + x²*s₇)
+        s₁₁ = 1.0 + (x + x²*s₉)
+    else
+        h = a/b
+        c = h/(1.0 + h)
+        x = 1.0/(1.0 + h)
+        d = b + a - 0.5
+        x² = x*x
+        s₃ = 1.0 + (x + x²)
+        s₅ = 1.0 + (x + x²*s₃)
+        s₇ = 1.0 + (x + x²*s₅)
+        s₉ = 1.0 + (x + x²*s₇)
+        s₁₁ = 1.0 + (x + x²*s₉)
     end
-    h = b/a
-    c = 1.0/(1.0 + h)
-    x = h/(1.0 + h)
-    d = a + (b - 0.5)
-    @goto l20
 
-    @label l10
-     h = a/b
-     c = h/(1.0 + h)
-     x = 1.0/(1.0 + h)
-     d = b + (a - 0.5)
+    # SET W = del(b) - del(a+b)
+    t = (1.0/b)^2.0
+    w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
+    w *= c/b
 
-    # SN = (1 - X^N)/(1 - X)
-    @label l20
-     x² = x*x
-     s₃ = 1.0 + (x + x²)
-     s₅ = 1.0 + (x + x²*s₃)
-     s₇ = 1.0 + (x + x²*s₅)
-     s₉ = 1.0 + (x + x²*s₇)
-     s₁₁ = 1.0 + (x + x²*s₉)
-
-     # SET W = del(b) - del(a+b)
-     t = (1.0/b)^2.0
-     w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
-     w *= c/b
-
-     #COMBINING 
-     u = d*log1p(a/b)
-     v = a*(log(b) - 1.0)
-     if u <= v
+    #COMBINING 
+    u = d*log1p(a/b)
+    v = a*(log(b) - 1.0)
+    if u <= v
         return w - u - v
-     end
-     return w - v - u
+    end
+    return w - v - u
 end 
 
 #EVALUATION OF  DEL(A0) + DEL(B0) - DEL(A0 + B0)  WHERE LN(GAMMA(A)) = (A - 0.5)*LN(A) - A + 0.5*LN(2*PI) + DEL(A). IT IS ASSUMED THAT A0 .GE. 8 AND B0 .GE. 8.
@@ -69,23 +69,18 @@ end
 #EVALUATION OF EXP(MU+X)
 function esum(mu::Float64, x::Float64)
     if x > 0.0
-        @goto l10
+        if mu > 0.0 || mu + x < 0.0
+            w = mu
+            return exp(w)*exp(x)
+        else
+            return exp(mu + x)
+        end
     elseif mu < 0.0 || mu + x > 0.0
-        @goto l20
+        w = mu
+        return exp(w)*exp(x)
     else
         return exp(mu + x)
     end
-
-    @label l10
-     if mu > 0.0 || mu + x < 0.0
-        @goto l20
-     else
-        return exp(mu + x)
-     end
-    
-    @label l20
-     w = mu
-     return exp(w)*exp(x)
 end
 
 #EVALUATION OF  EXP(MU) * (X**A*Y**B/BETA(A,B))
@@ -490,18 +485,15 @@ function apser(a::Float64, b::Float64, x::Float64, epps::Float64)
     bx = b*x
     t = x - bx
     if b*epps > 2e-2
-      @goto l10
+        c = log(bx) + g + t
+    else
+        c = log(x) + digamma(b) + g + t
     end
-    c = log(x) + digamma(b) + g + t
-    @goto l20
 
-    @label l10
-     c = log(bx) + g + t
 
-    @label l20
-     tol = 5.0*epps*abs(c)
-     j = 1.0
-     s = 0.0
+    tol = 5.0*epps*abs(c)
+    j = 1.0
+    s = 0.0
 
     j += 1.0
     t *= (x - bx/j)
