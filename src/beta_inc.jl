@@ -4,6 +4,11 @@ const exparg_n = -745.133
 const exparg_p =  707.5
 
 #COMPUTE log(gamma(b)/gamma(a+b)) when b >= 8
+"""
+    loggammadiv(a,b)
+
+Computes ``log(\\Gamma(b)/\\Gamma(a+b))`` when b >= 8
+"""
 function loggammadiv(a::Float64, b::Float64)
     if a > b
         h = b/a
@@ -43,7 +48,15 @@ function loggammadiv(a::Float64, b::Float64)
     return w - v - u
 end 
 
-#EVALUATION OF  DEL(A0) + DEL(B0) - DEL(A0 + B0)  WHERE LN(GAMMA(A)) = (A - 0.5)*LN(A) - A + 0.5*LN(2*PI) + DEL(A). IT IS ASSUMED THAT A0 .GE. 8 AND B0 .GE. 8.
+"""
+    bcorr(a0,b0)
+
+Compute del(a0) + del(b0) - del(a0 + b0) where del(a) is given by:
+```math
+log(\\Gamma(a)) = (a - 0.5)*log(a) - a + 0.5*log(2\\pi) + del(a)
+```
+for a0,b0 >= 8
+"""
 function bcorr(a0::Float64, b0::Float64)
     a = min(a0,b0)
     b = max(a0,b0)
@@ -66,7 +79,11 @@ function bcorr(a0::Float64, b0::Float64)
     return @horner(t, .833333333333333E-01, -.277777777760991E-02, .793650666825390E-03, -.595202931351870E-03, .837308034031215E-03, -.165322962780713E-02)/a + w
 end
 
-#EVALUATION OF EXP(MU+X)
+"""
+    esum(mu,x)
+
+Compute ``e^{mu+x}``
+"""
 function esum(mu::Float64, x::Float64)
     if x > 0.0
         if mu > 0.0 || mu + x < 0.0
@@ -83,8 +100,13 @@ function esum(mu::Float64, x::Float64)
     end
 end
 
-#EVALUATION OF  EXP(MU) * (X**A*Y**B/BETA(A,B))
-function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bool)
+"""
+    brcmp1(mu,a,b,x,y,case)
+
+If case == 1: compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
+else : compute above with mu = 0.0
+"""
+function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, case::Bool)
     a0 = min(a,b)
     if a0 >= 8.0
       @goto l100
@@ -219,9 +241,12 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
      return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-bcorr(a,b))
 end   
 
-#CONTINUED FRACTION EXPANSION FOR IX(A,B) WHEN A,B .GT. 1
-#IT IS ASSUMED THAT  LAMBDA = (A + B)*Y - B. 
+"""
+    bfrac(a,b,x,y,lambda,epps)
 
+Compute ``I_{x}(a,b)`` using continued fraction expansion when a,b > 1.
+It is assumed that ``\\lambda = (a+b)*y - b``
+"""
 function bfrac(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
     ans = brcmp1(0.0,a,b,x,y,false)
     if ans == 0.0
@@ -275,11 +300,12 @@ function bfrac(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, 
     return ans*r
 end
 
-#ASYMPTOTIC EXPANSION FOR IX(A,B) FOR LARGE A AND B.
-#LAMBDA = (A + B)*Y - B  AND EPS IS THE TOLERANCE USED.
-#IT IS ASSUMED THAT LAMBDA IS NONNEGATIVE AND THAT
-#A AND B ARE GREATER THAN OR EQUAL TO 15
+"""
+    basym(a,b,lambda,epps)
 
+Compute ``I_{x}(a,b)`` using asymptotic expansion for a,b >= 15.
+It is assumed that ``\\lambda = (a+b)*y - b``
+"""
 function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
     a0 = b0 = c = d = zeros(21)
     e0 = 2/sqrt(pi)
@@ -308,7 +334,7 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
      end
      z0 = sqrt(f)
      z = 0.5*(z0/e1)
-     z2 = 2*f
+     z² = 2*f
 
      a0[1] = (2.0/3.0)*r1
      c[1] = -0.5*a0[1]
@@ -356,8 +382,8 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
 
         j0 = e1*znm1 + (n - 1.0)*j0
         j1 = e1*zn + n*j1
-        znm1 *= z2
-        zn *= z2
+        znm1 *= z²
+        zn *= z²
         w *= w0
         t0 = d[n]*w*j0
         w *= w0
@@ -371,10 +397,13 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
       u = exp(-bcorr(a,b))
       return e0*t*u*sm
 end        
-    
-#ASYMPTOTIC EXPANSION FOR IX(A,B) WHEN A IS LARGER THAN B. THE RESULT OF THE EXPANSION IS ADDED TO W. IT IS ASSUMED THAT A .GE. 15 AND B .LE. 1.  EPS IS THE TOLERANCE USED
-#EVALUATION OF Ix(a,b) for B .LT. MIN(EPS,EPS*A) AND X .LE. 0.5
 
+"""
+    bgrat(a,b,x,y,w,epps)
+
+Evaluation of I_{x}(a,b) when b < min(epps,epps*a) and x <= 0.5 using asymptotic expansion.
+It is assumed a >= 15 and b <= 1, and epps is tolerance used.
+"""
 function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps::Float64)
     c = zeros(30)
     d = zeros(30)
@@ -612,7 +641,11 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
     return ans*(1.0 + a*sm)
 end
 
-#EVALUATION OF Ix(a,b) - Ix(a+n,b) where n is +ve int and epps is tolerance
+"""
+    bup(a,b,x,y,n,epps)
+
+Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where n is positive integer and epps is tolerance.
+"""
 function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64)
     apb = a + b
     ap1 = a + 1.0
@@ -693,38 +726,38 @@ I_{x}(a,b) = G(a,b) \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
 ```
 and ``I_{y}(a,b) = 1.0 - I_{x}(a,b)``.
 given
-``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)``
+``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)`` and y = 1.0 - x
 """
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     ans_x = 0.0
     ans_y = 0.0
     lambda = a - (a+b)*x
-    if a < 0.0 || b < 0.0
-        println("1")
-        return (0.0,0.0)
-    elseif a == 0.0 && b == 0.0
-        println("2")
-        return (0.0,0.0)
-    elseif x < 0.0 || x > 1.0
-        println("3")
-        return (0.0,0.0)
-    elseif y < 0.0 || y > 1.0
-        println("4")
-        return (0.0,0.0)
-    else
-        z = x + y - 1.0
-        if abs(z) > 3.0*eps()
-            println("5")
-            return (0.0,0.0)
-        end
-    end
+    # if a < 0.0 || b < 0.0
+    #     println("1")
+    #     return (0.0,0.0)
+    # elseif a == 0.0 && b == 0.0
+    #     println("2")
+    #     return (0.0,0.0)
+    # elseif x < 0.0 || x > 1.0
+    #     println("3")
+    #     return (0.0,0.0)
+    # elseif y < 0.0 || y > 1.0
+    #     println("4")
+    #     return (0.0,0.0)
+    # else
+    #     z = x + y - 1.0
+    #     if abs(z) > 3.0*eps()
+    #         println("5")
+    #         return (0.0,0.0)         # ERROR HANDLING
+    #     end
+    # end
 
     if x == 0.0
-        @goto l200
-    elseif y == 0.0
-        @goto l210
-    elseif a == 0.0
         return (0.0,1.0)
+    elseif y == 0.0
+        return (1.0,0.0)
+    elseif a == 0.0
+        return (1.0,0.0)
     elseif b == 0.0
         return (0.0,1.0)
     end
@@ -733,7 +766,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     if max(a,b) < 1.0E-3 * epps
         return (b/(a+b), a/(a+b))
     end
-    ind = 0
+    ind = 0.0
     a0 = a
     b0 = b
     x0 = x
@@ -745,7 +778,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     if x <= 0.5
         @goto l10
     end
-    ind = 1
+    ind = 1.0
     a0 = b
     b0 = a
     y0 = x
@@ -799,7 +832,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         @goto l40
      end
     
-    ind = 1
+    ind = 1.0
     a0 = b
     b0 = a
     x0 = y
@@ -899,17 +932,6 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      @goto l220
 
 #TERMINATION
-
-    @label l200
-     if a == 0.0
-        println("6")
-        return (0.0,0.0)
-     end
-    @label l210
-     if b == 0.0
-        println("7")
-        return (0.0,0.0)
-     end
     @label l220
      if ind == 0.0
         return (ans_x,ans_y)
