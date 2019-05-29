@@ -75,7 +75,7 @@ function bcorr(a0::Float64, b0::Float64)
     w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
     # COMPUTE DEL(A) + W
-    t = (1.0/a)^2.0
+    t = inv(a)^2.0
     return @horner(t, .833333333333333E-01, -.277777777760991E-02, .793650666825390E-03, -.595202931351870E-03, .837308034031215E-03, -.165322962780713E-02)/a + w
 end
 
@@ -111,36 +111,28 @@ function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, cas
     if a0 >= 8.0
       @goto l100
     elseif x > 0.375
-      @goto l10
+        if y > 0.375
+            lnx = log(x)
+        else
+            lnx = log1p(-y)
+        end
+        lny = log(y)
+    else
+        lnx = log(x)
+        lny = log1p(-x)
     end
-    lnx = log(x)
-    lny = log1p(-x)
-    @goto l20
-
-    @label l10
-     if y > 0.375
-      @goto l11
-     end
-     lnx  = log1p(-y)
-     lny = log(y)
-     @goto l20
-   
-    @label l11
-     lnx = log(x)
-     lny = log(y)
-    @label l20
-     z = a*lnx + b*lny
-     if a0 < 1.0
-       @goto l30
-     end
-     z -= logbeta(a,b)
-     return case ? esum(mu,z) : exp(z)
+    z = a*lnx + b*lny
+    if a0 >= 1.0
+        z -= logbeta(a,b)
+        return case ? esum(mu,z) : exp(z)
+    end
 
    #PROCEDURE A < 1 OR B < 1
     @label l30
      b0 = max(a,b)
      if b0 >= 8.0
-        @goto l80
+        u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
+        return a0*(case ? esum(mu, z-u) : exp(z-u))
      elseif b0 > 1.0
         @goto l60
      end
@@ -169,74 +161,52 @@ function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, cas
     @label l60
      u = SpecialFunctions.loggamma1p(a0)
      n = b0 - 1.0
-     if n < 1
-        @goto l70
+     if n >= 1
+        c = 1.0
+        for i = 1:n
+            b0 -= 1.0
+            c *= (b0/(a0+b0))
+        end
+        u += log(c)
      end
-     c = 1.0
-     for i = 1:n
-        b0 -= 1.0
-        c *= (b0/(a0+b0))
-     end
-     u += log(c)
 
     @label l70
      z -= u
      b0 -= 1.0
      apb = a0 + b0
      if apb > 1.0
-        @goto l71
+        u = a0 + b0 - 1.0
+        t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
      else
         t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-        @goto l72
      end
-    @label l71
-     u = a0 + b0 - 1.0
-     t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-    @label l72
      return a0*(case ? esum(mu,z) : exp(z))*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
-    
-    # FOR B0 >= 8
-    @label l80
-     u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
-     return a0*(case ? esum(mu, z-u) : exp(z-u))
     
     # FOR A >= 8 AND B >= 8
     @label l100
      if a > b 
-         @goto l101
+        h = b/a
+        x0 = 1.0/(1.0 + h)
+        y0 = h/(1.0 + h)
+        lambda = (a+b)*y - b
      else
-         h = a/b
-         x0 = h/(1.0 + h)
-         y0 = 1.0/(1.0 + h)
-         lambda = a - (a+b)*x
-         @goto l110
+        h = a/b
+        x0 = h/(1.0 + h)
+        y0 = 1.0/(1.0 + h)
+        lambda = a - (a+b)*x
      end
-    @label l101
-     h = b/a
-     x0 = 1.0/(1.0 + h)
-     y0 = h/(1.0 + h)
-     lambda = (a+b)*y - b
-    @label l110
      e = -lambda/a
      if abs(e) > 0.6
-        @goto l111
+        u = e - log(x/x0)
      else
         u = -SpecialFunctions.log1pmx(e)
-        @goto l120
      end
-    @label l111
-     u = e - log(x/x0)
-    @label l120
      e = lambda/b
      if abs(e) > 0.6
-        @goto l121
+        v = e - log(y/y0)
      else
         v = -SpecialFunctions.log1pmx(e)
-        @goto l130
      end
-    @label l121
-     v = e - log(y/y0)
-    @label l130
      z = case ? esum(mu, -(a*u + b*v)) : exp(-(a*u+b*v))
      return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-bcorr(a,b))
 end   
@@ -313,44 +283,40 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
 
     ans = 0.0
     if a >= b
-        @goto l10
+        h = b/a
+        r0 = 1.0/(1.0 + h)
+        r1 = (b-a)/a
+        w0 = 1.0/sqrt(b*(1.0+h))
+    else
+        h = a/b
+        r0 = 1.0/(1.0 + h)
+        r1 = (b-a)/b
+        w0 = 1.0/sqrt(a*(1.0+h))
     end
-    h = a/b
-    r0 = 1.0/(1.0 + h)
-    r1 = (b-a)/b
-    w0 = 1.0/sqrt(a*(1.0+h))
-    @goto l20
+    f = -a*SpecialFunctions.logmxp1(-lambda/a) + b*SpecialFunctions.logmxp1(lambda/b)
+    t = exp(-f)
+    if t == 0.0
+    return ans
+    end
+    z0 = sqrt(f)
+    z = 0.5*(z0/e1)
+    z² = 2*f
 
-    @label l10
-     h = b/a
-     r0 = 1.0/(1.0 + h)
-     r1 = (b-a)/a
-     w0 = 1.0/sqrt(b*(1.0+h))
-    @label l20
-     f = -a*SpecialFunctions.logmxp1(-lambda/a) + b*SpecialFunctions.logmxp1(lambda/b)
-     t = exp(-f)
-     if t == 0.0
-        return ans
-     end
-     z0 = sqrt(f)
-     z = 0.5*(z0/e1)
-     z² = 2*f
+    a0[1] = (2.0/3.0)*r1
+    c[1] = -0.5*a0[1]
+    d[1] = - c[1]
+    j0 = (0.5/e0)*erfcx(z0)
+    j1 = e1
+    sm = j0 + d[1]*w0*j1
 
-     a0[1] = (2.0/3.0)*r1
-     c[1] = -0.5*a0[1]
-     d[1] = - c[1]
-     j0 = (0.5/e0)*erfcx(z0)
-     j1 = e1
-     sm = j0 + d[1]*w0*j1
+    s = 1.0
+    h² = h*h
+    hn = 1.0
+    w = w0
+    znm1 = z
+    zn = z²
 
-     s = 1.0
-     h² = h*h
-     hn = 1.0
-     w = w0
-     znm1 = z
-     zn = z²
-
-     for n = 2:2:20
+    for n = 2:2:20
         hn *= h²
         a0[n] = 2.0*r0*(1.0 + h*hn)/(n + 2.0)
         np1 = n + 1
@@ -392,10 +358,10 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
         if (abs(t0) + abs(t1)) <= epps*sm
             break
         end
-     end
-     @label l60
-      u = exp(-bcorr(a,b))
-      return e0*t*u*sm
+    end
+    
+    u = exp(-bcorr(a,b))
+    return e0*t*u*sm
 end        
 
 """
@@ -410,38 +376,34 @@ function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps:
     bm1 = b - 1.0
     nu = a + 0.5*bm1
     if y > 0.375
-        @goto l10
+        lnx = log(x)
     else
         lnx = log1p(-y)
-        @goto l11
     end
-    @label l10
-     lnx = log(x)
-    @label l11
-     z = -nu*lnx
-     if b*z == 0.0
-        @goto l100
-     end
+    z = -nu*lnx
+    if b*z == 0.0
+        return error("expansion can't be computed")
+    end
 
     # COMPUTATION OF THE EXPANSION
     #SET R = EXP(-Z)*Z**B/GAMMA(B)
-     r = b*(1.0 + SpecialFunctions.rgamma1pm1(b))*exp(b*log(z))
-     r *= exp(a*lnx)*exp(0.5*bm1*lnx)
-     u = loggammadiv(b,a) + b*log(nu)
-     u = r*exp(-u)
-     if u == 0.0
-        @goto l100
-     end
-     (p, q) = gamma_inc(b,z,0)
-     v = 0.25*(1.0/nu)^2.0
-     t2 = 0.25*lnx*lnx
-     l = w/u
-     j = q/r
-     sm = j
-     t = 1.0
-     cn = 1.0
-     n2 = 0.0
-     for n = 1:30
+    r = b*(1.0 + SpecialFunctions.rgamma1pm1(b))*exp(b*log(z))
+    r *= exp(a*lnx)*exp(0.5*bm1*lnx)
+    u = loggammadiv(b,a) + b*log(nu)
+    u = r*exp(-u)
+    if u == 0.0
+        return error("expansion can't be computed")
+    end
+    (p, q) = gamma_inc(b,z,0)
+    v = 0.25*(1.0/nu)^2.0
+    t2 = 0.25*lnx*lnx
+    l = w/u
+    j = q/r
+    sm = j
+    t = 1.0
+    cn = 1.0
+    n2 = 0.0
+    for n = 1:30
         bp2n = b + n2
         j = (bp2n*(bp2n + 1.0)*j + (z + bp2n + 1.0)*t)*v
         n2 += 2.0
@@ -449,31 +411,24 @@ function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps:
         cn /= n2*(n2 + 1.0)
         c[n] = cn
         s = 0.0
-        if n == 1
-            @goto l21
+        if n != 1
+            nm1 = n -1
+            coef = b - n
+            for i = 1:nm1
+                s += coef*c[i]*d[n-i]
+                coef += b
+            end
         end
-        nm1 = n -1
-        coef = b - n
-        for i = 1:nm1
-            s += coef*c[i]*d[n-i]
-            coef += b
+        d[n] = bm1*cn + s/n
+        dj = d[n] * j
+        sm += dj
+        if sm <= 0.0
+            return error("expansion can't be computed")
         end
-        @label l21
-         d[n] = bm1*cn + s/n
-         dj = d[n] * j
-         sm += dj
-         if sm <= 0.0
-             @goto l100
-         end
-         if abs(dj) <= epps*(sm+l)
-             @goto l30
-         end
-     end
-    @label l30
-      return w+u*sm
-    @label l100
-     print("error")
-     return 0.0
+        if abs(dj) <= epps*(sm+l)
+            return w+u*sm
+        end
+    end
 end 
 
 
@@ -565,15 +520,11 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
      end
      apb = a + b
      if apb > 1.0
-        @goto l20
+        u = a + b - 1.0
+        z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
      else
         z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-        @goto l30
      end
-    @label l20
-     u = a + b - 1.0
-     z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-    @label l30
      c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
      ans *= c*(b/apb)
      @goto l70
@@ -582,31 +533,23 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
     @label l40
      u = SpecialFunctions.loggamma1p(a0)
      m = b0 - 1.0
-     if m < 1.0
-        @goto l50
+     if m >= 1.0
+        c = 1.0
+        for i = 1:m
+            b0 -= 1.0
+            c *= (b0/(a0+b0))
+        end
+        u += log(c)
      end
-     c = 1.0
-    @label l41
-     for i = 1:m
-        b0 -= 1.0
-        c *= (b0/(a0+b0))
-     end
-     u += log(c)
-
-    @label l50
      z = a*log(x) - u
      b0 -= 1.0
      apb = a0 + b0
      if apb > 1.0
-        @goto l51
+        u = a0 + b0 - 1.0
+        t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
      else
         t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-        @goto l52
      end
-    @label l51
-     u = a0 + b0 - 1.0
-     t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-    @label l52
      ans = exp(z)*(a0/a)*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
      @goto l70
 
@@ -627,17 +570,16 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
     n = 0.0
     c = 1.0
     tol = epps/a
-    @label l100
-     n += 1.0
-     c *= x*(1.0 - b/n)
-     w = c/(a + n)
-     sm += w
-     while abs(w) > tol
-         n += 1.0
-         c *= x*(1.0 - b/n)
-         w = c/(a+n)
-         sm += w
-     end
+    n += 1.0
+    c *= x*(1.0 - b/n)
+    w = c/(a + n)
+    sm += w
+    while abs(w) > tol
+        n += 1.0
+        c *= x*(1.0 - b/n)
+        w = c/(a+n)
+        sm += w
+    end
     return ans*(1.0 + a*sm)
 end
 
@@ -651,9 +593,7 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
     ap1 = a + 1.0
     mu = 0.0
     d = 1.0
-    if n == 1 || a < 1.0
-        @goto l10
-    else
+    if n != 1 && a >= 1.0
         mu = abs(exparg_n)
         k = exparg_p
         if k < mu 
@@ -663,23 +603,22 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
         d = exp(-t)
     end
 
-    @label l10
-     ans = brcmp1(mu,a,b,x,y,true)/a
-     if n == 1 || ans == 0.0
+    ans = brcmp1(mu,a,b,x,y,true)/a
+    if n == 1 || ans == 0.0
         return ans
-     end
-     nm1 = n -1
-     w = d
+    end
+    nm1 = n -1
+    w = d
 
-     k = 0
-     if b <= 1.0
+    k = 0
+    if b <= 1.0
         @goto l40
-     elseif y > 1.0e-4
+    elseif y > 1.0e-4
         @goto l20
-     else
+    else
         k = nm1
         @goto l30
-     end
+    end
 
     @label l20
      r = (b - 1.0)*x/y - a
