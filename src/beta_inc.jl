@@ -267,7 +267,7 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
     a0 = b0 = c = d = zeros(21)
     e0 = 2/sqrt(pi)
     e1 = 2^(-1.5)
-
+    sm = 0.0
     ans = 0.0
     if a >= b
         h = b/a
@@ -280,14 +280,14 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
         r1 = (b-a)/b
         w0 = 1.0/sqrt(a*(1.0+h))
     end
-    f = -a*SpecialFunctions.logmxp1(-lambda/a) + b*SpecialFunctions.logmxp1(lambda/b)
+    f = -a*SpecialFunctions.log1pmx(-(lambda/a)) - b*SpecialFunctions.log1pmx((lambda/b))
     t = exp(-f)
     if t == 0.0
-    return ans
+        return ans
     end
     z0 = sqrt(f)
     z = 0.5*(z0/e1)
-    z² = 2*f
+    z² = 2.0*f
 
     a0[1] = (2.0/3.0)*r1
     c[1] = -0.5*a0[1]
@@ -303,7 +303,7 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
     znm1 = z
     zn = z²
 
-    for n = 2:2:20
+    for n = 2: 2: 20
         hn *= h²
         a0[n] = 2.0*r0*(1.0 + h*hn)/(n + 2.0)
         np1 = n + 1
@@ -335,13 +335,22 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
 
         j0 = e1*znm1 + (n - 1.0)*j0
         j1 = e1*zn + n*j1
+        println("ll")
+        print(e1)
+        print(",")
+        print(znm1)
+        print(",")
+        print(n)
+        print(",")
+        print(e1*znm1+(n-1.0)*j0)
         znm1 *= z²
         zn *= z²
         w *= w0
         t0 = d[n]*w*j0
         w *= w0
+       # println(j0)
         t1 = d[np1]*w*j1
-        sm += t0 + t1
+        sm += (t0 + t1)
         if (abs(t0) + abs(t1)) <= epps*sm
             break
         end
@@ -487,62 +496,62 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
         return 0.0
     end
     a0 = min(a,b)
+    b0 = max(a,b)
     if a0 >= 1.0
         z = a*log(x) - logbeta(a,b)
         ans = exp(z)/a
-    end
-
-
-    b0 = max(a,b)
-    if b0 >= 8.0
-        u = SpecialFunctions.rgamma1pm1(a0) + loggammadiv(a0,b0)
-        z = a*log(x) - u
-        ans = (a0/a)*exp(z)
-        if ans == 0.0 || a <= 0.1*epps
-            return ans
-        end
-    elseif b0 > 1.0
-        u = SpecialFunctions.loggamma1p(a0)
-        m = b0 - 1.0
-        if m >= 1.0
-            c = 1.0
-            for i = 1:m
-                b0 -= 1.0
-                c *= (b0/(a0+b0))
-            end
-            u += log(c)
-        end
-        z = a*log(x) - u
-        b0 -= 1.0
-        apb = a0 + b0
-        if apb > 1.0
-            u = a0 + b0 - 1.0
-            t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-        else
-            t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-        end
-        ans = exp(z)*(a0/a)*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
-        if ans == 0.0 || a <= 0.1*epps
-            return ans
-        end
     else
-     #PROCEDURE FOR A0 < 1 && B0 < 1
-        ans = x^a
-        if ans == 0.0
-            return ans
-        end
-        apb = a + b
-        if apb > 1.0
-            u = a + b - 1.0
-            z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+        
+        if b0 >= 8.0
+            u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
+            z = a*log(x) - u
+            ans = (a0/a)*exp(z)
+            if ans == 0.0 || a <= 0.1*epps
+                return ans
+            end
+        elseif b0 > 1.0
+            u = SpecialFunctions.loggamma1p(a0)
+            m = b0 - 1.0
+            if m >= 1.0
+                c = 1.0
+                for i = 1:m
+                    b0 -= 1.0
+                    c *= (b0/(a0+b0))
+                end
+                u += log(c)
+            end
+            z = a*log(x) - u
+            b0 -= 1.0
+            apb = a0 + b0
+            if apb > 1.0
+                u = a0 + b0 - 1.0
+                t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+            else
+                t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+            end
+            ans = exp(z)*(a0/a)*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
+            if ans == 0.0 || a <= 0.1*epps
+                return ans
+            end
         else
-            z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-        end
-        c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
-        ans *= c*(b/apb)
-        #label l70 start
-        if ans == 0.0 || a <= 0.1*epps
-            return ans
+        #PROCEDURE FOR A0 < 1 && B0 < 1
+            ans = x^a
+            if ans == 0.0
+                return ans
+            end
+            apb = a + b
+            if apb > 1.0
+                u = a + b - 1.0
+                z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+            else
+                z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+            end
+            c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
+            ans *= c*(b/apb)
+            #label l70 start
+            if ans == 0.0 || a <= 0.1*epps
+                return ans
+            end
         end
     end
     if ans == 0.0 || a <= 0.1*epps
@@ -564,6 +573,7 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
         w = c/(a+n)
         sm += w
     end
+    println("sries")
     return ans*(1.0 + a*sm)
 end
 
@@ -572,7 +582,7 @@ end
 
 Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where n is positive integer and epps is tolerance.
 """
-function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64)
+function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Float64, epps::Float64) #doubt
     apb = a + b
     ap1 = a + 1.0
     mu = 0.0
@@ -769,34 +779,41 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
 #EVALUATION OF ALGOS FOR PROPER SUB-DOMAINS
 
     @label l80
+     println("fpser")
      ans_x = fpser(a0,b0,x0,epps)
      ans_y = 1.0 - ans_x
      @goto l220
      
     @label l90
+     println("apser")
      ans_y = apser(a0,b0,x0,epps)
      ans_x = 1.0 - ans_y
      @goto l220
 
     @label l100
+     println("bpser")
      ans_x = bpser(a0,b0,x0,epps)
      ans_y = 1.0 - ans_x
      @goto l220
 
     @label l110
+     println("bpser")
      ans_y = bpser(b0,a0,y0,epps)
      ans_x = 1.0 - ans_y
      @goto l220
 
     @label l120
+     println("bfrac")
      ans_x = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
      ans_y = 1.0 - ans_x
      @goto l220
 
     @label l130
+     println("bup")
      ans_y = bup(b0,a0,y0,x0,n,epps)
      b0 += n
     @label l131
+     println("bgrat")
      ans_y = bgrat(b0,a0,y0,x0,ans_y,15.0*eps())
      ans_x = 1.0 - ans_y
      @goto l220
@@ -811,15 +828,18 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      b0=1.0
 
     @label l141
+     println("bup")
      ans_x = bup(b0,a0,y0,x0,n,epps)
      if x0 > 0.7
         @goto l150
      end
+     println("bpser")
      ans_x += bpser(a0,b0,x0,epps)
      ans_y = 1.0 - ans_x
      @goto l220
 
     @label l150
+     println("bup")
      if a0 > 15.0
         @goto l151
      end
@@ -828,14 +848,16 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      a0 += n
 
     @label l151
+     println("bgrat")
      ans_x = bgrat(a0,b0,x0,y0,15.0*eps())
      ans_y = 1.0 - ans_x
      @goto l220
 
     @label l180
+     println("basym")
+     lambda = (a+b)*y - b
      ans_x = basym(a0,b0,lambda,100.0*eps())
      ans_y = 1.0 - ans_x
-     @goto l220
 
 #TERMINATION
     @label l220
