@@ -203,6 +203,7 @@ end
 
 Compute ``I_{x}(a,b)`` using continued fraction expansion when a,b > 1.
 It is assumed that ``\\lambda = (a+b)*y - b``
+DLMF : https://dlmf.nist.gov/8.17#E22
 """
 function bfrac(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
     ans = brcmp1(0.0,a,b,x,y,false)
@@ -264,7 +265,7 @@ Compute ``I_{x}(a,b)`` using asymptotic expansion for a,b >= 15.
 It is assumed that ``\\lambda = (a+b)*y - b``
 """
 function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
-    a0 = b0 = c = d = zeros(21)
+    a0 = b0 = c = d = zeros(22)
     e0 = 2/sqrt(pi)
     e1 = 2^(-1.5)
     sm = 0.0
@@ -335,20 +336,11 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
 
         j0 = e1*znm1 + (n - 1.0)*j0
         j1 = e1*zn + n*j1
-        println("ll")
-        print(e1)
-        print(",")
-        print(znm1)
-        print(",")
-        print(n)
-        print(",")
-        print(e1*znm1+(n-1.0)*j0)
         znm1 *= z²
         zn *= z²
         w *= w0
         t0 = d[n]*w*j0
         w *= w0
-       # println(j0)
         t1 = d[np1]*w*j1
         sm += (t0 + t1)
         if (abs(t0) + abs(t1)) <= epps*sm
@@ -458,7 +450,7 @@ function fpser(a::Float64, b::Float64, x::Float64, epps::Float64)
     return ans
 end
 
-#A .LE. MIN(EPS,EPS*B), B*X .LE. 1, AND X .LE. 0.5.,  A is small
+#A <= MIN(EPS,EPS*B), B*X <= 1, AND X <= 0.5.,  A is small
 
 function apser(a::Float64, b::Float64, x::Float64, epps::Float64)         
     g = Base.MathConstants.eulergamma
@@ -581,8 +573,9 @@ end
     bup(a,b,x,y,n,epps)
 
 Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where n is positive integer and epps is tolerance.
+A more generalised version of https://dlmf.nist.gov/8.17#E20
 """
-function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Float64, epps::Float64) #doubt
+function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64) 
     apb = a + b
     ap1 = a + 1.0
     mu = 0.0
@@ -647,9 +640,12 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Float64, epps::F
      end
      return ans*w
 end
+
 #SIGNIFICANT DIGIT COMPUTATION OF INCOMPLETE BETA FUNCTION RATIOS
 #by ARMIDO R. DIDONATO AND ALFRED H. MORRIS, JR.
 #ACM Transactions on Mathematical Software. Vol18, No3, September1992, Pages360-373
+#DLMF : https://dlmf.nist.gov/8.17#E1
+#Wikipedia : https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function
 
 """
     beta_inc(a,b,x,y)
@@ -819,8 +815,8 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      @goto l220
     
     @label l140
-     n = b0
-     b0 -= n
+     n = trunc(Int, b0)
+     b0 -= float(n)
      if b0 != 0.0
         @goto l141
      end
