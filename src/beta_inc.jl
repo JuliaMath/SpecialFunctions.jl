@@ -109,7 +109,31 @@ else : compute above with mu = 0.0
 function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, case::Bool)
     a0 = min(a,b)
     if a0 >= 8.0
-      @goto l100
+        if a > b 
+            h = b/a
+            x0 = 1.0/(1.0 + h)
+            y0 = h/(1.0 + h)
+            lambda = (a+b)*y - b
+        else
+            h = a/b
+            x0 = h/(1.0 + h)
+            y0 = 1.0/(1.0 + h)
+            lambda = a - (a+b)*x
+        end
+        e = -lambda/a
+        if abs(e) > 0.6
+            u = e - log(x/x0)
+        else
+            u = -SpecialFunctions.log1pmx(e)
+        end
+        e = lambda/b
+        if abs(e) > 0.6
+            v = e - log(y/y0)
+        else
+            v = -SpecialFunctions.log1pmx(e)
+        end
+        z = case ? esum(mu, -(a*u + b*v)) : exp(-(a*u+b*v))
+        return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-bcorr(a,b))
     elseif x > 0.375
         if y > 0.375
             lnx = log(x)
@@ -128,87 +152,50 @@ function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, cas
     end
 
    #PROCEDURE A < 1 OR B < 1
-    @label l30
-     b0 = max(a,b)
-     if b0 >= 8.0
+    b0 = max(a,b)
+    if b0 >= 8.0
         u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
         return a0*(case ? esum(mu, z-u) : exp(z-u))
-     elseif b0 > 1.0
-        @goto l60
-     end
+    elseif b0 > 1.0
+        u = SpecialFunctions.loggamma1p(a0)
+        n = b0 - 1.0
+        if n >= 1
+            c = 1.0
+            for i = 1:n
+                b0 -= 1.0
+                c *= (b0/(a0+b0))
+            end
+            u += log(c)
+        end
+
+    end
 
      # FOR B0 <= 1
-     ans = case ? esum(mu,z) : exp(z)
-     if ans == 0.0
+    ans = case ? esum(mu,z) : exp(z)
+    if ans == 0.0
         return 0.0
-     end
-     apb = a + b
-     if apb > 1.0
-        @goto l40
-     else
+    end
+    apb = a + b
+    if apb > 1.0
+        u = a + b - 1.0
+        z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+    else
         z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-        @goto l50
-     end
-    @label l40
-     u = a + b - 1.0
-     z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+    end
 
-    @label l50
-     c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
-     return ans*(a0*c)/(1.0 + a0/b0)
+    c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
+    return ans*(a0*c)/(1.0 + a0/b0)
 
-    #  FOR 1 < B0 < 8
-    @label l60
-     u = SpecialFunctions.loggamma1p(a0)
-     n = b0 - 1.0
-     if n >= 1
-        c = 1.0
-        for i = 1:n
-            b0 -= 1.0
-            c *= (b0/(a0+b0))
-        end
-        u += log(c)
-     end
-
-    @label l70
-     z -= u
-     b0 -= 1.0
-     apb = a0 + b0
-     if apb > 1.0
+    z -= u
+    b0 -= 1.0
+    apb = a0 + b0
+    if apb > 1.0
         u = a0 + b0 - 1.0
         t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-     else
+    else
         t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-     end
-     return a0*(case ? esum(mu,z) : exp(z))*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
-    
-    # FOR A >= 8 AND B >= 8
-    @label l100
-     if a > b 
-        h = b/a
-        x0 = 1.0/(1.0 + h)
-        y0 = h/(1.0 + h)
-        lambda = (a+b)*y - b
-     else
-        h = a/b
-        x0 = h/(1.0 + h)
-        y0 = 1.0/(1.0 + h)
-        lambda = a - (a+b)*x
-     end
-     e = -lambda/a
-     if abs(e) > 0.6
-        u = e - log(x/x0)
-     else
-        u = -SpecialFunctions.log1pmx(e)
-     end
-     e = lambda/b
-     if abs(e) > 0.6
-        v = e - log(y/y0)
-     else
-        v = -SpecialFunctions.log1pmx(e)
-     end
-     z = case ? esum(mu, -(a*u + b*v)) : exp(-(a*u+b*v))
-     return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-bcorr(a,b))
+    end
+    return a0*(case ? esum(mu,z) : exp(z))*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
 end   
 
 """
@@ -500,70 +487,67 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
         return 0.0
     end
     a0 = min(a,b)
-    if a0 < 1.0
-      @goto l10
+    if a0 >= 1.0
+        z = a*log(x) - logbeta(a,b)
+        ans = exp(z)/a
     end
-    z = a*log(x) - logbeta(a,b)
-    ans = exp(z)/a
 
-    @label l10
-     b0 = max(a,b)
-     if b0 >= 8.0
-        @goto l60
-     elseif b0 > 1.0
-        @goto l40
-     end
-     #PROCEDURE FOR A0 < 1 && B0 < 1
-     ans = x^a
-     if ans == 0.0
-        return ans
-     end
-     apb = a + b
-     if apb > 1.0
-        u = a + b - 1.0
-        z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-     else
-        z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-     end
-     c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
-     ans *= c*(b/apb)
-     @goto l70
 
-    #PROCEDURE FOR A0 < 1 AND 1 < B0 <8
-    @label l40
-     u = SpecialFunctions.loggamma1p(a0)
-     m = b0 - 1.0
-     if m >= 1.0
-        c = 1.0
-        for i = 1:m
-            b0 -= 1.0
-            c *= (b0/(a0+b0))
+    b0 = max(a,b)
+    if b0 >= 8.0
+        u = SpecialFunctions.rgamma1pm1(a0) + loggammadiv(a0,b0)
+        z = a*log(x) - u
+        ans = (a0/a)*exp(z)
+        if ans == 0.0 || a <= 0.1*epps
+            return ans
         end
-        u += log(c)
-     end
-     z = a*log(x) - u
-     b0 -= 1.0
-     apb = a0 + b0
-     if apb > 1.0
-        u = a0 + b0 - 1.0
-        t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-     else
-        t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-     end
-     ans = exp(z)*(a0/a)*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
-     @goto l70
-
-    #PROCEDURE FOR A0 < 1 AND B0 >= 8
-
-    @label l60
-     u = SpecialFunctions.rgamma1pm1(a0) + loggammadiv(a0,b0)
-     z = a*log(x) - u
-     ans = (a0/a)*exp(z)
-    @label l70
-     if ans == 0.0 || a <= 0.1*epps
+    elseif b0 > 1.0
+        u = SpecialFunctions.loggamma1p(a0)
+        m = b0 - 1.0
+        if m >= 1.0
+            c = 1.0
+            for i = 1:m
+                b0 -= 1.0
+                c *= (b0/(a0+b0))
+            end
+            u += log(c)
+        end
+        z = a*log(x) - u
+        b0 -= 1.0
+        apb = a0 + b0
+        if apb > 1.0
+            u = a0 + b0 - 1.0
+            t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+        else
+            t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+        end
+        ans = exp(z)*(a0/a)*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
+        if ans == 0.0 || a <= 0.1*epps
+            return ans
+        end
+    else
+     #PROCEDURE FOR A0 < 1 && B0 < 1
+        ans = x^a
+        if ans == 0.0
+            return ans
+        end
+        apb = a + b
+        if apb > 1.0
+            u = a + b - 1.0
+            z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+        else
+            z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+        end
+        c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
+        ans *= c*(b/apb)
+        #label l70 start
+        if ans == 0.0 || a <= 0.1*epps
+            return ans
+        end
+    end
+    if ans == 0.0 || a <= 0.1*epps
         return ans
-     end
-
+    end
     # COMPUTE THE SERIES
 
     sm = 0.0
@@ -611,35 +595,36 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
     w = d
 
     k = 0
-    if b <= 1.0
-        @goto l40
-    elseif y > 1.0e-4
-        @goto l20
-    else
-        k = nm1
-        @goto l30
+    if b > 1.0
+        if y > 1e-4
+            r = (b - 1.0)*x/y - a
+            if r < 1.0
+                @goto l40
+            end
+            k = t = nm1
+            if r < t
+                k = r
+            end
+            for i = 1:k
+                l = i -1
+                d *= ((apb + l)/(ap1 + l))*x
+                w += d
+            end
+            if k == nm1
+                return ans*w
+            end
+        else
+            k = nm1
+        end
+        for i = 1:k
+            l = i -1
+            d *= ((apb + l)/(ap1 + l))*x
+            w += d
+        end
+        if k == nm1
+            return ans*w
+        end
     end
-
-    @label l20
-     r = (b - 1.0)*x/y - a
-     if r < 1.0
-        @goto l40
-     end
-     k = t = nm1
-     if r < t
-        k = r
-     end
-    # ADD INC TERMS OF SERIES
-    @label l30
-     for i = 1:k
-        l = i -1
-        d *= ((apb + l)/(ap1 + l))*x
-        w += d
-     end
-     if k == nm1
-        return ans*w
-     end
-    # ADD REMAINING TERMS
     @label l40
      kp1 = k + 1
      for i = kp1:nm1
@@ -649,8 +634,8 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
         if d <= epps*w
             break
         end
-    end
-    return ans*w
+     end
+     return ans*w
 end
 #SIGNIFICANT DIGIT COMPUTATION OF INCOMPLETE BETA FUNCTION RATIOS
 #by ARMIDO R. DIDONATO AND ALFRED H. MORRIS, JR.
@@ -671,25 +656,20 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     ans_x = 0.0
     ans_y = 0.0
     lambda = a - (a+b)*x
-    # if a < 0.0 || b < 0.0
-    #     println("1")
-    #     return (0.0,0.0)
-    # elseif a == 0.0 && b == 0.0
-    #     println("2")
-    #     return (0.0,0.0)
-    # elseif x < 0.0 || x > 1.0
-    #     println("3")
-    #     return (0.0,0.0)
-    # elseif y < 0.0 || y > 1.0
-    #     println("4")
-    #     return (0.0,0.0)
-    # else
-    #     z = x + y - 1.0
-    #     if abs(z) > 3.0*eps()
-    #         println("5")
-    #         return (0.0,0.0)         # ERROR HANDLING
-    #     end
-    # end
+    if a < 0.0 || b < 0.0
+        return error("a or b is negative")
+    elseif a == 0.0 && b == 0.0
+        return error("a and b are 0.0")
+    elseif x < 0.0 || x > 1.0
+        return error("x < 0 or x > 1")
+    elseif y < 0.0 || y > 1.0
+        return error("y < 0  or y > 1")
+    else
+        z = x + y - 1.0
+        if abs(z) > 3.0*eps()
+            return error("x + y != 1.0")         # ERROR HANDLING
+        end
+    end
 
     if x == 0.0
         return (0.0,1.0)
@@ -705,7 +685,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     if max(a,b) < 1.0E-3 * epps
         return (b/(a+b), a/(a+b))
     end
-    ind = 0.0
+    ind = false
     a0 = a
     b0 = b
     x0 = x
@@ -717,7 +697,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     if x <= 0.5
         @goto l10
     end
-    ind = 1.0
+    ind = true
     a0 = b
     b0 = a
     y0 = x
@@ -729,7 +709,18 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      elseif a0 < min(epps, epps*b0)
         @goto l90
      elseif max(a0,b0) > 1.0
-        @goto l20
+        if b0 <= 1.0 || (x0*b0)^a0 <= 0.7
+            @goto l100
+        elseif x0 >= 0.3
+            @goto l110
+        elseif x0 >= 0.1
+            if b0 > 15.0
+                @goto l131
+            else
+                n = 20
+                @goto l130
+            end
+        end
      elseif a0 >= min(0.2, b0) || x0^a0 <= 0.9
         @goto l100
      elseif x0 >= 0.3
@@ -739,39 +730,18 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         @goto l130
      end
 
-    @label l20
-     if b0 <= 1.0 || (x0*b0)^a0 <= 0.7
-        @goto l100
-     elseif x0 >= 0.3
-        @goto l110
-     elseif x0 >= 0.1
-        @goto l21
-     end
-
-    @label l21
-     if b0 > 15.0
-        @goto l131
-     else
-        n = 20
-        @goto l130
-     end
-
 #PROCEDURE FOR A0>1 AND B0>1
     @label l30
      if a > b
-        @goto l31
+        lambda = (a+b)*y - b
+     else
+        lambda = a - (a+b)*x
      end
-    lambda = a - (a+b)*x
-    @goto l32
-
-    @label l31
-     lambda = (a+b)*y - b
-    @label l32
      if lambda >= 0.0
         @goto l40
      end
     
-    ind = 1.0
+    ind = true
     a0 = b
     b0 = a
     x0 = y
@@ -785,15 +755,12 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      elseif b0 < 40.0
         @goto l140
      elseif a0 > b0
-        @goto l50
+        if b0 <= 100.0 || lambda > 0.03*b0
+            @goto l120
+        else
+            @goto l180
+        end
      elseif a0 <= 100.0 || lambda > 0.03*a0
-        @goto l120
-     else
-        @goto l180
-     end
-
-    @label l50
-     if b0 <= 100.0 || lambda > 0.03*b0
         @goto l120
      else
         @goto l180
@@ -872,13 +839,9 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
 
 #TERMINATION
     @label l220
-     if ind == 0.0
+     if !ind
         return (ans_x,ans_y)
      end
      #ans_x, ans_y = ans_y, ans_x
      return (ans_y, ans_x)
 end
-
-    
-
-
