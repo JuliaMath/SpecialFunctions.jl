@@ -659,8 +659,8 @@ given
 ``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)`` and y = 1.0 - x
 """
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
-    ans_x = 0.0
-    ans_y = 0.0
+    ans_p = 0.0
+    ans_q = 0.0
     lambda = a - (a+b)*x
     if a < 0.0 || b < 0.0
         return error("a or b is negative")
@@ -700,21 +700,25 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         @goto l30
     end
 #PROCEDURE FOR A0<=1 OR B0<=1
-    if x <= 0.5
-        @goto l10
-    end
-    ind = true
-    a0 = b
-    b0 = a
-    y0 = x
-    x0 = y
+    if x > 0.5
+        ind = true
+        a0 = b
+        b0 = a
+        y0 = x
+        x0 = y
 
-    @label l10
-     if b0 < min(epps, epps*a0)
-        @goto l80
-     elseif a0 < min(epps, epps*b0)
-        @goto l90
-     elseif max(a0,b0) > 1.0
+    end
+    if b0 < min(epps, epps*a0)
+        println("fpser")
+        ans_p = fpser(a0,b0,x0,epps)
+        ans_q = 1.0 - ans_p
+        @goto l220
+    elseif a0 < min(epps, epps*b0)
+        println("apser")
+        ans_q = apser(a0,b0,x0,epps)
+        ans_p = 1.0 - ans_q
+        @goto l220
+    elseif max(a0,b0) > 1.0
         if b0 <= 1.0 || (x0*b0)^a0 <= 0.7
             @goto l100
         elseif x0 >= 0.3
@@ -727,14 +731,14 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                 @goto l130
             end
         end
-     elseif a0 >= min(0.2, b0) || x0^a0 <= 0.9
+    elseif a0 >= min(0.2, b0) || x0^a0 <= 0.9
         @goto l100
-     elseif x0 >= 0.3
+    elseif x0 >= 0.3
         @goto l110
-     else
+    else
         n = 20
         @goto l130
-     end
+    end
 
 #PROCEDURE FOR A0>1 AND B0>1
     @label l30
@@ -743,123 +747,95 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      else
         lambda = a - (a+b)*x
      end
-     if lambda >= 0.0
-        @goto l40
-     end
+    if lambda < 0.0
+        ind = true
+        a0 = b
+        b0 = a
+        x0 = y
+        y0 = x
+        lambda = abs(lambda)
+    end
     
-    ind = true
-    a0 = b
-    b0 = a
-    x0 = y
-    y0 = x
-
-    lambda = abs(lambda)
-    @label l40
-     if b0 < 40.0 && b0*x0 <= 0.7
-
+    if b0 < 40.0 && b0*x0 <= 0.7
         @goto l100
-     elseif b0 < 40.0
-        @goto l140
-     elseif a0 > b0
+    elseif b0 < 40.0
+        n = trunc(Int, b0)
+        b0 -= float(n)
+        if b0 == 0.0
+            n-=1
+            b0=1.0
+        end
+        println("bup")
+        ans_p = bup(b0,a0,y0,x0,n,epps)
+        if x0 > 0.7
+            println("bup")
+            if a0 <= 15.0
+                n = 20
+                ans_p += bup(a0, b0, x0, y0, n, epps)
+                a0 += n
+            end
+        
+            println("bgrat")
+            ans_p = bgrat(a0,b0,x0,y0,15.0*eps())
+            ans_q = 1.0 - ans_p
+            @goto l220
+        end
+        println("bpser")
+        ans_p += bpser(a0,b0,x0,epps)
+        ans_q = 1.0 - ans_p
+        @goto l220
+    elseif a0 > b0
         if b0 <= 100.0 || lambda > 0.03*b0
             @goto l120
         else
             @goto l180
         end
-     elseif a0 <= 100.0 || lambda > 0.03*a0
+    elseif a0 <= 100.0 || lambda > 0.03*a0
         @goto l120
-     else
+    else
         @goto l180
-     end
+    end
 
 #EVALUATION OF ALGOS FOR PROPER SUB-DOMAINS
-
-    @label l80
-     println("fpser")
-     ans_x = fpser(a0,b0,x0,epps)
-     ans_y = 1.0 - ans_x
-     @goto l220
-     
-    @label l90
-     println("apser")
-     ans_y = apser(a0,b0,x0,epps)
-     ans_x = 1.0 - ans_y
-     @goto l220
-
     @label l100
      println("bpser")
-     ans_x = bpser(a0,b0,x0,epps)
-     ans_y = 1.0 - ans_x
+     ans_p = bpser(a0,b0,x0,epps)
+     ans_q = 1.0 - ans_p
      @goto l220
 
     @label l110
      println("bpser")
-     ans_y = bpser(b0,a0,y0,epps)
-     ans_x = 1.0 - ans_y
+     ans_q = bpser(b0,a0,y0,epps)
+     ans_p = 1.0 - ans_q
      @goto l220
 
     @label l120
      println("bfrac")
-     ans_x = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
-     ans_y = 1.0 - ans_x
+     ans_p = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
+     ans_q = 1.0 - ans_p
      @goto l220
 
     @label l130
      println("bup")
-     ans_y = bup(b0,a0,y0,x0,n,epps)
+     ans_q = bup(b0,a0,y0,x0,n,epps)
      b0 += n
     @label l131
      println("bgrat")
-     ans_y = bgrat(b0,a0,y0,x0,ans_y,15.0*eps())
-     ans_x = 1.0 - ans_y
-     @goto l220
-    
-    @label l140
-     n = trunc(Int, b0)
-     b0 -= float(n)
-     if b0 != 0.0
-        @goto l141
-     end
-     n-=1
-     b0=1.0
-
-    @label l141
-     println("bup")
-     ans_x = bup(b0,a0,y0,x0,n,epps)
-     if x0 > 0.7
-        @goto l150
-     end
-     println("bpser")
-     ans_x += bpser(a0,b0,x0,epps)
-     ans_y = 1.0 - ans_x
-     @goto l220
-
-    @label l150
-     println("bup")
-     if a0 > 15.0
-        @goto l151
-     end
-     n = 20
-     ans_x += bup(a0, b0, x0, y0, n, epps)
-     a0 += n
-
-    @label l151
-     println("bgrat")
-     ans_x = bgrat(a0,b0,x0,y0,15.0*eps())
-     ans_y = 1.0 - ans_x
+     ans_q = bgrat(b0,a0,y0,x0,ans_q,15.0*eps())
+     ans_p = 1.0 - ans_q
      @goto l220
 
     @label l180
      println("basym")
      lambda = (a+b)*y - b
-     ans_x = basym(a0,b0,lambda,100.0*eps())
-     ans_y = 1.0 - ans_x
+     ans_p = basym(a0,b0,lambda,100.0*eps())
+     ans_q = 1.0 - ans_p
 
 #TERMINATION
     @label l220
      if !ind
-        return (ans_x,ans_y)
+        return (ans_p,ans_q)
      end
-     #ans_x, ans_y = ans_y, ans_x
-     return (ans_y, ans_x)
+     #ans_p, ans_q = ans_q, ans_p
+     return (ans_q, ans_p)
 end
