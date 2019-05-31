@@ -660,8 +660,8 @@ given
 ``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)`` and y = 1.0 - x
 """
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
-    ans_p = 0.0
-    ans_q = 0.0
+    p = 0.0
+    q = 0.0
     lambda = a - (a+b)*x
     if a < 0.0 || b < 0.0
         return error("a or b is negative")
@@ -687,7 +687,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     elseif b == 0.0
         return (0.0,1.0)
     end
-
+#EVALUATION OF ALGOS FOR PROPER SUB-DOMAINS ABOVE
     epps = max(eps(), 1.0e-15)
     if max(a,b) < 1.0E-3 * epps
         return (b/(a+b), a/(a+b))
@@ -715,21 +715,58 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         end
        
         if b0 < 40.0 && b0*x0 <= 0.7
-            @goto l100
+            println("bpser")
+            p = bpser(a0,b0,x0,epps)
+            q = 1.0 - p
+            @goto l220
         elseif b0 < 40.0
-                @goto l140
+                n = trunc(Int, b0)
+                b0 -= float(n)
+                if b0 == 0.0
+                    n-=1
+                    b0=1.0
+                end
+                println("bup")
+                p = bup(b0,a0,y0,x0,n,epps)
+                if x0 <= 0.7
+                    println("bpser")
+                    p += bpser(a0,b0,x0,epps)
+                    q = 1.0 - p
+                    @goto l220
+                end
+                println("bup")
+                if a0 <= 15.0
+                    n = 20
+                    p += bup(a0, b0, x0, y0, n, epps)
+                    a0 += n
+                end
+                println("bgrat")
+                p = bgrat(a0,b0,x0,y0,p,15.0*eps())
+                q = 1.0 - p
+                @goto l220
         elseif a0 > b0
             if b0 <= 100.0 || lambda > 0.03*b0
                 
-                @goto l120
+                println("bfrac")
+                p = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
+                q = 1.0 - p
+                @goto l220
             else
-                @goto l180
+                println("basym")
+                p = basym(a0,b0,lambda,100.0*eps())
+                q = 1.0 - p
+                @goto l220
             end
         elseif a0 <= 100.0 || lambda > 0.03*a0
-         
-            @goto l120
+            println("bfrac")
+            p = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
+            q = 1.0 - p
+            @goto l220
         else
-            @goto l180
+            println("basym")
+            p = basym(a0,b0,lambda,100.0*eps())
+            q = 1.0 - p
+            @goto l220
         end
     end
 #PROCEDURE FOR A0<=1 OR B0<=1
@@ -742,126 +779,88 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     end
 
     if b0 < min(epps, epps*a0)
-        @goto l80
+        println("fpser")
+        p = fpser(a0,b0,x0,epps)
+        q = 1.0 - p
+        @goto l220
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
-        @goto l90
+        println("apser")
+        q = apser(a0,b0,x0,epps)
+        p = 1.0 - q
+        @goto l220
     elseif max(a0,b0) > 1.0
         if b0 <= 1.0 
-            @goto l100
+            println("bpser")
+            p = bpser(a0,b0,x0,epps)
+            q = 1.0 - p
+            @goto l220
         elseif x0 >= 0.3
-            @goto l110
+            println("bpser")
+            q = bpser(b0,a0,y0,epps)
+            p = 1.0 - q
+            @goto l220
         elseif x0 >= 0.1
             if b0 > 15.0
-                @goto l131
+                println("bgrat")
+                q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+                p = 1.0 - q
+                @goto l220
             else
                 n = 20
-                @goto l130
+                println("bup")
+                q = bup(b0,a0,y0,x0,n,epps)
+                b0 += n
+                println("bgrat")
+                q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+                p = 1.0 - q
+                @goto l220
             end
         elseif (x0*b0)^(a0) <= 0.7
-            @goto l100
+            println("bpser")
+            p = bpser(a0,b0,x0,epps)
+            q = 1.0 - p
+            @goto l220
         else
             n = 20
-            @goto l130
+            println("bup")
+            q = bup(b0,a0,y0,x0,n,epps)
+            b0 += n
+            println("bgrat")
+            q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+            p = 1.0 - q
+            @goto l220
         end
     elseif a0 >= min(0.2, b0)
-        @goto l100
+        println("bpser")
+        p = bpser(a0,b0,x0,epps)
+        q = 1.0 - p
+        @goto l220
     elseif x0^a0 <= 0.9
-        @goto l100
+        println("bpser")
+        p = bpser(a0,b0,x0,epps)
+        q = 1.0 - p
+        @goto l220
     elseif x0 >= 0.3
-        @goto l110
+        println("bpser")
+        q = bpser(b0,a0,y0,epps)
+        p = 1.0 - q
+        @goto l220
     else
         n = 20
-        @goto l130
+        println("bup")
+        q = bup(b0,a0,y0,x0,n,epps)
+        b0 += n
+        println("bgrat")
+        q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+        p = 1.0 - q
+        @goto l220
     end
-     
-    
-#EVALUATION OF ALGOS FOR PROPER SUB-DOMAINS
-
-    @label l80
-     println("fpser")
-     ans_p = fpser(a0,b0,x0,epps)
-     ans_q = 1.0 - ans_p
-     @goto l220
-     
-    @label l90
-     println("apser")
-     ans_q = apser(a0,b0,x0,epps)
-     ans_p = 1.0 - ans_q
-     @goto l220
-
-    @label l100
-     println("bpser")
-     ans_p = bpser(a0,b0,x0,epps)
-     ans_q = 1.0 - ans_p
-     @goto l220
-
-    @label l110
-     println("bpser")
-     ans_q = bpser(b0,a0,y0,epps)
-     ans_p = 1.0 - ans_q
-     @goto l220
-
-    @label l120
-     println("bfrac")
-     ans_p = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
-     ans_q = 1.0 - ans_p
-     @goto l220
-
-    @label l130
-     println("bup")
-     ans_q = bup(b0,a0,y0,x0,n,epps)
-     b0 += n
-    @label l131
-     println("bgrat")
-     ans_q = bgrat(b0,a0,y0,x0,ans_q,15.0*eps())
-     ans_p = 1.0 - ans_q
-     @goto l220
-    
-    @label l140
-     n = trunc(Int, b0)
-     b0 -= float(n)
-     if b0 != 0.0
-        @goto l141
-     end
-     n-=1
-     b0=1.0
-
-    @label l141
-     println("bup")
-     ans_p = bup(b0,a0,y0,x0,n,epps)
-     if x0 > 0.7
-        @goto l150
-     end
-     println("bpser")
-     ans_p += bpser(a0,b0,x0,epps)
-     ans_q = 1.0 - ans_p
-     @goto l220
-
-    @label l150
-     println("bup")
-     if a0 > 15.0
-        @goto l151
-     end
-     n = 20
-     ans_p += bup(a0, b0, x0, y0, n, epps)
-     a0 += n
-
-    @label l151
-     println("bgrat")
-     ans_p = bgrat(a0,b0,x0,y0,ans_p,15.0*eps())
-     ans_q = 1.0 - ans_p
-     @goto l220
-
-    @label l180
-     println("basym")
-     ans_p = basym(a0,b0,lambda,100.0*eps())
-     ans_q = 1.0 - ans_p
 
 #TERMINATION
     @label l220
      if !ind
-        return (ans_p,ans_q)
+        return (p,q)
      end
-     #ans_p, ans_q = ans_q, ans_p
-     return (ans_q, ans_p)
+     #p, q = q, p
+     return (q, p)
 end
