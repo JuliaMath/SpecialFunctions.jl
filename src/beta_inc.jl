@@ -359,8 +359,8 @@ Evaluation of I_{x}(a,b) when b < min(epps,epps*a) and x <= 0.5 using asymptotic
 It is assumed a >= 15 and b <= 1, and epps is tolerance used.
 """
 function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps::Float64)
-    c = zeros(30)
-    d = zeros(30)
+    c = zeros(31)
+    d = zeros(31)
     bm1 = b - 1.0
     nu = a + 0.5*bm1
     if y > 0.375
@@ -414,9 +414,10 @@ function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps:
             return error("expansion can't be computed")
         end
         if abs(dj) <= epps*(sm+l)
-            return w+u*sm
+            break
         end
     end
+    return w + u*sm
 end 
 
 
@@ -696,8 +697,40 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     b0 = b
     x0 = x
     y0 = y
+
     if min(a0,b0) > 1.0
-        @goto l30
+        #PROCEDURE FOR A0>1 AND B0>1
+        if a > b
+            lambda = (a+b)*y - b
+        else
+            lambda = a - (a+b)*x
+        end
+        if lambda < 0.0
+            ind = true
+            a0 = b
+            b0 = a
+            x0 = y
+            y0 = x
+            lambda = abs(lambda)
+        end
+       
+        if b0 < 40.0 && b0*x0 <= 0.7
+            @goto l100
+        elseif b0 < 40.0
+                @goto l140
+        elseif a0 > b0
+            if b0 <= 100.0 || lambda > 0.03*b0
+                
+                @goto l120
+            else
+                @goto l180
+            end
+        elseif a0 <= 100.0 || lambda > 0.03*a0
+         
+            @goto l120
+        else
+            @goto l180
+        end
     end
 #PROCEDURE FOR A0<=1 OR B0<=1
     if x > 0.5
@@ -706,20 +739,14 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         b0 = a
         y0 = x
         x0 = y
-
     end
+
     if b0 < min(epps, epps*a0)
-        println("fpser")
-        ans_p = fpser(a0,b0,x0,epps)
-        ans_q = 1.0 - ans_p
-        @goto l220
-    elseif a0 < min(epps, epps*b0)
-        println("apser")
-        ans_q = apser(a0,b0,x0,epps)
-        ans_p = 1.0 - ans_q
-        @goto l220
+        @goto l80
+    elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
+        @goto l90
     elseif max(a0,b0) > 1.0
-        if b0 <= 1.0 || (x0*b0)^a0 <= 0.7
+        if b0 <= 1.0 
             @goto l100
         elseif x0 >= 0.3
             @goto l110
@@ -730,8 +757,15 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                 n = 20
                 @goto l130
             end
+        elseif (x0*b0)^(a0) <= 0.7
+            @goto l100
+        else
+            n = 20
+            @goto l130
         end
-    elseif a0 >= min(0.2, b0) || x0^a0 <= 0.9
+    elseif a0 >= min(0.2, b0)
+        @goto l100
+    elseif x0^a0 <= 0.9
         @goto l100
     elseif x0 >= 0.3
         @goto l110
@@ -739,64 +773,22 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         n = 20
         @goto l130
     end
-
-#PROCEDURE FOR A0>1 AND B0>1
-    @label l30
-     if a > b
-        lambda = (a+b)*y - b
-     else
-        lambda = a - (a+b)*x
-     end
-    if lambda < 0.0
-        ind = true
-        a0 = b
-        b0 = a
-        x0 = y
-        y0 = x
-        lambda = abs(lambda)
-    end
+     
     
-    if b0 < 40.0 && b0*x0 <= 0.7
-        @goto l100
-    elseif b0 < 40.0
-        n = trunc(Int, b0)
-        b0 -= float(n)
-        if b0 == 0.0
-            n-=1
-            b0=1.0
-        end
-        println("bup")
-        ans_p = bup(b0,a0,y0,x0,n,epps)
-        if x0 > 0.7
-            println("bup")
-            if a0 <= 15.0
-                n = 20
-                ans_p += bup(a0, b0, x0, y0, n, epps)
-                a0 += n
-            end
-        
-            println("bgrat")
-            ans_p = bgrat(a0,b0,x0,y0,15.0*eps())
-            ans_q = 1.0 - ans_p
-            @goto l220
-        end
-        println("bpser")
-        ans_p += bpser(a0,b0,x0,epps)
-        ans_q = 1.0 - ans_p
-        @goto l220
-    elseif a0 > b0
-        if b0 <= 100.0 || lambda > 0.03*b0
-            @goto l120
-        else
-            @goto l180
-        end
-    elseif a0 <= 100.0 || lambda > 0.03*a0
-        @goto l120
-    else
-        @goto l180
-    end
-
 #EVALUATION OF ALGOS FOR PROPER SUB-DOMAINS
+
+    @label l80
+     println("fpser")
+     ans_p = fpser(a0,b0,x0,epps)
+     ans_q = 1.0 - ans_p
+     @goto l220
+     
+    @label l90
+     println("apser")
+     ans_q = apser(a0,b0,x0,epps)
+     ans_p = 1.0 - ans_q
+     @goto l220
+
     @label l100
      println("bpser")
      ans_p = bpser(a0,b0,x0,epps)
@@ -824,10 +816,44 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
      ans_q = bgrat(b0,a0,y0,x0,ans_q,15.0*eps())
      ans_p = 1.0 - ans_q
      @goto l220
+    
+    @label l140
+     n = trunc(Int, b0)
+     b0 -= float(n)
+     if b0 != 0.0
+        @goto l141
+     end
+     n-=1
+     b0=1.0
+
+    @label l141
+     println("bup")
+     ans_p = bup(b0,a0,y0,x0,n,epps)
+     if x0 > 0.7
+        @goto l150
+     end
+     println("bpser")
+     ans_p += bpser(a0,b0,x0,epps)
+     ans_q = 1.0 - ans_p
+     @goto l220
+
+    @label l150
+     println("bup")
+     if a0 > 15.0
+        @goto l151
+     end
+     n = 20
+     ans_p += bup(a0, b0, x0, y0, n, epps)
+     a0 += n
+
+    @label l151
+     println("bgrat")
+     ans_p = bgrat(a0,b0,x0,y0,ans_p,15.0*eps())
+     ans_q = 1.0 - ans_p
+     @goto l220
 
     @label l180
      println("basym")
-     lambda = (a+b)*y - b
      ans_p = basym(a0,b0,lambda,100.0*eps())
      ans_q = 1.0 - ans_p
 
