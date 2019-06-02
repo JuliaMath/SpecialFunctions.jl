@@ -1,7 +1,7 @@
 using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
-const exparg_n = -745.133
-const exparg_p =  707.5
+const exparg_n = log(nextfloat(floatmin(Float64)))
+const exparg_p =  log(prevfloat(floatmax(Float64)))
 
 #COMPUTE log(gamma(b)/gamma(a+b)) when b >= 8
 """
@@ -106,7 +106,7 @@ end
 If case == 1: compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
 else : compute above with mu = 0.0
 """
-function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, case::Bool)
+function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bool)
     a0 = min(a,b)
     if a0 >= 8.0
         if a > b 
@@ -115,10 +115,10 @@ function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, cas
             y0 = h/(1.0 + h)
             lambda = (a+b)*y - b
         else
-            h = a/b
-            x0 = h/(1.0 + h)
-            y0 = 1.0/(1.0 + h)
-            lambda = a - (a+b)*x
+             h = a/b
+             x0 = h/(1.0 + h)
+             y0 = 1.0/(1.0 + h)
+             lambda = a - (a+b)*x
         end
         e = -lambda/a
         if abs(e) > 0.6
@@ -137,40 +137,48 @@ function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, cas
     elseif x > 0.375
         if y > 0.375
             lnx = log(x)
+            lny = log(y)
         else
             lnx = log1p(-y)
+            lny = log(y)
         end
-        lny = log(y)
     else
         lnx = log(x)
         lny = log1p(-x)
     end
     z = a*lnx + b*lny
-    if a0 >= 1.0
-        z -= logbeta(a,b)
-        return case ? esum(mu,z) : exp(z)
-    end
-
-   #PROCEDURE A < 1 OR B < 1
-    b0 = max(a,b)
-    if b0 >= 8.0
-        u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
-        return a0*(case ? esum(mu, z-u) : exp(z-u))
-    elseif b0 > 1.0
-        u = SpecialFunctions.loggamma1p(a0)
-        n = b0 - 1.0
-        if n >= 1
-            c = 1.0
-            for i = 1:n
-                b0 -= 1.0
-                c *= (b0/(a0+b0))
+    if a0 < 1.0
+        b0 = max(a,b)
+        if b0 >= 8.0
+            u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
+            return a0*(case ? esum(mu, z-u) : exp(z-u))
+        elseif b0 > 1.0
+            u = SpecialFunctions.loggamma1p(a0)
+            n = b0 - 1.0
+            if n >= 1
+                c = 1.0
+                for i = 1:n
+                    b0 -= 1.0
+                    c *= (b0/(a0+b0))
+                end
+                u += log(c)
             end
-            u += log(c)
+            z -= u
+            b0 -= 1.0
+            apb = a0 + b0
+            if apb > 1.0
+                u = a0 + b0 - 1.0
+                t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+            else
+                t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+            end
+            return a0*(case ? esum(mu,z) : exp(z))*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
         end
-
+    else
+        z -= logbeta(a,b)
     end
 
-     # FOR B0 <= 1
+   
     ans = case ? esum(mu,z) : exp(z)
     if ans == 0.0
         return 0.0
@@ -182,30 +190,19 @@ function brcmp1(mu::Float64, a::Float64, b::Float64, x::Float64, y::Float64, cas
     else
         z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
     end
-
     c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
-    return ans*(a0*c)/(1.0 + a0/b0)
-
-    z -= u
-    b0 -= 1.0
-    apb = a0 + b0
-    if apb > 1.0
-        u = a0 + b0 - 1.0
-        t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
-    else
-        t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
-    end
-    return a0*(case ? esum(mu,z) : exp(z))*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
-end   
+    return ans*(a0*c)/(1.0 + a0/b0)    
+end  
 
 """
-    bfrac(a,b,x,y,lambda,epps)
+    beta_inc_cont_fraction(a,b,x,y,lambda,epps)
 
 Compute ``I_{x}(a,b)`` using continued fraction expansion when a,b > 1.
 It is assumed that ``\\lambda = (a+b)*y - b``
 DLMF : https://dlmf.nist.gov/8.17#E22
+BFRAC(A,B,X,Y,LAMBDA,EPS)
 """
-function bfrac(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
+function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
     ans = brcmp1(0.0,a,b,x,y,false)
     if ans == 0.0
         return 0.0
@@ -259,18 +256,19 @@ function bfrac(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, 
 end
 
 """
-    basym(a,b,lambda,epps)
+    beta_inc_asymp_exp(a,b,lambda,epps)
 
 Compute ``I_{x}(a,b)`` using asymptotic expansion for a,b >= 15.
 It is assumed that ``\\lambda = (a+b)*y - b``
+BASYM(A,B,LAMBDA,EPS)
 """
-function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
-    a0 = b0 = c = d = zeros(22)
+function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float64)
+    a0 = b0 = c = d = zeros(25)
     e0 = 2/sqrt(pi)
     e1 = 2^(-1.5)
     sm = 0.0
     ans = 0.0
-    if a >= b
+    if a > b
         h = b/a
         r0 = 1.0/(1.0 + h)
         r1 = (b-a)/a
@@ -312,7 +310,7 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
         a0[np1] = 2.0*r1*s/(n+3.0)
 
         for i = n:np1
-            r = -0.5*(i + 1.0)
+            r = -0.5*(i )
             b0[1] = r*a0[1]
             for m = 2:i
                 bsum = 0.0
@@ -323,8 +321,9 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
                 end
                 b0[m] = r*a0[m] + bsum/m
             end
-            c[i] = b0[i]/(i + 1.0)
-
+            c[i] = b0[i]/(i+1.0)
+            print("---")
+            println(b0[i])
             dsum = 0.0
             im1 = i - 1
             for j = 1:im1
@@ -336,18 +335,23 @@ function basym(a::Float64, b::Float64, lambda::Float64, epps::Float64)
 
         j0 = e1*znm1 + (n - 1.0)*j0
         j1 = e1*zn + n*j1
+        print(j0)
+        print(",")
         znm1 *= z²
         zn *= z²
         w *= w0
         t0 = d[n]*w*j0
         w *= w0
         t1 = d[np1]*w*j1
+        print(d[n])
+        print(",")
+        println(d[np1])
         sm += (t0 + t1)
         if (abs(t0) + abs(t1)) <= epps*sm
             break
         end
     end
-    
+    println(sm)
     u = exp(-bcorr(a,b))
     return e0*t*u*sm
 end        
@@ -581,7 +585,7 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
     ap1 = a + 1.0
     mu = 0.0
     d = 1.0
-    if n != 1 && a >= 1.0
+    if (n != 1 && a >= 1.0) && (apb >= 1.1*ap1)
         mu = abs(exparg_n)
         k = exparg_p
         if k < mu 
@@ -603,7 +607,16 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
         if y > 1e-4
             r = (b - 1.0)*x/y - a
             if r < 1.0
-                @goto l40
+                kp1 = k + 1
+                for i = kp1:nm1
+                    l = i - 1
+                    d *= ((apb + l)/(ap1 + l))*x
+                    w += d
+                    if d <= epps*w
+                        break
+                    end
+                end
+                return ans*w
             end
             k = t = nm1
             if r < t
@@ -619,27 +632,27 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
             end
         else
             k = nm1
-        end
-        for i = 1:k
-            l = i -1
-            d *= ((apb + l)/(ap1 + l))*x
-            w += d
+        
+            for i = 1:k
+                l = i -1
+                d *= ((apb + l)/(ap1 + l))*x
+                w += d
+            end
         end
         if k == nm1
             return ans*w
         end
     end
-    @label l40
-     kp1 = k + 1
-     for i = kp1:nm1
+    kp1 = k + 1
+    for i = kp1:nm1
         l = i - 1
         d *= ((apb + l)/(ap1 + l))*x
         w += d
         if d <= epps*w
             break
         end
-     end
-     return ans*w
+    end
+    return ans*w
 end
 
 #SIGNIFICANT DIGIT COMPUTATION OF INCOMPLETE BETA FUNCTION RATIOS
@@ -662,7 +675,7 @@ given
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     p = 0.0
     q = 0.0
-    lambda = a - (a+b)*x
+   # lambda = a - (a+b)*x
     if a < 0.0 || b < 0.0
         return error("a or b is negative")
     elseif a == 0.0 && b == 0.0
@@ -713,12 +726,10 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
             y0 = x
             lambda = abs(lambda)
         end
-       
         if b0 < 40.0 && b0*x0 <= 0.7
             println("bpser")
             p = bpser(a0,b0,x0,epps)
             q = 1.0 - p
-            @goto l220
         elseif b0 < 40.0
                 n = trunc(Int, b0)
                 b0 -= float(n)
@@ -732,7 +743,11 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                     println("bpser")
                     p += bpser(a0,b0,x0,epps)
                     q = 1.0 - p
-                    @goto l220
+                    if !ind
+                        return (p,q)
+                    end
+                     #p, q = q, p
+                    return (q, p)
                 end
                 println("bup")
                 if a0 <= 15.0
@@ -743,31 +758,31 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                 println("bgrat")
                 p = bgrat(a0,b0,x0,y0,p,15.0*eps())
                 q = 1.0 - p
-                @goto l220
         elseif a0 > b0
             if b0 <= 100.0 || lambda > 0.03*b0
                 
-                println("bfrac")
-                p = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
+                println("beta_inc_cont_fraction")
+                p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,15.0*eps())
                 q = 1.0 - p
-                @goto l220
             else
-                println("basym")
-                p = basym(a0,b0,lambda,100.0*eps())
+                println("beta_inc_asymp_exp")
+                p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
                 q = 1.0 - p
-                @goto l220
             end
         elseif a0 <= 100.0 || lambda > 0.03*a0
-            println("bfrac")
-            p = bfrac(a0,b0,x0,y0,lambda,15.0*eps())
+            println("beta_inc_cont_fraction")
+            p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,15.0*eps())
             q = 1.0 - p
-            @goto l220
         else
-            println("basym")
-            p = basym(a0,b0,lambda,100.0*eps())
+            println("beta_inc_asymp_exp")
+            p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
             q = 1.0 - p
-            @goto l220
         end
+        if !ind
+            return (p, q)
+        end
+         #p, q = q, p
+        return (q, p)
     end
 #PROCEDURE FOR A0<=1 OR B0<=1
     if x > 0.5
@@ -782,29 +797,24 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         println("fpser")
         p = fpser(a0,b0,x0,epps)
         q = 1.0 - p
-        @goto l220
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
         println("apser")
         q = apser(a0,b0,x0,epps)
         p = 1.0 - q
-        @goto l220
     elseif max(a0,b0) > 1.0
         if b0 <= 1.0 
             println("bpser")
             p = bpser(a0,b0,x0,epps)
             q = 1.0 - p
-            @goto l220
         elseif x0 >= 0.3
             println("bpser")
             q = bpser(b0,a0,y0,epps)
             p = 1.0 - q
-            @goto l220
         elseif x0 >= 0.1
             if b0 > 15.0
                 println("bgrat")
                 q = bgrat(b0,a0,y0,x0,q,15.0*eps())
                 p = 1.0 - q
-                @goto l220
             else
                 n = 20
                 println("bup")
@@ -813,13 +823,11 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                 println("bgrat")
                 q = bgrat(b0,a0,y0,x0,q,15.0*eps())
                 p = 1.0 - q
-                @goto l220
             end
         elseif (x0*b0)^(a0) <= 0.7
             println("bpser")
             p = bpser(a0,b0,x0,epps)
             q = 1.0 - p
-            @goto l220
         else
             n = 20
             println("bup")
@@ -828,23 +836,19 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
             println("bgrat")
             q = bgrat(b0,a0,y0,x0,q,15.0*eps())
             p = 1.0 - q
-            @goto l220
         end
     elseif a0 >= min(0.2, b0)
         println("bpser")
         p = bpser(a0,b0,x0,epps)
         q = 1.0 - p
-        @goto l220
     elseif x0^a0 <= 0.9
         println("bpser")
         p = bpser(a0,b0,x0,epps)
         q = 1.0 - p
-        @goto l220
     elseif x0 >= 0.3
         println("bpser")
         q = bpser(b0,a0,y0,epps)
         p = 1.0 - q
-        @goto l220
     else
         n = 20
         println("bup")
@@ -853,14 +857,12 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         println("bgrat")
         q = bgrat(b0,a0,y0,x0,q,15.0*eps())
         p = 1.0 - q
-        @goto l220
     end
 
 #TERMINATION
-    @label l220
-     if !ind
+    if !ind
         return (p,q)
-     end
+    end
      #p, q = q, p
-     return (q, p)
+    return (q, p)
 end
