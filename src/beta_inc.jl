@@ -108,6 +108,7 @@ else : compute above with mu = 0.0
 """
 function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bool)
     a0 = min(a,b)
+    b0 = max(a,b)
     if a0 >= 8.0
         if a > b 
             h = b/a
@@ -154,7 +155,7 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
             return a0*(case ? esum(mu, z-u) : exp(z-u))
         elseif b0 > 1.0
             u = SpecialFunctions.loggamma1p(a0)
-            n = b0 - 1.0
+            n = trunc(Int,b0 - 1.0)
             if n >= 1
                 c = 1.0
                 for i = 1:n
@@ -176,10 +177,12 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
         end
     else
         z -= logbeta(a,b)
+        ans = case ? esum(mu,z) : exp(z)
+        return ans
     end
 
    
-    ans = case ? esum(mu,z) : exp(z)
+    
     if ans == 0.0
         return 0.0
     end
@@ -263,7 +266,7 @@ It is assumed that ``\\lambda = (a+b)*y - b``
 BASYM(A,B,LAMBDA,EPS)
 """
 function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float64)
-    a0 = b0 = c = d = zeros(25)
+    a0 = b0 = c = d = zeros(22)
     e0 = 2/sqrt(pi)
     e1 = 2^(-1.5)
     sm = 0.0
@@ -310,7 +313,7 @@ function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float
         a0[np1] = 2.0*r1*s/(n+3.0)
 
         for i = n:np1
-            r = -0.5*(i )
+            r = -0.5*(i - 1.0)
             b0[1] = r*a0[1]
             for m = 2:i
                 bsum = 0.0
@@ -323,14 +326,18 @@ function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float
             end
             c[i] = b0[i]/(i+1.0)
             print("---")
-            println(b0[i])
+            println(c[i])
             dsum = 0.0
             im1 = i - 1
             for j = 1:im1
                 imj = i - j
                 dsum += d[imj]*c[j]
+                println("::::")
+                println(dsum)
             end
             d[i] = -(dsum + c[i])
+            println("++++")
+            println(d[i])
         end
 
         j0 = e1*znm1 + (n - 1.0)*j0
@@ -580,12 +587,12 @@ end
 Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where n is positive integer and epps is tolerance.
 A more generalised version of https://dlmf.nist.gov/8.17#E20
 """
-function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64) 
+function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64)
     apb = a + b
     ap1 = a + 1.0
     mu = 0.0
     d = 1.0
-    if (n != 1 && a >= 1.0) && (apb >= 1.1*ap1)
+    if n != 1 && a >= 1.0 && apb >= 1.1*ap1
         mu = abs(exparg_n)
         k = exparg_p
         if k < mu 
@@ -603,46 +610,56 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
     w = d
 
     k = 0
-    if b > 1.0
-        if y > 1e-4
-            r = (b - 1.0)*x/y - a
-            if r < 1.0
-                kp1 = k + 1
-                for i = kp1:nm1
-                    l = i - 1
-                    d *= ((apb + l)/(ap1 + l))*x
-                    w += d
-                    if d <= epps*w
-                        break
-                    end
+    if b <= 1.0
+        kp1 = k + 1
+        for i = kp1:nm1
+            l = i - 1
+            d *= ((apb + l)/(ap1 + l))*x
+            w += d
+            if d <= epps*w
+                break
+            end
+        end
+        return ans*w
+    elseif y > 1.0e-4
+        r = trunc(Int,(b - 1.0)*x/y - a)
+        if r < 1.0
+            kp1 = k + 1
+            for i = kp1:nm1
+                l = i - 1
+                d *= ((apb + l)/(ap1 + l))*x
+                w += d
+                if d <= epps*w
+                    break
                 end
-                return ans*w
             end
-            k = t = nm1
-            if r < t
-                k = r
-            end
-            for i = 1:k
-                l = i -1
-                d *= ((apb + l)/(ap1 + l))*x
-                w += d
-            end
-            if k == nm1
-                return ans*w
-            end
-        else
-            k = nm1
-        
-            for i = 1:k
-                l = i -1
-                d *= ((apb + l)/(ap1 + l))*x
-                w += d
-            end
+            return ans*w
+        end
+        k = t = nm1
+        if r < t
+            k = r
+        end
+        # ADD INC TERMS OF SERIES
+        for i = 1:k
+            l = i -1
+            d *= ((apb + l)/(ap1 + l))*x
+            w += d
+        end
+        if k == nm1
+            return ans*w
+        end
+    else
+        k = nm1
+        for i = 1:k
+            l = i -1
+            d *= ((apb + l)/(ap1 + l))*x
+            w += d
         end
         if k == nm1
             return ans*w
         end
     end
+
     kp1 = k + 1
     for i = kp1:nm1
         l = i - 1
@@ -651,9 +668,10 @@ function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::F
         if d <= epps*w
             break
         end
-    end
-    return ans*w
+   end
+   return ans*w
 end
+
 
 #SIGNIFICANT DIGIT COMPUTATION OF INCOMPLETE BETA FUNCTION RATIOS
 #by ARMIDO R. DIDONATO AND ALFRED H. MORRIS, JR.
@@ -766,7 +784,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                 q = 1.0 - p
             else
                 println("beta_inc_asymp_exp")
-                p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
+                p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
                 q = 1.0 - p
             end
         elseif a0 <= 100.0 || lambda > 0.03*a0
@@ -775,7 +793,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
             q = 1.0 - p
         else
             println("beta_inc_asymp_exp")
-            p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
+            p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
             q = 1.0 - p
         end
         if !ind
