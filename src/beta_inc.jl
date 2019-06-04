@@ -266,7 +266,10 @@ It is assumed that ``\\lambda = (a+b)*y - b``
 BASYM(A,B,LAMBDA,EPS)
 """
 function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float64)
-    a0 = b0 = c = d = zeros(22)
+    a0 =zeros(22)
+    b0 = zeros(22)
+    c = zeros(22)
+    d = zeros(22)
     e0 = 2/sqrt(pi)
     e1 = 2^(-1.5)
     sm = 0.0
@@ -308,57 +311,42 @@ function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float
     for n = 2: 2: 20
         hn *= h²
         a0[n] = 2.0*r0*(1.0 + h*hn)/(n + 2.0)
-        np1 = n + 1
         s += hn
-        a0[np1] = 2.0*r1*s/(n+3.0)
+        a0[n+1] = 2.0*r1*s/(n+3.0)
 
-        for i = n:np1
-            r = -0.5*(i - 1.0)
+        for i = n: n+1
+            r = -0.5*(i + 1.0)
             b0[1] = r*a0[1]
             for m = 2:i
                 bsum = 0.0
-                mm1 = m - 1
-                for j =1:mm1
-                    mmj = m - j
-                    bsum += (j*r - mmj)*a0[j]*b0[mmj]
+                for j =1: m-1
+                    bsum += (j*r - (m-j))*a0[j]*b0[m-j]
                 end
                 b0[m] = r*a0[m] + bsum/m
             end
             c[i] = b0[i]/(i+1.0)
-            print("---")
-            println(c[i])
             dsum = 0.0
-            im1 = i - 1
-            for j = 1:im1
+            for j = 1: i-1
                 imj = i - j
                 dsum += d[imj]*c[j]
-                println("::::")
-                println(dsum)
             end
             d[i] = -(dsum + c[i])
-            println("++++")
-            println(d[i])
         end
 
         j0 = e1*znm1 + (n - 1.0)*j0
         j1 = e1*zn + n*j1
-        print(j0)
-        print(",")
         znm1 *= z²
         zn *= z²
         w *= w0
         t0 = d[n]*w*j0
         w *= w0
-        t1 = d[np1]*w*j1
-        print(d[n])
-        print(",")
-        println(d[np1])
+        t1 = d[n+1]*w*j1
         sm += (t0 + t1)
         if (abs(t0) + abs(t1)) <= epps*sm
             break
         end
     end
-    println(sm)
+
     u = exp(-bcorr(a,b))
     return e0*t*u*sm
 end        
@@ -784,7 +772,8 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                 q = 1.0 - p
             else
                 println("beta_inc_asymp_exp")
-                p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
+                #p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
+                p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
                 q = 1.0 - p
             end
         elseif a0 <= 100.0 || lambda > 0.03*a0
@@ -793,7 +782,8 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
             q = 1.0 - p
         else
             println("beta_inc_asymp_exp")
-            p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
+            #p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
+            p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
             q = 1.0 - p
         end
         if !ind
