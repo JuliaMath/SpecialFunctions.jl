@@ -15,46 +15,34 @@ function loggammadiv(a::Float64, b::Float64)
         c = 1.0/(1.0 + h)
         x = h/(1.0 + h)
         d = a + (b - 0.5)
-        x² = x*x
-        s₃ = 1.0 + (x + x²)
-        s₅ = 1.0 + (x + x²*s₃)
-        s₇ = 1.0 + (x + x²*s₅)
-        s₉ = 1.0 + (x + x²*s₇)
-        s₁₁ = 1.0 + (x + x²*s₉)
     else
         h = a/b
         c = h/(1.0 + h)
         x = 1.0/(1.0 + h)
         d = b + a - 0.5
-        x² = x*x
-        s₃ = 1.0 + (x + x²)
-        s₅ = 1.0 + (x + x²*s₃)
-        s₇ = 1.0 + (x + x²*s₅)
-        s₉ = 1.0 + (x + x²*s₇)
-        s₁₁ = 1.0 + (x + x²*s₉)
     end
+    x² = x*x
+    s₃ = 1.0 + (x + x²)
+    s₅ = 1.0 + (x + x²*s₃)
+    s₇ = 1.0 + (x + x²*s₅)
+    s₉ = 1.0 + (x + x²*s₇)
+    s₁₁ = 1.0 + (x + x²*s₉)
 
-    # SET W = del(b) - del(a+b)
-    t = (1.0/b)^2.0
+    # SET W = stirling(b) - stirling(a+b)
+    t = inv(b)^2
     w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
 
     #COMBINING 
     u = d*log1p(a/b)
     v = a*(log(b) - 1.0)
-    if u <= v
-        return w - u - v
-    end
-    return w - v - u
+    return u <= v ? w - u - v : w - v - u
 end 
 
 """
     bcorr(a0,b0)
 
-Compute del(a0) + del(b0) - del(a0 + b0) where del(a) is given by:
-```math
-log(\\Gamma(a)) = (a - 0.5)*log(a) - a + 0.5*log(2\\pi) + del(a)
-```
+Compute stirling(a0) + stirling(b0) - stirling(a0 + b0) 
 for a0,b0 >= 8
 """
 function bcorr(a0::Float64, b0::Float64)
@@ -71,11 +59,11 @@ function bcorr(a0::Float64, b0::Float64)
     s₇ = 1.0 + (x + x²*s₅)
     s₉ = 1.0 + (x + x²*s₇)
     s₁₁ = 1.0 + (x + x²*s₉)
-    t = (1.0/b)^2.0
+    t = inv(b)^2
     w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
-    # COMPUTE DEL(A) + W
-    t = inv(a)^2.0
+    # COMPUTE stirling(a) + w
+    t = inv(a)^2
     return @horner(t, .833333333333333E-01, -.277777777760991E-02, .793650666825390E-03, -.595202931351870E-03, .837308034031215E-03, -.165322962780713E-02)/a + w
 end
 
@@ -87,14 +75,12 @@ Compute ``e^{mu+x}``
 function esum(mu::Float64, x::Float64)
     if x > 0.0
         if mu > 0.0 || mu + x < 0.0
-            w = mu
-            return exp(w)*exp(x)
+            return exp(mu)*exp(x)
         else
             return exp(mu + x)
         end
     elseif mu < 0.0 || mu + x > 0.0
-        w = mu
-        return exp(w)*exp(x)
+        return exp(mu)*exp(x)
     else
         return exp(mu + x)
     end
@@ -107,8 +93,7 @@ If case == 1: compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
 else : compute above with mu = 0.0
 """
 function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bool)
-    a0 = min(a,b)
-    b0 = max(a,b)
+    a0, b0 = minmax(a,b)
     if a0 >= 8.0
         if a > b 
             h = b/a
@@ -122,17 +107,9 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
              lambda = a - (a+b)*x
         end
         e = -lambda/a
-        if abs(e) > 0.6
-            u = e - log(x/x0)
-        else
-            u = -SpecialFunctions.log1pmx(e)
-        end
+        u = abs(e) > 0.6 ? u = e - log(x/x0) : -SpecialFunctions.log1pmx(e)
         e = lambda/b
-        if abs(e) > 0.6
-            v = e - log(y/y0)
-        else
-            v = -SpecialFunctions.log1pmx(e)
-        end
+        v = abs(e) > 0.6 ? e - log(y/y0) : -SpecialFunctions.log1pmx(e)
         z = case ? esum(mu, -(a*u + b*v)) : exp(-(a*u+b*v))
         return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-bcorr(a,b))
     elseif x > 0.375
@@ -203,7 +180,7 @@ end
 Compute ``I_{x}(a,b)`` using continued fraction expansion when a,b > 1.
 It is assumed that ``\\lambda = (a+b)*y - b``
 DLMF : https://dlmf.nist.gov/8.17#E22
-BFRAC(A,B,X,Y,LAMBDA,EPS)
+BFRAC(A,B,X,Y,LAMBDA,EPS) from Didonato and Morris (1982)
 """
 function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
     ans = brcmp1(0.0,a,b,x,y,false)
@@ -259,13 +236,13 @@ function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, 
 end
 
 """
-    beta_inc_asymp_exp(a,b,lambda,epps)
+    beta_inc_asymptotic_symmetric(a,b,lambda,epps)
 
 Compute ``I_{x}(a,b)`` using asymptotic expansion for a,b >= 15.
 It is assumed that ``\\lambda = (a+b)*y - b``
-BASYM(A,B,LAMBDA,EPS)
+BASYM(A,B,LAMBDA,EPS) from Didonato and Morris (1982)
 """
-function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float64)
+function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)
     a0 =zeros(22)
     b0 = zeros(22)
     c = zeros(22)
@@ -333,7 +310,7 @@ function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float
             d[i] = -(dsum + c[i])
         end
 
-        j0 = e1*znm1 + (n - 1.0)*j0
+        j0 = e1*znm1 + (n - 1)*j0
         j1 = e1*zn + n*j1
         znm1 *= z²
         zn *= z²
@@ -352,12 +329,12 @@ function beta_inc_asymp_exp(a::Float64, b::Float64, lambda::Float64, epps::Float
 end        
 
 """
-    bgrat(a,b,x,y,w,epps)
+    beta_inc_asymptotic_asymmetric(a,b,x,y,w,epps)
 
 Evaluation of I_{x}(a,b) when b < min(epps,epps*a) and x <= 0.5 using asymptotic expansion.
 It is assumed a >= 15 and b <= 1, and epps is tolerance used.
 """
-function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps::Float64)
+function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps::Float64)
     c = zeros(31)
     d = zeros(31)
     bm1 = b - 1.0
@@ -382,8 +359,8 @@ function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps:
         return error("expansion can't be computed")
     end
     (p, q) = gamma_inc(b,z,0)
-    v = 0.25*(1.0/nu)^2.0
-    t2 = 0.25*lnx*lnx
+    v = inv(nu)^2/4
+    t2 = lnx^2/4
     l = w/u
     j = q/r
     sm = j
@@ -420,7 +397,7 @@ function bgrat(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps:
 end 
 
 
-
+#For b < min(eps, eps*a) and x <= 0.5
 function fpser(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 1.0
     if a > 1.0e-3 * epps
@@ -482,7 +459,7 @@ end
 
 #B .LE. 1 OR B*X .LE. 0.7
 
-function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
+function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 0.0
     if x == 0.0
         return 0.0
@@ -570,12 +547,12 @@ function bpser(a::Float64, b::Float64, x::Float64, epps::Float64)
 end
 
 """
-    bup(a,b,x,y,n,epps)
+    beta_inc_diff(a,b,x,y,n,epps)
 
 Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where n is positive integer and epps is tolerance.
 A more generalised version of https://dlmf.nist.gov/8.17#E20
 """
-function bup(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64)
+function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64)
     apb = a + b
     ap1 = a + 1.0
     mu = 0.0
@@ -719,11 +696,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
 
     if min(a0,b0) > 1.0
         #PROCEDURE FOR A0>1 AND B0>1
-        if a > b
-            lambda = (a+b)*y - b
-        else
-            lambda = a - (a+b)*x
-        end
+        lambda = a > b ? (a+b)*y - b : a - (a+b)*x
         if lambda < 0.0
             ind = true
             a0 = b
@@ -733,8 +706,8 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
             lambda = abs(lambda)
         end
         if b0 < 40.0 && b0*x0 <= 0.7
-            println("bpser")
-            p = bpser(a0,b0,x0,epps)
+            println("beta_inc_power_series")
+            p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         elseif b0 < 40.0
                 n = trunc(Int, b0)
@@ -743,26 +716,22 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                     n-=1
                     b0=1.0
                 end
-                println("bup")
-                p = bup(b0,a0,y0,x0,n,epps)
+                println("beta_inc_diff")
+                p = beta_inc_diff(b0,a0,y0,x0,n,epps)
                 if x0 <= 0.7
-                    println("bpser")
-                    p += bpser(a0,b0,x0,epps)
+                    println("beta_inc_power_series")
+                    p += beta_inc_power_series(a0,b0,x0,epps)
                     q = 1.0 - p
-                    if !ind
-                        return (p,q)
-                    end
-                     #p, q = q, p
-                    return (q, p)
+                    return ind ? (q, p) : (p, q)
                 end
-                println("bup")
+                println("beta_inc_diff")
                 if a0 <= 15.0
                     n = 20
-                    p += bup(a0, b0, x0, y0, n, epps)
+                    p += beta_inc_diff(a0, b0, x0, y0, n, epps)
                     a0 += n
                 end
-                println("bgrat")
-                p = bgrat(a0,b0,x0,y0,p,15.0*eps())
+                println("beta_inc_asymptotic_asymmetric")
+                p = beta_inc_asymptotic_asymmetric(a0,b0,x0,y0,p,15.0*eps())
                 q = 1.0 - p
         elseif a0 > b0
             if b0 <= 100.0 || lambda > 0.03*b0
@@ -771,9 +740,9 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                 p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,15.0*eps())
                 q = 1.0 - p
             else
-                println("beta_inc_asymp_exp")
+                println("beta_inc_asymptotic_symmetric")
                 #p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
-                p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
+                p = beta_inc_asymptotic_symmetric(a0,b0,lambda,100.0*eps())
                 q = 1.0 - p
             end
         elseif a0 <= 100.0 || lambda > 0.03*a0
@@ -781,16 +750,12 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
             p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,15.0*eps())
             q = 1.0 - p
         else
-            println("beta_inc_asymp_exp")
+            println("beta_inc_asymptotic_symmetric")
             #p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
-            p = beta_inc_asymp_exp(a0,b0,lambda,100.0*eps())
+            p = beta_inc_asymptotic_symmetric(a0,b0,lambda,100.0*eps())
             q = 1.0 - p
         end
-        if !ind
-            return (p, q)
-        end
-         #p, q = q, p
-        return (q, p)
+        return ind ? (q, p) : (p, q)
     end
 #PROCEDURE FOR A0<=1 OR B0<=1
     if x > 0.5
@@ -811,66 +776,62 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         p = 1.0 - q
     elseif max(a0,b0) > 1.0
         if b0 <= 1.0 
-            println("bpser")
-            p = bpser(a0,b0,x0,epps)
+            println("beta_inc_power_series")
+            p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         elseif x0 >= 0.3
-            println("bpser")
-            q = bpser(b0,a0,y0,epps)
+            println("beta_inc_power_series")
+            q = beta_inc_power_series(b0,a0,y0,epps)
             p = 1.0 - q
         elseif x0 >= 0.1
             if b0 > 15.0
-                println("bgrat")
-                q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+                println("beta_inc_asymptotic_asymmetric")
+                q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
                 p = 1.0 - q
             else
                 n = 20
-                println("bup")
-                q = bup(b0,a0,y0,x0,n,epps)
+                println("beta_inc_diff")
+                q = beta_inc_diff(b0,a0,y0,x0,n,epps)
                 b0 += n
-                println("bgrat")
-                q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+                println("beta_inc_asymptotic_asymmetric")
+                q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
                 p = 1.0 - q
             end
         elseif (x0*b0)^(a0) <= 0.7
-            println("bpser")
-            p = bpser(a0,b0,x0,epps)
+            println("beta_inc_power_series")
+            p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         else
             n = 20
-            println("bup")
-            q = bup(b0,a0,y0,x0,n,epps)
+            println("beta_inc_diff")
+            q = beta_inc_diff(b0,a0,y0,x0,n,epps)
             b0 += n
-            println("bgrat")
-            q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+            println("beta_inc_asymptotic_asymmetric")
+            q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
             p = 1.0 - q
         end
     elseif a0 >= min(0.2, b0)
-        println("bpser")
-        p = bpser(a0,b0,x0,epps)
+        println("beta_inc_power_series")
+        p = beta_inc_power_series(a0,b0,x0,epps)
         q = 1.0 - p
     elseif x0^a0 <= 0.9
-        println("bpser")
-        p = bpser(a0,b0,x0,epps)
+        println("beta_inc_power_series")
+        p = beta_inc_power_series(a0,b0,x0,epps)
         q = 1.0 - p
     elseif x0 >= 0.3
-        println("bpser")
-        q = bpser(b0,a0,y0,epps)
+        println("beta_inc_power_series")
+        q = beta_inc_power_series(b0,a0,y0,epps)
         p = 1.0 - q
     else
         n = 20
-        println("bup")
-        q = bup(b0,a0,y0,x0,n,epps)
+        println("beta_inc_diff")
+        q = beta_inc_diff(b0,a0,y0,x0,n,epps)
         b0 += n
-        println("bgrat")
-        q = bgrat(b0,a0,y0,x0,q,15.0*eps())
+        println("beta_inc_asymptotic_asymmetric")
+        q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
         p = 1.0 - q
     end
 
 #TERMINATION
-    if !ind
-        return (p,q)
-    end
-     #p, q = q, p
-    return (q, p)
+    return ind ? (q, p) : (p, q)
 end
