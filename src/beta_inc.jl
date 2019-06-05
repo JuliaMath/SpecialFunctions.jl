@@ -107,9 +107,9 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
              lambda = a - (a+b)*x
         end
         e = -lambda/a
-        u = abs(e) > 0.6 ? u = e - log(x/x0) : -SpecialFunctions.log1pmx(e)
+        u = abs(e) > 0.6 ? u = e - log(x/x0) : - log1pmx(e)
         e = lambda/b
-        v = abs(e) > 0.6 ? e - log(y/y0) : -SpecialFunctions.log1pmx(e)
+        v = abs(e) > 0.6 ? e - log(y/y0) : - log1pmx(e)
         z = case ? esum(mu, -(a*u + b*v)) : exp(-(a*u+b*v))
         return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-bcorr(a,b))
     elseif x > 0.375
@@ -128,10 +128,10 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
     if a0 < 1.0
         b0 = max(a,b)
         if b0 >= 8.0
-            u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
+            u = loggamma1p(a0) + loggammadiv(a0,b0)
             return a0*(case ? esum(mu, z-u) : exp(z-u))
         elseif b0 > 1.0
-            u = SpecialFunctions.loggamma1p(a0)
+            u = loggamma1p(a0)
             n = trunc(Int,b0 - 1.0)
             if n >= 1
                 c = 1.0
@@ -146,11 +146,11 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
             apb = a0 + b0
             if apb > 1.0
                 u = a0 + b0 - 1.0
-                t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+                t = (1.0 + rgamma1pm1(u))/apb
             else
-                t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+                t = 1.0 + rgamma1pm1(apb)
             end
-            return a0*(case ? esum(mu,z) : exp(z))*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
+            return a0*(case ? esum(mu,z) : exp(z))*(1.0 + rgamma1pm1(b0))/t
         end
     else
         z -= logbeta(a,b)
@@ -166,11 +166,11 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
     apb = a + b
     if apb > 1.0
         u = a + b - 1.0
-        z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+        z = (1.0 + rgamma1pm1(u))/apb
     else
-        z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+        z = 1.0 + rgamma1pm1(apb)
     end
-    c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
+    c = (1.0 + rgamma1pm1(a))*(1.0 + rgamma1pm1(b))/z
     return ans*(a0*c)/(1.0 + a0/b0)    
 end  
 
@@ -262,7 +262,7 @@ function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, 
         r1 = (b-a)/b
         w0 = 1.0/sqrt(a*(1.0+h))
     end
-    f = -a*SpecialFunctions.log1pmx(-(lambda/a)) - b*SpecialFunctions.log1pmx((lambda/b))
+    f = -a*log1pmx(-(lambda/a)) - b*log1pmx((lambda/b))
     t = exp(-f)
     if t == 0.0
         return ans
@@ -351,7 +351,7 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
 
     # COMPUTATION OF THE EXPANSION
     #SET R = EXP(-Z)*Z**B/GAMMA(B)
-    r = b*(1.0 + SpecialFunctions.rgamma1pm1(b))*exp(b*log(z))
+    r = b*(1.0 + rgamma1pm1(b))*exp(b*log(z))
     r *= exp(a*lnx)*exp(0.5*bm1*lnx)
     u = loggammadiv(b,a) + b*log(nu)
     u = r*exp(-u)
@@ -472,14 +472,14 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
     else
         
         if b0 >= 8.0
-            u = SpecialFunctions.loggamma1p(a0) + loggammadiv(a0,b0)
+            u = loggamma1p(a0) + loggammadiv(a0,b0)
             z = a*log(x) - u
             ans = (a0/a)*exp(z)
             if ans == 0.0 || a <= 0.1*epps
                 return ans
             end
         elseif b0 > 1.0
-            u = SpecialFunctions.loggamma1p(a0)
+            u = loggamma1p(a0)
             m = b0 - 1.0
             if m >= 1.0
                 c = 1.0
@@ -494,11 +494,11 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
             apb = a0 + b0
             if apb > 1.0
                 u = a0 + b0 - 1.0
-                t = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+                t = (1.0 + rgamma1pm1(u))/apb
             else
-                t = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+                t = 1.0 + rgamma1pm1(apb)
             end
-            ans = exp(z)*(a0/a)*(1.0 + SpecialFunctions.rgamma1pm1(b0))/t
+            ans = exp(z)*(a0/a)*(1.0 + rgamma1pm1(b0))/t
             if ans == 0.0 || a <= 0.1*epps
                 return ans
             end
@@ -511,11 +511,11 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
             apb = a + b
             if apb > 1.0
                 u = a + b - 1.0
-                z = (1.0 + SpecialFunctions.rgamma1pm1(u))/apb
+                z = (1.0 + rgamma1pm1(u))/apb
             else
-                z = 1.0 + SpecialFunctions.rgamma1pm1(apb)
+                z = 1.0 + rgamma1pm1(apb)
             end
-            c = (1.0 + SpecialFunctions.rgamma1pm1(a))*(1.0 + SpecialFunctions.rgamma1pm1(b))/z
+            c = (1.0 + rgamma1pm1(a))*(1.0 + rgamma1pm1(b))/z
             ans *= c*(b/apb)
             #label l70 start
             if ans == 0.0 || a <= 0.1*epps
@@ -542,7 +542,6 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
         w = c/(a+n)
         sm += w
     end
-    println("sries")
     return ans*(1.0 + a*sm)
 end
 
@@ -706,7 +705,6 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
             lambda = abs(lambda)
         end
         if b0 < 40.0 && b0*x0 <= 0.7
-            println("beta_inc_power_series")
             p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         elseif b0 < 40.0
@@ -716,42 +714,31 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
                     n-=1
                     b0=1.0
                 end
-                println("beta_inc_diff")
                 p = beta_inc_diff(b0,a0,y0,x0,n,epps)
                 if x0 <= 0.7
-                    println("beta_inc_power_series")
                     p += beta_inc_power_series(a0,b0,x0,epps)
                     q = 1.0 - p
-                    return ind ? (q, p) : (p, q)
+                else
+                    if a0 <= 15.0
+                        n = 20
+                        p += beta_inc_diff(a0, b0, x0, y0, n, epps)
+                        a0 += n
+                    end
+                    p = beta_inc_asymptotic_asymmetric(a0,b0,x0,y0,p,15.0*eps())
+                    q = 1.0 - p
                 end
-                println("beta_inc_diff")
-                if a0 <= 15.0
-                    n = 20
-                    p += beta_inc_diff(a0, b0, x0, y0, n, epps)
-                    a0 += n
-                end
-                println("beta_inc_asymptotic_asymmetric")
-                p = beta_inc_asymptotic_asymmetric(a0,b0,x0,y0,p,15.0*eps())
-                q = 1.0 - p
         elseif a0 > b0
             if b0 <= 100.0 || lambda > 0.03*b0
-                
-                println("beta_inc_cont_fraction")
                 p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,15.0*eps())
                 q = 1.0 - p
             else
-                println("beta_inc_asymptotic_symmetric")
-                #p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
                 p = beta_inc_asymptotic_symmetric(a0,b0,lambda,100.0*eps())
                 q = 1.0 - p
             end
         elseif a0 <= 100.0 || lambda > 0.03*a0
-            println("beta_inc_cont_fraction")
             p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,15.0*eps())
             q = 1.0 - p
         else
-            println("beta_inc_asymptotic_symmetric")
-            #p = beta_inc_cont_fraction(a0,b0,x0,y0,lambda,100.0*eps())
             p = beta_inc_asymptotic_symmetric(a0,b0,lambda,100.0*eps())
             q = 1.0 - p
         end
@@ -767,67 +754,52 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     end
 
     if b0 < min(epps, epps*a0)
-        println("fpser")
         p = fpser(a0,b0,x0,epps)
         q = 1.0 - p
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
-        println("apser")
         q = apser(a0,b0,x0,epps)
         p = 1.0 - q
     elseif max(a0,b0) > 1.0
         if b0 <= 1.0 
-            println("beta_inc_power_series")
             p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         elseif x0 >= 0.3
-            println("beta_inc_power_series")
             q = beta_inc_power_series(b0,a0,y0,epps)
             p = 1.0 - q
         elseif x0 >= 0.1
             if b0 > 15.0
-                println("beta_inc_asymptotic_asymmetric")
                 q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
                 p = 1.0 - q
             else
                 n = 20
-                println("beta_inc_diff")
                 q = beta_inc_diff(b0,a0,y0,x0,n,epps)
                 b0 += n
-                println("beta_inc_asymptotic_asymmetric")
                 q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
                 p = 1.0 - q
             end
         elseif (x0*b0)^(a0) <= 0.7
-            println("beta_inc_power_series")
             p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         else
             n = 20
-            println("beta_inc_diff")
             q = beta_inc_diff(b0,a0,y0,x0,n,epps)
             b0 += n
-            println("beta_inc_asymptotic_asymmetric")
             q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
             p = 1.0 - q
         end
     elseif a0 >= min(0.2, b0)
-        println("beta_inc_power_series")
         p = beta_inc_power_series(a0,b0,x0,epps)
         q = 1.0 - p
     elseif x0^a0 <= 0.9
-        println("beta_inc_power_series")
         p = beta_inc_power_series(a0,b0,x0,epps)
         q = 1.0 - p
     elseif x0 >= 0.3
-        println("beta_inc_power_series")
         q = beta_inc_power_series(b0,a0,y0,epps)
         p = 1.0 - q
     else
         n = 20
-        println("beta_inc_diff")
         q = beta_inc_diff(b0,a0,y0,x0,n,epps)
         b0 += n
-        println("beta_inc_asymptotic_asymmetric")
         q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
         p = 1.0 - q
     end
