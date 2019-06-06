@@ -393,6 +393,12 @@ end
 
 
 #For b < min(eps, eps*a) and x <= 0.5
+"""
+    beta_inc_power_series2(a,b,x,epps)
+
+Variant of BPSER(A,B,X,EPS).
+FPSER(A,B,X,EPS) from Didonato and Morris (1982)
+"""
 function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 1.0
     if a > 1.0e-3 * epps
@@ -423,7 +429,12 @@ function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float6
 end
 
 #A <= MIN(EPS,EPS*B), B*X <= 1, AND X <= 0.5.,  A is small
+"""
+    beta_inc_power_series1(a,b,x,epps)
 
+Another variant of BPSER(A,B,X,EPS)
+APSER(A,B,X,EPS) from Didonato and Morris (1982)
+"""
 function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)         
     g = Base.MathConstants.eulergamma
     bx = b*x
