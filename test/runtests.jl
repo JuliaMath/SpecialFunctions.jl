@@ -164,7 +164,7 @@ end
     end
     @test beta_inc(1.5,200.5,0.07,0.93)[1] ≈ 0.99999790408564
     @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
-    @test SpecialFunctions.bcorr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1) 
+    @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1) 
 end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.
