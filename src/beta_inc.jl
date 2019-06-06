@@ -40,12 +40,12 @@ function loggammadiv(a::Float64, b::Float64)
 end 
 
 """
-    bcorr(a0,b0)
+    stirling_corr(a0,b0)
 
 Compute stirling(a0) + stirling(b0) - stirling(a0 + b0) 
 for a0,b0 >= 8
 """
-function bcorr(a0::Float64, b0::Float64)
+function stirling_corr(a0::Float64, b0::Float64)
     a = min(a0,b0)
     b = max(a0,b0)
 
@@ -87,12 +87,11 @@ function esum(mu::Float64, x::Float64)
 end
 
 """
-    brcmp1(mu,a,b,x,y,case)
+    beta_integrand(a,b,x,y,mu=0.0)
 
-If case == 1: compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
-else : compute above with mu = 0.0
+Compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
 """
-function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bool)
+function beta_integrand(a::Float64,b::Float64,x::Float64,y::Float64,mu::Float64=0.0)
     a0, b0 = minmax(a,b)
     if a0 >= 8.0
         if a > b 
@@ -110,8 +109,8 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
         u = abs(e) > 0.6 ? u = e - log(x/x0) : - log1pmx(e)
         e = lambda/b
         v = abs(e) > 0.6 ? e - log(y/y0) : - log1pmx(e)
-        z = case ? esum(mu, -(a*u + b*v)) : exp(-(a*u+b*v))
-        return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-bcorr(a,b))
+        z = esum(mu, -(a*u + b*v))
+        return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-stirling_corr(a,b))
     elseif x > 0.375
         if y > 0.375
             lnx = log(x)
@@ -129,7 +128,7 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
         b0 = max(a,b)
         if b0 >= 8.0
             u = loggamma1p(a0) + loggammadiv(a0,b0)
-            return a0*(case ? esum(mu, z-u) : exp(z-u))
+            return a0*(esum(mu, z-u))
         elseif b0 > 1.0
             u = loggamma1p(a0)
             n = trunc(Int,b0 - 1.0)
@@ -150,23 +149,19 @@ function brcmp1(mu::Float64,a::Float64,b::Float64,x::Float64,y::Float64,case::Bo
             else
                 t = 1.0 + rgamma1pm1(apb)
             end
-            return a0*(case ? esum(mu,z) : exp(z))*(1.0 + rgamma1pm1(b0))/t
+            return a0*(esum(mu,z))*(1.0 + rgamma1pm1(b0))/t
         end
     else
         z -= logbeta(a,b)
-        ans = case ? esum(mu,z) : exp(z)
+        ans = esum(mu,z)
         return ans
     end
-
-   
-    
     if ans == 0.0
         return 0.0
     end
     apb = a + b
     if apb > 1.0
-        u = a + b - 1.0
-        z = (1.0 + rgamma1pm1(u))/apb
+        z = (1.0 + rgamma1pm1(apb - 1.0))/apb
     else
         z = 1.0 + rgamma1pm1(apb)
     end
@@ -183,7 +178,7 @@ DLMF : https://dlmf.nist.gov/8.17#E22
 BFRAC(A,B,X,Y,LAMBDA,EPS) from Didonato and Morris (1982)
 """
 function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
-    ans = brcmp1(0.0,a,b,x,y,false)
+    ans = beta_integrand(a,b,x,y)
     if ans == 0.0
         return 0.0
     end
@@ -324,7 +319,7 @@ function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, 
         end
     end
 
-    u = exp(-bcorr(a,b))
+    u = exp(-stirling_corr(a,b))
     return e0*t*u*sm
 end        
 
@@ -398,7 +393,7 @@ end
 
 
 #For b < min(eps, eps*a) and x <= 0.5
-function fpser(a::Float64, b::Float64, x::Float64, epps::Float64)
+function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 1.0
     if a > 1.0e-3 * epps
         ans = 0.0
@@ -429,7 +424,7 @@ end
 
 #A <= MIN(EPS,EPS*B), B*X <= 1, AND X <= 0.5.,  A is small
 
-function apser(a::Float64, b::Float64, x::Float64, epps::Float64)         
+function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)         
     g = Base.MathConstants.eulergamma
     bx = b*x
     t = x - bx
@@ -438,12 +433,9 @@ function apser(a::Float64, b::Float64, x::Float64, epps::Float64)
     else
         c = log(x) + digamma(b) + g + t
     end
-
-
     tol = 5.0*epps*abs(c)
     j = 1.0
     s = 0.0
-
     j += 1.0
     t *= (x - bx/j)
     aj = t/j
@@ -458,7 +450,15 @@ function apser(a::Float64, b::Float64, x::Float64, epps::Float64)
 end
 
 #B .LE. 1 OR B*X .LE. 0.7
+"""
+    beta_inc_power_series(a,b,x,epps)
 
+Computes Ix(a,b) using power series :
+```math
+I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j}) 
+```
+BPSER(A,B,X,EPS) from Didonato and Morris (1982)
+"""
 function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 0.0
     if x == 0.0
@@ -566,7 +566,7 @@ function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Intege
         d = exp(-t)
     end
 
-    ans = brcmp1(mu,a,b,x,y,true)/a
+    ans = beta_integrand(a,b,x,y,mu)/a
     if n == 1 || ans == 0.0
         return ans
     end
@@ -754,10 +754,10 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     end
 
     if b0 < min(epps, epps*a0)
-        p = fpser(a0,b0,x0,epps)
+        p = beta_inc_power_series2(a0,b0,x0,epps)
         q = 1.0 - p
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
-        q = apser(a0,b0,x0,epps)
+        q = beta_inc_power_series1(a0,b0,x0,epps)
         p = 1.0 - q
     elseif max(a0,b0) > 1.0
         if b0 <= 1.0 
