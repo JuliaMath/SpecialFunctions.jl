@@ -820,8 +820,8 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
 end
 
 beta_inc(a::Float64, b::Float64, x::Float64) = beta_inc(a, b, x, 1.0 - x)
-beta_inc(a::Float32, b::Float32, x::Float32, y::Float32) = (Float32(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[1]), Float32(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[2]))
-beta_inc(a::Float16, b::Float16, x::Float16, y::Float16) = (Float16(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[1]), Float16(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[2]))
-beta_inc(a::Real, b::Real, x::Real, y::Real) = beta_inc(float(a), float(b), float(x), float(y))
-beta_inc(a::Integer, b::Float64, x::Integer, y::Float64) = beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))
-beta_inc(a::AbstractFloat, b::AbstractFloat, x::AbstractFloat, y::AbstractFloat) = throw(MethodError(beta_inc,(a, b, x, y,"")))
+function beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
+    T.(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y)))
+end
+beta_inc(a::Real, b::Real, x::Real, y::Real) = beta_inc(promote(float(a), float(b), float(x), float(y))...)
+beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(beta_inc,(a, b, x, y,"")))
