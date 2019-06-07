@@ -663,7 +663,7 @@ I_{x}(a,b) = G(a,b) \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
 ```
 and ``I_{y}(a,b) = 1.0 - I_{x}(a,b)``.
 given
-``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)`` and y = 1.0 - x
+``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)`` and ``x+y = 1``.
 """
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     p = 0.0
@@ -819,8 +819,9 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     return ind ? (q, p) : (p, q)
 end
 
-beta_inc(a::Float32,b::Float32,x::Float32,y::Float32) = (Float32(beta_inc(Float64(a),Float64(b),Float64(x),Float64(y))[1]), Float32(beta_inc(Float64(a),Float64(b),Float64(x),Float64(y))[2]))
-beta_inc(a::Float16,b::Float16,x::Float16,y::Float16) = (Float16(beta_inc(Float64(a),Float64(b),Float64(x),Float64(y))[1]), Float16(beta_inc(Float64(a),Float64(b),Float64(x),Float64(y))[2]))
-beta_inc(a::Real,b::Real,x::Real,y::Real) = beta_inc(float(a),float(b),float(x),float(y))
-beta_inc(a::Integer,b::Float64,x::Integer,y::Float64) = beta_inc(Float64(a),Float64(b),Float64(x),Float64(y))
-beta_inc(a::AbstractFloat,b::AbstractFloat,x::AbstractFloat,y::AbstractFloat) = throw(MethodError(beta_inc,(a,b,x,y,"")))
+beta_inc(a::Float64, b::Float64, x::Float64) = beta_inc(a, b, x, 1.0 - x)
+beta_inc(a::Float32, b::Float32, x::Float32, y::Float32) = (Float32(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[1]), Float32(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[2]))
+beta_inc(a::Float16, b::Float16, x::Float16, y::Float16) = (Float16(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[1]), Float16(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))[2]))
+beta_inc(a::Real, b::Real, x::Real, y::Real) = beta_inc(float(a), float(b), float(x), float(y))
+beta_inc(a::Integer, b::Float64, x::Integer, y::Float64) = beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))
+beta_inc(a::AbstractFloat, b::AbstractFloat, x::AbstractFloat, y::AbstractFloat) = throw(MethodError(beta_inc,(a, b, x, y,"")))
