@@ -20,6 +20,7 @@ libraries.
 | [`trigamma(x)`](@ref SpecialFunctions.trigamma)     | [trigamma function](https://en.wikipedia.org/wiki/Trigamma_function) (i.e the logarithmic second derivative of `gamma` at `x`) |
 | [`polygamma(m,x)`](@ref SpecialFunctions.polygamma)  | [polygamma function](https://en.wikipedia.org/wiki/Polygamma_function) (i.e the (m+1)-th derivative of the `lgamma` function at `x`) |
 | [`gamma_inc(a,x,IND)`](@ref SpecialFunctions.gamma_inc)  | [incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates P(a,x) and Q(a,x)for accuracy specified by IND and returns tuple (p,q)) |
+| [`beta_inc(a,b,x,y)`](@ref SpecialFunctions.beta_inc)  | [incomplete beta function ratio Ix(a,b) and Iy(a,b)](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function) (i.e evaluates Ix(a,b) and Iy(a,b) and returns tuple (p,q)) |
 | [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)  | [inverse of incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates x given P(a,x)=p and Q(a,x)=q  |
 | [`ellipk(x)`](@ref SpecialFunctions.ellipk)    | [complete elliptic integral of 1st kind](https://en.wikipedia.org/wiki/Elliptic_integral) (i.e evaluates complete elliptic integral of 1st kind at `x`)  |
 | [`ellipe(x)`](@ref SpecialFunctions.ellipe)    | [complete elliptic integral of 2nd kind](https://en.wikipedia.org/wiki/Elliptic_integral) (i.e evaluates complete elliptic integral of 2nd kind at `x`)  |
