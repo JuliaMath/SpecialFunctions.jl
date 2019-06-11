@@ -825,3 +825,125 @@ function beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
 end
 beta_inc(a::Real, b::Real, x::Real, y::Real) = beta_inc(promote(float(a), float(b), float(x), float(y))...)
 beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(beta_inc,(a, b, x, y,"")))
+
+
+#find x ; given p, q, Ix(p,q) = alpha, beta = logabsbeta(p,q)[1]
+"""
+    beta_inc_inv(p,q,beta,alpha)
+
+Compute inverse of incomplete beta function.
+"""
+function beta_inc_inv(p::Float64, q::Float64, beta::Float64, alpha::Float64)
+    sae = -30.0
+    fpu = 10.0^sae
+    ans = alpha
+    if alpha == 0.0
+        return 0.0
+    elseif alpha == 1.0
+        return 1.0
+    end
+
+    #change tail if necessary
+
+    if alpha > 0.5
+        a = 1.0 - alpha
+        pp = q
+        qq = p
+        indx = true
+    else
+        a = alpha
+        pp = p
+        qq = q
+        indx = false
+    end
+
+    #Initial approx
+
+    r = sqrt(-log(a^2))
+    y = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
+
+    if p > 1.0 && q > 1.0
+        r = (y^2 - 3.0)/6.0
+        s = 1.0/(2*pp - 1.0)
+        t = 1.0/(2*qq - 1.0)
+        h = 2.0/(s+t)
+        w = y*sqrt(h+r)/h - (t-s)*(r + 5.0/6.0 - 2.0/(3.0*h))
+        ans = pp/ (pp+qq*exp(w^2))
+    else
+        r = 2.0*qq
+        t = 1.0/(9.0*qq)
+        t = r*(1.0-t+y*sqrt(t))^3
+        if t <= 0.0
+            ans = 1.0 - exp((log((1.0-a)*qq)+beta)/qq)
+        else
+            t = (4.0*pp+r-2.0)/t
+            if t <= 1.0
+                ans = exp((log(a*pp)+beta)/pp)
+            else
+                ans = 1.0 - 2.0/(t+1.0)
+            end
+        end
+    end
+
+    #solve x using modified newton-raphson iteration
+
+    r = 1.0 - pp
+    t = 1.0 - qq
+    yprev = 0.0
+    sq = 1.0
+    prev = 1.0
+
+    if ans < 0.0001
+        ans = 0.0001
+    end
+    if ans > .9999
+        ans = .9999
+    end
+
+    iex = max(-5.0/pp^2 - 1.0/a^0.2 - 13.0, sae)
+    acu = 10.0^iex
+
+    #iterate
+    @label l10
+     y = beta_inc(pp,qq,ans)[1]
+     xin = ans
+     y = (y-a)*exp(beta+r*log(xin)+t*log(1.0-xin))
+     if y*yprev <= 0.0
+        prev = max(sq, fpu)
+     end
+     g = 1.0
+
+    @label l20
+     adj = g*y
+     sq = adj^2
+     if prev <= sq
+        @goto l30
+     end
+     tx = ans - adj
+     if tx >= 0.0 && tx <= 1.0
+        @goto l40
+     end
+
+    @label l30
+     g /= 3.0
+     @goto l20
+
+    #check if current estimate is acceptable
+    @label l40
+     if prev <= acu || y^2 <= acu
+        ans = tx
+        return indx ? 1.0 - ans : ans
+     end
+
+     if tx == 0.0 || tx == 1.0
+        @goto l30
+     end
+
+     if tx == ans
+        return indx ? 1.0 - ans : ans
+     end
+
+     ans = tx
+     yprev = y
+     @goto l10
+end
