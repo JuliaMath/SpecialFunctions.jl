@@ -163,8 +163,8 @@ end
         ctr += 1 
     end
     @test beta_inc(1.5,200.5,0.07,0.93)[1] ≈ 0.99999790408564
-    #@test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
-    #@test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1) 
+    @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
+    @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1) 
 end
 @testset "inverse of incomplete beta" begin
     f(a,b,p) = beta_inc_inv(a,b,logbeta(a,b)[1],p)

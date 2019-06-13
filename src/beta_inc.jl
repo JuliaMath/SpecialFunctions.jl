@@ -826,43 +826,45 @@ end
 beta_inc(a::Real, b::Real, x::Real, y::Real) = beta_inc(promote(float(a), float(b), float(x), float(y))...)
 beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(beta_inc,(a, b, x, y,"")))
 
+#GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms AS 63: The Incomplete Beta Integral and AS 64: Inverse of the Incomplete Beta Integeral,
+#Applied Statistics,
+#Volume 26, Number 1, 1977, pages 111-114. 
 
-#find x ; given p, q, Ix(p,q) = alpha, beta = logabsbeta(p,q)[1]
 """
-    beta_inc_inv(p,q,beta,alpha)
+    beta_inc_inv(a,b,beta,p)
 
-Compute inverse of incomplete beta function.
+Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x`; also beta = logbeta(a,b)[1]
 """
-function beta_inc_inv(p::Float64, q::Float64, beta::Float64, alpha::Float64)
+function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
     sae = -30.0
     fpu = 10.0^sae
-    ans = alpha
-    if alpha == 0.0
+    ans = p
+    if p == 0.0
         return 0.0
-    elseif alpha == 1.0
+    elseif p == 1.0
         return 1.0
     end
 
     #change tail if necessary
 
-    if alpha > 0.5
-        a = 1.0 - alpha
-        pp = q
-        qq = p
+    if p > 0.5
+        aa = 1.0 - p
+        pp = b
+        qq = a
         indx = true
     else
-        a = alpha
-        pp = p
-        qq = q
+        aa = p
+        pp = a
+        qq = b
         indx = false
     end
 
     #Initial approx
 
-    r = sqrt(-log(a^2))
+    r = sqrt(-log(aa^2))
     y = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
 
-    if p > 1.0 && q > 1.0
+    if a > 1.0 && b > 1.0
         r = (y^2 - 3.0)/6.0
         s = 1.0/(2*pp - 1.0)
         t = 1.0/(2*qq - 1.0)
@@ -874,11 +876,11 @@ function beta_inc_inv(p::Float64, q::Float64, beta::Float64, alpha::Float64)
         t = 1.0/(9.0*qq)
         t = r*(1.0-t+y*sqrt(t))^3
         if t <= 0.0
-            ans = 1.0 - exp((log((1.0-a)*qq)+beta)/qq)
+            ans = 1.0 - exp((log((1.0-aa)*qq)+beta)/qq)
         else
             t = (4.0*pp+r-2.0)/t
             if t <= 1.0
-                ans = exp((log(a*pp)+beta)/pp)
+                ans = exp((log(aa*pp)+beta)/pp)
             else
                 ans = 1.0 - 2.0/(t+1.0)
             end
@@ -900,50 +902,42 @@ function beta_inc_inv(p::Float64, q::Float64, beta::Float64, alpha::Float64)
         ans = .9999
     end
 
-    iex = max(-5.0/pp^2 - 1.0/a^0.2 - 13.0, sae)
+    iex = max(-5.0/pp^2 - 1.0/aa^0.2 - 13.0, sae)
     acu = 10.0^iex
 
     #iterate
-    @label l10
-     y = beta_inc(pp,qq,ans)[1]
-     xin = ans
-     y = (y-a)*exp(beta+r*log(xin)+t*log(1.0-xin))
-     if y*yprev <= 0.0
-        prev = max(sq, fpu)
-     end
-     g = 1.0
+    while true
+        y = beta_inc(pp,qq,ans)[1]
+        xin = ans
+        y = (y-aa)*exp(beta+r*log(xin)+t*log(1.0-xin))
+        if y*yprev <= 0.0
+            prev = max(sq, fpu)
+        end
+        g = 1.0
 
-    @label l20
-     adj = g*y
-     sq = adj^2
-     if prev <= sq
-        @goto l30
-     end
-     tx = ans - adj
-     if tx >= 0.0 && tx <= 1.0
-        @goto l40
-     end
+        tx = ans - g*y
+        while true
+            adj = g*y
+            sq = adj^2
+            tx = ans - adj
+            if (prev > sq && tx >= 0.0 && tx <= 1.0)
+                break
+            end
+            g /= 3.0
+        end
 
-    @label l30
-     g /= 3.0
-     @goto l20
+        #check if current estimate is acceptable
+    
+        if prev <= acu || y^2 <= acu
+            ans = tx
+            return indx ? 1.0 - ans : ans
+        end
 
-    #check if current estimate is acceptable
-    @label l40
-     if prev <= acu || y^2 <= acu
+        if tx == ans
+            return indx ? 1.0 - ans : ans
+        end
+
         ans = tx
-        return indx ? 1.0 - ans : ans
-     end
-
-     if tx == 0.0 || tx == 1.0
-        @goto l30
-     end
-
-     if tx == ans
-        return indx ? 1.0 - ans : ans
-     end
-
-     ans = tx
-     yprev = y
-     @goto l10
+        yprev = y
+    end
 end
