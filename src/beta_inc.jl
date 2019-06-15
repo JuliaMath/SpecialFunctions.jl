@@ -836,8 +836,7 @@ beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(be
 Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x`; also beta = logbeta(a,b)[1]
 """
 function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
-    sae = -30.0
-    fpu = 10.0^sae
+    fpu = 1e-30
     ans = p
     if p == 0.0
         return 0.0
@@ -902,7 +901,7 @@ function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
         ans = .9999
     end
 
-    iex = max(-5.0/pp^2 - 1.0/aa^0.2 - 13.0, sae)
+    iex = max(-5.0/pp^2 - 1.0/aa^0.2 - 13.0, -30.0)
     acu = 10.0^iex
 
     #iterate
