@@ -6,7 +6,8 @@ makedocs(
     authors     = "Jeff Bezanson, Stefan Karpinski, Viral B. Shah, et al.",
     pages       = [
         "Home"      => "index.md",
-        "Functions" => "special.md",
+        "Overview"  => "functions_overview.md",
+        "List"      => "functions_list.md",
     ],
 )
 
