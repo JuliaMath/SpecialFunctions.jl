@@ -167,7 +167,7 @@ end
     @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1) 
 end
 @testset "inverse of incomplete beta" begin
-    f(a,b,p) = beta_inc_inv(a,b,logbeta(a,b)[1],p)
+    f(a,b,p) = beta_inc_inv(a,b,p)
     @test f(.5,.5,0.6376856085851985E-01) ≈ 0.01
     @test f(.5,.5,0.20483276469913355) ≈ 0.1
     @test f(.5,.5,1.0000) ≈ 1.0000

@@ -831,11 +831,11 @@ beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(be
 #Volume 26, Number 1, 1977, pages 111-114. 
 
 """
-    beta_inc_inv(a,b,beta,p)
+    beta_inc_inv(a,b,p,q,lb=logbeta(a,b)[1])
 
-Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x`; also beta = logbeta(a,b)[1]
+Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x`.
 """
-function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
+function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbeta(a,b)[1])
     fpu = 1e-30
     ans = p
     if p == 0.0
@@ -847,7 +847,7 @@ function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
     #change tail if necessary
 
     if p > 0.5
-        aa = 1.0 - p
+        aa = q
         pp = b
         qq = a
         indx = true
@@ -875,11 +875,11 @@ function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
         t = 1.0/(9.0*qq)
         t = r*(1.0-t+y*sqrt(t))^3
         if t <= 0.0
-            ans = 1.0 - exp((log((1.0-aa)*qq)+beta)/qq)
+            ans = 1.0 - exp((log((1.0-aa)*qq)+lb)/qq)
         else
             t = (4.0*pp+r-2.0)/t
             if t <= 1.0
-                ans = exp((log(aa*pp)+beta)/pp)
+                ans = exp((log(aa*pp)+lb)/pp)
             else
                 ans = 1.0 - 2.0/(t+1.0)
             end
@@ -908,7 +908,7 @@ function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
     while true
         y = beta_inc(pp,qq,ans)[1]
         xin = ans
-        y = (y-aa)*exp(beta+r*log(xin)+t*log(1.0-xin))
+        y = (y-aa)*exp(lb+r*log(xin)+t*log(1.0-xin))
         if y*yprev <= 0.0
             prev = max(sq, fpu)
         end
@@ -940,3 +940,5 @@ function beta_inc_inv(a::Float64, b::Float64, beta::Float64, p::Float64)
         yprev = y
     end
 end
+
+beta_inc_inv(a::Float64, b::Float64, p::Float64) = beta_inc_inv(a, b, p, 1.0-p)
