@@ -837,7 +837,7 @@ Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p
 """
 function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbeta(a,b)[1])
     fpu = 1e-30
-    ans = p
+    x = p
     if p == 0.0
         return 0.0
     elseif p == 1.0
@@ -869,19 +869,19 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
         t = 1.0/(2*qq - 1.0)
         h = 2.0/(s+t)
         w = y*sqrt(h+r)/h - (t-s)*(r + 5.0/6.0 - 2.0/(3.0*h))
-        ans = pp/ (pp+qq*exp(w^2))
+        x = pp/ (pp+qq*exp(w^2))
     else
         r = 2.0*qq
         t = 1.0/(9.0*qq)
         t = r*(1.0-t+y*sqrt(t))^3
         if t <= 0.0
-            ans = 1.0 - exp((log((1.0-aa)*qq)+lb)/qq)
+            x = -expm1((log((1.0-aa)*qq)+lb)/qq)
         else
             t = (4.0*pp+r-2.0)/t
             if t <= 1.0
-                ans = exp((log(aa*pp)+lb)/pp)
+                x = exp((log(aa*pp)+lb)/pp)
             else
-                ans = 1.0 - 2.0/(t+1.0)
+                x = 1.0 - 2.0/(t+1.0)
             end
         end
     end
@@ -894,11 +894,11 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
     sq = 1.0
     prev = 1.0
 
-    if ans < 0.0001
-        ans = 0.0001
+    if x < 0.0001
+        x = 0.0001
     end
-    if ans > .9999
-        ans = .9999
+    if x > .9999
+        x = .9999
     end
 
     iex = max(-5.0/pp^2 - 1.0/aa^0.2 - 13.0, -30.0)
@@ -906,19 +906,19 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
 
     #iterate
     while true
-        y = beta_inc(pp,qq,ans)[1]
-        xin = ans
+        y = beta_inc(pp,qq,x)[1]
+        xin = x
         y = (y-aa)*exp(lb+r*log(xin)+t*log(1.0-xin))
         if y*yprev <= 0.0
             prev = max(sq, fpu)
         end
         g = 1.0
 
-        tx = ans - g*y
+        tx = x - g*y
         while true
             adj = g*y
             sq = adj^2
-            tx = ans - adj
+            tx = x - adj
             if (prev > sq && tx >= 0.0 && tx <= 1.0)
                 break
             end
@@ -928,15 +928,15 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
         #check if current estimate is acceptable
     
         if prev <= acu || y^2 <= acu
-            ans = tx
-            return indx ? 1.0 - ans : ans
+            x = tx
+            return indx ? 1.0 - x : x
         end
 
-        if tx == ans
-            return indx ? 1.0 - ans : ans
+        if tx == x
+            return indx ? 1.0 - x : x
         end
 
-        ans = tx
+        x = tx
         yprev = y
     end
 end
