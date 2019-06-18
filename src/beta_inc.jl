@@ -833,15 +833,15 @@ beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(be
 """
     beta_inc_inv(a,b,p,q,lb=logbeta(a,b)[1])
 
-Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x`.
+Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x` and return tuple (x,y).
 """
 function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbeta(a,b)[1])
     fpu = 1e-30
     x = p
     if p == 0.0
-        return 0.0
+        return (0.0, 1.0)
     elseif p == 1.0
-        return 1.0
+        return (1.0, 0.0)
     end
 
     #change tail if necessary
@@ -929,11 +929,11 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
     
         if prev <= acu || y^2 <= acu
             x = tx
-            return indx ? 1.0 - x : x
+            return indx ? (1.0 - x, x) : (x, 1.0-x)
         end
 
         if tx == x
-            return indx ? 1.0 - x : x
+            return indx ? (1.0 - x, x) : (x, 1.0-x)
         end
 
         x = tx
