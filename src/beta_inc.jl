@@ -847,39 +847,39 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
     #change tail if necessary
 
     if p > 0.5
-        aa = q
-        pp = b
-        qq = a
+        pp = q 
+        aa = b
+        bb = a
         indx = true
     else
-        aa = p
-        pp = a
-        qq = b
+        pp = p
+        aa = a
+        bb = b
         indx = false
     end
 
     #Initial approx
 
-    r = sqrt(-log(aa^2))
-    y = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
+    r = sqrt(-log(pp^2))
+    pp_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
 
     if a > 1.0 && b > 1.0
-        r = (y^2 - 3.0)/6.0
-        s = 1.0/(2*pp - 1.0)
-        t = 1.0/(2*qq - 1.0)
+        r = (pp_approx^2 - 3.0)/6.0
+        s = 1.0/(2*aa - 1.0)
+        t = 1.0/(2*bb - 1.0)
         h = 2.0/(s+t)
-        w = y*sqrt(h+r)/h - (t-s)*(r + 5.0/6.0 - 2.0/(3.0*h))
-        x = pp/ (pp+qq*exp(w^2))
+        w = pp_approx*sqrt(h+r)/h - (t-s)*(r + 5.0/6.0 - 2.0/(3.0*h))
+        x = aa/ (aa+bb*exp(w^2))
     else
-        r = 2.0*qq
-        t = 1.0/(9.0*qq)
-        t = r*(1.0-t+y*sqrt(t))^3
+        r = 2.0*bb
+        t = 1.0/(9.0*bb)
+        t = r*(1.0-t+pp_approx*sqrt(t))^3
         if t <= 0.0
-            x = -expm1((log((1.0-aa)*qq)+lb)/qq)
+            x = -expm1((log((1.0-pp)*bb)+lb)/bb)
         else
-            t = (4.0*pp+r-2.0)/t
+            t = (4.0*aa+r-2.0)/t
             if t <= 1.0
-                x = exp((log(aa*pp)+lb)/pp)
+                x = exp((log(pp*aa)+lb)/aa)
             else
                 x = 1.0 - 2.0/(t+1.0)
             end
@@ -888,9 +888,9 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
 
     #solve x using modified newton-raphson iteration
 
-    r = 1.0 - pp
-    t = 1.0 - qq
-    yprev = 0.0
+    r = 1.0 - aa
+    t = 1.0 - bb
+    pp_approx_prev = 0.0
     sq = 1.0
     prev = 1.0
 
@@ -901,22 +901,22 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
         x = .9999
     end
 
-    iex = max(-5.0/pp^2 - 1.0/aa^0.2 - 13.0, -30.0)
+    iex = max(-5.0/aa^2 - 1.0/pp^0.2 - 13.0, -30.0)
     acu = 10.0^iex
 
     #iterate
     while true
-        y = beta_inc(pp,qq,x)[1]
+        pp_approx = beta_inc(aa,bb,x)[1]
         xin = x
-        y = (y-aa)*exp(lb+r*log(xin)+t*log(1.0-xin))
-        if y*yprev <= 0.0
+        pp_approx = (pp_approx-pp)*exp(lb+r*log(xin)+t*log1p(-xin))
+        if pp_approx * pp_approx_prev <= 0.0
             prev = max(sq, fpu)
         end
         g = 1.0
 
-        tx = x - g*y
+        tx = x - g*pp_approx
         while true
-            adj = g*y
+            adj = g*pp_approx
             sq = adj^2
             tx = x - adj
             if (prev > sq && tx >= 0.0 && tx <= 1.0)
@@ -927,7 +927,7 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
 
         #check if current estimate is acceptable
     
-        if prev <= acu || y^2 <= acu
+        if prev <= acu || pp_approx^2 <= acu
             x = tx
             return indx ? (1.0 - x, x) : (x, 1.0-x)
         end
@@ -937,7 +937,7 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
         end
 
         x = tx
-        yprev = y
+        pp_approx_prev = pp_approx
     end
 end
 
