@@ -1,4 +1,29 @@
 # Functions
+Here the *Special Functions* are listed according to the structure of [NIST Digital Library of Mathematical Functions](https://dlmf.nist.gov/).
+
+## Error Functions, Dawson’s and Fresnel Integrals
+
+### Error Function
+The *error function* is implemented via [`erf(x)`](@ref SpecialFunctions.erf).
+
+Definition: ``\mathrm{erf}(x) = \frac{2}{\pi} \int_0^x \exp(-t^2) \; dt``.
+Domain: ``x \in \mathbb{C}``.
+
+Implementation notes: The function is evaluated by calling the C library [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.E1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+### Complementary Error Function
+The *complementary error function* is implemented via [`erfc(x)`](@ref SpecialFunctions.erfc).
+
+Definition: ``\mathrm{erfc}(x) = \frac{2}{\pi} \int_x^\infty \exp(-t^2) \; dt``.
+Domain: ``x \in \mathbb{C}``.
+
+Implementation notes: The function is evaluated by calling the C library [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.E2), [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
+
+
 
 | Function                                                      | Description                                                                                                                                                     |
 |:------------------------------------------------------------- |:--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
