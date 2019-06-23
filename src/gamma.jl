@@ -792,13 +792,6 @@ function beta(x::Number, w::Number)
             end
         end
     end
-    if abs(x) < abs(w)
-        x,w = w,x
-    end
-
-    if abs(x) > 1e4*abs(w) && abs(x) > 1e4
-        return beta_asymp(x,w)
-    end
     yx = loggamma(x)
     yw = loggamma(w)
     yxw = loggamma(x+w)
