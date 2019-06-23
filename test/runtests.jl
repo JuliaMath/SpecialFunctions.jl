@@ -802,6 +802,7 @@ end
     @test beta(3,5) ≈ 1/105
     @test logbeta(5,4) ≈ log(beta(5,4))
     @test beta(5,4) ≈ beta(4,5)
+    @test beta(-2.0,2.0) ≈ 0.5
     @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈ -16/3
     @test logabsbeta(-1/2, 3)[1] ≈ log(16/3)
     @test beta(Float32(5),Float32(4)) == beta(Float32(4),Float32(5))

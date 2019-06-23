@@ -712,6 +712,28 @@ loggamma(z::Complex{T}) where {T<:Union{Float32,Float16}} = Complex{T}(loggamma(
 
 gamma(z::Complex) = exp(loggamma(z))
 
+#Special case for negative integer argument
+function beta_neg(a::Integer, b::Float64)
+    if b == trunc(Int,b) && 1-a-b > 0
+        sgn = ((trunc(Int,b))%2 == 0) ? 1 : -1
+        return sgn* beta(1-a-b,b)
+    else
+        return error("overflow")
+    end
+end
+
+#asymptotic expansion for log(B(a,b)) for |a| >> |b|
+function beta_asymp(a::Float64, b::Float64)
+    r, sgn = loggamma(b)
+
+    r-= b*log(a)
+    r+= b*(1-b)/(2*a)
+    r+= b*(1-b)*(1-2*b)/(12*a^2)
+    r+= -b^2*(1-b)^2/(12*a^3)
+
+    return sgn*exp(r)
+end
+
 """
     beta(x, y)
 
@@ -720,6 +742,31 @@ Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)
 function beta end
 
 function beta(x::Real, w::Real)
+    if x <= 0.0
+        if x == floor(x)
+            if x == trunc(Int,x)
+                return beta_neg(trunc(Int,x), w)
+            else
+                return error("overflow")
+            end
+        end
+    end
+    if w <= 0.0
+        if w == floor(w)
+            if w == trunc(Int,w)
+                return beta_neg(trunc(Int,w), x)
+            else
+                return error("overflow")
+            end
+        end
+    end
+    if abs(x) < abs(w)
+        x,w = w,x
+    end
+
+    if abs(x) > 1e5*abs(w) && abs(x) > 1e5
+        return beta_asymp(x,w)
+    end
     yx, sx = logabsgamma(x)
     yw, sw = logabsgamma(w)
     yxw, sxw = logabsgamma(x+w)
@@ -727,6 +774,31 @@ function beta(x::Real, w::Real)
 end
 
 function beta(x::Number, w::Number)
+    if x <= 0.0
+        if x == floor(x)
+            if x == trunc(Int,x)
+                return beta_neg(trunc(Int,x), w)
+            else
+                return error("overflow")
+            end
+        end
+    end
+    if w <= 0.0
+        if w == floor(w)
+            if w == trunc(Int,w)
+                return beta_neg(trunc(Int,w), x)
+            else
+                return error("overflow")
+            end
+        end
+    end
+    if abs(x) < abs(w)
+        x,w = w,x
+    end
+
+    if abs(x) > 1e4*abs(w) && abs(x) > 1e4
+        return beta_asymp(x,w)
+    end
     yx = loggamma(x)
     yw = loggamma(w)
     yxw = loggamma(x+w)
