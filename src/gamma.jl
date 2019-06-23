@@ -774,24 +774,6 @@ function beta(x::Real, w::Real)
 end
 
 function beta(x::Number, w::Number)
-    if x <= 0.0
-        if x == floor(x)
-            if x == trunc(Int,x)
-                return beta_neg(trunc(Int,x), w)
-            else
-                return error("overflow")
-            end
-        end
-    end
-    if w <= 0.0
-        if w == floor(w)
-            if w == trunc(Int,w)
-                return beta_neg(trunc(Int,w), x)
-            else
-                return error("overflow")
-            end
-        end
-    end
     yx = loggamma(x)
     yw = loggamma(w)
     yxw = loggamma(x+w)
