@@ -712,28 +712,6 @@ loggamma(z::Complex{T}) where {T<:Union{Float32,Float16}} = Complex{T}(loggamma(
 
 gamma(z::Complex) = exp(loggamma(z))
 
-#Special case for negative integer argument
-function beta_neg(a::Integer, b::Float64)
-    if b == trunc(Int,b) && 1-a-b > 0
-        sgn = ((trunc(Int,b))%2 == 0) ? 1 : -1
-        return sgn* beta(1-a-b,b)
-    else
-        return error("overflow")
-    end
-end
-
-#asymptotic expansion for log(B(a,b)) for |a| >> |b|
-function beta_asymp(a::Float64, b::Float64)
-    r, sgn = loggamma(b)
-
-    r-= b*log(a)
-    r+= b*(1-b)/(2*a)
-    r+= b*(1-b)*(1-2*b)/(12*a^2)
-    r+= -b^2*(1-b)^2/(12*a^3)
-
-    return sgn*exp(r)
-end
-
 """
     beta(x, y)
 
@@ -741,43 +719,61 @@ Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)
 """
 function beta end
 
-function beta(x::Real, w::Real)
-    if x <= 0.0
-        if x == floor(x)
-            if x == trunc(Int,x)
-                return beta_neg(trunc(Int,x), w)
+function beta(a::Real, b::Real)
+    #Special case for negative integer argument
+    if a <= 0.0
+        if a == floor(a)
+            if isinteger(a)
+                if isinteger(b) && 1-a-b > 0
+                    sgn = (isinteger(b/2)) ? 1 : -1
+                    return sgn* beta(1-a-b,b)
+                else
+                    return NaN
+                end
             else
-                return error("overflow")
+                return NaN
             end
         end
     end
-    if w <= 0.0
-        if w == floor(w)
-            if w == trunc(Int,w)
-                return beta_neg(trunc(Int,w), x)
+    if b <= 0.0
+        if b == floor(b)
+            if isinteger(b)
+                if isinteger(b) && 1-a-b > 0
+                    sgn = (isinteger(b/2)) ? 1 : -1
+                    return sgn* beta(1-a-b,b)
+                else
+                    return NaN
+                end
             else
-                return error("overflow")
+                return NaN
             end
         end
     end
-    if abs(x) < abs(w)
-        x,w = w,x
+    if abs(a) < abs(b)
+        a,b = b,a
     end
+    #asymptotic expansion for log(B(a,b)) for |a| >> |b|
+    if abs(a) > 1e5*abs(b) && abs(a) > 1e5
+        r, sgn = logabsgamma(b)
 
-    if abs(x) > 1e5*abs(w) && abs(x) > 1e5
-        return beta_asymp(x,w)
+        r-= b*log(a)
+        r+= b*(1-b)/(2*a)
+        r+= b*(1-b)*(1-2*b)/(12*a^2)
+        r+= -b^2*(1-b)^2/(12*a^3)
+
+        return sgn*exp(r)
     end
-    yx, sx = logabsgamma(x)
-    yw, sw = logabsgamma(w)
-    yxw, sxw = logabsgamma(x+w)
-    return exp(yx + yw - yxw) * (sx*sw*sxw)
+    ya, sa = logabsgamma(a)
+    yb, sb = logabsgamma(b)
+    yab, sab = logabsgamma(a+b)
+    return exp(ya + yb - yab) * (sa*sb*sab)
 end
 
-function beta(x::Number, w::Number)
-    yx = loggamma(x)
-    yw = loggamma(w)
-    yxw = loggamma(x+w)
-    return exp(yx + yw - yxw)
+function beta(a::Number, b::Number)
+    ya = loggamma(a)
+    yb = loggamma(b)
+    yab = loggamma(a+b)
+    return exp(ya + yb - yab)
 end
 
 """
