@@ -722,38 +722,29 @@ function beta end
 function beta(a::Real, b::Real)
     #Special case for negative integer argument
     if a <= 0.0
-        if a == floor(a)
-            if isinteger(a)
-                if isinteger(b) && 1-a-b > 0
-                    sgn = (isinteger(b/2)) ? 1 : -1
-                    return sgn* beta(1-a-b,b)
-                else
-                    return NaN
-                end
-            else
-                return NaN
-            end
+        if isinteger(a) && isinteger(b) && 1-a-b > 0
+            sgn = isinteger(b/2) ? 1 : -1
+            return sgn* beta(1-a-b,b)
+        else
+            return NaN
         end
     end
     if b <= 0.0
-        if b == floor(b)
-            if isinteger(b)
-                if isinteger(b) && 1-a-b > 0
-                    sgn = (isinteger(b/2)) ? 1 : -1
-                    return sgn* beta(1-a-b,b)
-                else
-                    return NaN
-                end
-            else
-                return NaN
-            end
+        if isinteger(a) && isinteger(b) && 1-a-b > 0
+            sgn = isinteger(a/2) ? 1 : -1
+            return sgn* beta(1-a-b,a)
+        else
+            return NaN
         end
     end
-    if abs(a) < abs(b)
+    if a < b
         a,b = b,a
     end
     #asymptotic expansion for log(B(a,b)) for |a| >> |b|
     if abs(a) > 1e5*abs(b) && abs(a) > 1e5
+        if a > 8
+            return exp(loggammadiv(b,a) + loggamma(b))
+        end
         r, sgn = logabsgamma(b)
 
         r-= b*log(a)
