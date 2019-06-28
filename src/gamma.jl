@@ -722,19 +722,15 @@ function beta end
 function beta(a::Real, b::Real)
     #Special case for negative integer argument
     if a <= 0.0
-        if isinteger(a) && isinteger(b) && 1-a-b > 0
+        if isinteger(a) && 1-a-b > 0
             sgn = isinteger(b/2) ? 1 : -1
             return sgn* beta(1-a-b,b)
-        else
-            return NaN
         end
     end
     if b <= 0.0
-        if isinteger(a) && isinteger(b) && 1-a-b > 0
+        if isinteger(b) && 1-a-b > 0
             sgn = isinteger(a/2) ? 1 : -1
             return sgn* beta(1-a-b,a)
-        else
-            return NaN
         end
     end
     if a < b
