@@ -738,17 +738,7 @@ function beta(a::Real, b::Real)
     end
     #asymptotic expansion for log(B(a,b)) for |a| >> |b|
     if abs(a) > 1e5*abs(b) && abs(a) > 1e5
-        if a > 8
-            return exp(loggammadiv(b,a) + loggamma(b))
-        end
-        r, sgn = logabsgamma(b)
-
-        r-= b*log(a)
-        r+= b*(1-b)/(2*a)
-        r+= b*(1-b)*(1-2*b)/(12*a^2)
-        r+= -b^2*(1-b)^2/(12*a^3)
-
-        return sgn*exp(r)
+        return exp(loggammadiv(b,a) + loggamma(b))
     end
     ya, sa = logabsgamma(a)
     yb, sb = logabsgamma(b)
