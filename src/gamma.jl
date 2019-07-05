@@ -760,7 +760,7 @@ Natural logarithm of the [`beta`](@ref) function ``\\log(|\\operatorname{B}(x,y)
 
 See also [`logabsbeta`](@ref).
 """
-logbeta(x::Number, w::Number) = loggamma(x)+loggamma(w)-loggamma(x+w)
+logbeta(a::Number, b::Number) = loggamma(a)+loggamma(b)-loggamma(a+b)
 
 """
     logabsbeta(x, y)
@@ -769,11 +769,30 @@ Compute the natural logarithm of the absolute value of the [`beta`](@ref) functi
 
 See also [`logbeta`](@ref).
 """
-function logabsbeta(x::Real, w::Real)
-    yx, sx = logabsgamma(x)
-    yw, sw = logabsgamma(w)
-    yxw, sxw = logabsgamma(x+w)
-    (yx + yw - yxw), (sx*sw*sxw)
+function logabsbeta(a::Real, b::Real)
+    if a <= 0.0
+        if isinteger(a) && 1-a-b > 0
+            sgn = isinteger(b/2) ? 1 : -1
+            return sgn* logabsbeta(1-a-b,b)
+        end
+    end
+    if b <= 0.0
+        if isinteger(b) && 1-a-b > 0
+            sgn = isinteger(a/2) ? 1 : -1
+            return sgn* logabsbeta(1-a-b,a)
+        end
+    end
+    if a < b
+        a,b = b,a
+    end
+    #asymptotic expansion for log(B(a,b)) for |a| >> |b|
+    if abs(a) > 1e5*abs(b) && abs(a) > 1e5
+        return loggammadiv(b,a) + loggamma(b)
+    end
+    ya, sa = logabsgamma(a)
+    yb, sb = logabsgamma(b)
+    yab, sab = logabsgamma(a+b)
+    (ya + yb - yab), (sa*sb*sab)
 end
 ## from base/mpfr.jl
 
