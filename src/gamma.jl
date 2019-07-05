@@ -773,13 +773,13 @@ function logabsbeta(a::Real, b::Real)
     if a <= 0.0
         if isinteger(a) && 1-a-b > 0
             sgn = isinteger(b/2) ? 1 : -1
-            return sgn* logabsbeta(1-a-b,b)
+            return logabsbeta(1-a-b,b), sgn
         end
     end
     if b <= 0.0
         if isinteger(b) && 1-a-b > 0
             sgn = isinteger(a/2) ? 1 : -1
-            return sgn* logabsbeta(1-a-b,a)
+            return logabsbeta(1-a-b,a), sgn
         end
     end
     if a < b
@@ -787,7 +787,7 @@ function logabsbeta(a::Real, b::Real)
     end
     #asymptotic expansion for log(B(a,b)) for |a| >> |b|
     if abs(a) > 1e5*abs(b) && abs(a) > 1e5
-        return loggammadiv(b,a) + loggamma(b)
+        return (loggammadiv(b,a) + loggamma(b)), 1
     end
     ya, sa = logabsgamma(a)
     yb, sb = logabsgamma(b)
