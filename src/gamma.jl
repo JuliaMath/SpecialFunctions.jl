@@ -773,13 +773,13 @@ function logabsbeta(a::Real, b::Real)
     if a <= 0.0
         if isinteger(a) && 1-a-b > 0
             sgn = isinteger(b/2) ? 1 : -1
-            return logabsbeta(1-a-b,b), sgn
+            return logabsbeta(1-a-b,b)
         end
     end
     if b <= 0.0
         if isinteger(b) && 1-a-b > 0
             sgn = isinteger(a/2) ? 1 : -1
-            return logabsbeta(1-a-b,a), sgn
+            return logabsbeta(1-a-b,a)
         end
     end
     if a < b
