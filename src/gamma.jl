@@ -551,7 +551,7 @@ function polygamma(m::Integer, z::Number)
     polygamma(m, x)
 end
 
-export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
+export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial, multgam
 
 ## from base/special/gamma.jl
 
@@ -882,3 +882,14 @@ function logabsbinomial(n::T, k::T) where {T<:Integer}
     end
 end
 logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)
+
+"""
+    multgam(a::Float64, p::Int)
+
+Is the multivariate gamma function [https://en.wikipedia.org/wiki/Multivariate_gamma_function](https://en.wikipedia.org/wiki/Multivariate_gamma_function)
+Returns Γ_p(a). a is a Float64 and p is a positive Int. 
+"""
+function multgam(a::Real, p::Int)
+	p > 0 || throw(DomainError(p, "p should be positive."))
+	return π^(0.5*p*(p-1))*prod(gamma(a+0.5*(1.0-j)) for j in 1:p)
+end
