@@ -884,10 +884,10 @@ end
 logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)
 
 """
-    multgam(a::Float64, p::Int)
+    multgam(a::Real, p::Int)
 
-Is the multivariate gamma function [https://en.wikipedia.org/wiki/Multivariate_gamma_function](https://en.wikipedia.org/wiki/Multivariate_gamma_function)
-Returns Γ_p(a). a is a Float64 and p is a positive Int. 
+Is the multivariate gamma function (https://en.wikipedia.org/wiki/Multivariate_gamma_function)
+Returns Γ_p(a). a is a real number and p is a positive Int. 
 """
 function multgam(a::Real, p::Int)
 	p > 0 || throw(DomainError(p, "p should be positive."))
