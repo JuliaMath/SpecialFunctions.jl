@@ -214,6 +214,32 @@ end
     @test f(1.30625000,11.75620000,0.21053116418502513) ≈ 0.033557
     @test f(1.30625000,11.75620000,0.18241165418408148) ≈ 0.029522
 end
+@testset "noncentral beta cdf" begin
+    @test ncbeta(Float32(5.0),Float32(5.0),Float32(54.0),Float32(0.8640)) ≈ Float32(0.456302)
+    @test ncbeta(Float32(5.0),Float32(5.0),Float32(140.0),Float32(0.90)) ≈ Float32(0.104134)
+    @test ncbeta(Float32(5.0),Float32(5.0),Float32(170.0),Float32(0.9560)) ≈ Float32(0.602235)
+    @test ncbeta(Float32(10.0),Float32(10.0),Float32(140.0),Float32(0.90)) ≈ Float32(0.600811)
+    @test ncbeta(Float32(10.0),Float32(10.0),Float32(250.0),Float32(0.9)) ≈ Float32(0.902850E-01)
+    @test ncbeta(Float32(20.0),Float32(20.0),Float32(54.0),Float32(0.8787)) ≈ Float32(0.999865)
+    @test ncbeta(Float32(20.0),Float32(20.0),Float32(140.0),Float32(0.9)) ≈ Float32(0.992600)
+    @test ncbeta(Float32(20.0),Float32(20.0),Float32(250.0),Float32(0.922)) ≈ Float32(0.964111)
+    @test ncbeta(Float32(10.0),Float32(20.0),Float32(150.0),Float32(0.868)) ≈ Float32(0.937663)
+    @test ncbeta(Float32(10.0),Float32(10.0),Float32(120.0),Float32(0.9)) ≈ Float32(0.730682)
+    @test ncbeta(Float32(15.0),Float32(5.0),Float32(80.0),Float32(0.88)) ≈ Float32(0.160426)
+    @test ncbeta(Float32(20.0),Float32(10.0),Float32(110.0),Float32(0.85)) ≈ Float32(0.186749)
+    @test ncbeta(Float32(20.0),Float32(30.0),Float32(65.0),Float32(0.66)) ≈ Float32(0.655939)
+    @test ncbeta(Float32(20.0),Float32(50.0),Float32(130.0),Float32(0.720)) ≈ Float32(0.979688)
+    @test ncbeta(Float32(30.0),Float32(20.0),Float32(80.0),Float32(0.720)) ≈ Float32(0.116239)
+    @test ncbeta(Float32(30.0),Float32(40.0),Float32(130.0),Float32(0.8)) ≈ Float32(0.993043)
+    @test ncbeta(Float32(10.0),Float32(5.0),Float32(20.0),Float32(0.644)) ≈ Float32(0.506899E-01)
+    @test ncbeta(Float32(10.0),Float32(10.0),Float32(54.0),Float32(0.7)) ≈ Float32(0.103096)
+    @test ncbeta(Float32(10.0),Float32(30.0),Float32(80.0),Float32(0.78)) ≈ Float32(0.997842)
+    @test ncbeta(Float32(15.0),Float32(20.0),Float32(120.0),Float32(0.76)) ≈ Float32(0.255555)
+    @test ncbeta(Float32(10.0),Float32(5.0),Float32(55.0),Float32(0.795)) ≈ Float32(0.668307E-01)
+    @test ncbeta(Float32(12.0),Float32(17.0),Float32(64.0),Float32(0.56)) ≈ Float32(0.113601E-01)
+    @test ncbeta(Float32(30.0),Float32(30.0),Float32(140.0),Float32(0.80)) ≈ Float32(0.781337)
+    @test ncbeta(Float32(35.0),Float32(30.0),Float32(20.0),Float32(0.670)) ≈ Float32(0.886713)
+end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.
 	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
