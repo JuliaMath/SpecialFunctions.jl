@@ -1,5 +1,3 @@
-using Base.Math: @horner
-
 const errmax = 1e-15
 
 #Compute tail of noncentral Beta distribution
@@ -27,24 +25,22 @@ function ncbeta_tail(x::Float64, a::Float64, b::Float64, lambda::Float64)
     sumq = 1.0 - q
     ans = ax
 
-    @label l10
-     xj += 1.0
-     temp -= gx
-     gx *= x*(a+b+xj-1.0)/(a+xj)
-     q *= c/xj
-     sumq -= q
-     ax = temp*q
-     ans += ax
+    while true
+        xj += 1.0
+        temp -= gx
+        gx *= x*(a+b+xj-1.0)/(a+xj)
+        q *= c/xj
+        sumq -= q
+        ax = temp*q
+        ans += ax
 
-     #Check convergence
-     errbd = abs((temp-gx)*sumq)
-     if trunc(Int,xj) < 1000 && errbd > 1e-10
-        @goto l10
-     end
-     if errbd > 1e-7
-        return error("Didn't converge")
-     end
-     return ans
+        #Check convergence
+        errbd = abs((temp-gx)*sumq)
+        if trunc(Int,xj) > 1000 || errbd < 1e-10
+            break
+        end
+    end
+    return ans
 end
 
 #R Chattamvelli, R Shanmugam, Algorithm AS 310: Computing the Non-central Beta Distribution #Function, Applied Statistics, Volume 46, Number 1, 1997, pages 146-156
@@ -89,60 +85,52 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
 
         #Iterations start from M and goes downwards
 
-        @label l20
-         if iter1 < iterlo
-            @goto l30
-         end
-         if q < errmax
-            @goto l30
-         end
+        while true
+            if iter1 < iterlo || q < errmax
+                break
+            end
 
-         q *= iter1/c
-         xj += 1.0
-         gx *= (a + iter1)/(x*(a+b+iter1-1.0))
-         iter1 -= 1
-         temp += gx
-         psum += q
-         sm += q*temp
-         @goto l20
+            q *= iter1/c
+            xj += 1.0
+            gx *= (a + iter1)/(x*(a+b+iter1-1.0))
+            iter1 -= 1
+            temp += gx
+            psum += q
+            sm += q*temp
+        end
 
-        @label l30
-         t0 = logabsgamma(a+b)[1] - logabsgamma(a+1.0)[1] - logabsgamma(b)[1]
-         s0 = a*log(x) + b*log(1.0-x)
+        t0 = logabsgamma(a+b)[1] - logabsgamma(a+1.0)[1] - logabsgamma(b)[1]
+        s0 = a*log(x) + b*log(1.0-x)
 
-         s = 0.0
-         for i = 1:iter1
-            j = i - 1
-            s += exp(t0+s0+j*log(x))
-            t1 = log(a+b+j) - log(a+j+1.0) + t0
-            t0 = t1
-         end
-         #Compute first part of error bound
+        s = 0.0
+        for i = 1:iter1
+        j = i - 1
+        s += exp(t0+s0+j*log(x))
+        t1 = log(a+b+j) - log(a+j+1.0) + t0
+        t0 = t1
+        end
+        #Compute first part of error bound
 
-         errbd = (1.0 - gamma_inc(float(iter1),c,0)[1])*(temp+s)
-         q = r
-         temp = ftemp
-         gx = fx
-         iter2 = m
+        errbd = (1.0 - gamma_inc(float(iter1),c,0)[1])*(temp+s)
+        q = r
+        temp = ftemp
+        gx = fx
+        iter2 = m
 
-        @label l50
-         ebd = errbd + (1.0 - psum)*temp
-         if ebd < errmax || iterhi <= iter2
-            return sm
-         end
-         iter2 += 1
-         xj += 1.0
-         q *= c/iter2
-         psum += q
-         temp -= gx
-         gx *= x*(a+b+iter2-1.0)/(a+iter2)
-         sm += q*temp
-         @goto l50
-
-
+        while true
+            ebd = errbd + (1.0 - psum)*temp
+            if ebd < errmax || iterhi <= iter2
+                return sm
+            end
+            iter2 += 1
+            xj += 1.0
+            q *= c/iter2
+            psum += q
+            temp -= gx
+            gx *= x*(a+b+iter2-1.0)/(a+iter2)
+            sm += q*temp
+        end
     end
-
-
 end
 
 function ncbeta(a::T,b::T,lambda::T,x::T) where {T<:Union{Float16,Float32}}
