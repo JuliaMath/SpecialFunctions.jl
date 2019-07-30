@@ -16,9 +16,9 @@ function ncbeta_tail(x::Float64, a::Float64, b::Float64, lambda::Float64)
     c = 0.5*lambda
     #Init series
 
-    beta = logabsgamma(a)[1] + logabsgamma(b)[1] - logabsgamma(a+b)[1]
+    beta = logabsbeta(a,b)[1]
     temp = beta_inc(a,b,x)[1]
-    gx = exp(a*log(x) + b*log(1.0-x) - beta - log(a))
+    gx = (SpecialFunctions.beta_integrand(a,b,x,1.0-x))/a
     q = exp(-c)
     xj = 0.0
     ax = q*temp
@@ -36,7 +36,7 @@ function ncbeta_tail(x::Float64, a::Float64, b::Float64, lambda::Float64)
 
         #Check convergence
         errbd = abs((temp-gx)*sumq)
-        if trunc(Int,xj) > 1000 || errbd < 1e-10
+        if xj > 1000 || errbd < 1e-10
             break
         end
     end
@@ -72,7 +72,7 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
         r = q
         psum = q
 
-        beta = logabsgamma(a+mr)[1] + logabsgamma(b)[1] - logabsgamma(a+mr+b)[1]
+        beta = logabsbeta(a+mr,b)[1]
         s1 = (a+mr)*log(x) + b*log(1.0-x) - log(a+mr) - beta
         gx = exp(s1)
         fx = gx
@@ -103,15 +103,14 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
         s0 = a*log(x) + b*log(1.0-x)
 
         s = 0.0
-        for i = 1:iter1
-        j = i - 1
-        s += exp(t0+s0+j*log(x))
-        t1 = log(a+b+j) - log(a+j+1.0) + t0
-        t0 = t1
+        for j = 0:iter1-1
+            s += exp(t0+s0+j*log(x))
+            t1 = log(a+b+j) - log(a+j+1.0) + t0
+            t0 = t1
         end
         #Compute first part of error bound
 
-        errbd = (1.0 - gamma_inc(float(iter1),c,0)[1])*(temp+s)
+        errbd = (gamma_inc(float(iter1),c,0)[2])*(temp+s)
         q = r
         temp = ftemp
         gx = fx
