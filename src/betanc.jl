@@ -1,10 +1,18 @@
 const errmax = 1e-15
 
 #Compute tail of noncentral Beta distribution
+#Russell Lenth, Algorithm AS 226: Computing Noncentral Beta Probabilities,
+#Applied Statistics,Volume 36, Number 2, 1987, pages 241-244
+
 """
 	ncbeta_tail(x,a,b,lambda)
 
 Compute tail of the noncentral beta distribution.
+Uses the recursive relation 
+```math
+I_{x}(a,b+1;0) = I_{x}(a,b;0) - \\Gamma(a+b)/\\Gamma(a+1)\\Gamma(b)x^{a}(1-x)^{b}
+```
+and ``\\Gamma(a+1) = a\\Gamma(a)`` given in Equation (26.5.16) in Abromowitz and Stegun(1965).
 """
 function ncbeta_tail(x::Float64, a::Float64, b::Float64, lambda::Float64)
     if x <= 0.0
@@ -43,12 +51,27 @@ function ncbeta_tail(x::Float64, a::Float64, b::Float64, lambda::Float64)
     return ans
 end
 
-#R Chattamvelli, R Shanmugam, Algorithm AS 310: Computing the Non-central Beta Distribution #Function, Applied Statistics, Volume 46, Number 1, 1997, pages 146-156
+#R Chattamvelli, R Shanmugam, Algorithm AS 310: Computing the Non-central Beta Distribution Function,
+#Applied Statistics, Volume 46, Number 1, 1997, pages 146-156
 
 """
 	ncbeta(a,b,lambda,x)
 
-Compute the CDF of the noncentral beta distribution.
+Compute the CDF of the noncentral beta distribution given by
+```math
+I_{x}(a,b+1;\\lambda ) = \\sum_{j=0}^{\\infty}q(\\lambda/2,j)I_{x}(a+j,b;0)
+```
+For lambda < 54 : algorithm suggested by Lenth(1987) in ncbeta_tail(x,a,b,lambda).
+Else for lambda >= 54 :
+First ``\\lambda/2`` is calculated and the Poisson term is calculated using ``P(j-1)=j/\\lambda P(j)`` and ``P(j+1) = \\lambda/(j+1) P(j)``.
+Then backward recurrences are used until either the Poisson weights fall below `errmax` or `iterlo` is reached.
+```math
+I_{x}(a+j-1,b) = I_{x}(a+j,b) + \\Gamma(a+b+j-1)/\\Gamma(a+j)\\Gamma(b)x^{a+j-1}(1-x)^{b}
+```
+Then forward recurrences are used until error bound falls below `errmax`.
+```math
+I_{x}(a+j+1,b) = I_{x}(a+j,b) - \\Gamma(a+b+j)/\\Gamma(a+j)\\Gamma(b)x^{a+j}(1-x)^{b}
+```
 """
 function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     ans = x
@@ -73,8 +96,7 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
         psum = q
 
         beta = logabsbeta(a+mr,b)[1]
-        s1 = (a+mr)*log(x) + b*log(1.0-x) - log(a+mr) - beta
-        gx = exp(s1)
+        gx = SpecialFunctions.beta_integrand(a+mr,b,x,1.0-x)/(a + mr)
         fx = gx
         temp = beta_inc(a+mr,b,x)[1]
         ftemp = temp
@@ -115,6 +137,7 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
         temp = ftemp
         gx = fx
         iter2 = m
+        #Iterations for the higher part
 
         while true
             ebd = errbd + (1.0 - psum)*temp
