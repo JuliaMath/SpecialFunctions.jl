@@ -14,7 +14,7 @@ I_{x}(a,b+1;0) = I_{x}(a,b;0) - \\Gamma(a+b)/\\Gamma(a+1)\\Gamma(b)x^{a}(1-x)^{b
 ```
 and ``\\Gamma(a+1) = a\\Gamma(a)`` given in Equation (26.5.16) in Abromowitz and Stegun(1965).
 """
-function ncbeta_tail(x::Float64, a::Float64, b::Float64, lambda::Float64)
+function ncbeta_tail(a::Float64, b::Float64, lambda::Float64, x::Float64)
     if x <= 0.0
         return 0.0
     elseif x >= 1.0
@@ -26,7 +26,7 @@ function ncbeta_tail(x::Float64, a::Float64, b::Float64, lambda::Float64)
 
     beta = logabsbeta(a,b)[1]
     temp = beta_inc(a,b,x)[1]
-    gx = (SpecialFunctions.beta_integrand(a,b,x,1.0-x))/a
+    gx = (beta_integrand(a,b,x,1.0-x))/a
     q = exp(-c)
     xj = 0.0
     ax = q*temp
@@ -84,9 +84,9 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     xj = 0.0
 
     if lambda < 54.0
-        return ncbeta_tail(x,a,b,lambda)
+        return ncbeta_tail(a,b,lambda,x)
     else
-        m = trunc(Int, c+0.5)
+        m = round(Int, c)
         mr = float(m)
         iterlo = m - trunc(Int, 5.0*sqrt(mr))
         iterhi = m + trunc(Int, 5.0*sqrt(mr))
@@ -107,8 +107,8 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
 
         #Iterations start from M and goes downwards
 
-        while true
-            if iter1 < iterlo || q < errmax
+        for iter1 = m:-1:iterlo
+            if q < errmax
                 break
             end
 
@@ -139,9 +139,9 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
         iter2 = m
         #Iterations for the higher part
 
-        while true
+        for iter2 = m:iterhi-1
             ebd = errbd + (1.0 - psum)*temp
-            if ebd < errmax || iterhi <= iter2
+            if ebd < errmax
                 return sm
             end
             iter2 += 1
@@ -152,6 +152,7 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
             gx *= x*(a+b+iter2-1.0)/(a+iter2)
             sm += q*temp
         end
+        return sm
     end
 end
 
