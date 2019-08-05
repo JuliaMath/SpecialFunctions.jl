@@ -51,18 +51,10 @@ function ncbeta_tail(a::Float64, b::Float64, lambda::Float64, x::Float64)
     return ans
 end
 
-#R Chattamvelli, R Shanmugam, Algorithm AS 310: Computing the Non-central Beta Distribution Function,
-#Applied Statistics, Volume 46, Number 1, 1997, pages 146-156
-
 """
-	ncbeta(a,b,lambda,x)
+    ncbeta_poisson(a,b,lambda,x)
 
-Compute the CDF of the noncentral beta distribution given by
-```math
-I_{x}(a,b+1;\\lambda ) = \\sum_{j=0}^{\\infty}q(\\lambda/2,j)I_{x}(a+j,b;0)
-```
-For lambda < 54 : algorithm suggested by Lenth(1987) in ncbeta_tail(x,a,b,lambda).
-Else for lambda >= 54 :
+Compute CDF of noncentral beta if lambda >= 54 using:
 First ``\\lambda/2`` is calculated and the Poisson term is calculated using ``P(j-1)=j/\\lambda P(j)`` and ``P(j+1) = \\lambda/(j+1) P(j)``.
 Then backward recurrences are used until either the Poisson weights fall below `errmax` or `iterlo` is reached.
 ```math
@@ -73,6 +65,91 @@ Then forward recurrences are used until error bound falls below `errmax`.
 I_{x}(a+j+1,b) = I_{x}(a+j,b) - \\Gamma(a+b+j)/\\Gamma(a+j)\\Gamma(b)x^{a+j}(1-x)^{b}
 ```
 """
+function ncbeta_poisson(a::Float64, b::Float64, lambda::Float64, x::Float64)
+    c = 0.5*lambda
+    xj = 0.0
+    m = round(Int, c)
+    mr = float(m)
+    iterlo = m - trunc(Int, 5.0*sqrt(mr))
+    iterhi = m + trunc(Int, 5.0*sqrt(mr))
+    t = -c + mr*log(c) - logabsgamma(mr + 1.0)[1]
+    q = exp(t)
+    r = q
+    psum = q
+
+    beta = logabsbeta(a+mr,b)[1]
+    gx = beta_integrand(a+mr,b,x,1.0-x)/(a + mr)
+    fx = gx
+    temp = beta_inc(a+mr,b,x)[1]
+    ftemp = temp
+    xj += 1.0
+
+    sm = q*temp
+    iter1 = m
+
+    #Iterations start from M and goes downwards
+
+    for iter1 = m:-1:iterlo
+        if q < errmax
+            break
+        end
+
+        q *= iter1/c
+        xj += 1.0
+        gx *= (a + iter1)/(x*(a+b+iter1-1.0))
+        iter1 -= 1
+        temp += gx
+        psum += q
+        sm += q*temp
+    end
+
+    t0 = logabsgamma(a+b)[1] - logabsgamma(a+1.0)[1] - logabsgamma(b)[1]
+    s0 = a*log(x) + b*log(1.0-x)
+
+    s = 0.0
+    for j = 0:iter1-1
+        s += exp(t0+s0+j*log(x))
+        t1 = log(a+b+j) - log(a+j+1.0) + t0
+        t0 = t1
+    end
+    #Compute first part of error bound
+
+    errbd = (gamma_inc(float(iter1),c,0)[2])*(temp+s)
+    q = r
+    temp = ftemp
+    gx = fx
+    iter2 = m
+    #Iterations for the higher part
+
+    for iter2 = m:iterhi-1
+        ebd = errbd + (1.0 - psum)*temp
+        if ebd < errmax
+            return sm
+        end
+        iter2 += 1
+        xj += 1.0
+        q *= c/iter2
+        psum += q
+        temp -= gx
+        gx *= x*(a+b+iter2-1.0)/(a+iter2)
+        sm += q*temp
+    end
+    return sm
+end
+
+#R Chattamvelli, R Shanmugam, Algorithm AS 310: Computing the Non-central Beta Distribution Function,
+#Applied Statistics, Volume 46, Number 1, 1997, pages 146-156
+
+"""
+	ncbeta(a,b,lambda,x)
+
+Compute the CDF of the noncentral beta distribution given by
+```math
+I_{x}(a,b+1;\\lambda ) = \\sum_{j=0}^{\\infty}q(\\lambda/2,j)I_{x}(a+j,b;0)
+```
+For lambda < 54 : algorithm suggested by Lenth(1987) in ncbeta_tail(a,b,lambda,x).
+Else for lambda >= 54 : modification in Chattamvelli(1997) in ncbeta_poisson(a,b,lambda,x) by using both forward and backward recurrences.
+"""
 function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     ans = x
     if x <= 0.0
@@ -80,79 +157,11 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     elseif x >= 1.0
         return 1.0
     end
-    c = 0.5*lambda
-    xj = 0.0
 
     if lambda < 54.0
         return ncbeta_tail(a,b,lambda,x)
     else
-        m = round(Int, c)
-        mr = float(m)
-        iterlo = m - trunc(Int, 5.0*sqrt(mr))
-        iterhi = m + trunc(Int, 5.0*sqrt(mr))
-        t = -c + mr*log(c) - logabsgamma(mr + 1.0)[1]
-        q = exp(t)
-        r = q
-        psum = q
-
-        beta = logabsbeta(a+mr,b)[1]
-        gx = SpecialFunctions.beta_integrand(a+mr,b,x,1.0-x)/(a + mr)
-        fx = gx
-        temp = beta_inc(a+mr,b,x)[1]
-        ftemp = temp
-        xj += 1.0
-
-        sm = q*temp
-        iter1 = m
-
-        #Iterations start from M and goes downwards
-
-        for iter1 = m:-1:iterlo
-            if q < errmax
-                break
-            end
-
-            q *= iter1/c
-            xj += 1.0
-            gx *= (a + iter1)/(x*(a+b+iter1-1.0))
-            iter1 -= 1
-            temp += gx
-            psum += q
-            sm += q*temp
-        end
-
-        t0 = logabsgamma(a+b)[1] - logabsgamma(a+1.0)[1] - logabsgamma(b)[1]
-        s0 = a*log(x) + b*log(1.0-x)
-
-        s = 0.0
-        for j = 0:iter1-1
-            s += exp(t0+s0+j*log(x))
-            t1 = log(a+b+j) - log(a+j+1.0) + t0
-            t0 = t1
-        end
-        #Compute first part of error bound
-
-        errbd = (gamma_inc(float(iter1),c,0)[2])*(temp+s)
-        q = r
-        temp = ftemp
-        gx = fx
-        iter2 = m
-        #Iterations for the higher part
-
-        for iter2 = m:iterhi-1
-            ebd = errbd + (1.0 - psum)*temp
-            if ebd < errmax
-                return sm
-            end
-            iter2 += 1
-            xj += 1.0
-            q *= c/iter2
-            psum += q
-            temp -= gx
-            gx *= x*(a+b+iter2-1.0)/(a+iter2)
-            sm += q*temp
-        end
-        return sm
+        return ncbeta_poisson(a,b,lambda,x)
     end
 end
 
