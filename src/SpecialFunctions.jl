@@ -52,6 +52,7 @@ export
     beta_inc_inv,
     gamma_inc_inv,
     ncbeta,
+    ncF,
     hankelh1,
     hankelh1x,
     hankelh2,

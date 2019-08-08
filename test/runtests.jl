@@ -239,6 +239,7 @@ end
     @test ncbeta(Float32(12.0),Float32(17.0),Float32(64.0),Float32(0.56)) ≈ Float32(0.113601E-01)
     @test ncbeta(Float32(30.0),Float32(30.0),Float32(140.0),Float32(0.80)) ≈ Float32(0.781337)
     @test ncbeta(Float32(35.0),Float32(30.0),Float32(20.0),Float32(0.670)) ≈ Float32(0.886713)
+    @test ncF(Float32(2.0), Float32(3.0), Float32(4.0), Float32(5.0)) ≈ Float32(0.3761448105)
 end
 @testset "elliptic integrals" begin
 #Computed using Wolframalpha EllipticK and EllipticE functions.

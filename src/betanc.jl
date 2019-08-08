@@ -165,10 +165,31 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     end
 end
 
+"""
+    ncF(x,v1,v2,lambda)
+
+Compute CDF of noncentral F distribution given by:
+```math
+F(x, v1, v2; lambda) = I_{v1*x/(v1*x + v2)}(v1/2, v2/2; \\lambda)
+```
+where ``I_{x}(a,b; lambda)`` is the noncentral beta function computed above.
+
+Wikipedia: https://en.wikipedia.org/wiki/Noncentral_F-distribution 
+"""
+function ncF(x::Float64, v1::Float64, v2::Float64, lambda::Float64)
+    return ncbeta(v1/2, v2/2, lambda, (v1*x)/(v1*x + v2))
+end
+
 function ncbeta(a::T,b::T,lambda::T,x::T) where {T<:Union{Float16,Float32}}
 	T.(ncbeta(Float64(a),Float64(b),Float64(lambda),Float64(x)))
 end
 
+function ncF(x::T,v1::T,v2::T,lambda::T) where {T<:Union{Float16,Float32}}
+	T.(ncF(Float64(x),Float64(v1),Float64(v2),Float64(lambda)))
+end
+
 ncbeta(a::Real,b::Real,lambda::Real,x::Real) = ncbeta(promote(float(a),float(b),float(lambda),float(x))...)
 ncbeta(a::T,b::T,lambda::T,x::T) where {T<:AbstractFloat} = throw(MethodError(ncbeta,(a,b,lambda,x,"")))
+ncF(x::Real,v1::Real,v2::Real,lambda::Real) = ncF(promote(float(x),float(v1),float(v2),float(lambda))...)
+ncF(x::T,v1::T,v2::T,lambda::T) where {T<:AbstractFloat} = throw(MethodError(ncF,(x,v1,v2,lambda,"")))
 
