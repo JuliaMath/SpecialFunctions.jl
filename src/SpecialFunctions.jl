@@ -49,6 +49,7 @@ export
     trigamma,
     gamma_inc,
     beta_inc,
+    beta_inc_inv,
     gamma_inc_inv,
     hankelh1,
     hankelh1x,
