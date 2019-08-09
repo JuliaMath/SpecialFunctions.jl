@@ -41,53 +41,151 @@ for f in (:erfcx, :erfi, :Dawson)
     end
 end
 
-"""
+@doc raw"""
     erf(x)
-Compute the error function of `x`, defined by ``\\frac{2}{\\sqrt{\\pi}} \\int_0^x e^{-t^2} dt``
-for arbitrary complex `x`.
+
+Compute the error function of ``x``, defined by
+
+```math
+\operatorname{erf}(x) = \frac{2}{\pi} \int_0^x \exp(-t^2) \; \mathrm{d}t
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.E1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunctions.erfcx),
+[`erfi(x)`](@ref SpecialFunctions.erfi), [`dawson(x)`](@ref SpecialFunctions.dawson),
+[`erfinv(x)`](@ref SpecialFunctions.erfinv), [`erfcinv(x)`](@ref SpecialFunctions.erfcinv).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
 erf
 
-"""
+@doc raw"""
     erfc(x)
-Compute the complementary error function of `x`, defined by ``1 - \\operatorname{erf}(x)``.
+
+Compute the complementary error function of ``x``, defined by
+
+```math
+\operatorname{erfc}(x)
+= 1 - \operatorname{erf}(x)
+= \frac{2}{\pi} \int_x^\infty \exp(-t^2) \; \mathrm{d}t
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+This is the accurate version of `1-erf(x)` for large ``x``.
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.E2),
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
+
+See also: [`erf(x)`](@ref SpecialFunctions.erf).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
 erfc
 
-"""
+@doc raw"""
     erfcx(x)
 
-Compute the scaled complementary error function of `x`, defined by ``e^{x^2} \\operatorname{erfc}(x)``.
-Note also that ``\\operatorname{erfcx}(-ix)`` computes the Faddeeva function ``w(x)``.
+Compute the scaled complementary error function of ``x``, defined by
+
+```math
+\operatorname{erfcx}(x)
+= e^{x^2} \operatorname{erfc}(x)
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+This is the accurate version of ``e^{x^2} \operatorname{erfc}(x)`` for large ``x``.
+Note also that ``\operatorname{erfcx}(-ix)`` computes the Faddeeva function `w(x)`.
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.E3),
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
+
+See also: [`erfc(x)`](@ref SpecialFunctions.erfc).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `BigFloat`: MPFR has an open TODO item for this function until then, we use
+    [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail.
 """
 erfcx
 
-"""
+@doc raw"""
     erfi(x)
 
-Compute the imaginary error function of `x`, defined by ``-i \\operatorname{erf}(ix)``.
+Compute the imaginary error function of ``x``, defined by
+
+```math
+\operatorname{erfi}(x)
+= -i \operatorname{erf}(ix)
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Imaginary_error_function).
+
+See also: [`erf(x)`](@ref SpecialFunctions.erf).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 """
 erfi
 
-"""
+@doc raw"""
     dawson(x)
 
-Compute the Dawson function (scaled imaginary error function) of `x`, defined by
-``\\frac{\\sqrt{\\pi}}{2} e^{-x^2} \\operatorname{erfi}(x)``.
+Compute the Dawson function (scaled imaginary error function) of ``x``, defined by
+
+```math
+\operatorname{dawson}(x)
+= \frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+This is the accurate version of ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)``
+for large ``x``.
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.E5),
+[Wikipedia](https://en.wikipedia.org/wiki/Dawson_function).
+
+See also: [`erfi(x)`](@ref SpecialFunctions.erfi).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 """
 dawson
 
-# Compute the inverse of the error function: erf(erfinv(x)) == x,
-# using the rational approximants tabulated in:
-#     J. M. Blair, C. A. Edwards, and J. H. Johnson, "Rational Chebyshev
-#     approximations for the inverse of the error function," Math. Comp. 30,
-#     pp. 827--830 (1976).
-#         http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7
-#         http://www.jstor.org/stable/2005402
-"""
+@doc raw"""
     erfinv(x)
 
-Compute the inverse error function of a real `x`, defined by ``\\operatorname{erf}(\\operatorname{erfinv}(x)) = x``.
+Compute the inverse error function of a real ``x``, that is
+
+```math
+\operatorname{erfinv}(x) = \operatorname{erf}^{-1}(x)
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Inverse_functions).
+
+See also: [`erf(x)`](@ref SpecialFunctions.erf).
+
+# Implementation
+Using the rational approximants tabulated in:
+> J. M. Blair, C. A. Edwards, and J. H. Johnson,
+> "Rational Chebyshev approximations for the inverse of the error function",
+> Math. Comp. 30, pp. 827--830 (1976).
+> <http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <http://www.jstor.org/stable/2005402>
 """
 function erfinv(x::Float64)
     a = abs(x)
@@ -202,13 +300,28 @@ end
 
 erfinv(x::Integer) = erfinv(float(x))
 
-# Inverse complementary error function: use Blair tables for y = 1-x,
-# exploiting the greater accuracy of y (vs. x) when y is small.
-"""
+@doc raw"""
     erfcinv(x)
 
-Compute the inverse error complementary function of a real `x`, defined by
-``\\operatorname{erfc}(\\operatorname{erfcinv}(x)) = x``.
+Compute the inverse error complementary function of a real ``x``, that is
+
+```math
+\operatorname{erfcinv}(x) = \operatorname{erfc}^{-1}(x)
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Inverse_functions).
+
+See also: [`erfc(x)`](@ref SpecialFunctions.erfc).
+
+# Implementation
+Using the rational approximants tabulated in:
+> J. M. Blair, C. A. Edwards, and J. H. Johnson,
+> "Rational Chebyshev approximations for the inverse of the error function",
+> Math. Comp. 30, pp. 827--830 (1976).
+> <http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <http://www.jstor.org/stable/2005402>
 """
 function erfcinv(y::Float64)
     if y > 0.0625

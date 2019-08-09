@@ -3,56 +3,21 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 
 ## Error Functions, Dawson’s and Fresnel Integrals
 
-### Error Function
-The *error function* is implemented via [`erf(x)`](@ref SpecialFunctions.erf)
-
-```math
-\mathrm{erf}(x) = \frac{2}{\pi} \int_0^x \exp(-t^2) \; \mathrm{d}t
-\quad \text{for} \quad x \in \mathbb{C} \, .
-```
-
-Support for `BigFloat`: Yes.
-
-Implementation notes: The function is evaluated by calling the C library [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
-
-External links: [DLMF](https://dlmf.nist.gov/7.2.E1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
-
-### Complementary Error Function
-The *complementary error function* is implemented via [`erfc(x)`](@ref SpecialFunctions.erfc)
-
-```math
-\mathrm{erfc}(x) = \frac{2}{\pi} \int_x^\infty \exp(-t^2) \; \mathrm{d}t
-\quad \text{for} \quad x \in \mathbb{C} \, .
-```
-
-Support for `BigFloat`: Yes.
-
-Implementation notes: The function is evaluated by calling the C library [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
-
-External links: [DLMF](https://dlmf.nist.gov/7.2.E2), [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
-
-### Imaginary Error Function
-The *imaginary error function* is implemented via [`erfi(x)`](@ref SpecialFunctions.erfi)
-
-```math
-\mathrm{erfi}(x) = \frac{2}{\pi} \int_0^x \exp(t^2) \; \mathrm{d}t
-\quad \text{for} \quad x \in \mathbb{C} \, .
-```
-
-Support for `BigFloat`: No.
-
-Implementation notes: The function is evaluated by calling the Julia wrapper [openspecfun](https://github.com/JuliaMath/openspecfun) around a C library.
-
-External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Imaginary_error_function).
+| Function | Description |
+|:-------- |:----------- |
+| [`erf(x)`](@ref SpecialFunctions.erf)         | [error function](https://en.wikipedia.org/wiki/Error_function) at ``x`` |
+| [`erfc(x)`](@ref SpecialFunctions.erfc)       | complementary error function, i.e. the accurate version of ``1-\operatorname{erf}(x)`` for large ``x`` |
+| [`erfcinv(x)`](@ref SpecialFunctions.erfcinv) | inverse function to [`erfc()`](@ref SpecialFunctions.erfc) |
+| [`erfcx(x)`](@ref SpecialFunctions.erfcx)     | scaled complementary error function, i.e. accurate ``e^{x^2} \operatorname{erfc}(x)`` for large ``x`` |
+| [`erfi(x)`](@ref SpecialFunctions.erfi)       | imaginary error function defined as ``-i \operatorname{erf}(ix)`` |
+| [`erfinv(x)`](@ref SpecialFunctions.erfinv)   | inverse function to [`erf()`](@ref SpecialFunctions.erf) |
+| [`dawson(x)`](@ref SpecialFunctions.dawson)   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)`` for large ``x`` |
 
 
 
+# WIP not grouped
 | Function                                                      | Description                                                                                                                                                     |
 |:------------------------------------------------------------- |:--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`erfinv(x)`](@ref SpecialFunctions.erfinv)                   | inverse function to [`erf()`](@ref SpecialFunctions.erf)                                                                                                        |
-| [`erfcinv(x)`](@ref SpecialFunctions.erfcinv)                 | inverse function to [`erfc()`](@ref SpecialFunctions.erfc)                                                                                                       |
-| [`erfcx(x)`](@ref SpecialFunctions.erfcx)                     | scaled complementary error function, i.e. accurate `exp(x^2) * erfc(x)` for large `x`                                                                           |
-| [`dawson(x)`](@ref SpecialFunctions.dawson)                   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate `exp(-x^2) * erfi(x) * sqrt(pi) / 2` for large `x`                                       |
 | [`sinint(x)`](@ref SpecialFunctions.sinint)                   | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
 | [`cosint(x)`](@ref SpecialFunctions.cosint)                   | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral) at `x` |
 | [`digamma(x)`](@ref SpecialFunctions.digamma)                 | [digamma function](https://en.wikipedia.org/wiki/Digamma_function) (i.e. the derivative of `lgamma` at `x`)                                                     |
