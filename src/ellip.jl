@@ -18,6 +18,12 @@ Computes Complete Elliptic Integral of 1st kind ``K(m)`` for parameter ``m`` giv
 External links: [DLMF](https://dlmf.nist.gov/19.2#E8),
 [Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants).
 
+See also: [`ellipe(m)`](@ref SpecialFunctions.ellipe).
+
+# Arguments
+- `m`: parameter ``m`` is in relation to elliptic modulus ``k`` by ``k^2=m`` and modular
+    angle ``\alpha`` by ``k=\sin \alpha``
+
 # Implementation
 Using piecewise approximation polynomial as given in
 > 'Fast Computation of Complete Elliptic Integrals and Jacobian Elliptic Functions',
