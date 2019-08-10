@@ -51,6 +51,8 @@ export
     beta_inc,
     beta_inc_inv,
     gamma_inc_inv,
+    ncbeta,
+    ncF,
     hankelh1,
     hankelh1x,
     hankelh2,
@@ -66,6 +68,7 @@ include("ellip.jl")
 include("sincosint.jl")
 include("gamma.jl")
 include("gamma_inc.jl")
+include("betanc.jl")
 include("beta_inc.jl")
 include("deprecated.jl")
 
