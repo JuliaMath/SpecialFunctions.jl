@@ -1,23 +1,38 @@
 using Base.Math: @horner
 
-#Using piecewise approximation polynomial as given in
-#'Fast Computation of Complete Elliptic Integrals and Jacobian Elliptic Functions'
-#                          Fukushima, Toshio. (2014). F09-FastEI. Celest Mech Dyn Astr
-#                                                            DOI 10.1007/s10569-009-9228-z
-#Link : https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf
-#
-#For m<0 , followed  Fukushima, Toshio. (2014). Precise, compact, and fast computation of complete elliptic integrals by piecewise minimax rational function approximation. Journal of Computational and Applied Mathematics. 282. 10.13140/2.1.1946.6245.   
-# Link:  https://www.researchgate.net/profile/Toshio_Fukushima/publication/267330394_Precise_compact_and_fast_computation_of_complete_elliptic_integrals_by_piecewise_minimax_rational_function_approximation/links/544b81a40cf2d6347f43074f/Precise-compact-and-fast-computation-of-complete-elliptic-integrals-by-piecewise-minimax-rational-function-approximation.pdf?origin=publication_detail
-#Also suggested in this paper that we should consider domain only from (-inf,1].
 
 
 
-"""
-   ellipk(x)
+@doc raw"""
+    ellipk(m)
 
- DLMF : https://dlmf.nist.gov/19.2#E4  , https://dlmf.nist.gov/19.2#E8 
- Wiki : https://en.wikipedia.org/wiki/Elliptic_integral 
-Computes Complete Elliptic Integral of 1st kind at `x`-> K(x)--- given by: ``\\int_{0}^{\\pi/2} \\frac{1}{\\sqrt{1 - x(\\sin \\theta )^{2}}} d\\theta`` 
+Computes Complete Elliptic Integral of 1st kind ``K(m)`` for parameter ``m`` given by
+
+```math
+\operatorname{ellipk}(m)
+= K(m)
+= \int_0^{ \frac{\pi}{2} } \frac{1}{\sqrt{1 - m \sin^2 \theta}} \, \mathrm{d}\theta
+\quad \text{for} \quad m \in \left( -\infty, 1 \right] \, .
+```
+
+External links: [DLMF](https://dlmf.nist.gov/19.2#E8),
+[Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants).
+
+# Implementation
+Using piecewise approximation polynomial as given in
+> 'Fast Computation of Complete Elliptic Integrals and Jacobian Elliptic Functions',
+> Fukushima, Toshio. (2014). F09-FastEI. Celest Mech Dyn Astr,
+> DOI 10.1007/s10569-009-9228-z,
+> <https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf>
+
+For ``m<0```, followed
+> Fukushima, Toshio. (2014).
+> 'Precise, compact, and fast computation of complete elliptic integrals by piecewise
+> minimax rational function approximation'.
+> Journal of Computational and Applied Mathematics. 282.
+> DOI 10.13140/2.1.1946.6245.,
+> <https://www.researchgate.net/publication/267330394>
+Also suggested in this paper that we should consider domain only from ``(-\infty,1]``.
 """
 function ellipk(a::Float64)
     flag = false 
