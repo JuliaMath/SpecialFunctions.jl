@@ -12,55 +12,8 @@ relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
 relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 ≅(a,b) = relerrc(a,b) ≤ 1e-13
 
-@testset "error functions" begin
-    @test erf(Float16(1)) ≈ 0.84270079294971486934
-    @test erf(1) ≈ 0.84270079294971486934
-    @test erfc(1) ≈ 0.15729920705028513066
-    @test erfc(Float16(1)) ≈ 0.15729920705028513066
-    @test erfcx(1) ≈ 0.42758357615580700442
-    @test erfcx(Float32(1)) ≈ 0.42758357615580700442
-    @test erfcx(Complex{Float32}(1)) ≈ 0.42758357615580700442
-    @test erfi(1) ≈ 1.6504257587975428760
-    @test erfinv(0.84270079294971486934) ≈ 1
-    @test erfcinv(0.15729920705028513066) ≈ 1
-    @test dawson(1) ≈ 0.53807950691276841914
+include("erf.jl")
 
-    @test erf(1+2im) ≈ -0.53664356577856503399-5.0491437034470346695im
-    @test erfc(1+2im) ≈ 1.5366435657785650340+5.0491437034470346695im
-    @test erfcx(1+2im) ≈ 0.14023958136627794370-0.22221344017989910261im
-    @test erfi(1+2im) ≈ -0.011259006028815025076+1.0036063427256517509im
-    @test dawson(1+2im) ≈ -13.388927316482919244-11.828715103889593303im
-
-    for elty in [Float32,Float64]
-        for x in exp10.(range(-200, stop=-0.01, length=50))
-            @test isapprox(erf(erfinv(x)), x, atol=1e-12*x)
-            @test isapprox(erf(erfinv(-x)), -x, atol=1e-12*x)
-            @test isapprox(erfc(erfcinv(2*x)), 2*x, atol=1e-12*x)
-            if x > 1e-20
-                xf = Float32(x)
-                @test isapprox(erf(erfinv(xf)), xf, atol=1e-5*xf)
-                @test isapprox(erf(erfinv(-xf)), -xf, atol=1e-5*xf)
-                @test isapprox(erfc(erfcinv(2xf)), 2xf, atol=1e-5*xf)
-            end
-        end
-        @test erfinv(one(elty)) == Inf
-        @test erfinv(-one(elty)) == -Inf
-        @test_throws DomainError erfinv(convert(elty,2.0))
-
-        @test erfcinv(zero(elty)) == Inf
-        @test_throws DomainError erfcinv(-one(elty))
-    end
-
-    @test erfinv(one(Int)) == erfinv(1.0)
-    @test erfcinv(one(Int)) == erfcinv(1.0)
-
-    @test erfcx(1.8) ≈ erfcx(big(1.8)) rtol=4*eps()
-    @test erfcx(1.8e8) ≈ erfcx(big(1.8e8)) rtol=4*eps()
-    @test erfcx(1.8e88) ≈ erfcx(big(1.8e88)) rtol=4*eps()
-
-    @test_throws MethodError erf(big(1.0)*im)
-    @test_throws MethodError erfi(big(1.0))
-end
 @testset "incomplete gamma ratios" begin
 #Computed using Wolframalpha gamma(a,x)/gamma(a) ~ gamma_q(a,x,0) function.
     @test gamma_inc(10,10,0)[2] ≈ 0.45792971447185221
