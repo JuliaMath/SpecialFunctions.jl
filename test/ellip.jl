@@ -12,6 +12,7 @@
         @test ellipk(0.69)  ≈ 2.0608816467301313            rtol=2*eps()
         @test ellipk(0.75)  ≈ 2.15651564749964323           rtol=2*eps()
         @test ellipk(0.84)  ≈ 2.3592635547450067            rtol=2*eps()
+        @test ellipk(0.88)  ≈ 2.492635323239715564          rtol=2*eps()
         @test ellipk(0.92)  ≈ 2.683551406315229344          rtol=2*eps()
         @test ellipk(1.0) == Inf
         @test ellipk(Float16(0.92)) ≈ 2.683551406315229344  rtol=2*eps(Float16)
