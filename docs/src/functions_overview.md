@@ -19,7 +19,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | Function | Description |
 |:-------- |:----------- |
 | [`ellipk(m)`](@ref SpecialFunctions.ellipk)    | [complete elliptic integral of 1st kind](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants) ``K(m)``  |
-| [`ellipe(x)`](@ref SpecialFunctions.ellipe)    | [complete elliptic integral of 2nd kind](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind) ``E(m)`` |
+| [`ellipe(m)`](@ref SpecialFunctions.ellipe)    | [complete elliptic integral of 2nd kind](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind) ``E(m)`` |
 
 
 # WIP not grouped
