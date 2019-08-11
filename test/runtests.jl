@@ -89,7 +89,7 @@ end
     @test gamma_inc((100),(80),0)[2] ≈ 0.9828916869648668
     @test gamma_inc((100),(80),1)[2] ≈ 0.9828916869
     @test Float16(gamma_inc((100),(80),2)[2]) ≈ Float16(.983)
-    @test gamma_inc(13.5,15.1,0)[2] ≈ 0.305242642543419087  
+    @test gamma_inc(13.5,15.1,0)[2] ≈ 0.305242642543419087
     @test gamma_inc(11,9,0)[1] ≈ 0.2940116796594881834
     @test gamma_inc(8,32,0)[1] ≈ 0.99999989060651042057
     @test gamma_inc(15,16,0)[2] ≈ 0.3675273597655649298
@@ -145,26 +145,26 @@ end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(0.9,0.8,x,1.0-x)[1] ≈ ans3[ctr]#scipy.special.betainc(0.9,0.8,x)
-        ctr += 1 
+        ctr += 1
     end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(80.9,0.8,x,1.0-x)[1] ≈ ans4[ctr]#scipy.special.betainc(80.9,0.8,x)
-        ctr += 1 
+        ctr += 1
     end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(1.7,10.5,x,1.0-x)[1] ≈ ans5[ctr]#scipy.special.betainc(1.7,10.5,x)
-        ctr += 1 
+        ctr += 1
     end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(100.5,100.5,x,1.0-x)[1] ≈ ans6[ctr]#scipy.special.betainc(100.5,100.5,x)
-        ctr += 1 
+        ctr += 1
     end
     @test beta_inc(1.5,200.5,0.07,0.93)[1] ≈ 0.99999790408564
     @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
-    @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1) 
+    @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1)
 end
 @testset "inverse of incomplete beta" begin
     f(a,b,p) = beta_inc_inv(a,b,p)[1]
@@ -173,7 +173,7 @@ end
     @test f(.5,.5,1.0000) ≈ 1.0000
     @test f(1.0,.5,0.0) ≈ 0.00
     @test f(1.0,.5,0.5012562893380045E-02) ≈ 0.01
-    @test f(1.0,.5,0.5131670194948620E-01) ≈ 0.1 
+    @test f(1.0,.5,0.5131670194948620E-01) ≈ 0.1
     @test f(1.0,.5, 0.2928932188134525) ≈ 0.5
     @test f(1.0,1.0,.5) ≈ 0.5
     @test f(2.0,2.0,.028) ≈ 0.1
@@ -241,39 +241,9 @@ end
     @test ncbeta(Float32(35.0),Float32(30.0),Float32(20.0),Float32(0.670)) ≈ Float32(0.886713)
     @test ncF(Float32(2.0), Float32(3.0), Float32(4.0), Float32(5.0)) ≈ Float32(0.3761448105)
 end
-@testset "elliptic integrals" begin
-#Computed using Wolframalpha EllipticK and EllipticE functions.
-	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipk(0.92) ≈ 2.683551406315229344 rtol=2*eps()
-	@test ellipk(0.5) ≈ 1.854074677301371918 rtol=2*eps()
-	@test ellipk(0.01) ≈ 1.57474556151735595 rtol=2*eps()
-	@test ellipk(0.45) ≈ 1.81388393681698264 rtol=2*eps()
-	@test ellipk(-0.5) ≈ 1.41573720842595619 rtol=2*eps()
-	@test ellipk(0.75) ≈ 2.15651564749964323 rtol=2*eps()
-	@test ellipk(0.17) ≈ 1.6448064907988806 rtol=2*eps()
-	@test ellipk(0.25) ≈ 1.685750354812596 rtol=2*eps()
-	@test ellipk(0.69) ≈ 2.0608816467301313 rtol=2*eps()
-	@test ellipk(0.84) ≈ 2.3592635547450067 rtol=2*eps()
-	@test ellipe(0.15) ≈ 1.5101218320928197 rtol=2*eps()
-	@test ellipe(0.21) ≈ 1.4847605813318776 rtol=2*eps()
-	@test ellipe(0.42) ≈ 1.3898829914929717 rtol=2*eps()
-	@test ellipe(0.66) ≈ 1.2650125751607508 rtol=2*eps()
-	@test ellipe(0.76) ≈ 1.2047136418292115 rtol=2*eps()
-	@test ellipe(0.865) ≈ 1.1322436887003925 rtol=2*eps()
-	@test ellipe(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipe(0.8) ≈ 1.17848992432783852 rtol=2*eps()
-	@test ellipe(0.5) ≈ 1.3506438810476755 rtol=2*eps()
-	@test ellipe(0.01) ≈ 1.5668619420216682 rtol=2*eps()
-	@test ellipe(0.99) ≈ 1.0159935450252239 rtol=2*eps()
-	@test ellipe(-0.1) ≈ 1.6093590249375295 rtol=2*eps()
-	@test ellipe(0.3) ≈ 1.4453630644126652 rtol=2*eps()
-	@test ellipe(1.0) ≈ 1.00
-	@test ellipk(1.0)==Inf
-	@test_throws MethodError ellipk(BigFloat(0.5))
-	@test_throws MethodError ellipe(BigFloat(-1))
-	@test_throws DomainError ellipe(Float16(2.0))
-	@test_throws DomainError ellipe(Float32(2.5))
-end 
+
+include("ellip.jl")
+
 @testset "sine and cosine integrals" begin
     # Computed via wolframalpha.com: SinIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]] and CosIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]]
     sinintvals = [0.9460830703671830149, 1.605412976802694849, 1.848652527999468256, 1.75820313894905306, 1.54993124494467414, 1.4246875512805065, 1.4545966142480936, 1.5741868217069421, 1.665040075829602, 1.658347594218874, 1.578306806945727416, 1.504971241526373371, 1.499361722862824564, 1.556211050077665054, 1.618194443708368739, 1.631302268270032886, 1.590136415870701122, 1.536608096861185462, 1.518630031769363932, 1.548241701043439840]
@@ -369,7 +339,7 @@ end
         true_h133 = 0.30906272225525164362 - 0.53854161610503161800im
         @test besselh(3,1,3) ≈ true_h133
         @test besselh(-3,1,3) ≈ -true_h133
-        @test besselh(Float32(3),1,Float32(3)) ≈ true_h133	
+        @test besselh(Float32(3),1,Float32(3)) ≈ true_h133
         @test besselh(Float16(3),1,Float16(3)) ≈ true_h133
         @test besselh(3,2,3) ≈ conj(true_h133)
         @test besselh(-3,2,3) ≈ -conj(true_h133)
