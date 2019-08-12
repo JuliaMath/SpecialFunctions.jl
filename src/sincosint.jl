@@ -101,9 +101,9 @@ function sinint(x::Float64)
 end
 
 function cosint(x::Float64)
-    t, r0, r1 = x*x, 0.616505485620716233797110404100, 3.384180422551186426397851146402
-    r01, r02 = 0.6162109375, 0.29454812071623379711E-3
-    r11, r12 = 3.3837890625, 0.39136005118642639785E-3
+    t, r0, r1   = x*x, 0.616505485620716233797110404100, 3.384180422551186426397851146402
+    r01, r02    = 0.6162109375, 0.29454812071623379711E-3
+    r11, r12    = 3.3837890625, 0.39136005118642639785E-3
     if x < 0.0
         throw(DomainError(x, "`x` must be nonnegative."))
     elseif x ≤ 3.0
@@ -218,10 +218,10 @@ end
 
 for f in (:sinint, :cosint)
     @eval begin
-        ($f)(x::Float32) = Float32(($f)(Float64(x)))
-        ($f)(x::Float16) = Float16(($f)(Float64(x)))
-        ($f)(x::Real) = ($f)(float(x))
-        ($f)(x::AbstractFloat) = error("not implemented for ", typeof(x))
+        ($f)(x::Float32)        = Float32(($f)(Float64(x)))
+        ($f)(x::Float16)        = Float16(($f)(Float64(x)))
+        ($f)(x::Real)           = ($f)(float(x))
+        ($f)(x::AbstractFloat)  = error("not implemented for ", typeof(x))
     end
 end
 
