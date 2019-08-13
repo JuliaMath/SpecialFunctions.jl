@@ -53,7 +53,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`besselk(nu,z)`](@ref SpecialFunctions.besselk)              | modified [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the second kind of order `nu` at `z`                                               |
 | [`besselkx(nu,z)`](@ref SpecialFunctions.besselkx)            | scaled modified Bessel function of the second kind of order `nu` at `z`                                                                                         |
 
-## Gamma and Related Functions
+## Gamma and related functions
 | Function | Description |
 |:-------- |:----------- |
 | [`digamma(x)`](@ref SpecialFunctions.digamma)                 | [digamma function](https://en.wikipedia.org/wiki/Digamma_function) (i.e. the derivative of `lgamma` at `x`)                                                     |
@@ -73,7 +73,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`logabsbeta(x,y)`](@ref SpecialFunctions.logabsbeta)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
 | [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
 
-## Riemann Zeta and Related Functions
+## Riemann Zeta and related functions
 | Function | Description |
 |:-------- |:----------- |
 | [`eta(x)`](@ref SpecialFunctions.eta)                         | [Dirichlet eta function](https://en.wikipedia.org/wiki/Dirichlet_eta_function) at `x`                                                                           |
