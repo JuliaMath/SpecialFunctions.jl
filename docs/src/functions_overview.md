@@ -56,6 +56,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 ## Gamma and related functions
 | Function | Description |
 |:-------- |:----------- |
+| [`gamma(z)`](@ref SpecialFunctions.gamma) | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) ``\Gamma(z)`` |
 | [`digamma(x)`](@ref SpecialFunctions.digamma)                 | [digamma function](https://en.wikipedia.org/wiki/Digamma_function) (i.e. the derivative of `lgamma` at `x`)                                                     |
 | [`invdigamma(x)`](@ref SpecialFunctions.invdigamma)   | [invdigamma function](http://bariskurt.com/calculating-the-inverse-of-digamma-function/) (i.e. inverse of `digamma` function at `x` using fixed-point iteration algorithm) |
 | [`trigamma(x)`](@ref SpecialFunctions.trigamma)     | [trigamma function](https://en.wikipedia.org/wiki/Trigamma_function) (i.e the logarithmic second derivative of `gamma` at `x`) |
@@ -63,7 +64,6 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`gamma_inc(a,x,IND)`](@ref SpecialFunctions.gamma_inc)  | [incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates P(a,x) and Q(a,x)for accuracy specified by IND and returns tuple (p,q)) |
 | [`beta_inc(a,b,x,y)`](@ref SpecialFunctions.beta_inc)  | [incomplete beta function ratio Ix(a,b) and Iy(a,b)](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function) (i.e evaluates Ix(a,b) and Iy(a,b) and returns tuple (p,q)) |
 | [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)  | [inverse of incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates x given P(a,x)=p and Q(a,x)=q  |
-| [`gamma(x)`](@ref SpecialFunctions.gamma)                                            | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) at `x`                                                                                           |
 | [`loggamma(x)`](@ref SpecialFunctions.loggamma)                                           | accurate `log(gamma(x))` for large `x`                 |
 | [`logabsgamma(x)`](@ref SpecialFunctions.logabsgamma)                                           | accurate `log(abs(gamma(x)))` for large `x`                                                                                  |
 | [`lgamma(x)`](@ref SpecialFunctions.lgamma)                                           | accurate `log(gamma(x))` for large `x`                                                                                                                          |

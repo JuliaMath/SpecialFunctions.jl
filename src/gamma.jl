@@ -560,10 +560,34 @@ gamma(x::Float32) = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x),
 gamma(x::Float16) = Float16(gamma(Float32(x)))
 gamma(x::AbstractFloat) = throw(MethodError(gamma, x))
 
-"""
-    gamma(x)
+@doc raw"""
+    gamma(z)
 
-Compute the gamma function of `x`.
+Compute the gamma function for complex ``z``, defined by
+
+```math
+\Gamma(z)
+:=
+\begin{cases}
+    n!
+    & \text{for} \quad z = n+1 \;, n = 0,1,2,\dots
+    \\
+    \int_0^\infty t^{z-1} {\mathrm e}^{-t} \, {\mathrm d}t
+    & \text{for} \quad \Re(z) > 0
+\end{cases}
+```
+and by analytic continuation in the whole complex plane.
+
+External links:
+[DLMF](https://dlmf.nist.gov/5.2.E1),
+[Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
+
+See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma).
+
+# Implementation by
+- `Float`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `Complex`: by `exp(loggamma(z))`.
 """
 gamma(x::Real) = gamma(float(x))
 
