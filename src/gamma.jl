@@ -555,10 +555,19 @@ export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, lo
 
 ## from base/special/gamma.jl
 
-gamma(x::Float64) = nan_dom_err(ccall((:tgamma, libm), Float64, (Float64,), x), x)
-gamma(x::Float32) = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x), x)
-gamma(x::Float16) = Float16(gamma(Float32(x)))
+gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libm), Float64, (Float64,), x), x)
+gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x), x)
+gamma(x::Float16)       = Float16(gamma(Float32(x)))
+gamma(x::Real)          = gamma(float(x))
 gamma(x::AbstractFloat) = throw(MethodError(gamma, x))
+
+function gamma(x::BigFloat)
+    isnan(x) && return x
+    z = BigFloat()
+    ccall((:mpfr_gamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    isnan(z) && throw(DomainError(x, "NaN result for non-NaN input."))
+    return z
+end
 
 @doc raw"""
     gamma(z)
@@ -588,8 +597,9 @@ See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma).
 - `Float`: C standard math library
     [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 - `Complex`: by `exp(loggamma(z))`.
+- `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
-gamma(x::Real) = gamma(float(x))
+gamma
 
 function logabsgamma(x::Float64)
     signp = Ref{Int32}()
@@ -819,15 +829,6 @@ function logabsbeta(a::Real, b::Real)
     (ya + yb - yab), (sa*sb*sab)
 end
 ## from base/mpfr.jl
-
-# Functions for which NaN results are converted to DomainError, following Base
-function gamma(x::BigFloat)
-    isnan(x) && return x
-    z = BigFloat()
-    ccall((:mpfr_gamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    isnan(z) && throw(DomainError(x, "NaN result for non-NaN input."))
-    return z
-end
 
 # log of absolute value of gamma function
 function logabsgamma(x::BigFloat)
