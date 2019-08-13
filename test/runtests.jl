@@ -12,55 +12,8 @@ relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
 relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 ≅(a,b) = relerrc(a,b) ≤ 1e-13
 
-@testset "error functions" begin
-    @test erf(Float16(1)) ≈ 0.84270079294971486934
-    @test erf(1) ≈ 0.84270079294971486934
-    @test erfc(1) ≈ 0.15729920705028513066
-    @test erfc(Float16(1)) ≈ 0.15729920705028513066
-    @test erfcx(1) ≈ 0.42758357615580700442
-    @test erfcx(Float32(1)) ≈ 0.42758357615580700442
-    @test erfcx(Complex{Float32}(1)) ≈ 0.42758357615580700442
-    @test erfi(1) ≈ 1.6504257587975428760
-    @test erfinv(0.84270079294971486934) ≈ 1
-    @test erfcinv(0.15729920705028513066) ≈ 1
-    @test dawson(1) ≈ 0.53807950691276841914
+include("erf.jl")
 
-    @test erf(1+2im) ≈ -0.53664356577856503399-5.0491437034470346695im
-    @test erfc(1+2im) ≈ 1.5366435657785650340+5.0491437034470346695im
-    @test erfcx(1+2im) ≈ 0.14023958136627794370-0.22221344017989910261im
-    @test erfi(1+2im) ≈ -0.011259006028815025076+1.0036063427256517509im
-    @test dawson(1+2im) ≈ -13.388927316482919244-11.828715103889593303im
-
-    for elty in [Float32,Float64]
-        for x in exp10.(range(-200, stop=-0.01, length=50))
-            @test isapprox(erf(erfinv(x)), x, atol=1e-12*x)
-            @test isapprox(erf(erfinv(-x)), -x, atol=1e-12*x)
-            @test isapprox(erfc(erfcinv(2*x)), 2*x, atol=1e-12*x)
-            if x > 1e-20
-                xf = Float32(x)
-                @test isapprox(erf(erfinv(xf)), xf, atol=1e-5*xf)
-                @test isapprox(erf(erfinv(-xf)), -xf, atol=1e-5*xf)
-                @test isapprox(erfc(erfcinv(2xf)), 2xf, atol=1e-5*xf)
-            end
-        end
-        @test erfinv(one(elty)) == Inf
-        @test erfinv(-one(elty)) == -Inf
-        @test_throws DomainError erfinv(convert(elty,2.0))
-
-        @test erfcinv(zero(elty)) == Inf
-        @test_throws DomainError erfcinv(-one(elty))
-    end
-
-    @test erfinv(one(Int)) == erfinv(1.0)
-    @test erfcinv(one(Int)) == erfcinv(1.0)
-
-    @test erfcx(1.8) ≈ erfcx(big(1.8)) rtol=4*eps()
-    @test erfcx(1.8e8) ≈ erfcx(big(1.8e8)) rtol=4*eps()
-    @test erfcx(1.8e88) ≈ erfcx(big(1.8e88)) rtol=4*eps()
-
-    @test_throws MethodError erf(big(1.0)*im)
-    @test_throws MethodError erfi(big(1.0))
-end
 @testset "incomplete gamma ratios" begin
 #Computed using Wolframalpha gamma(a,x)/gamma(a) ~ gamma_q(a,x,0) function.
     @test gamma_inc(10,10,0)[2] ≈ 0.45792971447185221
@@ -89,7 +42,7 @@ end
     @test gamma_inc((100),(80),0)[2] ≈ 0.9828916869648668
     @test gamma_inc((100),(80),1)[2] ≈ 0.9828916869
     @test Float16(gamma_inc((100),(80),2)[2]) ≈ Float16(.983)
-    @test gamma_inc(13.5,15.1,0)[2] ≈ 0.305242642543419087  
+    @test gamma_inc(13.5,15.1,0)[2] ≈ 0.305242642543419087
     @test gamma_inc(11,9,0)[1] ≈ 0.2940116796594881834
     @test gamma_inc(8,32,0)[1] ≈ 0.99999989060651042057
     @test gamma_inc(15,16,0)[2] ≈ 0.3675273597655649298
@@ -145,26 +98,26 @@ end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(0.9,0.8,x,1.0-x)[1] ≈ ans3[ctr]#scipy.special.betainc(0.9,0.8,x)
-        ctr += 1 
+        ctr += 1
     end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(80.9,0.8,x,1.0-x)[1] ≈ ans4[ctr]#scipy.special.betainc(80.9,0.8,x)
-        ctr += 1 
+        ctr += 1
     end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(1.7,10.5,x,1.0-x)[1] ≈ ans5[ctr]#scipy.special.betainc(1.7,10.5,x)
-        ctr += 1 
+        ctr += 1
     end
     ctr = 1
     for x = 0.01:0.01:0.99
         @test beta_inc(100.5,100.5,x,1.0-x)[1] ≈ ans6[ctr]#scipy.special.betainc(100.5,100.5,x)
-        ctr += 1 
+        ctr += 1
     end
     @test beta_inc(1.5,200.5,0.07,0.93)[1] ≈ 0.99999790408564
     @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
-    @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1) 
+    @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling(11.99) + SpecialFunctions.stirling(100.1) - SpecialFunctions.stirling(11.99 + 100.1)
 end
 @testset "inverse of incomplete beta" begin
     f(a,b,p) = beta_inc_inv(a,b,p)[1]
@@ -173,7 +126,7 @@ end
     @test f(.5,.5,1.0000) ≈ 1.0000
     @test f(1.0,.5,0.0) ≈ 0.00
     @test f(1.0,.5,0.5012562893380045E-02) ≈ 0.01
-    @test f(1.0,.5,0.5131670194948620E-01) ≈ 0.1 
+    @test f(1.0,.5,0.5131670194948620E-01) ≈ 0.1
     @test f(1.0,.5, 0.2928932188134525) ≈ 0.5
     @test f(1.0,1.0,.5) ≈ 0.5
     @test f(2.0,2.0,.028) ≈ 0.1
@@ -241,75 +194,9 @@ end
     @test ncbeta(Float32(35.0),Float32(30.0),Float32(20.0),Float32(0.670)) ≈ Float32(0.886713)
     @test ncF(Float32(2.0), Float32(3.0), Float32(4.0), Float32(5.0)) ≈ Float32(0.3761448105)
 end
-@testset "elliptic integrals" begin
-#Computed using Wolframalpha EllipticK and EllipticE functions.
-	@test ellipk(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipk(0.92) ≈ 2.683551406315229344 rtol=2*eps()
-	@test ellipk(0.5) ≈ 1.854074677301371918 rtol=2*eps()
-	@test ellipk(0.01) ≈ 1.57474556151735595 rtol=2*eps()
-	@test ellipk(0.45) ≈ 1.81388393681698264 rtol=2*eps()
-	@test ellipk(-0.5) ≈ 1.41573720842595619 rtol=2*eps()
-	@test ellipk(0.75) ≈ 2.15651564749964323 rtol=2*eps()
-	@test ellipk(0.17) ≈ 1.6448064907988806 rtol=2*eps()
-	@test ellipk(0.25) ≈ 1.685750354812596 rtol=2*eps()
-	@test ellipk(0.69) ≈ 2.0608816467301313 rtol=2*eps()
-	@test ellipk(0.84) ≈ 2.3592635547450067 rtol=2*eps()
-	@test ellipe(0.15) ≈ 1.5101218320928197 rtol=2*eps()
-	@test ellipe(0.21) ≈ 1.4847605813318776 rtol=2*eps()
-	@test ellipe(0.42) ≈ 1.3898829914929717 rtol=2*eps()
-	@test ellipe(0.66) ≈ 1.2650125751607508 rtol=2*eps()
-	@test ellipe(0.76) ≈ 1.2047136418292115 rtol=2*eps()
-	@test ellipe(0.865) ≈ 1.1322436887003925 rtol=2*eps()
-	@test ellipe(0) ≈ 1.570796326794896619231322 rtol=2*eps()
-	@test ellipe(0.8) ≈ 1.17848992432783852 rtol=2*eps()
-	@test ellipe(0.5) ≈ 1.3506438810476755 rtol=2*eps()
-	@test ellipe(0.01) ≈ 1.5668619420216682 rtol=2*eps()
-	@test ellipe(0.99) ≈ 1.0159935450252239 rtol=2*eps()
-	@test ellipe(-0.1) ≈ 1.6093590249375295 rtol=2*eps()
-	@test ellipe(0.3) ≈ 1.4453630644126652 rtol=2*eps()
-	@test ellipe(1.0) ≈ 1.00
-	@test ellipk(1.0)==Inf
-	@test_throws MethodError ellipk(BigFloat(0.5))
-	@test_throws MethodError ellipe(BigFloat(-1))
-	@test_throws DomainError ellipe(Float16(2.0))
-	@test_throws DomainError ellipe(Float32(2.5))
-end 
-@testset "sine and cosine integrals" begin
-    # Computed via wolframalpha.com: SinIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]] and CosIntegral[SetPrecision[Table[x,{x, 1,20,1}],20]]
-    sinintvals = [0.9460830703671830149, 1.605412976802694849, 1.848652527999468256, 1.75820313894905306, 1.54993124494467414, 1.4246875512805065, 1.4545966142480936, 1.5741868217069421, 1.665040075829602, 1.658347594218874, 1.578306806945727416, 1.504971241526373371, 1.499361722862824564, 1.556211050077665054, 1.618194443708368739, 1.631302268270032886, 1.590136415870701122, 1.536608096861185462, 1.518630031769363932, 1.548241701043439840]
-    cosintvals = [0.3374039229009681347, 0.4229808287748649957, 0.119629786008000328, -0.14098169788693041, -0.19002974965664388, -0.06805724389324713, 0.07669527848218452, 0.122433882532010, 0.0553475313331336, -0.045456433004455, -0.08956313549547997948, -0.04978000688411367560, 0.02676412556403455504, 0.06939635592758454727, 0.04627867767436043960, -0.01420019012019002240, -0.05524268226081385053, -0.04347510299950100478, 0.00515037100842612857, 0.04441982084535331654]
-    for x in 1:20
-        @test sinint(x) ≅ sinintvals[x]
-        @test sinint(-x) ≅ -sinintvals[x]
-        @test cosint(x) ≅ cosintvals[x]
-    end
 
-    @test sinint(1.f0) == Float32(sinint(1.0))
-    @test cosint(1.f0) == Float32(cosint(1.0))
-
-    @test sinint(Float16(1.0)) == Float16(sinint(1.0))
-    @test cosint(Float16(1.0)) == Float16(cosint(1.0))
-
-    @test sinint(1//2) == sinint(0.5)
-    @test cosint(1//2) == cosint(0.5)
-
-    @test sinint(1e300) ≅ π/2
-    @test cosint(1e300) ≅ -8.17881912115908554103E-301
-    @test sinint(1e-300) ≅ 1.0E-300
-    @test cosint(1e-300) ≅ -690.1983122333121
-
-    @test sinint(Inf) == π/2
-    @test cosint(Inf) == 0.0
-    @test isnan(sinint(NaN))
-    @test isnan(cosint(NaN))
-
-    @test_throws ErrorException sinint(big(1.0))
-    @test_throws ErrorException cosint(big(1.0))
-    @test_throws DomainError cosint(-1.0)
-    @test_throws DomainError cosint(Float32(-1.0))
-    @test_throws DomainError cosint(Float16(-1.0))
-    @test_throws DomainError cosint(-1//2)
-end
+include("ellip.jl")
+include("sincosint.jl")
 
 @testset "airy" begin
     @test_throws AmosException airyai(200im)
@@ -369,7 +256,7 @@ end
         true_h133 = 0.30906272225525164362 - 0.53854161610503161800im
         @test besselh(3,1,3) ≈ true_h133
         @test besselh(-3,1,3) ≈ -true_h133
-        @test besselh(Float32(3),1,Float32(3)) ≈ true_h133	
+        @test besselh(Float32(3),1,Float32(3)) ≈ true_h133
         @test besselh(Float16(3),1,Float16(3)) ≈ true_h133
         @test besselh(3,2,3) ≈ conj(true_h133)
         @test besselh(-3,2,3) ≈ -conj(true_h133)

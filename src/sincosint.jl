@@ -1,20 +1,5 @@
 using Base.Math: @horner
 
-# Compute the sine integral: ∫_0^x sin(t)/t dt,
-# and the cosine integral: γ + log x + ∫_0^x (cos(t)-1)/t dt,
-# using the rational approximants tabulated in:
-#     A.J. MacLeod, "Rational approximations, software and test methods for
-#     sine and cosine integrals," Numer. Algor. 12, pp. 259--272 (1996).
-#         http://dx.doi.org/10.1007/BF02142806
-#         https://link.springer.com/article/10.1007/BF02142806
-#
-# Note: the second zero of Ci(x) has a typo that is fixed:
-#
-# r1 = 3.38418 04228 51186 42639 78511 46402 in the article, but is in fact:
-#
-# r1 = 3.38418 04225 51186 42639 78511 46402.
-#
-
 function sinint(x::Float64)
     t = x*x
     if t ≤ 36.0
@@ -116,9 +101,9 @@ function sinint(x::Float64)
 end
 
 function cosint(x::Float64)
-    t, r0, r1 = x*x, 0.616505485620716233797110404100, 3.384180422551186426397851146402
-    r01, r02 = 0.6162109375, 0.29454812071623379711E-3
-    r11, r12 = 3.3837890625, 0.39136005118642639785E-3
+    t, r0, r1   = x*x, 0.616505485620716233797110404100, 3.384180422551186426397851146402
+    r01, r02    = 0.6162109375, 0.29454812071623379711E-3
+    r11, r12    = 3.3837890625, 0.39136005118642639785E-3
     if x < 0.0
         throw(DomainError(x, "`x` must be nonnegative."))
     elseif x ≤ 3.0
@@ -233,26 +218,73 @@ end
 
 for f in (:sinint, :cosint)
     @eval begin
-        ($f)(x::Float32) = Float32(($f)(Float64(x)))
-        ($f)(x::Float16) = Float16(($f)(Float64(x)))
-        ($f)(x::Real) = ($f)(float(x))
-        ($f)(x::AbstractFloat) = error("not implemented for ", typeof(x))
+        ($f)(x::Float32)        = Float32(($f)(Float64(x)))
+        ($f)(x::Float16)        = Float16(($f)(Float64(x)))
+        ($f)(x::Real)           = ($f)(float(x))
+        ($f)(x::AbstractFloat)  = error("not implemented for ", typeof(x))
     end
 end
 
 
-"""
+@doc raw"""
     sinint(x)
 
-Compute the sine integral function of `x`, defined by ``\\operatorname{Si}(x) := \\int_0^x\\frac{\\sin t}{t} dt``
-for real `x`.
+Compute the sine integral function of ``x``, defined by
+
+```math
+\operatorname{Si}(x)
+:= \int_0^x \frac{\sin t}{t} \, \mathrm{d}t
+\quad \text{for} \quad
+x \in \mathbb{R} \,.
+```
+
+External links: [DLMF](https://dlmf.nist.gov/6.2.E9),
+[Wikipedia](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral).
+
+See also: [`cosint(x)`](@ref SpecialFunctions.cosint).
+
+# Implementation
+Using the rational approximants tabulated in:
+> A.J. MacLeod,
+> "Rational approximations, software and test methods for sine and cosine integrals",
+> Numer. Algor. 12, pp. 259--272 (1996).
+> <http://dx.doi.org/10.1007/BF02142806>,
+> <https://link.springer.com/article/10.1007/BF02142806>.
+
+Note: the second zero of ``Ci(x)`` has a typo that is fixed:
+``r_1 = 3.38418 0422\mathbf{8} 51186 42639 78511 46402`` in the article, but is in fact:
+``r_1 = 3.38418 0422\mathbf{5} 51186 42639 78511 46402``.
 """
 sinint
 
-"""
+@doc raw"""
     cosint(x)
 
-Compute the cosine integral function of `x`, defined by ``\\operatorname{Ci}(x) := \\gamma + \\log x + \\int_0^x \\frac{\\cos t - 1}{t} dt``
-for real `x > 0`, where ``\\gamma`` is the Euler-Mascheroni constant.
+Compute the cosine integral function of ``x``, defined by
+
+```math
+\operatorname{Ci}(x)
+:= \gamma + \log x + \int_0^x \frac{\cos (t) - 1}{t} \, \mathrm{d}t
+\quad \text{for} \quad
+x > 0 \,,
+```
+where ``\gamma`` is the Euler-Mascheroni constant.
+
+External links: [DLMF](https://dlmf.nist.gov/6.2.E13),
+[Wikipedia](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral).
+
+See also: [`sinint(x)`](@ref SpecialFunctions.sinint).
+
+# Implementation
+Using the rational approximants tabulated in:
+> A.J. MacLeod,
+> "Rational approximations, software and test methods for sine and cosine integrals",
+> Numer. Algor. 12, pp. 259--272 (1996).
+> <http://dx.doi.org/10.1007/BF02142806>,
+> <https://link.springer.com/article/10.1007/BF02142806>.
+
+Note: the second zero of ``Ci(x)`` has a typo that is fixed:
+``r_1 = 3.38418 0422\mathbf{8} 51186 42639 78511 46402`` in the article, but is in fact:
+``r_1 = 3.38418 0422\mathbf{5} 51186 42639 78511 46402``.
 """
 cosint
