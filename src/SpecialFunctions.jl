@@ -60,6 +60,7 @@ export
     zeta,
     sinint,
     cosint,
+    legendreP,
     lbinomial
 
 include("bessel.jl")
@@ -71,6 +72,8 @@ include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
 include("deprecated.jl")
+include("legendre.jl")
+
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
           :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
