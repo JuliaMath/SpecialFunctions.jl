@@ -78,3 +78,8 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 |:-------- |:----------- |
 | [`eta(x)`](@ref SpecialFunctions.eta)                         | [Dirichlet eta function](https://en.wikipedia.org/wiki/Dirichlet_eta_function) at `x`                                                                           |
 | [`zeta(x)`](@ref SpecialFunctions.zeta)                       | [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function) at `x`                                                                             |
+
+## Legendre and related functions
+| Function | Description |
+|:-------- |:----------- |
+| [`legendreP(n,x)`](@ref SpecialFunctions.legendreP) | [Legendre polynomial](https://en.wikipedia.org/wiki/Legendre_polynomials) ``P_n(x)``. |
