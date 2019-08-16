@@ -61,6 +61,7 @@ export
     sinint,
     cosint,
     hermiteH,
+    laguerreL,
     legendreP,
     lbinomial
 

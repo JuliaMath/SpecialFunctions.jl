@@ -25,6 +25,34 @@ function hermiteH(n::Integer, x::Real)
 end
 
 @doc raw"""
+    laguerreL(n, x)
+
+Evaluate the Laguerre polynomial ``L_n(x)`` of order ``n`` at position ``x``, defined by
+
+```math
+L_n(x)
+=\frac{e^x}{n!} \frac{\mathrm{d}^n}{\mathrm{d}x^n} \left(e^{-x} x^n\right)
+\quad \text{for} \quad
+x \geq 0, \; n = 0, 1, 2, \dots
+```
+
+External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
+[Wikipedia](https://en.wikipedia.org/wiki/Laguerre_polynomials).
+"""
+function laguerreL(n::Integer, x::Real)
+    if n < 0
+        throw(DomainError(n, "must be non-negative"))
+    end
+    if x < 0
+        throw(DomainError(x, "must be nonnegative"))
+    end
+
+    ABC_recurrence(n, x,
+        m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
+        1, 1, -1)                           # P_{0,0}, P_{1,0}, P_{1,1}
+end
+
+@doc raw"""
     legendreP(n, x)
 
 Evaluate the Legendre Polynomial ``P_n(x)`` of order ``n`` at position ``x``, defined by the
@@ -133,12 +161,17 @@ end
 
 # differentiate for combinations of coefficients: Real vs Function
 function ABC_recurrence_step(m::Integer, x::Real,
+    A::Function, B::Function, C::Function,
+    p_prev::Real, p_prev_prev::Real)
+
+    (A(m)*x + B(m)) * p_prev - C(m) * p_prev_prev
+end
+function ABC_recurrence_step(m::Integer, x::Real,
     A::Function, B::Integer, C::Function,
     p_prev::Real, p_prev_prev::Real)
 
     (A(m)*x + B) * p_prev - C(m) * p_prev_prev
 end
-
 function ABC_recurrence_step(m::Integer, x::Real,
     A::Integer, B::Integer, C::Function,
     p_prev::Real, p_prev_prev::Real)
