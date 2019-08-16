@@ -1,4 +1,30 @@
 @doc raw"""
+    hermiteH(n, x)
+
+Evaluate the (physicists') Hermite polynomials ``H_n(x)`` of order ``n`` at position ``x``,
+defined by
+
+```math
+H_n(x)
+= (-1)^n e^{x^2} \frac{\mathrm{d}^n}{\mathrm{d}x^n} e^{-x^2}
+\quad \text{for} \quad
+x \in \mathbb{R}, \; n = 0, 1, 2, \dots
+```
+
+External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
+[Wikipedia](https://en.wikipedia.org/wiki/Hermite_polynomials).
+"""
+function hermiteH(n::Integer, x::Real)
+    if n < 0
+        throw(DomainError(n, "must be non-negative"))
+    end
+
+    ABC_recurrence(n, x,
+        2, 0, m->2(m-1),        # A_m, B_m, C_m
+        1, 0, 2)                # P_{0,0}, P_{1,0}, P_{1,1}
+end
+
+@doc raw"""
     legendreP(n, x)
 
 Evaluate the Legendre Polynomial ``P_n(x)`` of order ``n`` at position ``x``, defined by the
@@ -71,7 +97,15 @@ and Chebyshev polynomials of 1st kind ``T_n`` and 2nd kind ``U_n``.
 
 #Implementation
 For some polynomials the coefficients ``A_m, B_m, C_m`` are independent of ``m`` and for
-others they aren't. Which is why we use `Union{Integer,Function}`.
+others they aren't. Which is why we use `Union{Integer,Function}` and functions can be
+easily created by anonymous functions.
+
+# Reference
+> JIN, J. M.;
+> JJIE, Zhang Shan.
+> "Computation of special functions".
+> Wiley, 1996.
+> (p. 23)
 """
 function ABC_recurrence(n::Integer, x::Real,
         A::Union{Integer,Function}, B::Union{Integer,Function}, C::Union{Integer,Function},
@@ -97,9 +131,17 @@ function ABC_recurrence(n::Integer, x::Real,
     p
 end
 
+# differentiate for combinations of coefficients: Real vs Function
 function ABC_recurrence_step(m::Integer, x::Real,
     A::Function, B::Integer, C::Function,
     p_prev::Real, p_prev_prev::Real)
 
     (A(m)*x + B) * p_prev - C(m) * p_prev_prev
+end
+
+function ABC_recurrence_step(m::Integer, x::Real,
+    A::Integer, B::Integer, C::Function,
+    p_prev::Real, p_prev_prev::Real)
+
+    (A*x + B) * p_prev - C(m) * p_prev_prev
 end

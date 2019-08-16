@@ -59,5 +59,6 @@ SpecialFunctions.beta
 SpecialFunctions.logbeta
 SpecialFunctions.logabsbeta
 SpecialFunctions.logabsbinomial
+SpecialFunctions.hermiteH
 SpecialFunctions.legendreP
 ```

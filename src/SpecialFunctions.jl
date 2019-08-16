@@ -60,6 +60,7 @@ export
     zeta,
     sinint,
     cosint,
+    hermiteH,
     legendreP,
     lbinomial
 
