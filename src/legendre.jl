@@ -36,15 +36,22 @@ end
 
 function legendreP_bonnet(n::Integer, x::Real)
 
-    # legP_m: will hold legendreP(m, x) for m = 0,..,n
-    # at least of size 2 for initialization
-    legP_m      = zeros(max(n+1,2), 1)
-    legP_m[1:2] .= [1, x]
+    legP_prev_prev  = 1
+    legP_prev       = x
 
-    # iterative evaluate higher orders. should be more efficient than recursive..
-    for m = 2:n
-        legP_m[m+1] = ((2*m-1)//m) * x * legP_m[m] - ((m-1)/m) * legP_m[m-1]
+    if      n == 0
+        return legP_prev_prev
+    elseif  n == 1
+        return legP_prev
     end
 
-    legP_m[n+1]
+    legP = missing
+    for m = 2:n
+        legP = ((2*m-1)//m) * x * legP_prev - ((m-1)/m) * legP_prev_prev
+
+        legP_prev_prev  = legP_prev
+        legP_prev       = legP
+    end
+
+    legP
 end
