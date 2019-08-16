@@ -31,27 +31,75 @@ function legendreP(n::Integer, x::Real)
         throw(DomainError(x, "must be in the range [-1,1]"))
     end
 
-    legendreP_bonnet(n, x)
+    ABC_recurrence(n, x,
+        m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
+        1, 0, 1)                            # P_{0,0}, P_{1,0}, P_{1,1}
 end
 
-function legendreP_bonnet(n::Integer, x::Real)
+@doc raw"""
+    ABC_recurrence(n, x, A, B, C, c0_0, c1_0, c1_1)
 
-    legP_prev_prev  = 1
-    legP_prev       = x
+Evaluate polynomials by the recurrence
+```math
+Q_n(x)
+=
+\begin{cases}
+    c^{(0)}_0
+    & \text{for} \quad n = 0
+    \\
+    c^{(1)}_0 + c^{(0)}_1 x
+    & \text{for} \quad n = 1
+    \\
+    (A_n x + B_n) p_{n-1}(x) - C_n p_{n-2}(x)
+    & \text{for} \quad n \geq 2
+    \,.
+\end{cases}
+```
+
+This will be used to compute Legendre ``P_n``, Laguerre ``L_n``, Hermite ``H_n``,
+and Chebyshev polynomials of 1st kind ``T_n`` and 2nd kind ``U_n``.
+
+# Arguments
+- `n::Integer`:     Polynomial order
+- `x::Real`:        evaluation point
+- `A::Union{Integer,Function}`:    recurrence coefficient ``A_m``
+- `B::Union{Integer,Function}`:    recurrence coefficient ``B_m``
+- `C::Union{Integer,Function}`:    recurrence coefficient ``C_m``
+- `c0_0::Real`:     polynomial coefficient ``c^{(0)}_0``
+- `c1_0::Real`:     polynomial coefficient ``c^{(1)}_0``
+- `c1_1::Real`:     polynomial coefficient ``c^{(1)}_1``
+
+#Implementation
+For some polynomials the coefficients ``A_m, B_m, C_m`` are independent of ``m`` and for
+others they aren't. Which is why we use `Union{Integer,Function}`.
+"""
+function ABC_recurrence(n::Integer, x::Real,
+        A::Union{Integer,Function}, B::Union{Integer,Function}, C::Union{Integer,Function},
+        c0_0::Integer, c1_0::Integer, c1_1::Integer)
+
+    p_prev_prev = c0_0
+    p_prev      = c1_0 + c1_1 * x
 
     if      n == 0
-        return legP_prev_prev
+        return p_prev_prev
     elseif  n == 1
-        return legP_prev
+        return p_prev
     end
 
-    legP = missing
+    p = missing
     for m = 2:n
-        legP = ((2*m-1)//m) * x * legP_prev - ((m-1)/m) * legP_prev_prev
+        p = ABC_recurrence_step(m, x, A, B, C, p_prev, p_prev_prev)
 
-        legP_prev_prev  = legP_prev
-        legP_prev       = legP
+        p_prev_prev  = p_prev
+        p_prev       = p
     end
 
-    legP
+    p
+end
+
+function ABC_recurrence_step(m::Integer, x::Real,
+    A::Function, B::Integer, C::Function,
+    p_prev::Real, p_prev_prev::Real)
+
+    (A(m)*x + B) * p_prev - C(m) * p_prev_prev
 end
