@@ -1,4 +1,42 @@
 @doc raw"""
+    chebyshevT(n, x)
+
+Evaluate the Chebyshev polynomials of the first kind ``T_n(x)`` of order ``n`` at position
+``x``, defined by
+
+```math
+T_n(x)
+=
+\begin{cases}
+    1
+    & \text{for} \quad n = 0\,, \; x \in [-1,1]
+    \\
+    x
+    & \text{for} \quad n = 1\,, \; x \in [-1,1]
+    \\
+    2 x T_{n-1}(x) - T_{n-2}(x)
+    & \text{for} \quad n \geq 2\,, \; x \in [-1,1]
+    \,.
+\end{cases}
+```
+
+External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
+[Wikipedia](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
+"""
+function chebyshevT(n::Integer, x::Real)
+    if n < 0
+        throw(DomainError(n, "must be non-negative"))
+    end
+    if x < -1 || x > 1
+        throw(DomainError(x, "must be in the range [-1,1]"))
+    end
+
+    ABC_recurrence(n, x,
+        2, 0, 1,                # A_m, B_m, C_m
+        1, 0, 1)                # P_{0,0}, P_{1,0}, P_{1,1}
+end
+
+@doc raw"""
     hermiteH(n, x)
 
 Evaluate the (physicists') Hermite polynomials ``H_n(x)`` of order ``n`` at position ``x``,

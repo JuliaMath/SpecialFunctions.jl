@@ -59,6 +59,7 @@ SpecialFunctions.beta
 SpecialFunctions.logbeta
 SpecialFunctions.logabsbeta
 SpecialFunctions.logabsbinomial
+SpecialFunctions.chebyshevT
 SpecialFunctions.hermiteH
 SpecialFunctions.laguerreL
 SpecialFunctions.legendreP

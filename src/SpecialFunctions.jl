@@ -60,6 +60,7 @@ export
     zeta,
     sinint,
     cosint,
+    chebyshevT,
     hermiteH,
     laguerreL,
     legendreP,

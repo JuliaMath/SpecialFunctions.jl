@@ -76,4 +76,31 @@ using Polynomials: Poly
 
         @test_throws MethodError laguerreL(0, Complex(1))
     end
+
+    @testset "chebyshev 1" begin
+        n_poly  = 6
+        c       = zeros(n_poly, n_poly)
+        c[1,1]  = 1
+        c[2, 1:2] .= [ 0,  1                 ]
+        c[3, 1:3] .= [-1,  0,  2             ]
+        c[4, 1:4] .= [ 0, -3,  0,   4        ]
+        c[5, 1:5] .= [ 1,  0, -8,   0, 8     ]
+        c[6, 1:6] .= [ 0,  5,  0, -20, 0, 16 ]
+
+        n_x = 20
+        x_arr = range(-1, 1, length=n_x)
+        for n = 0:n_poly-1
+            P = Poly(c[n+1,:])
+            for x in x_arr
+                @test chebyshevT(n, x) ≈ P(x)        rtol=1e-14
+            end
+        end
+
+        @test_throws DomainError chebyshevT(-1, 0)
+        @test_throws DomainError chebyshevT(0, 1.1)
+        @test_throws DomainError chebyshevT(0, -1.1)
+        @test_throws DomainError chebyshevT(-1, 2)
+
+        @test_throws MethodError chebyshevT(0, Complex(1))
+    end
 end
