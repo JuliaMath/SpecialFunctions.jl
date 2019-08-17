@@ -61,6 +61,7 @@ export
     sinint,
     cosint,
     chebyshevT,
+    chebyshevU,
     hermiteH,
     laguerreL,
     legendreP,

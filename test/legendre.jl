@@ -103,4 +103,31 @@ using Polynomials: Poly
 
         @test_throws MethodError chebyshevT(0, Complex(1))
     end
+
+    @testset "chebyshev 2" begin
+        n_poly  = 6
+        c       = zeros(n_poly, n_poly)
+        c[1,1]  = 1
+        c[2, 1:2] .= [ 0,  2                   ]
+        c[3, 1:3] .= [-1,  0,   4              ]
+        c[4, 1:4] .= [ 0, -4,   0,   8         ]
+        c[5, 1:5] .= [ 1,  0, -12,   0, 16     ]
+        c[6, 1:6] .= [ 0,  6,   0, -32,  0, 32 ]
+
+        n_x = 20
+        x_arr = range(-1, 1, length=n_x)
+        for n = 0:n_poly-1
+            P = Poly(c[n+1,:])
+            for x in x_arr
+                @test chebyshevU(n, x) ≈ P(x)        rtol=1e-14
+            end
+        end
+
+        @test_throws DomainError chebyshevU(-1, 0)
+        @test_throws DomainError chebyshevU(0, 1.1)
+        @test_throws DomainError chebyshevU(0, -1.1)
+        @test_throws DomainError chebyshevU(-1, 2)
+
+        @test_throws MethodError chebyshevU(0, Complex(1))
+    end
 end
