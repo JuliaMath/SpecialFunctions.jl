@@ -106,7 +106,7 @@ P_n(x)
     x
     & \text{for} \quad n = 1
     \\
-    \frac{2n-1}{n} P_{n-1}(x) - \frac{n-1}{n} P_{n-2}(x)
+    \frac{2n-1}{n} x P_{n-1}(x) - \frac{n-1}{n} P_{n-2}(x)
     & \text{for} \quad n \geq 2
     \,.
 \end{cases}
@@ -215,4 +215,10 @@ function ABC_recurrence_step(m::Integer, x::Real,
     p_prev::Real, p_prev_prev::Real)
 
     (A*x + B) * p_prev - C(m) * p_prev_prev
+end
+function ABC_recurrence_step(m::Integer, x::Real,
+    A::Integer, B::Integer, C::Integer,
+    p_prev::Real, p_prev_prev::Real)
+
+    (A*x + B) * p_prev - C * p_prev_prev
 end
