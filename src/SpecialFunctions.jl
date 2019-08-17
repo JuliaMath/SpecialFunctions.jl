@@ -65,6 +65,7 @@ export
     hermiteH,
     laguerreL,
     legendreP,
+    legendreQ,
     lbinomial
 
 include("bessel.jl")

@@ -64,4 +64,5 @@ SpecialFunctions.chebyshevU
 SpecialFunctions.hermiteH
 SpecialFunctions.laguerreL
 SpecialFunctions.legendreP
+SpecialFunctions.legendreQ
 ```

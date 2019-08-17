@@ -32,8 +32,9 @@ function chebyshevT(n::Integer, x::Real)
     end
 
     ABC_recurrence(n, x,
-        2, 0, 1,                # A_m, B_m, C_m
-        1, 0, 1)                # P_{0,0}, P_{1,0}, P_{1,1}
+        2, 0, 1,                            # A_m, B_m, C_m
+        [1],                                # P_0
+        [0, 1])                             # P_1
 end
 
 @doc raw"""
@@ -70,8 +71,9 @@ function chebyshevU(n::Integer, x::Real)
     end
 
     ABC_recurrence(n, x,
-        2, 0, 1,                # A_m, B_m, C_m
-        1, 0, 2)                # P_{0,0}, P_{1,0}, P_{1,1}
+        2, 0, 1,                            # A_m, B_m, C_m
+        [1],                                # P_0
+        [0, 2])                             # P_1
 end
 
 @doc raw"""
@@ -96,8 +98,9 @@ function hermiteH(n::Integer, x::Real)
     end
 
     ABC_recurrence(n, x,
-        2, 0, m->2(m-1),        # A_m, B_m, C_m
-        1, 0, 2)                # P_{0,0}, P_{1,0}, P_{1,1}
+        2, 0, m->2(m-1),                    # A_m, B_m, C_m
+        [1],                                # P_0
+        [0, 2])                             # P_1
 end
 
 @doc raw"""
@@ -125,7 +128,8 @@ function laguerreL(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
-        1, 1, -1)                           # P_{0,0}, P_{1,0}, P_{1,1}
+        [1],                                # P_0
+        [1, -1])                            # P_1
 end
 
 @doc raw"""
@@ -163,11 +167,61 @@ function legendreP(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
-        1, 0, 1)                            # P_{0,0}, P_{1,0}, P_{1,1}
+        [1],                                # P_0
+        [0, 1])                             # P_1
 end
 
 @doc raw"""
-    ABC_recurrence(n, x, A, B, C, c0_0, c1_0, c1_1)
+    legendreQ(n, x)
+
+Evaluate the Legendre function of second kind ``Q_n(x)`` of integer degree ``n`` at position
+``x``, defined by the Bonnet recursion
+
+```math
+Q_n(x)
+=
+\begin{cases}
+    \frac{1}{2} \log \frac{1+x}{1-x}
+    & \text{for} \quad n = 0\,, \; x \in (-1,1)
+    \\
+    P_1(x) Q_0(x) - 1
+    & \text{for} \quad n = 1\,, \; x \in (-1,1)
+    \\
+    \frac{2n-1}{n} x Q_{n-1}(x) - \frac{n-1}{n} Q_{n-2}(x)
+    & \text{for} \quad n \geq 2\,, \; x \in (-1,1)
+\end{cases}
+```
+where ``P_1`` is the Legendre polynomial of first kind and degree one.
+The function diverges at the interval boundaries
+``\lim_{x\searrow -1} Q_n(x) = (-1)^{n+1} \infty\,, \lim_{x\nearrow 1} Q_n(x) = \infty``.
+
+External links: [DLMF](https://dlmf.nist.gov/14.7.E2),
+[Wikipedia](https://en.wikipedia.org/wiki/Legendre_function#Legendre_functions_of_the_second_kind_(Qn)).
+"""
+function legendreQ(n::Integer, x::Real)
+    if n < 0
+        throw(DomainError(n, "must be non-negative"))
+    end
+    if x < -1 || x > 1
+        throw(DomainError(x, "must be in the range [-1,1]"))
+    end
+
+    if      x == 1
+        return Inf
+    elseif  x == -1
+        return (-1)^(n+1) * Inf
+    end
+
+    Q0(y) = 0.5 * log((1+y)/(1-y))
+    Q1(y) = legendreP(1, x) * Q0(y) - 1
+
+    ABC_recurrence(n, x,
+        m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
+        Q0, Q1)
+end
+
+@doc raw"""
+    ABC_recurrence(n, x, A, B, C, p0, p1)
 
 Evaluate polynomials by the recurrence
 ```math
@@ -190,19 +244,22 @@ This will be used to compute Legendre ``P_n``, Laguerre ``L_n``, Hermite ``H_n``
 and Chebyshev polynomials of 1st kind ``T_n`` and 2nd kind ``U_n``.
 
 # Arguments
-- `n::Integer`:     Polynomial order
-- `x::Real`:        evaluation point
-- `A::Union{Integer,Function}`:    recurrence coefficient ``A_m``
-- `B::Union{Integer,Function}`:    recurrence coefficient ``B_m``
-- `C::Union{Integer,Function}`:    recurrence coefficient ``C_m``
-- `c0_0::Real`:     polynomial coefficient ``c^{(0)}_0``
-- `c1_0::Real`:     polynomial coefficient ``c^{(1)}_0``
-- `c1_1::Real`:     polynomial coefficient ``c^{(1)}_1``
+- `n::Integer`:                             Polynomial order
+- `x::Real`:                                evaluation point
+- `A::Union{Integer,Function}`:             recurrence coefficient ``A_m``
+- `B::Union{Integer,Function}`:             recurrence coefficient ``B_m``
+- `C::Union{Integer,Function}`:             recurrence coefficient ``C_m``
+- `p0::Union{Array{Int64,1},Function}`:     function/polynomial of degree 0, e.g. ``c^{(0)}_i``
+- `p1::Union{Array{Int64,1},Function}`:     function/polynomial of degree 1, e.g. ``c^{(1)}_i``
 
 #Implementation
 For some polynomials the coefficients ``A_m, B_m, C_m`` are independent of ``m`` and for
 others they aren't. Which is why we use `Union{Integer,Function}` and functions can be
 easily created by anonymous functions.
+
+Degree 0, and 1 can be given by an array for the polynomial coefficients or as a function.
+
+Uses `Array{Int64,1}` instead of `Array{Integer,1}` as it is not a subtype.
 
 # Reference
 > JIN, J. M.;
@@ -213,10 +270,11 @@ easily created by anonymous functions.
 """
 function ABC_recurrence(n::Integer, x::Real,
         A::Union{Integer,Function}, B::Union{Integer,Function}, C::Union{Integer,Function},
-        c0_0::Integer, c1_0::Integer, c1_1::Integer)
+        p0::Union{Array{Int64,1},Function}, p1::Union{Array{Int64,1},Function})
 
-    p_prev_prev = c0_0
-    p_prev      = c1_0 + c1_1 * x
+    # evaluate initial functions
+    p_prev_prev = ABC_recurrence_eval(x, p0)
+    p_prev      = ABC_recurrence_eval(x, p1)
 
     if      n == 0
         return p_prev_prev
@@ -233,6 +291,19 @@ function ABC_recurrence(n::Integer, x::Real,
     end
 
     p
+end
+
+# evaluates the polynomial defined by coefficient array c.
+# only linear polynomials are used.
+function ABC_recurrence_eval(x::Real, c::Array{Int64,1})
+    if      length(c) == 1
+        return c[1]
+    elseif  length(c) == 2
+        return c[1] + c[2] * x
+    end
+end
+function ABC_recurrence_eval(x::Real, f::Function)
+    f(x)
 end
 
 # differentiate for combinations of coefficients: Real vs Function

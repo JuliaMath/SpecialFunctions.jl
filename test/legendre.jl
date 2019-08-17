@@ -1,4 +1,4 @@
-using Polynomials: Poly
+using Polynomials
 
 @testset "legendre and related functions" begin
     @testset "legendre" begin
@@ -25,6 +25,44 @@ using Polynomials: Poly
         @test_throws DomainError legendreP(-1, 2)
 
         @test_throws MethodError legendreP(0, Complex(1))
+    end
+
+    @testset "legendreQ" begin
+        q = Array{Function,1}(undef,  6)
+        Q0(x) = 0.5 * log((1+x)/(1-x))
+        q[1] = Q0
+
+        n_poly  = 5
+        c       = zeros(n_poly, n_poly)
+        c[1,1]  = -1
+        c[2,2]  = -3//2
+        c[3, 1:3] .= [  2//3,      0, -5//2                 ]
+        c[4, 1:4] .= [     0, 55//24,     0, -35//8         ]
+        c[5, 1:5] .= [-8//15,      0, 49//8,      0, -63//8 ]
+
+        for i = 1:n_poly
+            q[i+1] = x -> legendreP(i, x) * Q0(x) + polyval(Poly(c[i,:]), x)
+        end
+
+        n_x = 20
+        x_arr = range(-0.99, 0.99, length=n_x)
+        for n = 0:n_poly
+            for x in x_arr
+                @test legendreQ(n, x) ≈ q[n+1](x)        rtol=1e-14
+            end
+        end
+
+        for n in range(0, stop=3n_poly)
+            @test               Inf == legendreQ(n, 1)
+            @test (-1)^(n+1) *  Inf == legendreQ(n, -1)
+        end
+
+        @test_throws DomainError legendreQ(-1, 0)
+        @test_throws DomainError legendreQ( 1, 1.1)
+        @test_throws DomainError legendreQ( 1, -1.1)
+        @test_throws DomainError legendreQ(-1, 1.1)
+
+        @test_throws MethodError legendreQ(0, Complex(1))
     end
 
     @testset "hermite" begin

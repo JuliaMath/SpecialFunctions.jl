@@ -87,3 +87,4 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`hermiteH(n,x)`](@ref SpecialFunctions.hermiteH)     | [Hermite polynomial](https://en.wikipedia.org/wiki/Hermite_polynomials) ``H_n(x)`` |
 | [`laguerreL(n,x)`](@ref SpecialFunctions.laguerreL)   | [Laguerre polynomial](https://en.wikipedia.org/wiki/Laguerre_polynomials) ``L_n(x)`` |
 | [`legendreP(n,x)`](@ref SpecialFunctions.legendreP)   | [Legendre polynomial](https://en.wikipedia.org/wiki/Legendre_polynomials) ``P_n(x)`` |
+| [`legendreQ(n,x)`](@ref SpecialFunctions.legendreQ)   | [Legendre function of the second kind](https://en.wikipedia.org/wiki/Legendre_function#Legendre_functions_of_the_second_kind_(Qn)) ``Q_n(x)`` |
