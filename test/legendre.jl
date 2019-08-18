@@ -37,9 +37,7 @@ using Polynomials
             end
         end
 
-
         n_max   = 4
-        c       = zeros(n_max, n_max, n_max)
         P       = Array{Function,2}(undef, n_max, n_max)
 
         P[1, 1] = x -> -sqrt(1-x^2)
@@ -106,6 +104,49 @@ using Polynomials
         @test_throws DomainError legendreQ(-1, 1.1)
 
         @test_throws MethodError legendreQ(0, Complex(1))
+    end
+
+    @testset "assoc legendreQ" begin
+        n_poly  = 6
+        n_x     = 20
+        x_arr   = range(-1, 1, length=n_x)
+        for n = 0:n_poly
+            for x in x_arr
+                @test legendreQ(n, x) ≈ legendreQ(n, 0, x)        rtol=1e-14
+            end
+        end
+
+        n_max   = 2
+        m_max   = 3
+        Q       = Array{Function,2}(undef, n_max+1, m_max)
+
+        Q[1, 1] = x -> -(1-x^2)^(-0.5)
+        Q[1, 2] = x -> 2x / (1-x^2)
+        Q[1, 3] = x -> -(2+6x^2) * (1-x^2)^(-1.5)
+
+        Q[2, 1] = x -> -sqrt(1-x^2) * (0.5*log((1+x)/(1-x)) + x/(1-x^2))
+        Q[2, 2] = x -> 2 / (1-x^2)
+        Q[2, 3] = x -> -8x * (1-x^2)^(-1.5)
+
+        Q[3, 1] = x -> -sqrt(1-x^2) * (3x/2*log((1+x)/(1-x)) + (3x^2-2)/(1-x^2))
+        Q[3, 2] = x -> (1-x^2) * (3/2*log((1+x)/(1-x)) - (3x^3-5x)/(1-x^2)^2)
+        Q[3, 3] = x -> -8 * (1-x^2)^(-1.5)
+
+        x_arr   = range(-0.99, 0.99, length=n_x)
+        for n = 0:n_max
+            for m = 1:m_max
+                for x in x_arr
+                    @test legendreQ(n, m, x) ≈ Q[n+1,m](x)        rtol=1e-14
+                end
+            end
+        end
+
+        @test_throws DomainError legendreQ(-1,  0, 0)       # n too small
+        @test_throws DomainError legendreQ( 1, -1, 0)       # m too small
+        @test_throws DomainError legendreQ( 0,  0,  1.1)    # x too high
+        @test_throws DomainError legendreQ( 0,  0, -1.1)    # x too small
+
+        @test_throws MethodError legendreQ(0, 0, Complex(1))
     end
 
     @testset "hermite" begin

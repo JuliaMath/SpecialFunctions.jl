@@ -221,31 +221,44 @@ function legendreP(n::Integer, m::Integer, x::Real)
 end
 
 @doc raw"""
-    legendreQ(n, x)
+    legendreQ(n[, m], x)
 
 Evaluate the Legendre function of second kind ``Q_n(x)`` of integer degree ``n`` at position
-``x``, defined by the Bonnet recursion
+``x``.
+If the order ``m`` is supplied then the associated Legendre function of second kind
+``Q_n^{(m)}(x)`` is computed.
+Their definitions are given by
 
 ```math
-Q_n(x)
-=
-\begin{cases}
-    \frac{1}{2} \log \frac{1+x}{1-x}
-    & \text{for} \quad n = 0\,, \; x \in (-1,1)
+\begin{align}
+    Q_n^{(m)}(x)
+    &=
+    (-1)^m (1-x^2)^\frac{m}{2} \frac{\mathrm{d}^m}{\mathrm{d}x^m} \left( Q_n(x) \right)
+    \,, \quad m \in \mathbb{N}_0 \,, \; x \in (-1,1)
     \\
-    P_1(x) Q_0(x) - 1
-    & \text{for} \quad n = 1\,, \; x \in (-1,1)
-    \\
-    \frac{2n-1}{n} x Q_{n-1}(x) - \frac{n-1}{n} Q_{n-2}(x)
-    & \text{for} \quad n \geq 2\,, \; x \in (-1,1)
-\end{cases}
+    Q_n(x)
+    &=
+    \begin{cases}
+        \frac{1}{2} \log \frac{1+x}{1-x}
+        & \text{for} \quad n = 0
+        \\
+        P_1(x) Q_0(x) - 1
+        & \text{for} \quad n = 1
+        \\
+        \frac{2n-1}{n} x Q_{n-1}(x) - \frac{n-1}{n} Q_{n-2}(x)
+        & \text{for} \quad n \geq 2
+        \,.
+    \end{cases}
+\end{align}
 ```
 where ``P_1`` is the Legendre polynomial of first kind and degree one.
-The function diverges at the interval boundaries
-``\lim_{x\searrow -1} Q_n(x) = (-1)^{n+1} \infty\,, \lim_{x\nearrow 1} Q_n(x) = \infty``.
+The functions diverge at the interval boundaries
+``\lim_{x\rightarrow \pm 1} |Q_n(x)| = \infty``.
 
-External links: [DLMF](https://dlmf.nist.gov/14.7.E2),
-[Wikipedia](https://en.wikipedia.org/wiki/Legendre_function#Legendre_functions_of_the_second_kind_(Qn)).
+External links: [DLMF - Legendre function](https://dlmf.nist.gov/14.7.E2),
+[DLMF - associated Legendre function](https://dlmf.nist.gov/14.7.E9),
+[Wikipedia - Legendre function](https://en.wikipedia.org/wiki/Legendre_functions#Legendre_functions_of_the_second_kind_(Qn)),
+[Wikipedia - associated Legendre function](https://en.wikipedia.org/wiki/Legendre_function#Associated_Legendre_functions_of_the_second_kind).
 """
 function legendreQ(n::Integer, x::Real)
     if n < 0
@@ -267,6 +280,51 @@ function legendreQ(n::Integer, x::Real)
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
         Q0, Q1)
+end
+function legendreQ(n::Integer, m::Integer, x::Real)
+    if n < 0
+        throw(DomainError(n, "must be non-negative"))
+    end
+    if m < 0
+        throw(DomainError(m, "must be non-negative"))
+    end
+    if m == 0
+        return legendreQ(n, x)
+    end
+
+    # x check after: Q^0_n is also implemented for x = +-1
+    if x <= -1 || x >= 1
+        throw(DomainError(x, "must be in the range (-1,1)"))
+    end
+
+    # step 1: compute Q_n^0(x)
+    q_n_0 = legendreQ(n, x)
+
+    # step 2: compute Q_n^1(x)
+    Q01 = -(1-x^2)^(-0.5)                                                   # = Q_0^1(x)
+    Q11 = -sqrt(1-x^2) * (0.5*log((1+x)/(1-x)) + x/(1-x^2))                 # = Q_1^1(x)
+    if n == 0
+        q = Q01
+    elseif n == 1
+        q = Q11
+    else
+        q, q_prev = Q11, Q01
+        for k = 2:n
+            q_prev, q_prev_prev = q, q_prev
+            q = (2k-1)//(k-1) * x * q_prev - k//(k-1) * q_prev_prev         # = Q_k^1(x)
+        end                                                                 # on output: q = Q_n^1(x)
+    end
+    q_n_1 = q
+
+    # step 3: compute Q_n^m(x)
+    q_prev  = q_n_0
+    q       = q_n_1
+    for k = 2:m
+        q_prev, q_prev_prev = q, q_prev
+        q = -2*(k-1)*x*q_prev / sqrt(1-x^2) - (n+k-1)*(n-k+2)*q_prev_prev   # = Q_n^k(x)
+    end                                                                     # on output: q = Q_n^m(x)
+
+    q
 end
 
 @doc raw"""
