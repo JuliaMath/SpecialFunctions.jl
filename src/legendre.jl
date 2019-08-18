@@ -136,7 +136,7 @@ end
     legendreP(n[, m], x)
 
 Evaluate the Legendre polynomial ``P_n(x)`` of degree ``n`` at position ``x``.
-If the order ``m`` is supplied then the associated Legendre polynomials ``P_n^{(m)}(x)`` is
+If the order ``m`` is supplied then the associated Legendre polynomial ``P_n^{(m)}(x)`` is
 computed.
 Their definitions are given by
 ```math
@@ -161,6 +161,8 @@ Their definitions are given by
     \end{cases}
 \end{align}
 ```
+The Legendre polynomial ``P_n(x)`` are also called Legendre polynomial of first kind,
+respectively ``P_n^{(m)}(x)`` associated Legendre functions of first kind.
 
 External links: [DLMF - Legendre polynomial](https://dlmf.nist.gov/14.7.E1),
 [DLMF - associated Legendre polynomial](https://dlmf.nist.gov/14.7.E8),
