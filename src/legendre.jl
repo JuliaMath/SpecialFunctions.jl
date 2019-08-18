@@ -133,29 +133,39 @@ function laguerreL(n::Integer, x::Real)
 end
 
 @doc raw"""
-    legendreP(n, x)
+    legendreP(n[, m], x)
 
-Evaluate the Legendre Polynomial ``P_n(x)`` of order ``n`` at position ``x``, defined by the
-Bonnet recursion
-
+Evaluate the Legendre polynomial ``P_n(x)`` of degree ``n`` at position ``x``.
+If the order ``m`` is supplied then the associated Legendre polynomials ``P_n^{(m)}(x)`` is
+computed.
+Their definitions are given by
 ```math
-P_n(x)
-=
-\begin{cases}
-    1
-    & \text{for} \quad n = 0
+\begin{align}
+    P_n^{(m)}(x)
+    &=
+    (-1)^m (1-x^2)^\frac{m}{2} \frac{\mathrm{d}^m}{\mathrm{d}x^m} \left( P_n(x) \right)
+    \,, \quad m = 0, 1, \dots, n \,, \; x \in [-1,1]
     \\
-    x
-    & \text{for} \quad n = 1
-    \\
-    \frac{2n-1}{n} x P_{n-1}(x) - \frac{n-1}{n} P_{n-2}(x)
-    & \text{for} \quad n \geq 2
-    \,.
-\end{cases}
+    P_n(x)
+    &=
+    \begin{cases}
+        1
+        & \text{for} \quad n = 0
+        \\
+        x
+        & \text{for} \quad n = 1
+        \\
+        \frac{2n-1}{n} x P_{n-1}(x) - \frac{n-1}{n} P_{n-2}(x)
+        & \text{for} \quad n \geq 2
+        \,.
+    \end{cases}
+\end{align}
 ```
 
-External links: [DLMF](https://dlmf.nist.gov/14.7.E1),
-[Wikipedia](https://en.wikipedia.org/wiki/Legendre_polynomials).
+External links: [DLMF - Legendre polynomial](https://dlmf.nist.gov/14.7.E1),
+[DLMF - associated Legendre polynomial](https://dlmf.nist.gov/14.7.E8),
+[Wikipedia - Legendre polynomial](https://en.wikipedia.org/wiki/Legendre_polynomials),
+[Wikipedia - associated Legendre polynomial](https://en.wikipedia.org/wiki/Associated_Legendre_polynomials).
 """
 function legendreP(n::Integer, x::Real)
     if n < 0
@@ -169,6 +179,43 @@ function legendreP(n::Integer, x::Real)
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
         y->1,                               # P_0(y)
         y->y)                               # P_1(y)
+end
+function legendreP(n::Integer, m::Integer, x::Real)
+    if n < 0
+        throw(DomainError(n, "must be non-negative"))
+    end
+    if m < 0 || m > n
+        throw(DomainError(m, "must be in the range m = 0,..,n"))
+    end
+    if x < -1 || x > 1
+        throw(DomainError(x, "must be in the range [-1,1]"))
+    end
+
+    if m == 0
+        return legendreP(n, x)
+    end
+
+    # step 1: compute P_m^m(x)
+    p = 1                                           # = P_0^0(x)
+    for k = 1:m
+        p_prev  = p
+        p       = -(2k-1) * sqrt(1-x^2) * p_prev    # = P_k^k(x)
+    end                                             # on output: p = P_m^m(x)
+    if n == m
+        return p
+    end
+
+    # step 2: compute P_{m+1}^m(x)
+    p_prev  = p                                     # = P_m^m(x)
+    p       = (2m+1) * x * p_prev                   # = P_{m+1}^m(x)
+
+    # step 3: compute P_n^m(x)
+    for k = m+2:n
+        p_prev, p_prev_prev = p, p_prev
+        p = (2k-1)/(k-m)*x*p_prev - (k+m-1)/(k-m)*p_prev_prev       # = P_k^m(x)
+    end                                             # on output: p = P_n^m(x)
+
+    p
 end
 
 @doc raw"""

@@ -1,7 +1,7 @@
 using Polynomials
 
 @testset "legendre and related functions" begin
-    @testset "legendre" begin
+    @testset "legendreP" begin
         n_poly  = 6
         c       = zeros(n_poly, n_poly)
         c[1,1]  = 1
@@ -25,6 +25,49 @@ using Polynomials
         @test_throws DomainError legendreP(-1, 2)
 
         @test_throws MethodError legendreP(0, Complex(1))
+    end
+
+    @testset "assoc legendreP" begin
+        n_poly  = 6
+        n_x     = 20
+        x_arr   = range(-1, 1, length=n_x)
+        for n = 0:n_poly
+            for x in x_arr
+                @test legendreP(n, x) ≈ legendreP(n, 0, x)        rtol=1e-14
+            end
+        end
+
+
+        n_max   = 4
+        c       = zeros(n_max, n_max, n_max)
+        P       = Array{Function,2}(undef, n_max, n_max)
+
+        P[1, 1] = x -> -sqrt(1-x^2)
+        P[2, 1] = x -> -3x * sqrt(1-x^2)
+        P[2, 2] = x -> 3 * (1-x^2)
+        P[3, 1] = x -> -3//2 * sqrt(1-x^2) * (5x^2-1)
+        P[3, 2] = x -> 15x * (1-x^2)
+        P[3, 3] = x -> -15 * (1-x^2)^1.5
+        P[4, 1] = x -> -5//2 * sqrt(1-x^2) * (7x^3-3x)
+        P[4, 2] = x -> 15//2 * (1-x^2) * (7x^2-1)
+        P[4, 3] = x -> -105 * x * (1-x^2)^1.5
+        P[4, 4] = x -> 105 * (1-x^2)^2
+
+        for n = 1:n_max
+            for m = 1:n
+                for x in x_arr
+                    @test legendreP(n, m, x) ≈ P[n,m](x)        rtol=1e-14
+                end
+            end
+        end
+
+        @test_throws DomainError legendreP(-1,  0, 0)       # n too small
+        @test_throws DomainError legendreP( 1, -1, 0)       # m too small
+        @test_throws DomainError legendreP( 1,  2, 0)       # m too large
+        @test_throws DomainError legendreP( 0,  0,  1.1)    # x too high
+        @test_throws DomainError legendreP( 0,  0, -1.1)    # x too small
+
+        @test_throws MethodError legendreP(0, 0, Complex(1))
     end
 
     @testset "legendreQ" begin
