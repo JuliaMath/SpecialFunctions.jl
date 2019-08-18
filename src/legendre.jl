@@ -33,8 +33,8 @@ function chebyshevT(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
-        [1],                                # P_0
-        [0, 1])                             # P_1
+        y->1,                               # P_0(y)
+        y->y)                               # P_1(y)
 end
 
 @doc raw"""
@@ -72,8 +72,8 @@ function chebyshevU(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
-        [1],                                # P_0
-        [0, 2])                             # P_1
+        y->1,                               # P_0(y)
+        y->2y)                              # P_1(y)
 end
 
 @doc raw"""
@@ -99,8 +99,8 @@ function hermiteH(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         2, 0, m->2(m-1),                    # A_m, B_m, C_m
-        [1],                                # P_0
-        [0, 2])                             # P_1
+        y->1,                               # P_0(y)
+        y->2y)                              # P_1(y)
 end
 
 @doc raw"""
@@ -128,8 +128,8 @@ function laguerreL(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
-        [1],                                # P_0
-        [1, -1])                            # P_1
+        y->1,                               # P_0(y)
+        y->1-y)                             # P_1(y)
 end
 
 @doc raw"""
@@ -167,8 +167,8 @@ function legendreP(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
-        [1],                                # P_0
-        [0, 1])                             # P_1
+        y->1,                               # P_0(y)
+        y->y)                               # P_1(y)
 end
 
 @doc raw"""
@@ -225,13 +225,13 @@ end
 
 Evaluate polynomials by the recurrence
 ```math
-Q_n(x)
+p_n(x)
 =
 \begin{cases}
-    c^{(0)}_0
+    p_0(x)
     & \text{for} \quad n = 0
     \\
-    c^{(1)}_0 + c^{(0)}_1 x
+    p_1(x)
     & \text{for} \quad n = 1
     \\
     (A_n x + B_n) p_{n-1}(x) - C_n p_{n-2}(x)
@@ -244,22 +244,21 @@ This will be used to compute Legendre ``P_n``, Laguerre ``L_n``, Hermite ``H_n``
 and Chebyshev polynomials of 1st kind ``T_n`` and 2nd kind ``U_n``.
 
 # Arguments
-- `n::Integer`:                             Polynomial order
-- `x::Real`:                                evaluation point
-- `A::Union{Integer,Function}`:             recurrence coefficient ``A_m``
-- `B::Union{Integer,Function}`:             recurrence coefficient ``B_m``
-- `C::Union{Integer,Function}`:             recurrence coefficient ``C_m``
-- `p0::Union{Array{Int64,1},Function}`:     function/polynomial of degree 0, e.g. ``c^{(0)}_i``
-- `p1::Union{Array{Int64,1},Function}`:     function/polynomial of degree 1, e.g. ``c^{(1)}_i``
+- `n::Integer`:                     Polynomial order
+- `x::Real`:                        evaluation point
+- `A::Union{Integer,Function}`:     recurrence coefficient ``A_m``
+- `B::Union{Integer,Function}`:     recurrence coefficient ``B_m``
+- `C::Union{Integer,Function}`:     recurrence coefficient ``C_m``
+- `p0::Function`:                   function of degree 0, i.e. ``p_0``
+- `p1::Function`:                   function of degree 1, i.e. ``p_1``
 
 #Implementation
 For some polynomials the coefficients ``A_m, B_m, C_m`` are independent of ``m`` and for
 others they aren't. Which is why we use `Union{Integer,Function}` and functions can be
 easily created by anonymous functions.
 
-Degree 0, and 1 can be given by an array for the polynomial coefficients or as a function.
-
-Uses `Array{Int64,1}` instead of `Array{Integer,1}` as it is not a subtype.
+Degree 0, and 1 are supplied as a function. Efficiency is not an issue as it is only invoked
+once.
 
 # Reference
 > JIN, J. M.;
@@ -270,11 +269,11 @@ Uses `Array{Int64,1}` instead of `Array{Integer,1}` as it is not a subtype.
 """
 function ABC_recurrence(n::Integer, x::Real,
         A::Union{Integer,Function}, B::Union{Integer,Function}, C::Union{Integer,Function},
-        p0::Union{Array{Int64,1},Function}, p1::Union{Array{Int64,1},Function})
+        p0::Function, p1::Function)
 
     # evaluate initial functions
-    p_prev_prev = ABC_recurrence_eval(x, p0)
-    p_prev      = ABC_recurrence_eval(x, p1)
+    p_prev_prev = p0(x)
+    p_prev      = p1(x)
 
     if      n == 0
         return p_prev_prev
@@ -291,19 +290,6 @@ function ABC_recurrence(n::Integer, x::Real,
     end
 
     p
-end
-
-# evaluates the polynomial defined by coefficient array c.
-# only linear polynomials are used.
-function ABC_recurrence_eval(x::Real, c::Array{Int64,1})
-    if      length(c) == 1
-        return c[1]
-    elseif  length(c) == 2
-        return c[1] + c[2] * x
-    end
-end
-function ABC_recurrence_eval(x::Real, f::Function)
-    f(x)
 end
 
 # differentiate for combinations of coefficients: Real vs Function
