@@ -49,23 +49,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "functions_overview/#Error-Functions,-Dawson’s-and-Fresnel-Integrals-1",
+    "location": "functions_overview/#[Gamma-Function](https://dlmf.nist.gov/5)-1",
     "page": "Overview",
-    "title": "Error Functions, Dawson’s and Fresnel Integrals",
+    "title": "Gamma Function",
     "category": "section",
-    "text": "Function Description\nerf(x) error function at x\nerfc(x) complementary error function, i.e. the accurate version of 1-operatornameerf(x) for large x\nerfcinv(x) inverse function to erfc()\nerfcx(x) scaled complementary error function, i.e. accurate e^x^2 operatornameerfc(x) for large x\nerfi(x) imaginary error function defined as -i operatornameerf(ix)\nerfinv(x) inverse function to erf()\ndawson(x) scaled imaginary error function, a.k.a. Dawson function, i.e. accurate fracsqrtpi2 e^-x^2 operatornameerfi(x) for large x"
+    "text": "Function Description\ngamma(z) gamma function Gamma(z)\ndigamma(x) digamma function (i.e. the derivative of lgamma at x)\ninvdigamma(x) invdigamma function (i.e. inverse of digamma function at x using fixed-point iteration algorithm)\ntrigamma(x) trigamma function (i.e the logarithmic second derivative of gamma at x)\npolygamma(m,x) polygamma function (i.e the (m+1)-th derivative of the lgamma function at x)\ngamma_inc(a,x,IND) incomplete gamma function ratio P(a,x) and Q(a,x) (i.e evaluates P(a,x) and Q(a,x)for accuracy specified by IND and returns tuple (p,q))\nbeta_inc(a,b,x,y) incomplete beta function ratio Ix(a,b) and Iy(a,b) (i.e evaluates Ix(a,b) and Iy(a,b) and returns tuple (p,q))\ngamma_inc_inv(a,p,q) inverse of incomplete gamma function ratio P(a,x) and Q(a,x) (i.e evaluates x given P(a,x)=p and Q(a,x)=q\nloggamma(x) accurate log(gamma(x)) for large x\nlogabsgamma(x) accurate log(abs(gamma(x))) for large x\nlgamma(x) accurate log(gamma(x)) for large x\nlogfactorial(x) accurate log(factorial(x)) for large x; same as lgamma(x+1) for x > 1, zero otherwise\nbeta(x,y) beta function at x,y\nlogbeta(x,y) accurate log(beta(x,y)) for large x or y\nlogabsbeta(x,y) accurate log(abs(beta(x,y))) for large x or y\nlogabsbinomial(x,y) accurate log(abs(beta(x,y))) for large x or y"
 },
 
 {
-    "location": "functions_overview/#Elliptic-Integrals-1",
-    "page": "Overview",
-    "title": "Elliptic Integrals",
-    "category": "section",
-    "text": "Function Description\nellipk(m) complete elliptic integral of 1st kind K(m)\nellipe(m) complete elliptic integral of 2nd kind E(m)"
-},
-
-{
-    "location": "functions_overview/#Trigonometric-Integrals-1",
+    "location": "functions_overview/#[Trigonometric-Integrals](https://dlmf.nist.gov/6)-1",
     "page": "Overview",
     "title": "Trigonometric Integrals",
     "category": "section",
@@ -73,25 +65,41 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "functions_overview/#Airy,-Bessel-and-Hankel-Functions-1",
+    "location": "functions_overview/#[Error-Functions,-Dawson’s-and-Fresnel-Integrals](https://dlmf.nist.gov/7)-1",
     "page": "Overview",
-    "title": "Airy, Bessel and Hankel Functions",
+    "title": "Error Functions, Dawson’s and Fresnel Integrals",
     "category": "section",
-    "text": "Function Description\nairyai(z) Airy Ai function at z\nairyaiprime(z) derivative of the Airy Ai function at z\nairybi(z) Airy Bi function at z\nairybiprime(z) derivative of the Airy Bi function at z\nairyaix(z), airyaiprimex(z), airybix(z), airybiprimex(z) scaled Airy Ai function and kth derivatives at z\nbesselj(nu,z) Bessel function of the first kind of order nu at z\nbesselj0(z) besselj(0,z)\nbesselj1(z) besselj(1,z)\nbesseljx(nu,z) scaled Bessel function of the first kind of order nu at z\nbessely(nu,z) Bessel function of the second kind of order nu at z\nbessely0(z) bessely(0,z)\nbessely1(z) bessely(1,z)\nbesselyx(nu,z) scaled Bessel function of the second kind of order nu at z\nbesselh(nu,k,z) Bessel function of the third kind (a.k.a. Hankel function) of order nu at z; k must be either 1 or 2\nhankelh1(nu,z) besselh(nu, 1, z)\nhankelh1x(nu,z) scaled besselh(nu, 1, z)\nhankelh2(nu,z) besselh(nu, 2, z)\nhankelh2x(nu,z) scaled besselh(nu, 2, z)\nbesseli(nu,z) modified Bessel function of the first kind of order nu at z\nbesselix(nu,z) scaled modified Bessel function of the first kind of order nu at z\nbesselk(nu,z) modified Bessel function of the second kind of order nu at z\nbesselkx(nu,z) scaled modified Bessel function of the second kind of order nu at z"
+    "text": "Function Description\nerf(x) error function at x\nerfc(x) complementary error function, i.e. the accurate version of 1-operatornameerf(x) for large x\nerfcinv(x) inverse function to erfc()\nerfcx(x) scaled complementary error function, i.e. accurate e^x^2 operatornameerfc(x) for large x\nerfi(x) imaginary error function defined as -i operatornameerf(ix)\nerfinv(x) inverse function to erf()\ndawson(x) scaled imaginary error function, a.k.a. Dawson function, i.e. accurate fracsqrtpi2 e^-x^2 operatornameerfi(x) for large x"
 },
 
 {
-    "location": "functions_overview/#Gamma-and-related-functions-1",
+    "location": "functions_overview/#[Airy-and-Related-Functions](https://dlmf.nist.gov/9)-1",
     "page": "Overview",
-    "title": "Gamma and related functions",
+    "title": "Airy and Related Functions",
     "category": "section",
-    "text": "Function Description\ngamma(z) gamma function Gamma(z)\ndigamma(x) digamma function (i.e. the derivative of lgamma at x)\ninvdigamma(x) invdigamma function (i.e. inverse of digamma function at x using fixed-point iteration algorithm)\ntrigamma(x) trigamma function (i.e the logarithmic second derivative of gamma at x)\npolygamma(m,x) polygamma function (i.e the (m+1)-th derivative of the lgamma function at x)\ngamma_inc(a,x,IND) incomplete gamma function ratio P(a,x) and Q(a,x) (i.e evaluates P(a,x) and Q(a,x)for accuracy specified by IND and returns tuple (p,q))\nbeta_inc(a,b,x,y) incomplete beta function ratio Ix(a,b) and Iy(a,b) (i.e evaluates Ix(a,b) and Iy(a,b) and returns tuple (p,q))\ngamma_inc_inv(a,p,q) inverse of incomplete gamma function ratio P(a,x) and Q(a,x) (i.e evaluates x given P(a,x)=p and Q(a,x)=q\nloggamma(x) accurate log(gamma(x)) for large x\nlogabsgamma(x) accurate log(abs(gamma(x))) for large x\nlgamma(x) accurate log(gamma(x)) for large x\nlogfactorial(x) accurate log(factorial(x)) for large x; same as lgamma(x+1) for x > 1, zero otherwise\nbeta(x,y) beta function at x,y\nlogbeta(x,y) accurate log(beta(x,y)) for large x or y\nlogabsbeta(x,y) accurate log(abs(beta(x,y))) for large x or y\nlogabsbinomial(x,y) accurate log(abs(beta(x,y))) for large x or y"
+    "text": "Function Description\nairyai(z) Airy Ai function at z\nairyaiprime(z) derivative of the Airy Ai function at z\nairybi(z) Airy Bi function at z\nairybiprime(z) derivative of the Airy Bi function at z\nairyaix(z), airyaiprimex(z), airybix(z), airybiprimex(z) scaled Airy Ai function and kth derivatives at z"
 },
 
 {
-    "location": "functions_overview/#Riemann-Zeta-and-related-functions-1",
+    "location": "functions_overview/#[Bessel-Functions](https://dlmf.nist.gov/10)-1",
     "page": "Overview",
-    "title": "Riemann Zeta and related functions",
+    "title": "Bessel Functions",
+    "category": "section",
+    "text": "Function Description\nbesselj(nu,z) Bessel function of the first kind of order nu at z\nbesselj0(z) besselj(0,z)\nbesselj1(z) besselj(1,z)\nbesseljx(nu,z) scaled Bessel function of the first kind of order nu at z\nbessely(nu,z) Bessel function of the second kind of order nu at z\nbessely0(z) bessely(0,z)\nbessely1(z) bessely(1,z)\nbesselyx(nu,z) scaled Bessel function of the second kind of order nu at z\nbesselh(nu,k,z) Bessel function of the third kind (a.k.a. Hankel function) of order nu at z; k must be either 1 or 2\nhankelh1(nu,z) besselh(nu, 1, z)\nhankelh1x(nu,z) scaled besselh(nu, 1, z)\nhankelh2(nu,z) besselh(nu, 2, z)\nhankelh2x(nu,z) scaled besselh(nu, 2, z)\nbesseli(nu,z) modified Bessel function of the first kind of order nu at z\nbesselix(nu,z) scaled modified Bessel function of the first kind of order nu at z\nbesselk(nu,z) modified Bessel function of the second kind of order nu at z\nbesselkx(nu,z) scaled modified Bessel function of the second kind of order nu at z"
+},
+
+{
+    "location": "functions_overview/#[Elliptic-Integrals](https://dlmf.nist.gov/19)-1",
+    "page": "Overview",
+    "title": "Elliptic Integrals",
+    "category": "section",
+    "text": "Function Description\nellipk(m) complete elliptic integral of 1st kind K(m)\nellipe(m) complete elliptic integral of 2nd kind E(m)"
+},
+
+{
+    "location": "functions_overview/#[Zeta-and-Related-Functions](https://dlmf.nist.gov/25)-1",
+    "page": "Overview",
+    "title": "Zeta and Related Functions",
     "category": "section",
     "text": "Function Description\neta(x) Dirichlet eta function at x\nzeta(x) Riemann zeta function at x"
 },
