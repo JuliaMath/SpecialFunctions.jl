@@ -12,7 +12,7 @@ using Polynomials
         c[6, 1:6] .= [ 0, 15,   0, -70,  0, 63  ] / 8
 
         n_x = 20
-        x_arr = range(-1, 1, length=n_x)
+        x_arr = range(-1, stop=1, length=n_x)
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
@@ -30,7 +30,7 @@ using Polynomials
     @testset "assoc legendreP" begin
         n_poly  = 6
         n_x     = 20
-        x_arr   = range(-1, 1, length=n_x)
+        x_arr   = range(-1, stop=1, length=n_x)
         for n = 0:n_poly
             for x in x_arr
                 @test legendreP(n, x) ≈ legendreP(n, 0, x)        rtol=1e-14
@@ -86,7 +86,7 @@ using Polynomials
         end
 
         n_x = 20
-        x_arr = range(-0.99, 0.99, length=n_x)
+        x_arr = range(-0.99, stop=0.99, length=n_x)
         for n = 0:n_poly
             for x in x_arr
                 @test legendreQ(n, x) ≈ q[n+1](x)        rtol=1e-14
@@ -109,7 +109,7 @@ using Polynomials
     @testset "assoc legendreQ" begin
         n_poly  = 6
         n_x     = 20
-        x_arr   = range(-1, 1, length=n_x)
+        x_arr   = range(-1, stop=1, length=n_x)
         for n = 0:n_poly
             for x in x_arr
                 @test legendreQ(n, x) ≈ legendreQ(n, 0, x)        rtol=1e-14
@@ -132,7 +132,7 @@ using Polynomials
         Q[3, 2] = x -> (1-x^2) * (3/2*log((1+x)/(1-x)) - (3x^3-5x)/(1-x^2)^2)
         Q[3, 3] = x -> -8 * (1-x^2)^(-1.5)
 
-        x_arr   = range(-0.99, 0.99, length=n_x)
+        x_arr   = range(-0.99, stop=0.99, length=n_x)
         for n = 0:n_max
             for m = 1:m_max
                 for x in x_arr
@@ -160,7 +160,7 @@ using Polynomials
         c[6, 1:6] .= [ 0, 120,   0, -160,  0, 32  ]
 
         n_x = 20
-        x_arr = range(-2, 3, length=n_x)
+        x_arr = range(-2, stop=3, length=n_x)
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
@@ -184,7 +184,7 @@ using Polynomials
         c[6, 1:6] .= [120, -600, 600, -200, 25, -1  ] / 120
 
         n_x = 20
-        x_arr = range(0, 2, length=n_x)
+        x_arr = range(0, stop=2, length=n_x)
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
@@ -210,7 +210,7 @@ using Polynomials
         c[6, 1:6] .= [ 0,  5,  0, -20, 0, 16 ]
 
         n_x = 20
-        x_arr = range(-1, 1, length=n_x)
+        x_arr = range(-1, stop=1, length=n_x)
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
@@ -237,7 +237,7 @@ using Polynomials
         c[6, 1:6] .= [ 0,  6,   0, -32,  0, 32 ]
 
         n_x = 20
-        x_arr = range(-1, 1, length=n_x)
+        x_arr = range(-1, stop=1, length=n_x)
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
