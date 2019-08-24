@@ -145,6 +145,8 @@ using Polynomials
         @test_throws DomainError legendreQ( 1, -1, 0)       # m too small
         @test_throws DomainError legendreQ( 0,  0,  1.1)    # x too high
         @test_throws DomainError legendreQ( 0,  0, -1.1)    # x too small
+        @test_throws DomainError legendreQ( 0,  1,  1)      # x too high
+        @test_throws DomainError legendreQ( 0,  1, -1)      # x too small
 
         @test_throws MethodError legendreQ(0, 0, Complex(1))
     end

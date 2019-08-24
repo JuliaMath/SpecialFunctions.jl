@@ -390,7 +390,10 @@ function ABC_recurrence(n::Integer, x::Real,
 
     p = missing
     for m = 2:n
-        p = ABC_recurrence_step(m, x, A, B, C, p_prev, p_prev_prev)
+        Am  = ABC_eval(m, A)
+        Bm  = ABC_eval(m, B)
+        Cm  = ABC_eval(m, C)
+        p   = ABC_recurrence_step(x, Am, Bm, Cm, p_prev, p_prev_prev)
 
         p_prev_prev  = p_prev
         p_prev       = p
@@ -399,28 +402,18 @@ function ABC_recurrence(n::Integer, x::Real,
     p
 end
 
-# differentiate for combinations of coefficients: Real vs Function
-function ABC_recurrence_step(m::Integer, x::Real,
-    A::Function, B::Function, C::Function,
-    p_prev::Real, p_prev_prev::Real)
-
-    (A(m)*x + B(m)) * p_prev - C(m) * p_prev_prev
+# evaluate coefficients A,B,C at m. either constant of given as function.
+# TODO type casting: integer -> float in each iteration. ineffective...
+function ABC_eval(m::Integer, ABC::Integer)
+    Float64(ABC)
 end
-function ABC_recurrence_step(m::Integer, x::Real,
-    A::Function, B::Integer, C::Function,
-    p_prev::Real, p_prev_prev::Real)
-
-    (A(m)*x + B) * p_prev - C(m) * p_prev_prev
+function ABC_eval(m::Integer, ABC::Function)
+    Float64(ABC(m))
 end
-function ABC_recurrence_step(m::Integer, x::Real,
-    A::Integer, B::Integer, C::Function,
+
+function ABC_recurrence_step(x::Real,
+    Am::Real, Bm::Real, Cm::Real,
     p_prev::Real, p_prev_prev::Real)
 
-    (A*x + B) * p_prev - C(m) * p_prev_prev
-end
-function ABC_recurrence_step(m::Integer, x::Real,
-    A::Integer, B::Integer, C::Integer,
-    p_prev::Real, p_prev_prev::Real)
-
-    (A*x + B) * p_prev - C * p_prev_prev
+    (Am*x + Bm) * p_prev - Cm * p_prev_prev
 end
