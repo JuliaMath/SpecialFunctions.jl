@@ -12,7 +12,7 @@ relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
 relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 ≅(a,b) = relerrc(a,b) ≤ 1e-13
 
-include("legendre.jl")
+include("14_legendre.jl")
 include("erf.jl")
 
 @testset "incomplete gamma ratios" begin

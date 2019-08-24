@@ -77,7 +77,7 @@ include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
 include("deprecated.jl")
-include("legendre.jl")
+include("14_legendre.jl")
 
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
