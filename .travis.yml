@@ -2,23 +2,10 @@ language: julia
 os:
   - linux
   - osx
-addons:
-  apt_packages:
-    - gfortran
-before_install:
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        brew cask uninstall oclint;
-        brew install gcc;
-    fi
 julia:
-  - 0.7
-  - 1.0
-  - 1.1
+  - 1.3
   - nightly
-env:
-  matrix:
-    - JULIA_SPECIALFUNCTIONS_BUILD_SOURCE=true
-    - JULIA_SPECIALFUNCTIONS_BUILD_SOURCE=false
+
 notifications:
   email: false
 #script: # the default script is equivalent to the following
@@ -40,4 +27,3 @@ jobs:
                                     Pkg.build();'
         - julia --project=docs/ docs/make.jl
       after_success: skip
-      

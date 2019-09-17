@@ -1,15 +1,8 @@
 module SpecialFunctions
 
-# Load openspecfun libraries from our deps.jl
-let depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
-    if !isfile(depsjl_path)
-        error("SpecialFunctions is not installed properly, run `Pkg.build(\"SpecialFunctions\")`," *
-              "restart Julia and try again")
-    end
-    include(depsjl_path)
-end
+using Pkg.Artifacts
+using OpenSpecFun_jll
 
-__init__() = check_deps()
 export
     airyai,
     airyaiprime,
