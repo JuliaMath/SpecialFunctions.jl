@@ -13,7 +13,8 @@ before_install:
 julia:
   - 0.7
   - 1.0
-  - 1.1
+  - 1.2
+  - 1.3
   - nightly
 env:
   matrix:
@@ -40,4 +41,3 @@ jobs:
                                     Pkg.build();'
         - julia --project=docs/ docs/make.jl
       after_success: skip
-      
