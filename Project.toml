@@ -4,7 +4,6 @@ version = "0.8.0"
 
 [deps]
 OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
-Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [compat]
 julia = "1.3"

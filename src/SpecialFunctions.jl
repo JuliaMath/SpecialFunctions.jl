@@ -1,6 +1,5 @@
 module SpecialFunctions
 
-using Pkg.Artifacts
 using OpenSpecFun_jll
 
 export
