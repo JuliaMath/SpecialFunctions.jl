@@ -33,16 +33,16 @@ function loggammadiv(a::Float64, b::Float64)
     w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
 
-    #COMBINING 
+    #COMBINING
     u = d*log1p(a/b)
     v = a*(log(b) - 1.0)
     return u <= v ? w - u - v : w - v - u
-end 
+end
 
 """
     stirling_corr(a0,b0)
 
-Compute stirling(a0) + stirling(b0) - stirling(a0 + b0) 
+Compute stirling(a0) + stirling(b0) - stirling(a0 + b0)
 for a0,b0 >= 8
 """
 function stirling_corr(a0::Float64, b0::Float64)
@@ -94,7 +94,7 @@ Compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
 function beta_integrand(a::Float64,b::Float64,x::Float64,y::Float64,mu::Float64=0.0)
     a0, b0 = minmax(a,b)
     if a0 >= 8.0
-        if a > b 
+        if a > b
             h = b/a
             x0 = 1.0/(1.0 + h)
             y0 = h/(1.0 + h)
@@ -166,8 +166,8 @@ function beta_integrand(a::Float64,b::Float64,x::Float64,y::Float64,mu::Float64=
         z = 1.0 + rgamma1pm1(apb)
     end
     c = (1.0 + rgamma1pm1(a))*(1.0 + rgamma1pm1(b))/z
-    return ans*(a0*c)/(1.0 + a0/b0)    
-end  
+    return ans*(a0*c)/(1.0 + a0/b0)
+end
 
 """
     beta_inc_cont_fraction(a,b,x,y,lambda,epps)
@@ -321,7 +321,7 @@ function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, 
 
     u = exp(-stirling_corr(a,b))
     return e0*t*u*sm
-end        
+end
 
 """
     beta_inc_asymptotic_asymmetric(a,b,x,y,w,epps)
@@ -389,7 +389,7 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
         end
     end
     return w + u*sm
-end 
+end
 
 
 #For b < min(eps, eps*a) and x <= 0.5
@@ -418,7 +418,7 @@ function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float6
     t *= x
     c = t/an
     s += c
-    while abs(c) > tol 
+    while abs(c) > tol
         an += 1.0
         t *= x
         c = t/an
@@ -435,7 +435,7 @@ end
 Another variant of BPSER(A,B,X,EPS)
 APSER(A,B,X,EPS) from Didonato and Morris (1982)
 """
-function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)         
+function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)
     g = Base.MathConstants.eulergamma
     bx = b*x
     t = x - bx
@@ -466,7 +466,7 @@ end
 
 Computes Ix(a,b) using power series :
 ```math
-I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j}) 
+I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j})
 ```
 BPSER(A,B,X,EPS) from Didonato and Morris (1982)
 """
@@ -481,7 +481,7 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
         z = a*log(x) - logbeta(a,b)
         ans = exp(z)/a
     else
-        
+
         if b0 >= 8.0
             u = loggamma1p(a0) + loggammadiv(a0,b0)
             z = a*log(x) - u
@@ -570,7 +570,7 @@ function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Intege
     if n != 1 && a >= 1.0 && apb >= 1.1*ap1
         mu = abs(exparg_n)
         k = exparg_p
-        if k < mu 
+        if k < mu
             mu = k
         end
         t = mu
@@ -771,7 +771,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         q = beta_inc_power_series1(a0,b0,x0,epps)
         p = 1.0 - q
     elseif max(a0,b0) > 1.0
-        if b0 <= 1.0 
+        if b0 <= 1.0
             p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         elseif x0 >= 0.3
@@ -828,7 +828,7 @@ beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(be
 
 #GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms AS 63: The Incomplete Beta Integral and AS 64: Inverse of the Incomplete Beta Integeral,
 #Applied Statistics,
-#Volume 26, Number 1, 1977, pages 111-114. 
+#Volume 26, Number 1, 1977, pages 111-114.
 
 """
     beta_inc_inv(a,b,p,q,lb=logbeta(a,b)[1])
@@ -847,7 +847,7 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
     #change tail if necessary
 
     if p > 0.5
-        pp = q 
+        pp = q
         aa = b
         bb = a
         indx = true
@@ -926,7 +926,7 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
         end
 
         #check if current estimate is acceptable
-    
+
         if prev <= acu || pp_approx^2 <= acu
             x = tx
             return indx ? (1.0 - x, x) : (x, 1.0-x)
