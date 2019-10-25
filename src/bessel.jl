@@ -30,7 +30,7 @@ function _airy(z::Complex{Float64}, id::Int32, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
-    ccall((:zairy_,openspecfun), Cvoid,
+    ccall((:zairy_,libopenspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), id, kode,
@@ -47,7 +47,7 @@ function _biry(z::Complex{Float64}, id::Int32, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1 = Ref{Int32}()
 
-    ccall((:zbiry_,openspecfun), Cvoid,
+    ccall((:zbiry_,libopenspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}),
            real(z), imag(z), id, kode,
@@ -179,7 +179,7 @@ function _besselh(nu::Float64, k::Int32, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
-    ccall((:zbesh_,openspecfun), Cvoid,
+    ccall((:zbesh_,libopenspecfun), Cvoid,
            (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}, Ref{Int},
             Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
             real(z), imag(z), nu, kode, k, 1,
@@ -196,7 +196,7 @@ function _besseli(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
-    ccall((:zbesi_,openspecfun), Cvoid,
+    ccall((:zbesi_,libopenspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
@@ -213,7 +213,7 @@ function _besselj(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
-    ccall((:zbesj_,openspecfun), Cvoid,
+    ccall((:zbesj_,libopenspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
@@ -230,7 +230,7 @@ function _besselk(nu::Float64, z::Complex{Float64}, kode::Int32)
     ai1, ai2 = Ref{Float64}(), Ref{Float64}()
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
 
-    ccall((:zbesk_,openspecfun), Cvoid,
+    ccall((:zbesk_,libopenspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,
@@ -248,7 +248,7 @@ function _bessely(nu::Float64, z::Complex{Float64}, kode::Int32)
     ae1, ae2 = Ref{Int32}(), Ref{Int32}()
     wrk1, wrk2 = Ref{Float64}(), Ref{Float64}()
 
-    ccall((:zbesy_,openspecfun), Cvoid,
+    ccall((:zbesy_,libopenspecfun), Cvoid,
           (Ref{Float64}, Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Int32},
            Ref{Float64}, Ref{Float64}, Ref{Int32}, Ref{Float64}, Ref{Float64}, Ref{Int32}),
            real(z), imag(z), nu, kode, 1,

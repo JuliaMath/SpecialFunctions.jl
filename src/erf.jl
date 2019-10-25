@@ -22,8 +22,8 @@ end
 for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
     fname = (f === :Dawson) ? :dawson : f
     @eval begin
-        ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
-        ($fname)(z::Complex{Float32}) = Complex{Float32}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
+        ($fname)(z::Complex{Float32}) = Complex{Float32}(ccall(($(string("Faddeeva_",f)),libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
 
         ($fname)(z::Complex) = ($fname)(float(z))
         ($fname)(z::Complex{<:AbstractFloat}) = throw(MethodError($fname,(z,)))
@@ -33,8 +33,8 @@ end
 for f in (:erfcx, :erfi, :Dawson)
     fname = (f === :Dawson) ? :dawson : f
     @eval begin
-        ($fname)(x::Float64) = ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), x)
-        ($fname)(x::Float32) = Float32(ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), Float64(x)))
+        ($fname)(x::Float64) = ccall(($(string("Faddeeva_",f,"_re")),libopenspecfun), Float64, (Float64,), x)
+        ($fname)(x::Float32) = Float32(ccall(($(string("Faddeeva_",f,"_re")),libopenspecfun), Float64, (Float64,), Float64(x)))
 
         ($fname)(x::Real) = ($fname)(float(x))
         ($fname)(x::AbstractFloat) = throw(MethodError($fname,(x,)))
