@@ -5,9 +5,7 @@ eta, zeta, digamma, inverse digamma, trigamma, and polygamma functions.
 Most of these functions were formerly part of Base in early versions of Julia.
 
 This package downloads and builds [openspecfun](https://github.com/JuliaLang/openspecfun).
-Binaries are available for macOS, Windows, FreeBSD, and Linux (glibc >= 2.6).
-To force compilation of the library from source, set an environment variable called
-`JULIA_SPECIALFUNCTIONS_BUILD_SOURCE` equal to `true` before running `Pkg.build`.
+Binaries are available for macOS, Windows, FreeBSD, and Linux (glibc >= 2.6 and musl).
 
 | System | Test Status |
 | :----- | :---------: |
