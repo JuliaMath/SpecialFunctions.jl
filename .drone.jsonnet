@@ -18,7 +18,5 @@ local Pipeline(os, arch, version) = {
 
 [
     Pipeline("linux", "arm",   "1.3"),
-    Pipeline("linux", "arm64", "1.0"),
-    Pipeline("linux", "arm64", "1.2"),
     Pipeline("linux", "arm64", "1.3")
 ]

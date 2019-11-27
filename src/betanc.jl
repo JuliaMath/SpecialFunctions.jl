@@ -8,7 +8,7 @@ const errmax = 1e-15
 	ncbeta_tail(x,a,b,lambda)
 
 Compute tail of the noncentral beta distribution.
-Uses the recursive relation 
+Uses the recursive relation
 ```math
 I_{x}(a,b+1;0) = I_{x}(a,b;0) - \\Gamma(a+b)/\\Gamma(a+1)\\Gamma(b)x^{a}(1-x)^{b}
 ```
@@ -20,7 +20,7 @@ function ncbeta_tail(a::Float64, b::Float64, lambda::Float64, x::Float64)
     elseif x >= 1.0
         return 1.0
     end
-    
+
     c = 0.5*lambda
     #Init series
 
@@ -174,7 +174,7 @@ F(x, v1, v2; lambda) = I_{v1*x/(v1*x + v2)}(v1/2, v2/2; \\lambda)
 ```
 where ``I_{x}(a,b; lambda)`` is the noncentral beta function computed above.
 
-Wikipedia: https://en.wikipedia.org/wiki/Noncentral_F-distribution 
+Wikipedia: https://en.wikipedia.org/wiki/Noncentral_F-distribution
 """
 function ncF(x::Float64, v1::Float64, v2::Float64, lambda::Float64)
     return ncbeta(v1/2, v2/2, lambda, (v1*x)/(v1*x + v2))
@@ -192,4 +192,3 @@ ncbeta(a::Real,b::Real,lambda::Real,x::Real) = ncbeta(promote(float(a),float(b),
 ncbeta(a::T,b::T,lambda::T,x::T) where {T<:AbstractFloat} = throw(MethodError(ncbeta,(a,b,lambda,x,"")))
 ncF(x::Real,v1::Real,v2::Real,lambda::Real) = ncF(promote(float(x),float(v1),float(v2),float(lambda))...)
 ncF(x::T,v1::T,v2::T,lambda::T) where {T<:AbstractFloat} = throw(MethodError(ncF,(x,v1,v2,lambda,"")))
-
