@@ -1,6 +1,6 @@
 name = "SpecialFunctions"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "0.8.0"
+version = "0.9.0"
 
 [deps]
 OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
