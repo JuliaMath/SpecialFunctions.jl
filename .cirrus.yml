@@ -7,7 +7,6 @@ task:
         JULIA_VERSION: 1.3
         JULIA_VERSION: nightly
   install_script:
-    - if [ "${JULIA_SPECIALFUNCTIONS_BUILD_SOURCE}" = "true" ]; then pkg install -y gmake gcc; fi
     - sh -c "$(fetch https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh -o -)"
   build_script:
     - cirrusjl build
