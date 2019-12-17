@@ -426,3 +426,13 @@ function erfcx(x::BigFloat)
         return (1+s)/(x*sqrt(oftype(x,pi)))
     end
 end
+
+function logerfc(x::AbstractFloat)
+    if x > 0.0
+        return log(erfcx(x)) - x^2
+    else
+        return log(erfc(x))
+    end
+end
+
+logerfc(x::Integer) = logerfc(float(x))
