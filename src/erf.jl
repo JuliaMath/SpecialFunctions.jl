@@ -448,8 +448,8 @@ See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
 Based on the [`erfc(x)`](@ref SpecialFunctions.erfc) and [`erfcx(x)`](@ref SpecialFunctions.erfcx) functions.
 Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
-# Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
 function logerfc(x::Union{Float32, Float64, BigFloat})
+    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
     if x > 0.0
         return log(erfcx(x)) - x^2
     else
