@@ -8,6 +8,7 @@ CurrentModule = SpecialFunctions
 SpecialFunctions.erf
 SpecialFunctions.erfc
 SpecialFunctions.erfcx
+SpecialFunctions.logerfc
 SpecialFunctions.erfi
 SpecialFunctions.dawson
 SpecialFunctions.erfinv
