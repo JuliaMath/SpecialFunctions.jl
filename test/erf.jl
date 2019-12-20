@@ -18,6 +18,7 @@
         @test logerfc(Float64(-100)) ≈ 0.6931471805599453 rtol=2*eps(Float64)
         @test logerfc(Float32(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
         @test logerfc(Float64(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
+        @test logerfc(1000) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
         @test logerfc(Float32(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float32)
         @test logerfc(Float64(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float64)
 
