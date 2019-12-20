@@ -427,7 +427,8 @@ function erfcx(x::BigFloat)
     end
 end
 
-function logerfc(x::AbstractFloat)
+# Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
+function logerfc(x::Union{Float32, Float64, BigFloat})
     if x > 0.0
         return log(erfcx(x)) - x^2
     else
@@ -435,4 +436,5 @@ function logerfc(x::AbstractFloat)
     end
 end
 
-logerfc(x::Integer) = logerfc(float(x))
+logerfc(x::Real) = logerfc(float(x))
+logerfc(x::AbstractFloat) = throw(MethodError(logerfc, x))
