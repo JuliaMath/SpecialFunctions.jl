@@ -427,6 +427,24 @@ function erfcx(x::BigFloat)
     end
 end
 
+@doc raw"""
+    logerfc(x)
+
+Compute the natural logarithm of the complementary error function of ``x``, that is
+
+```math
+\operatorname{logerfc}(x) = \operatorname{ln}(\operatorname{erfc}(x))
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
+
+# Implementation
+Based on the [`erfc(x)`](@ref SpecialFunctions.erfc) and [`erfcx(x)`](@ref SpecialFunctions.erfcx) functions.
+"""
 # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
 function logerfc(x::Union{Float32, Float64, BigFloat})
     if x > 0.0
