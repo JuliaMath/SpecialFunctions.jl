@@ -47,7 +47,7 @@ end
 Compute the error function of ``x``, defined by
 
 ```math
-\operatorname{erf}(x) = \frac{2}{\pi} \int_0^x \exp(-t^2) \; \mathrm{d}t
+\operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x \exp(-t^2) \; \mathrm{d}t
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
