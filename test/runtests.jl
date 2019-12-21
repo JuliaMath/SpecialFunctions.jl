@@ -340,6 +340,24 @@ end
         end
     end
 
+    @testset "sphericalbesselj" begin
+        @test sphericalbesselj(1, 1)      ≈ 0.3011686789397568
+        @test sphericalbesselj(10, 5.5)   ≈ 0.0009369210263385842
+        @test sphericalbesselj(1.25, 5.5) ≈ -0.1123558799930763
+        @test sphericalbesselj(1.25, -5.5+0im) ≈ -0.079447604649286 - 0.079447604649286im
+        
+        @test_throws DomainError sphericalbesselj(1.25, -5.5)
+    end
+
+    @testset "sphericalbessely" begin
+        @test sphericalbessely(1, 1)      ≈ -1.381773290676036
+        @test sphericalbessely(10, 5.5)   ≈ -10.89087037026398
+        @test sphericalbessely(1.25, 5.5) ≈ 0.148322390312228
+        @test sphericalbessely(1.25, -5.5+0im) ≈ 0.054015441306998 + 0.104879767991574im
+        
+        @test_throws DomainError sphericalbessely(1.25, -5.5)
+    end
+    
     @testset "besselk" begin
         true_k33 = 0.12217037575718356792
         @test besselk(3,3) ≈ true_k33
