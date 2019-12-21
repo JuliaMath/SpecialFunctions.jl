@@ -37,6 +37,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`erfc(x)`](@ref SpecialFunctions.erfc)       | complementary error function, i.e. the accurate version of ``1-\operatorname{erf}(x)`` for large ``x`` |
 | [`erfcinv(x)`](@ref SpecialFunctions.erfcinv) | inverse function to [`erfc()`](@ref SpecialFunctions.erfc) |
 | [`erfcx(x)`](@ref SpecialFunctions.erfcx)     | scaled complementary error function, i.e. accurate ``e^{x^2} \operatorname{erfc}(x)`` for large ``x`` |
+| [`logerfc(x)`](@ref SpecialFunctions.logerfc) | log of the complementary error function, i.e. accurate ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x`` |
 | [`erfi(x)`](@ref SpecialFunctions.erfi)       | imaginary error function defined as ``-i \operatorname{erf}(ix)`` |
 | [`erfinv(x)`](@ref SpecialFunctions.erfinv)   | inverse function to [`erf()`](@ref SpecialFunctions.erf) |
 | [`dawson(x)`](@ref SpecialFunctions.dawson)   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)`` for large ``x`` |

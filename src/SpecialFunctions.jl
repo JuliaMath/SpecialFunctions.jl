@@ -34,6 +34,7 @@ export
     erfcx,
     erfi,
     erfinv,
+    logerfc,
     eta,
     digamma,
     invdigamma,
@@ -64,7 +65,7 @@ include("betanc.jl")
 include("beta_inc.jl")
 include("deprecated.jl")
 
-for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
+for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc,
           :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end

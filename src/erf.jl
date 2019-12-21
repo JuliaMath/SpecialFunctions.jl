@@ -426,3 +426,36 @@ function erfcx(x::BigFloat)
         return (1+s)/(x*sqrt(oftype(x,pi)))
     end
 end
+
+@doc raw"""
+    logerfc(x)
+
+Compute the natural logarithm of the complementary error function of ``x``, that is
+
+```math
+\operatorname{logerfc}(x) = \operatorname{ln}(\operatorname{erfc}(x))
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+This is the accurate version of ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x``.
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
+
+# Implementation
+Based on the [`erfc(x)`](@ref SpecialFunctions.erfc) and [`erfcx(x)`](@ref SpecialFunctions.erfcx) functions.
+Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
+"""
+function logerfc(x::Union{Float32, Float64, BigFloat})
+    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
+    if x > 0.0
+        return log(erfcx(x)) - x^2
+    else
+        return log(erfc(x))
+    end
+end
+
+logerfc(x::Real) = logerfc(float(x))
+logerfc(x::AbstractFloat) = throw(MethodError(logerfc, x))
