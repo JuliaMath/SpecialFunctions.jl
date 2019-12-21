@@ -596,7 +596,7 @@ softinvsqrt(z::Complex) = sqrt(z)/(abs(z) + (eps ∘ float ∘ abs)(z))
 """
     sphericalbesselj(nu, x)
 
-Spherical bessel function of the first kind at order \$nu\$, \$j_\\nu(x)\$. This is the non-singular
+Spherical bessel function of the first kind at order `nu`, ``j_ν(x)``. This is the non-singular
 solution to the radial part of the Helmholz equation in spherical coordinates.
 """
 sphericalbesselj(nu, x) = √(π/2)*softinvsqrt(x)*besselj(nu+1/2, x)
