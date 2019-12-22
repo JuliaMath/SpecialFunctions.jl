@@ -590,8 +590,8 @@ function bessely(n::Integer, x::BigFloat)
     return z
 end
 
-softinvsqrt(x)          = sqrt(x)/(abs(x) + (eps ∘ float      )(x))
-softinvsqrt(z::Complex) = sqrt(z)/(abs(z) + (eps ∘ float ∘ abs)(z))
+# softinvsqrt(x)          = sqrt(x)/(abs(x) + (eps ∘ float      )(x))
+# softinvsqrt(z::Complex) = sqrt(z)/(abs(z) + (eps ∘ float ∘ abs)(z))
 
 """
     sphericalbesselj(nu, x)
@@ -599,7 +599,17 @@ softinvsqrt(z::Complex) = sqrt(z)/(abs(z) + (eps ∘ float ∘ abs)(z))
 Spherical bessel function of the first kind at order `nu`, ``j_ν(x)``. This is the non-singular
 solution to the radial part of the Helmholz equation in spherical coordinates.
 """
-sphericalbesselj(nu, x::T) where {T} = √((float(T))(π)/2) * softinvsqrt(x) * besselj(nu + 1//2, x)
+function sphericalbesselj(nu, x::T) where {T}
+    if isapprox(x, 0, atol=1e-100)
+        if nu == 0
+            1.0
+        else
+            0.0
+        end
+    else
+        √((float(T))(π)/2x) * besselj(nu + 1//2, x)
+    end
+end
 
 """
     sphericalbessely(nu, x)
@@ -608,7 +618,7 @@ Spherical bessel function of the second kind at order `nu`, ``y_ν(x)``. This is
 solution to the radial part of the Helmholz equation in spherical coordinates. Sometimes
 known as a spherical Neumann function.
 """
-sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2) * softinvsqrt(x) * bessely(nu + 1//2, x)
+sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + 1//2, x)
 
 """
     hankelh1(nu, x)

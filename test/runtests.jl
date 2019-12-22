@@ -344,7 +344,12 @@ end
         @test sphericalbesselj(1, 1)      ≈ 0.3011686789397568
         @test sphericalbesselj(10, 5.5)   ≈ 0.0009369210263385842
         @test sphericalbesselj(1.25, 5.5) ≈ -0.1123558799930763
-        @test sphericalbesselj(1.25, -5.5+0im) ≈ -0.079447604649286 - 0.079447604649286im
+        @test sphericalbesselj(1.25, -5.5+0im) ≈ 0.079447604649286 + 0.079447604649286im
+
+        @test sphericalbesselj(0, 0.01) ≈ 0.999983333416666
+        @test sphericalbesselj(0, 0)    == 1.0
+        @test sphericalbesselj(1, 0)    == 0.0
+        @test sphericalbesselj(1, 0.01) ≈ 0.003333300000119047
         
         @test_throws DomainError sphericalbesselj(1.25, -5.5)
     end
@@ -353,9 +358,13 @@ end
         @test sphericalbessely(1, 1)      ≈ -1.381773290676036
         @test sphericalbessely(10, 5.5)   ≈ -10.89087037026398
         @test sphericalbessely(1.25, 5.5) ≈ 0.148322390312228
-        @test sphericalbessely(1.25, -5.5+0im) ≈ 0.054015441306998 + 0.104879767991574im
+        @test sphericalbessely(1.25, -5.5+0im) ≈ -0.054015441306998 - 0.104879767991574im
+
+        @test sphericalbessely(0, 1e-5) ≈ -99999.9999950000000
+        @test sphericalbessely(1, 1e-5) ≈ -1e10
         
         @test_throws DomainError sphericalbessely(1.25, -5.5)
+        @test_throws AmosException sphericalbessely(1, 0)
     end
     
     @testset "besselk" begin
