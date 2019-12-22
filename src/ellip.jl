@@ -31,7 +31,7 @@ Using piecewise approximation polynomial as given in
 > DOI 10.1007/s10569-009-9228-z,
 > <https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf>
 
-For ``m<0```, followed
+For ``m<0``, followed by
 > Fukushima, Toshio. (2014).
 > 'Precise, compact, and fast computation of complete elliptic integrals by piecewise
 > minimax rational function approximation'.
@@ -207,7 +207,7 @@ Using piecewise approximation polynomial as given in
 > DOI 10.1007/s10569-009-9228-z,
 > <https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf>
 
-For ``m<0```, followed
+For ``m<0``, followed by
 > Fukushima, Toshio. (2014).
 > 'Precise, compact, and fast computation of complete elliptic integrals by piecewise
 > minimax rational function approximation'.
