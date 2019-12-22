@@ -590,9 +590,6 @@ function bessely(n::Integer, x::BigFloat)
     return z
 end
 
-# softinvsqrt(x)          = sqrt(x)/(abs(x) + (eps ∘ float      )(x))
-# softinvsqrt(z::Complex) = sqrt(z)/(abs(z) + (eps ∘ float ∘ abs)(z))
-
 """
     sphericalbesselj(nu, x)
 
