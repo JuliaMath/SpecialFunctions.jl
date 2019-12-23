@@ -655,15 +655,15 @@ end
 #Wikipedia : https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function
 
 """
-    beta_inc(a,b,x,y)
+    beta_inc(a,b,x)
 
-Computes Incomplete Beta Function Ratios given by:
+Returns a tuple ``(I_{x}(a,b),1.0-I_{x}(a,b))`` where the Regularized Incomplete Beta Function is given by:
 ```math
-I_{x}(a,b) = G(a,b) \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
+I_{x}(a,b) = \\frac{1}{B(a,b)} \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
 ```
-and ``I_{y}(a,b) = 1.0 - I_{x}(a,b)``.
-given
-``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)`` and ``x+y = 1``.
+where ``B(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)``.
+
+External links: [DLMF](https://dlmf.nist.gov/8.17#E1), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 """
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     p = 0.0
@@ -834,6 +834,8 @@ beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(be
     beta_inc_inv(a,b,p,q,lb=logbeta(a,b)[1])
 
 Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x` and return tuple (x,y).
+
+See also: [`beta_inc(a,b,x,y)`](@ref SpecialFunctions.beta_inc)
 """
 function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbeta(a,b)[1])
     fpu = 1e-30

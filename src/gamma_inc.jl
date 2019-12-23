@@ -347,12 +347,15 @@ end
 """
     gamma_inc_cf(a, x, ind)
 
-Computes P(a,x) by continued fraction expansion given by :
+Computes ``P(a,x)`` by continued fraction expansion given by :
 ```math
 R(a,x) * \\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a+4-\\frac{(a+2)z}{a+5+\\frac{3z}{a+6-\\dots}}}}}}}
 ```
-Used when 1 <= a <= BIG and x < x0.
-DLMF : https://dlmf.nist.gov/8.9#E2
+Used when `1 <= a <= BIG` and `x < x0`.
+
+External links: [DLMF](https://dlmf.nist.gov/8.9#E2)
+
+See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_cf(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
@@ -786,7 +789,7 @@ end
 Compute `x0` - initial approximation when `a` is large.
 The inversion problem is rewritten as :
 ```math
-0.5 \\text{erfc}(\\eta \\sqrt{a/2}) + R_{a}(\\eta) = q
+0.5 \\operatorname{erfc}(\\eta \\sqrt{a/2}) + R_{a}(\\eta) = q
 ```
 For large values of `a` we can write: ``\\eta(q,a) = \\eta_{0}(q,a) + \\epsilon(\\eta_{0},a)``
 and it is possible to expand:
@@ -947,7 +950,7 @@ gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError(ga
 Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in ``P(a,x)=p`` and ``Q(a,x)=q``.
 
 External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [NIST](https://dlmf.nist.gov/8.2#E5),
-Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
