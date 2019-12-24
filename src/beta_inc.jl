@@ -664,6 +664,8 @@ I_{x}(a,b) = \\frac{1}{B(a,b)} \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
 where ``B(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)``.
 
 External links: [DLMF](https://dlmf.nist.gov/8.17#E1), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc_inv(a,b,p,q)`](@ref SpecialFunctions.beta_inc_inv)
 """
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     p = 0.0
@@ -835,7 +837,7 @@ beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(be
 
 Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x` and return tuple (x,y).
 
-See also: [`beta_inc(a,b,x,y)`](@ref SpecialFunctions.beta_inc)
+See also: [`beta_inc(a,b,x)`](@ref SpecialFunctions.beta_inc)
 """
 function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbeta(a,b)[1])
     fpu = 1e-30

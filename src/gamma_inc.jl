@@ -827,7 +827,7 @@ Q(x,a)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
 
 `IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [NIST](https://dlmf.nist.gov/8.2#E5), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
@@ -949,8 +949,7 @@ gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError(ga
 
 Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in ``P(a,x)=p`` and ``Q(a,x)=q``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [NIST](https://dlmf.nist.gov/8.2#E5),
-[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
