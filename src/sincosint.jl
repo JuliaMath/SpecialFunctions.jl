@@ -251,7 +251,7 @@ Using the rational approximants tabulated in:
 > <http://dx.doi.org/10.1007/BF02142806>,
 > <https://link.springer.com/article/10.1007/BF02142806>.
 
-Note: the second zero of ``Ci(x)`` has a typo that is fixed:
+Note: the second zero of ``\operatorname{Ci}(x)`` has a typo that is fixed:
 ``r_1 = 3.38418 0422\mathbf{8} 51186 42639 78511 46402`` in the article, but is in fact:
 ``r_1 = 3.38418 0422\mathbf{5} 51186 42639 78511 46402``.
 """
@@ -283,7 +283,7 @@ Using the rational approximants tabulated in:
 > <http://dx.doi.org/10.1007/BF02142806>,
 > <https://link.springer.com/article/10.1007/BF02142806>.
 
-Note: the second zero of ``Ci(x)`` has a typo that is fixed:
+Note: the second zero of ``\operatorname{Ci}(x)`` has a typo that is fixed:
 ``r_1 = 3.38418 0422\mathbf{8} 51186 42639 78511 46402`` in the article, but is in fact:
 ``r_1 = 3.38418 0422\mathbf{5} 51186 42639 78511 46402``.
 """
