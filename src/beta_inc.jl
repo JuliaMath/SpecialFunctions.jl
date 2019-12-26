@@ -179,8 +179,8 @@ External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.w
 
 See also: [`beta_inc`](@ref)
 
-# Implemented by
-'BFRAC(A,B,X,Y,LAMBDA,EPS) from Didonato and Morris (1982)'
+# Implementation
+`BFRAC(A,B,X,Y,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
     ans = beta_integrand(a,b,x,y)
@@ -245,8 +245,8 @@ External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.w
 
 See also: [`beta_inc`](@ref)
 
-# Implemented by
-'BASYM(A,B,LAMBDA,EPS) from Didonato and Morris (1982)''
+# Implemention
+`BASYM(A,B,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)
     a0 =zeros(22)
@@ -417,8 +417,8 @@ External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.w
 
 See also: [`beta_inc`](@ref)
 
-# Implemented by
-'FPSER(A,B,X,EPS) from Didonato and Morris (1982)''
+# Implementation
+`FPSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 1.0
@@ -459,8 +459,8 @@ External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.w
 
 See also: [`beta_inc`](@ref)
 
-# Implemented by
-'APSER(A,B,X,EPS) from Didonato and Morris (1982)'
+# Implementation
+`APSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)
     g = Base.MathConstants.eulergamma
@@ -499,8 +499,8 @@ External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.w
 
 See also: [`beta_inc`](@ref)
 
-# Implemented by
-'BPSER(A,B,X,EPS) from Didonato and Morris (1982)'
+# Implementation
+`BPSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 0.0

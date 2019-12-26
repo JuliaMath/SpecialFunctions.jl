@@ -147,8 +147,8 @@ Compute the CDF of the noncentral beta distribution given by
 ```math
 I_{x}(a,b;\\lambda ) = \\sum_{j=0}^{\\infty}q(\\lambda/2,j)I_{x}(a+j,b;0)
 ```
-For lambda < 54 : algorithm suggested by Lenth(1987) in ncbeta_tail(a,b,lambda,x).
-Else for lambda >= 54 : modification in Chattamvelli(1997) in ncbeta_poisson(a,b,lambda,x) by using both forward and backward recurrences.
+For ``\\lambda < 54`` : algorithm suggested by Lenth(1987) in `ncbeta_tail(a,b,lambda,x)`.
+Else for ``\\lambda >= 54`` : modification in Chattamvelli(1997) in `ncbeta_poisson(a,b,lambda,x)` by using both forward and backward recurrences.
 """
 function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     ans = x
