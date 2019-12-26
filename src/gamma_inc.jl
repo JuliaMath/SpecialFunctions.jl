@@ -93,8 +93,8 @@ end
 """
    rgamma1pm1(a)
 
-   Computation of 1/Gamma(a+1) - 1 for -0.5<=a<=1.5 : ``1/\\Gamma (a+1) - 1``
-   Uses the relation gamma(a+1) = a*gamma(a)
+   Computation of ``1/Gamma(a+1) - 1`` for `-0.5<=a<=1.5` : ``1/\\Gamma (a+1) - 1``
+   Uses the relation `gamma(a+1) = a*gamma(a)`.
 """
 function rgamma1pm1(a::Float64)
     t=a
@@ -117,7 +117,7 @@ end
 """
     rgammax(a,x)
 
-Evaluation of exp(-x)*x^a/gamma(a) : ``1/\\Gamma(a) e^{-x} x^{a}``
+Evaluation of ``1/\\Gamma(a) e^{-x} x^{a}``.
 """
 function rgammax(a::Float64,x::Float64)
     if x == 0.0
@@ -147,7 +147,7 @@ end
 """
     auxgam(x)
 
-Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, -1 <= x <= 1
+Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, `-1 <= x <= 1`.
 """
 function auxgam(x::Float64)
     if x < 0
@@ -157,10 +157,11 @@ function auxgam(x::Float64)
         return chepolsum(t, auxgam_coef)
     end
 end
+
 """
     loggamma1p(a)
 
-Compute ``log(\\Gamma(1+a))`` for -1 < a <= 1.
+Compute ``log(\\Gamma(1+a))`` for `-1 < a <= 1`.
 """
 function loggamma1p(x::Float64)
     return -log1p(x*(x-1.0)*auxgam(x))
@@ -169,7 +170,7 @@ end
 """
     chepolsum(n,x,a)
 
-Computes a series of Chebyshev Polynomials given by : a[1]/2 + a[2]T1(x) + .... + a[n]T{n-1}(X)
+Computes a series of Chebyshev Polynomials given by: `a[1]/2 + a[2]T1(x) + .... + a[n]T{n-1}(X)`.
 """
 function chepolsum(x::Float64, a::Array{Float64,1})
     n = length(a)
@@ -189,6 +190,7 @@ function chepolsum(x::Float64, a::Array{Float64,1})
         return a[1]/2.0 - r + h*x
     end
 end
+
 """
     stirling(x)
 
@@ -216,11 +218,14 @@ function stirling(x::Float64)
         end
     end
 end
-"""
+@doc raw"""
     gammax(x)
 
-`gammax(x)` = ``e^{stirling(x)}`` if `x>0`,
-else ``\\Gamma(x)/(e^{-x + (x-0.5)*log(x)}/\\sqrt{2 \\pi}``.
+```math
+\operatorname{gammax}(x) = \begin{cases}e^{\operatorname{stirling}(x)}\quad\quad\quad \text{if} \quad x>0,\\
+\frac{\Gamma(x)}{\sqrt{2 \pi}e^{-x + (x-0.5)\operatorname{log}(x)}},\quad \text{if} \quad x\leq 0.
+\end{cases}
+```
 """
 function gammax(x::Float64)
     if x >= 3
@@ -234,7 +239,7 @@ end
 """
     lambdaeta(eta)
 
-Function to compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-\\ln{\\lambda}``
+Compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-\\ln{\\lambda}``.
 """
 function lambdaeta(eta::Float64)
     s = eta*eta*0.5

@@ -439,8 +439,7 @@ Compute the natural logarithm of the complementary error function of ``x``, that
 
 This is the accurate version of ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x``.
 
-External links:
-[Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
 See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
 
