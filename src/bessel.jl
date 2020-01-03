@@ -655,7 +655,7 @@ end
 
 Bessel function of the second kind of order 1, ``Y_1(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also: [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
