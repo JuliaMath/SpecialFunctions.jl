@@ -554,7 +554,7 @@ end
 Scaled Bessel function of the second kind of order `nu`,
 ``Y_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
