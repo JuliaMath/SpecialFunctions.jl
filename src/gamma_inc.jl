@@ -93,8 +93,8 @@ end
 """
    rgamma1pm1(a)
 
-   Computation of 1/Gamma(a+1) - 1 for -0.5<=a<=1.5 : ``1/\\Gamma (a+1) - 1``
-   Uses the relation gamma(a+1) = a*gamma(a)
+   Computation of ``1/Gamma(a+1) - 1`` for `-0.5<=a<=1.5` : ``1/\\Gamma (a+1) - 1``
+   Uses the relation `gamma(a+1) = a*gamma(a)`.
 """
 function rgamma1pm1(a::Float64)
     t=a
@@ -117,7 +117,7 @@ end
 """
     rgammax(a,x)
 
-Evaluation of exp(-x)*x^a/gamma(a) : ``1/\\Gamma(a) e^{-x} x^{a}``
+Evaluation of ``1/\\Gamma(a) e^{-x} x^{a}``.
 """
 function rgammax(a::Float64,x::Float64)
     if x == 0.0
@@ -147,7 +147,7 @@ end
 """
     auxgam(x)
 
-Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, -1 <= x <= 1
+Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, `-1 <= x <= 1`.
 """
 function auxgam(x::Float64)
     if x < 0
@@ -157,10 +157,11 @@ function auxgam(x::Float64)
         return chepolsum(t, auxgam_coef)
     end
 end
+
 """
     loggamma1p(a)
 
-Compute ``log(\\Gamma(1+a))`` for -1 < a <= 1.
+Compute ``log(\\Gamma(1+a))`` for `-1 < a <= 1`.
 """
 function loggamma1p(x::Float64)
     return -log1p(x*(x-1.0)*auxgam(x))
@@ -169,7 +170,7 @@ end
 """
     chepolsum(n,x,a)
 
-Computes a series of Chebyshev Polynomials given by : a[1]/2 + a[2]T1(x) + .... + a[n]T{n-1}(X)
+Computes a series of Chebyshev Polynomials given by: `a[1]/2 + a[2]T1(x) + .... + a[n]T{n-1}(X)`.
 """
 function chepolsum(x::Float64, a::Array{Float64,1})
     n = length(a)
@@ -189,6 +190,7 @@ function chepolsum(x::Float64, a::Array{Float64,1})
         return a[1]/2.0 - r + h*x
     end
 end
+
 """
     stirling(x)
 
@@ -216,11 +218,14 @@ function stirling(x::Float64)
         end
     end
 end
-"""
+@doc raw"""
     gammax(x)
 
-`gammax(x)` = ``e^{stirling(x)}`` if `x>0`,
-else ``\\Gamma(x)/(e^{-x + (x-0.5)*log(x)}/\\sqrt{2 \\pi}``.
+```math
+\operatorname{gammax}(x) = \begin{cases}e^{\operatorname{stirling}(x)}\quad\quad\quad \text{if} \quad x>0,\\
+\frac{\Gamma(x)}{\sqrt{2 \pi}e^{-x + (x-0.5)\operatorname{log}(x)}},\quad \text{if} \quad x\leq 0.
+\end{cases}
+```
 """
 function gammax(x::Float64)
     if x >= 3
@@ -234,7 +239,7 @@ end
 """
     lambdaeta(eta)
 
-Function to compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-\\ln{\\lambda}``
+Compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-\\ln{\\lambda}``.
 """
 function lambdaeta(eta::Float64)
     s = eta*eta*0.5
@@ -347,12 +352,15 @@ end
 """
     gamma_inc_cf(a, x, ind)
 
-Computes P(a,x) by continued fraction expansion given by :
+Computes ``P(a,x)`` by continued fraction expansion given by :
 ```math
 R(a,x) * \\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a+4-\\frac{(a+2)z}{a+5+\\frac{3z}{a+6-\\dots}}}}}}}
 ```
-Used when 1 <= a <= BIG and x < x0.
-DLMF : https://dlmf.nist.gov/8.9#E2
+Used when `1 <= a <= BIG` and `x < x0`.
+
+External links: [DLMF](https://dlmf.nist.gov/8.9#E2)
+
+See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_cf(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
@@ -786,7 +794,7 @@ end
 Compute `x0` - initial approximation when `a` is large.
 The inversion problem is rewritten as :
 ```math
-0.5 \\text{erfc}(\\eta \\sqrt{a/2}) + R_{a}(\\eta) = q
+0.5 \\operatorname{erfc}(\\eta \\sqrt{a/2}) + R_{a}(\\eta) = q
 ```
 For large values of `a` we can write: ``\\eta(q,a) = \\eta_{0}(q,a) + \\epsilon(\\eta_{0},a)``
 and it is possible to expand:
@@ -824,7 +832,7 @@ Q(x,a)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
 
 `IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [NIST](https://dlmf.nist.gov/8.2#E5), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
@@ -946,8 +954,7 @@ gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError(ga
 
 Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in ``P(a,x)=p`` and ``Q(a,x)=q``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [NIST](https://dlmf.nist.gov/8.2#E5),
-Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links: [DLMF](https://dlmf.nist.gov/8.2#E4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
