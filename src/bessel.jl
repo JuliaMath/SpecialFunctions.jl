@@ -314,6 +314,18 @@ function besselh(nu::Float64, k::Integer, z::Complex{Float64})
     return _besselh(nu,Int32(k),z,Int32(1))
 end
 
+function besselh(nu::Float64, k::Integer, x::Float64)
+    # Given that x is real, Jnu(x) and Ynu(x) are also real.
+    if k == 1
+        return complex(besselj(nu, x), bessely(nu, x))
+    elseif k == 2
+        return complex(besselj(nu, x), -bessely(nu, x))
+    else
+        # We emulate ZBESH's behaviour
+        throw(AmosException(1))
+    end
+end
+
 """
     besselhx(nu, [k=1,] z)
 
