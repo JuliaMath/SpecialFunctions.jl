@@ -595,9 +595,8 @@ end
 for bfn in (:besselh, :besselhx)
     @eval begin
         $bfn(nu, z) = $bfn(nu, 1, z)
-        $bfn(nu::Real, k::Integer, x::Real) = $bfn(nu, k, float(x))
-        $bfn(nu::Real, k::Integer, x::AbstractFloat) = $bfn(float(nu), k, complex(x))
-
+        $bfn(nu::Real, k::Integer, x::Real) = $bfn(float(nu), k, float(x))
+        $bfn(nu::AbstractFloat, k::Integer, x::AbstractFloat) = $bfn(float(nu), k, complex(x))
         function $bfn(nu::Real, k::Integer, z::Complex)
             Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
             $bfn(Tf(nu), k, Complex{Tf}(z))
@@ -607,6 +606,9 @@ for bfn in (:besselh, :besselhx)
         $bfn(nu::T, k::Integer, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(nu,k,z)))
     end
 end
+
+besselh(nu::Float16, k::Integer, x::Float16) = Complex{Float16}(besselh(Float32(nu), k, Float32(x)))
+besselh(nu::Float32, k::Integer, x::Float32) = Complex{Float32}(besselh(Float64(nu), k, Float64(x)))
 
 """
     besselj0(x)
