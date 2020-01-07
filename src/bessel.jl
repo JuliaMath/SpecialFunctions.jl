@@ -66,9 +66,9 @@ end
 
 Airy function of the first kind ``\\operatorname{Ai}(x)``.
 
-See also: [`airyaix`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyaix`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 """
 function airyai end
 airyai(z::Complex{Float64}) = _airy(z, Int32(0), Int32(1))
@@ -78,9 +78,9 @@ airyai(z::Complex{Float64}) = _airy(z, Int32(0), Int32(1))
 
 Derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)``.
 
-See also: [`airyaiprimex`](@ref), [`airyai`](@ref), [`airybi`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyaiprimex`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 """
 function airyaiprime end
 airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
@@ -90,9 +90,9 @@ airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
 
 Airy function of the second kind ``\\operatorname{Bi}(x)``.
 
-See also: [`airybix`](@ref), [`airybiprime`](@ref),  [`airyai`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybix`](@ref), [`airybiprime`](@ref),  [`airyai`](@ref)
 """
 function airybi end
 airybi(z::Complex{Float64}) = _biry(z, Int32(0), Int32(1))
@@ -102,9 +102,9 @@ airybi(z::Complex{Float64}) = _biry(z, Int32(0), Int32(1))
 
 Derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x)``.
 
-See also: [`airybiprimex`](@ref), [`airybi`](@ref), [`airyai`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybiprimex`](@ref), [`airybi`](@ref), [`airyai`](@ref)
 """
 function airybiprime end
 airybiprime(z::Complex{Float64}) = _biry(z, Int32(1), Int32(1))
@@ -115,9 +115,9 @@ airybiprime(z::Complex{Float64}) = _biry(z, Int32(1), Int32(1))
 Scaled Airy function of the first kind ``\\operatorname{Ai}(x) e^{\\frac{2}{3} x
 \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
 
-See also: [`airyai`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyai`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 """
 function airyaix end
 airyaix(z::Complex{Float64}) = _airy(z, Int32(0), Int32(2))
@@ -128,9 +128,9 @@ airyaix(z::Complex{Float64}) = _airy(z, Int32(0), Int32(2))
 Scaled derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)
 e^{\\frac{2}{3} x \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
 
-See also: [`airyaiprime`](@ref), [`airyai`](@ref), [`airybi`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyaiprime`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 """
 function airyaiprimex end
 airyaiprimex(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(2))
@@ -140,9 +140,9 @@ airyaiprimex(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(2))
 
 Scaled Airy function of the second kind ``\\operatorname{Bi}(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
 
-See also: [`airybi`](@ref), [`airybiprime`](@ref), [`airyai`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybi`](@ref), [`airybiprime`](@ref), [`airyai`](@ref)
 """
 function airybix end
 airybix(z::Complex{Float64}) = _biry(z, Int32(0), Int32(2))
@@ -152,9 +152,9 @@ airybix(z::Complex{Float64}) = _biry(z, Int32(0), Int32(2))
 
 Scaled derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
 
-See also: [`airybiprime`](@ref), [`airybi`](@ref), [`airyai`](@ref)
-
 External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybiprime`](@ref), [`airybi`](@ref), [`airyai`](@ref)
 """
 function airybiprimex end
 airybiprimex(z::Complex{Float64}) = _biry(z, Int32(1), Int32(2))
@@ -702,7 +702,7 @@ hankelh2(nu, z) = besselh(nu, 2, z)
 """
     hankelh1x(nu, x)
 
-Scaled Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x) e^{-x i}``.
+Scaled Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x) e^{-ix}``.
 
 External links: [DLMF](https://dlmf.nist.gov/10.2.5), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
@@ -713,7 +713,7 @@ hankelh1x(nu, z) = besselhx(nu, 1, z)
 """
     hankelh2x(nu, x)
 
-Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i}``.
+Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{-ix}``.
 
 External links: [DLMF](https://dlmf.nist.gov/10.2.6), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
