@@ -260,8 +260,10 @@ end
         @test besselh(Float16(3),1,Float16(3)) ≈ true_h133
         @test besselh(3,2,3) ≈ conj(true_h133)
         @test besselh(-3,2,3) ≈ -conj(true_h133)
+        @test besselh(1,1,0) ≈ complex(0,-Inf)
+        @test besselh(1,2,0) ≈ complex(0,Inf)
         @testset "Error throwing" begin
-            @test_throws AmosException besselh(1,0)
+            @test_throws AmosException besselh(1,5,0)
             @test_throws MethodError besselh(1,big(1.0))
             @test_throws MethodError besselh(1,complex(big(1.0)))
             @test_throws MethodError besselhx(1,big(1.0))
