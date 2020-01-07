@@ -20,7 +20,7 @@ External links: [DLMF](https://dlmf.nist.gov/19.2#E8), [Wikipedia](https://en.wi
 See also: [`ellipe(m)`](@ref SpecialFunctions.ellipe).
 
 # Arguments
-- `m`: parameter ``m``, restricted to the range ``(-\infty,1]``, is related to the elliptic modulus ``k`` by ``k^2=m`` and to the modular
+- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to the elliptic modulus ``k`` by ``k^2=m`` and to the modular
     angle ``\alpha`` by ``k=\sin \alpha``.
 
 # Implementation
@@ -195,7 +195,7 @@ External links: [DLMF](https://dlmf.nist.gov/19.2#E8), [Wikipedia](https://en.wi
 See also: [`ellipk(m)`](@ref SpecialFunctions.ellipk).
 
 # Arguments
-- `m`: parameter ``m``, restricted to the range ``(-\infty,1]``, is related to the elliptic modulus ``k`` by ``k^2=m`` and to the modular
+- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to the elliptic modulus ``k`` by ``k^2=m`` and to the modular
     angle ``\alpha`` by ``k=\sin \alpha``.
 
 # Implementation
