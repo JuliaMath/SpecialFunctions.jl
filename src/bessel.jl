@@ -598,7 +598,7 @@ solution to the radial part of the Helmholz equation in spherical coordinates.
 """
 function sphericalbesselj(nu, x::T) where {T}
     besselj_nuhalf_x = besselj(nu + 1//2, x)
-    if abs(x) ≤ (sqrt ∘ eps ∘ zero)(besselj_nuhalf_x)
+    if abs(x) ≤ (sqrt ∘ eps ∘ real ∘ zero)(besselj_nuhalf_x)
         nu == 0 ? one(besselj_nuhalf_x) : zero(besselj_nuhalf_x)
     else
         √((float(T))(π)/2x) * besselj_nuhalf_x
