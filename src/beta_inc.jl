@@ -175,7 +175,7 @@ end
 Compute ``I_{x}(a,b)`` using continued fraction expansion when `a,b > 1`.
 It is assumed that ``\\lambda = (a+b)*y - b``
 
-External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -241,7 +241,7 @@ end
 Compute ``I_{x}(a,b)`` using asymptotic expansion for `a,b >= 15`.
 It is assumed that ``\\lambda = (a+b)*y - b``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -340,7 +340,7 @@ end
 Evaluation of ``I_{x}(a,b)`` when `b < min(epps,epps*a)` and `x <= 0.5` using asymptotic expansion.
 It is assumed `a >= 15` and `b <= 1`, and epps is tolerance used.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 """
@@ -413,7 +413,7 @@ end
 
 Variant of `BPSER(A,B,X,EPS)`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -455,7 +455,7 @@ end
 
 Another variant of `BPSER(A,B,X,EPS)`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -495,7 +495,7 @@ Computes ``I_x(a,b)`` using power series :
 ```math
 I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{j=1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j})
 ```
-External links: [DLMF](https://dlmf.nist.gov/8.17#E22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -592,9 +592,9 @@ end
     beta_inc_diff(a,b,x,y,n,epps)
 
 Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where `n` is positive integer and epps is tolerance.
-A generalised version of [DLMF](https://dlmf.nist.gov/8.17#E20).
+A generalised version of [DLMF](https://dlmf.nist.gov/8.17.20).
 
-External links: [DLMF](https://dlmf.nist.gov/8.17#E20), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.20), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 """
@@ -699,7 +699,7 @@ I_{x}(a,b) = \\frac{1}{B(a,b)} \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
 ```
 where ``B(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17#E1), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links: [DLMF](https://dlmf.nist.gov/8.17.1), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc_inv(a,b,p,q)`](@ref SpecialFunctions.beta_inc_inv)
 """

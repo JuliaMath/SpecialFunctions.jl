@@ -15,7 +15,7 @@ Computes Complete Elliptic Integral of 1st kind ``K(m)`` for parameter ``m`` giv
 \quad \text{for} \quad m \in \left( -\infty, 1 \right] \, .
 ```
 
-External links: [DLMF](https://dlmf.nist.gov/19.2#E8), [Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants).
+External links: [DLMF](https://dlmf.nist.gov/19.2.8), [Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants).
 
 See also: [`ellipe(m)`](@ref SpecialFunctions.ellipe).
 
@@ -190,7 +190,7 @@ Computes Complete Elliptic Integral of 2nd kind ``E(m)`` for parameter ``m`` giv
 \quad \text{for} \quad m \in \left( -\infty, 1 \right] \, .
 ```
 
-External links: [DLMF](https://dlmf.nist.gov/19.2#E8), [Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind).
+External links: [DLMF](https://dlmf.nist.gov/19.2.8), [Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind).
 
 See also: [`ellipk(m)`](@ref SpecialFunctions.ellipk).
 
