@@ -458,3 +458,35 @@ end
 
 logerfc(x::Real) = logerfc(float(x))
 logerfc(x::AbstractFloat) = throw(MethodError(logerfc, x))
+
+@doc raw"""
+    logerfcx(x)
+
+Compute the natural logarithm of the scaled complementary error function of ``x``, that is
+
+```math
+\operatorname{logerfcx}(x) = \operatorname{ln}(\operatorname{erfcx}(x))
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+This is the accurate version of ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large and negative ``x``.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
+
+# Implementation
+Based on the [`erfc(x)`](@ref SpecialFunctions.erfc) and [`erfcx(x)`](@ref SpecialFunctions.erfcx) functions.
+Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
+"""
+function logerfcx(x::Union{Float32, Float64, BigFloat})
+    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
+    if x < 0.0
+        return log(erfc(x)) + x^2
+    else
+        return log(erfcx(x))
+    end
+end
+
+logerfcx(x::Real) = logerfcx(float(x))
+logerfcx(x::AbstractFloat) = throw(MethodError(logerfcx, x))
