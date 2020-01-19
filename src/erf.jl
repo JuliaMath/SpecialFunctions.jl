@@ -184,7 +184,7 @@ Using the rational approximants tabulated in:
 > J. M. Blair, C. A. Edwards, and J. H. Johnson,
 > "Rational Chebyshev approximations for the inverse of the error function",
 > Math. Comp. 30, pp. 827--830 (1976).
-> <http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
 > <http://www.jstor.org/stable/2005402>
 """
 function erfinv(x::Float64)
@@ -320,7 +320,7 @@ Using the rational approximants tabulated in:
 > J. M. Blair, C. A. Edwards, and J. H. Johnson,
 > "Rational Chebyshev approximations for the inverse of the error function",
 > Math. Comp. 30, pp. 827--830 (1976).
-> <http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
 > <http://www.jstor.org/stable/2005402>
 """
 function erfcinv(y::Float64)
