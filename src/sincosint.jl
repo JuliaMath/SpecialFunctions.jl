@@ -248,7 +248,7 @@ Using the rational approximants tabulated in:
 > A.J. MacLeod,
 > "Rational approximations, software and test methods for sine and cosine integrals",
 > Numer. Algor. 12, pp. 259--272 (1996).
-> <http://dx.doi.org/10.1007/BF02142806>,
+> <https://doi.org/10.1007/BF02142806>,
 > <https://link.springer.com/article/10.1007/BF02142806>.
 
 Note: the second zero of ``\text{Ci}(x)`` has a typo that is fixed:
@@ -280,7 +280,7 @@ Using the rational approximants tabulated in:
 > A.J. MacLeod,
 > "Rational approximations, software and test methods for sine and cosine integrals",
 > Numer. Algor. 12, pp. 259--272 (1996).
-> <http://dx.doi.org/10.1007/BF02142806>,
+> <https://doi.org/10.1007/BF02142806>,
 > <https://link.springer.com/article/10.1007/BF02142806>.
 
 Note: the second zero of ``\text{Ci}(x)`` has a typo that is fixed:
