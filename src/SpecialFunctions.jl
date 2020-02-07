@@ -56,6 +56,7 @@ export
     cosint,
     lbinomial
 
+include("prelude.jl")
 include("bessel.jl")
 include("erf.jl")
 include("ellip.jl")
