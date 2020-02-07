@@ -1,8 +1,3 @@
-using Base.Math: @horner
-
-
-
-
 @doc raw"""
     ellipk(m)
 

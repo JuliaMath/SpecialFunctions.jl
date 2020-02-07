@@ -1,7 +1,5 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using Base.Math: nan_dom_err
-
 struct AmosException <: Exception
     id::Int32
 end

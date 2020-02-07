@@ -1,7 +1,4 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
-
-using Base.MPFR: ROUNDING_MODE, big_ln2
-
 const ComplexOrReal{T} = Union{T,Complex{T}}
 
 # Bernoulli numbers B_{2k}, using tabulated numerators and denominators from

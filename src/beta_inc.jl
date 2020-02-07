@@ -1,5 +1,4 @@
-using Base.Math: @horner
-using Base.MPFR: ROUNDING_MODE
+
 const exparg_n = log(nextfloat(floatmin(Float64)))
 const exparg_p =  log(prevfloat(floatmax(Float64)))
 
@@ -60,6 +59,7 @@ function stirling_corr(a0::Float64, b0::Float64)
     t = inv(b)^2
     w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
+
     # COMPUTE stirling(a) + w
     t = inv(a)^2
     return @horner(t, .833333333333333E-01, -.277777777760991E-02, .793650666825390E-03, -.595202931351870E-03, .837308034031215E-03, -.165322962780713E-02)/a + w

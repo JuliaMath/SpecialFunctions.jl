@@ -1,8 +1,4 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
-
-using Base.Math: @horner, libm
-using Base.MPFR: ROUNDING_MODE
-
 for f in (:erf, :erfc)
     @eval begin
         ($f)(x::Float64) = ccall(($(string(f)),libm), Float64, (Float64,), x)

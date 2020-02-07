@@ -1,5 +1,3 @@
-using Base.Math: @horner
-using Base.MPFR: ROUNDING_MODE
 #useful constants
 const acc0 = [5.0e-15 , 5.0e-7 , 5.0e-4] #accuracy options
 const big1 = [25.0 , 14.0, 10.0]
