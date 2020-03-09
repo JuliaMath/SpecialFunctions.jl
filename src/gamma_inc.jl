@@ -567,7 +567,7 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
         c5 = @horner(z , d50 , d5[1])
         c6 = @horner(z , d60 , d6[1])
 
-        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
+        t = @horner(z , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
         if l < 1.0
             p = c*(w - rt2pin*t/sqrt(a))
             return (p , 1.0 - p)

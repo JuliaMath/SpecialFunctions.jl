@@ -34,6 +34,8 @@
     @test gamma_inc(0.9,0.8,0)[1] ≈ 0.59832030278768172
     @test gamma_inc(1.7,2.5,0)[1] ≈ 0.78446115627678957
     @test gamma_inc(11.1,0.001,0)[2] ≈ 1.0000
+    @test gamma_inc(1e7, (1e7)+1, 0)[1] ≈ 0.5001682088254367
+    @test gamma_inc(1e7, (1e7)+1, 0)[2] ≈ 0.4998317911745633
     @test_throws DomainError gamma_inc(-1,2,2)
     @test_throws DomainError gamma_inc(0,0,1)
 end
