@@ -51,7 +51,7 @@ Compute the error function of ``x``, defined by
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.E1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+External links: [DLMF](https://dlmf.nist.gov/7.2.1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
 See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunctions.erfcx),
 [`erfi(x)`](@ref SpecialFunctions.erfi), [`dawson(x)`](@ref SpecialFunctions.dawson),
@@ -78,7 +78,7 @@ Compute the complementary error function of ``x``, defined by
 
 This is the accurate version of `1-erf(x)` for large ``x``.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.E2),
+External links: [DLMF](https://dlmf.nist.gov/7.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
 See also: [`erf(x)`](@ref SpecialFunctions.erf).
@@ -104,7 +104,7 @@ Compute the scaled complementary error function of ``x``, defined by
 This is the accurate version of ``e^{x^2} \operatorname{erfc}(x)`` for large ``x``.
 Note also that ``\operatorname{erfcx}(-ix)`` computes the Faddeeva function `w(x)`.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.E3),
+External links: [DLMF](https://dlmf.nist.gov/7.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
 See also: [`erfc(x)`](@ref SpecialFunctions.erfc).
@@ -153,7 +153,7 @@ Compute the Dawson function (scaled imaginary error function) of ``x``, defined 
 This is the accurate version of ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)``
 for large ``x``.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.E5),
+External links: [DLMF](https://dlmf.nist.gov/7.2.5),
 [Wikipedia](https://en.wikipedia.org/wiki/Dawson_function).
 
 See also: [`erfi(x)`](@ref SpecialFunctions.erfi).
@@ -184,7 +184,7 @@ Using the rational approximants tabulated in:
 > J. M. Blair, C. A. Edwards, and J. H. Johnson,
 > "Rational Chebyshev approximations for the inverse of the error function",
 > Math. Comp. 30, pp. 827--830 (1976).
-> <http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
 > <http://www.jstor.org/stable/2005402>
 """
 function erfinv(x::Float64)
@@ -320,7 +320,7 @@ Using the rational approximants tabulated in:
 > J. M. Blair, C. A. Edwards, and J. H. Johnson,
 > "Rational Chebyshev approximations for the inverse of the error function",
 > Math. Comp. 30, pp. 827--830 (1976).
-> <http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
 > <http://www.jstor.org/stable/2005402>
 """
 function erfcinv(y::Float64)
@@ -439,8 +439,7 @@ Compute the natural logarithm of the complementary error function of ``x``, that
 
 This is the accurate version of ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x``.
 
-External links:
-[Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
 See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
 
@@ -459,3 +458,35 @@ end
 
 logerfc(x::Real) = logerfc(float(x))
 logerfc(x::AbstractFloat) = throw(MethodError(logerfc, x))
+
+@doc raw"""
+    logerfcx(x)
+
+Compute the natural logarithm of the scaled complementary error function of ``x``, that is
+
+```math
+\operatorname{logerfcx}(x) = \operatorname{ln}(\operatorname{erfcx}(x))
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+This is the accurate version of ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large and negative ``x``.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
+
+# Implementation
+Based on the [`erfc(x)`](@ref SpecialFunctions.erfc) and [`erfcx(x)`](@ref SpecialFunctions.erfcx) functions.
+Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
+"""
+function logerfcx(x::Union{Float32, Float64, BigFloat})
+    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
+    if x < 0.0
+        return log(erfc(x)) + x^2
+    else
+        return log(erfcx(x))
+    end
+end
+
+logerfcx(x::Real) = logerfcx(float(x))
+logerfcx(x::AbstractFloat) = throw(MethodError(logerfcx, x))

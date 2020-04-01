@@ -210,12 +210,17 @@ end
 """
     zeta(s, z)
 
-Generalized zeta function ``\\zeta(s, z)``, defined
-by the sum ``\\sum_{k=0}^\\infty ((k+z)^2)^{-s/2}``, where
-any term with ``k+z=0`` is excluded.  For ``\\Re z > 0``,
+Generalized zeta function defined by
+```math
+\\zeta(s, z)=\\sum_{k=0}^\\infty \\frac{1}{((k+z)^2)^{s/2}},
+```
+where any term with ``k+z=0`` is excluded.  For ``\\Re z > 0``,
 this definition is equivalent to the Hurwitz zeta function
-``\\sum_{k=0}^\\infty (k+z)^{-s}``.   For ``z=1``, it yields
-the Riemann zeta function ``\\zeta(s)``.
+``\\sum_{k=0}^\\infty (k+z)^{-s}``.
+
+The Riemann zeta function is recovered as ``\\zeta(s)=\\zeta(s,1)``.
+
+External links: [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function), [Hurwitz zeta function](https://en.wikipedia.org/wiki/Hurwitz_zeta_function)
 """
 function zeta(s::ComplexOrReal{Float64}, z::ComplexOrReal{Float64})
     ζ = zero(promote_type(typeof(s), typeof(z)))
@@ -322,6 +327,10 @@ end
 
 Compute the polygamma function of order `m` of argument `x` (the `(m+1)`th derivative of the
 logarithm of `gamma(x)`)
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Polygamma_function)
+
+See also: [`gamma(z)`](@ref SpecialFunctions.gamma)
 """
 function polygamma(m::Integer, z::ComplexOrReal{Float64})
     m == 0 && return digamma(z)
@@ -385,7 +394,13 @@ end
 """
     zeta(s)
 
-Riemann zeta function ``\\zeta(s)``.
+Riemann zeta function
+
+```math
+\\zeta(s)=\\sum_{n=1}^\\infty \\frac{1}{n^s}\\quad\\text{for}\\quad s\\in\\mathbb{C}.
+```
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Riemann_zeta_function)
 """
 function zeta(s::ComplexOrReal{Float64})
     # Riemann zeta function; algorithm is based on specializing the Hurwitz
@@ -588,7 +603,7 @@ Compute the gamma function for complex ``z``, defined by
 and by analytic continuation in the whole complex plane.
 
 External links:
-[DLMF](https://dlmf.nist.gov/5.2.E1),
+[DLMF](https://dlmf.nist.gov/5.2.1),
 [Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
 
 See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma).

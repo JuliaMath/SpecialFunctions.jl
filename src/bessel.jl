@@ -65,6 +65,10 @@ end
     airyai(x)
 
 Airy function of the first kind ``\\operatorname{Ai}(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyaix`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 """
 function airyai end
 airyai(z::Complex{Float64}) = _airy(z, Int32(0), Int32(1))
@@ -73,6 +77,10 @@ airyai(z::Complex{Float64}) = _airy(z, Int32(0), Int32(1))
     airyaiprime(x)
 
 Derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyaiprimex`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 """
 function airyaiprime end
 airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
@@ -81,6 +89,10 @@ airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
     airybi(x)
 
 Airy function of the second kind ``\\operatorname{Bi}(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybix`](@ref), [`airybiprime`](@ref),  [`airyai`](@ref)
 """
 function airybi end
 airybi(z::Complex{Float64}) = _biry(z, Int32(0), Int32(1))
@@ -89,6 +101,10 @@ airybi(z::Complex{Float64}) = _biry(z, Int32(0), Int32(1))
     airybiprime(x)
 
 Derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybiprimex`](@ref), [`airybi`](@ref), [`airyai`](@ref)
 """
 function airybiprime end
 airybiprime(z::Complex{Float64}) = _biry(z, Int32(1), Int32(1))
@@ -98,6 +114,10 @@ airybiprime(z::Complex{Float64}) = _biry(z, Int32(1), Int32(1))
 
 Scaled Airy function of the first kind ``\\operatorname{Ai}(x) e^{\\frac{2}{3} x
 \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyai`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 """
 function airyaix end
 airyaix(z::Complex{Float64}) = _airy(z, Int32(0), Int32(2))
@@ -107,6 +127,10 @@ airyaix(z::Complex{Float64}) = _airy(z, Int32(0), Int32(2))
 
 Scaled derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)
 e^{\\frac{2}{3} x \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airyaiprime`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 """
 function airyaiprimex end
 airyaiprimex(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(2))
@@ -115,6 +139,10 @@ airyaiprimex(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(2))
     airybix(x)
 
 Scaled Airy function of the second kind ``\\operatorname{Bi}(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybi`](@ref), [`airybiprime`](@ref), [`airyai`](@ref)
 """
 function airybix end
 airybix(z::Complex{Float64}) = _biry(z, Int32(0), Int32(2))
@@ -123,6 +151,10 @@ airybix(z::Complex{Float64}) = _biry(z, Int32(0), Int32(2))
     airybiprimex(x)
 
 Scaled derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
+
+External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+
+See also: [`airybiprime`](@ref), [`airybi`](@ref), [`airyai`](@ref)
 """
 function airybiprimex end
 airybiprimex(z::Complex{Float64}) = _biry(z, Int32(1), Int32(2))
@@ -267,7 +299,10 @@ end
 Bessel function of the third kind of order `nu` (the Hankel function). `k` is either 1 or 2,
 selecting [`hankelh1`](@ref) or [`hankelh2`](@ref), respectively.
 `k` defaults to 1 if it is omitted.
-(See also [`besselhx`](@ref) for an exponentially scaled variant.)
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.5) and [DLMF](https://dlmf.nist.gov/10.2.6), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+
+See also: [`besselhx`](@ref) for an exponentially scaled variant.
 """
 function besselh end
 
@@ -277,6 +312,18 @@ function besselh(nu::Float64, k::Integer, z::Complex{Float64})
         return _besselh(-nu,Int32(k),z,Int32(1)) * complex(cospi(nu),-s*sinpi(nu))
     end
     return _besselh(nu,Int32(k),z,Int32(1))
+end
+
+function besselh(nu::Float64, k::Integer, x::Float64)
+    # Given that x is real, Jnu(x) and Ynu(x) are also real.
+    if k == 1
+        return complex(besselj(nu, x), bessely(nu, x))
+    elseif k == 2
+        return complex(besselj(nu, x), -bessely(nu, x))
+    else
+        # We emulate ZBESH's behaviour
+        throw(AmosException(1))
+    end
 end
 
 """
@@ -291,6 +338,10 @@ proportional to ``\\exp(∓iz)/\\sqrt{z}`` for large ``|z|``, and so the
 [`besselh`](@ref) function is susceptible to overflow or underflow
 when `z` has a large imaginary part.  The `besselhx` function cancels this
 exponential factor (analytically), so it avoids these problems.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+
+See also: [`besselh`](@ref)
 """
 function besselhx end
 
@@ -391,6 +442,10 @@ end
     besseli(nu, x)
 
 Modified Bessel function of the first kind of order `nu`, ``I_\\nu(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.25.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+
+See also: [`besselix(nu,x)`](@ref SpecialFunctions.besselix), [`besselj(nu,x)`](@ref SpecialFunctions.besselj), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besseli(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
@@ -403,6 +458,10 @@ end
     besselix(nu, x)
 
 Scaled modified Bessel function of the first kind of order `nu`, ``I_\\nu(x) e^{- | \\operatorname{Re}(x) |}``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.25.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+
+See also: [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselj(nu,x)`](@ref SpecialFunctions.besselj), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besselix(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
@@ -415,6 +474,10 @@ end
     besselj(nu, x)
 
 Bessel function of the first kind of order `nu`, ``J_\\nu(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+
+See also: [`besseljx(nu,x)`](@ref SpecialFunctions.besseljx), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besselj(nu::Real, x::AbstractFloat)
     if isinteger(nu)
@@ -431,6 +494,10 @@ end
     besseljx(nu, x)
 
 Scaled Bessel function of the first kind of order `nu`, ``J_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+
+See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besseljx(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
@@ -443,6 +510,10 @@ end
     besselk(nu, x)
 
 Modified Bessel function of the second kind of order `nu`, ``K_\\nu(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.25.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+
+See also: See also: [`besselkx(nu,x)`](@ref SpecialFunctions.besselkx), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselk(nu::Real, x::AbstractFloat)
     if x < 0
@@ -457,6 +528,10 @@ end
     besselkx(nu, x)
 
 Scaled modified Bessel function of the second kind of order `nu`, ``K_\\nu(x) e^x``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.25.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+
+See also: [`besselk(nu,x)`](@ref SpecialFunctions.besselk), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselkx(nu::Real, x::AbstractFloat)
     if x < 0
@@ -471,6 +546,10 @@ end
     bessely(nu, x)
 
 Bessel function of the second kind of order `nu`, ``Y_\\nu(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+
+See also [`besselyx(nu,x)`](@ref SpecialFunctions.besselyx) for a scaled variant.
 """
 function bessely(nu::Real, x::AbstractFloat)
     if x < 0
@@ -486,6 +565,10 @@ end
 
 Scaled Bessel function of the second kind of order `nu`,
 ``Y_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+
+See also [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
 function besselyx(nu::Real, x::AbstractFloat)
     if x < 0
@@ -512,9 +595,8 @@ end
 for bfn in (:besselh, :besselhx)
     @eval begin
         $bfn(nu, z) = $bfn(nu, 1, z)
-        $bfn(nu::Real, k::Integer, x::Real) = $bfn(nu, k, float(x))
-        $bfn(nu::Real, k::Integer, x::AbstractFloat) = $bfn(float(nu), k, complex(x))
-
+        $bfn(nu::Real, k::Integer, x::Real) = $bfn(float(nu), k, float(x))
+        $bfn(nu::AbstractFloat, k::Integer, x::AbstractFloat) = $bfn(float(nu), k, complex(x))
         function $bfn(nu::Real, k::Integer, z::Complex)
             Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
             $bfn(Tf(nu), k, Complex{Tf}(z))
@@ -525,10 +607,17 @@ for bfn in (:besselh, :besselhx)
     end
 end
 
+besselh(nu::Float16, k::Integer, x::Float16) = Complex{Float16}(besselh(Float32(nu), k, Float32(x)))
+besselh(nu::Float32, k::Integer, x::Float32) = Complex{Float32}(besselh(Float64(nu), k, Float64(x)))
+
 """
     besselj0(x)
 
 Bessel function of the first kind of order 0, ``J_0(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+
+See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselj0(x::BigFloat)
     z = BigFloat()
@@ -540,6 +629,10 @@ end
     besselj1(x)
 
 Bessel function of the first kind of order 1, ``J_1(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+
+See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselj1(x::BigFloat)
     z = BigFloat()
@@ -557,6 +650,10 @@ end
     bessely0(x)
 
 Bessel function of the second kind of order 0, ``Y_0(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+
+See also: [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
 function bessely0(x::BigFloat)
     if x < 0
@@ -571,6 +668,10 @@ end
     bessely1(x)
 
 Bessel function of the second kind of order 1, ``Y_1(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+
+See also: [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
 function bessely1(x::BigFloat)
     if x < 0
@@ -618,6 +719,10 @@ sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + 1//
     hankelh1(nu, x)
 
 Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.5), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+
+See also: [`hankelh1x`](@ref SpecialFunctions.hankelh1x)
 """
 hankelh1(nu, z) = besselh(nu, 1, z)
 
@@ -625,6 +730,10 @@ hankelh1(nu, z) = besselh(nu, 1, z)
     hankelh2(nu, x)
 
 Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x)``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.6), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+
+See also: [`hankelh2x(nu,x)`](@ref SpecialFunctions.hankelh2x)
 """
 hankelh2(nu, z) = besselh(nu, 2, z)
 
@@ -632,6 +741,10 @@ hankelh2(nu, z) = besselh(nu, 2, z)
     hankelh1x(nu, x)
 
 Scaled Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x) e^{-x i}``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.5), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+
+See also: [`hankelh1`](@ref SpecialFunctions.hankelh1)
 """
 hankelh1x(nu, z) = besselhx(nu, 1, z)
 
@@ -639,5 +752,9 @@ hankelh1x(nu, z) = besselhx(nu, 1, z)
     hankelh2x(nu, x)
 
 Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i}``.
+
+External links: [DLMF](https://dlmf.nist.gov/10.2.6), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+
+See also: [`hankelh2(nu,x)`](@ref SpecialFunctions.hankelh2)
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)

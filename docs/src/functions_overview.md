@@ -20,7 +20,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
 | [`logbeta(x,y)`](@ref SpecialFunctions.logbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 | [`logabsbeta(x,y)`](@ref SpecialFunctions.logabsbeta)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
-| [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
+| [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(binomial(n,k)))` for large `n` and `k` near `n/2`     |
 
 
 ## [Trigonometric Integrals](https://dlmf.nist.gov/6)
@@ -38,6 +38,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`erfcinv(x)`](@ref SpecialFunctions.erfcinv) | inverse function to [`erfc()`](@ref SpecialFunctions.erfc) |
 | [`erfcx(x)`](@ref SpecialFunctions.erfcx)     | scaled complementary error function, i.e. accurate ``e^{x^2} \operatorname{erfc}(x)`` for large ``x`` |
 | [`logerfc(x)`](@ref SpecialFunctions.logerfc) | log of the complementary error function, i.e. accurate ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x`` |
+| [`logerfcx(x)`](@ref SpecialFunctions.logerfcx) | log of the scaled complementary error function, i.e. accurate ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large negative ``x`` |
 | [`erfi(x)`](@ref SpecialFunctions.erfi)       | imaginary error function defined as ``-i \operatorname{erf}(ix)`` |
 | [`erfinv(x)`](@ref SpecialFunctions.erfinv)   | inverse function to [`erf()`](@ref SpecialFunctions.erf) |
 | [`dawson(x)`](@ref SpecialFunctions.dawson)   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)`` for large ``x`` |
