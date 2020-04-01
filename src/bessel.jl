@@ -698,7 +698,7 @@ Spherical bessel function of the first kind at order `nu`, ``j_ν(x)``. This is 
 solution to the radial part of the Helmholz equation in spherical coordinates.
 """
 function sphericalbesselj(nu, x::T) where {T}
-    besselj_nuhalf_x = besselj(nu + one(x)/2, x)
+    besselj_nuhalf_x = besselj(nu + one(nu)/2, x)
     if abs(x) ≤ sqrt(eps(real(zero(besselj_nuhalf_x))))
         nu == 0 ? one(besselj_nuhalf_x) : zero(besselj_nuhalf_x)
     else
