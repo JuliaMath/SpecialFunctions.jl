@@ -713,7 +713,7 @@ Spherical bessel function of the second kind at order `nu`, ``y_ν(x)``. This is
 solution to the radial part of the Helmholz equation in spherical coordinates. Sometimes
 known as a spherical Neumann function.
 """
-sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + 1//2, x)
+sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + one(nu)/2, x)
 
 """
     hankelh1(nu, x)
