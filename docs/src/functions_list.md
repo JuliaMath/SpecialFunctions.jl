@@ -32,10 +32,12 @@ SpecialFunctions.besselj0
 SpecialFunctions.besselj1
 SpecialFunctions.besselj
 SpecialFunctions.besseljx
+SpecialFunctions.sphericalbesselj
 SpecialFunctions.bessely0
 SpecialFunctions.bessely1
 SpecialFunctions.bessely
 SpecialFunctions.besselyx
+SpecialFunctions.sphericalbessely
 SpecialFunctions.hankelh1
 SpecialFunctions.hankelh1x
 SpecialFunctions.hankelh2

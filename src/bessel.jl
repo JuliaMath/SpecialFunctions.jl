@@ -692,6 +692,30 @@ function bessely(n::Integer, x::BigFloat)
 end
 
 """
+    sphericalbesselj(nu, x)
+
+Spherical bessel function of the first kind at order `nu`, ``j_ν(x)``. This is the non-singular
+solution to the radial part of the Helmholz equation in spherical coordinates.
+"""
+function sphericalbesselj(nu, x::T) where {T}
+    besselj_nuhalf_x = besselj(nu + one(nu)/2, x)
+    if abs(x) ≤ sqrt(eps(real(zero(besselj_nuhalf_x))))
+        nu == 0 ? one(besselj_nuhalf_x) : zero(besselj_nuhalf_x)
+    else
+        √((float(T))(π)/2x) * besselj_nuhalf_x
+    end
+end
+
+"""
+    sphericalbessely(nu, x)
+
+Spherical bessel function of the second kind at order `nu`, ``y_ν(x)``. This is the singular
+solution to the radial part of the Helmholz equation in spherical coordinates. Sometimes
+known as a spherical Neumann function.
+"""
+sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + 1//2, x)
+
+"""
     hankelh1(nu, x)
 
 Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x)``.
