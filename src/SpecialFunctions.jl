@@ -60,12 +60,12 @@ export
     zeta,
     sinint,
     cosint,
-    chebyshevT,
-    chebyshevU,
-    hermiteH,
-    laguerreL,
-    legendreP,
-    legendreQ,
+    chebyshevt,
+    chebyshevu,
+    hermiteh,
+    laguerrel,
+    legendrep,
+    legendreq,
     lbinomial
 
 include("bessel.jl")

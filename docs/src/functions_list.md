@@ -59,10 +59,10 @@ SpecialFunctions.beta
 SpecialFunctions.logbeta
 SpecialFunctions.logabsbeta
 SpecialFunctions.logabsbinomial
-SpecialFunctions.chebyshevT
-SpecialFunctions.chebyshevU
-SpecialFunctions.hermiteH
-SpecialFunctions.laguerreL
-SpecialFunctions.legendreP
-SpecialFunctions.legendreQ
+SpecialFunctions.chebyshevt
+SpecialFunctions.chebyshevu
+SpecialFunctions.hermiteh
+SpecialFunctions.laguerrel
+SpecialFunctions.legendrep
+SpecialFunctions.legendreq
 ```

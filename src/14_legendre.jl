@@ -1,5 +1,5 @@
 @doc raw"""
-    chebyshevT(n, x)
+    chebyshevt(n, x)
 
 Evaluate the Chebyshev polynomials of the first kind ``T_n(x)`` of order ``n`` at position
 ``x``, defined by
@@ -23,7 +23,7 @@ T_n(x)
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 """
-function chebyshevT(n::Integer, x::Real)
+function chebyshevt(n::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -38,7 +38,7 @@ function chebyshevT(n::Integer, x::Real)
 end
 
 @doc raw"""
-    chebyshevU(n, x)
+    chebyshevu(n, x)
 
 Evaluate the Chebyshev polynomials of the second kind ``U_n(x)`` of order ``n`` at position
 ``x``, defined by
@@ -62,7 +62,7 @@ U_n(x)
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 """
-function chebyshevU(n::Integer, x::Real)
+function chebyshevu(n::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -77,7 +77,7 @@ function chebyshevU(n::Integer, x::Real)
 end
 
 @doc raw"""
-    hermiteH(n, x)
+    hermiteh(n, x)
 
 Evaluate the (physicists') Hermite polynomials ``H_n(x)`` of order ``n`` at position ``x``,
 defined by
@@ -92,7 +92,7 @@ x \in \mathbb{R}, \; n = 0, 1, 2, \dots
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Hermite_polynomials).
 """
-function hermiteH(n::Integer, x::Real)
+function hermiteh(n::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -104,7 +104,7 @@ function hermiteH(n::Integer, x::Real)
 end
 
 @doc raw"""
-    laguerreL(n, x)
+    laguerrel(n, x)
 
 Evaluate the Laguerre polynomial ``L_n(x)`` of order ``n`` at position ``x``, defined by
 
@@ -118,7 +118,7 @@ x \geq 0, \; n = 0, 1, 2, \dots
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Laguerre_polynomials).
 """
-function laguerreL(n::Integer, x::Real)
+function laguerrel(n::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -133,7 +133,7 @@ function laguerreL(n::Integer, x::Real)
 end
 
 @doc raw"""
-    legendreP(n[, m], x)
+    legendrep(n[, m], x)
 
 Evaluate the Legendre polynomial ``P_n(x)`` of degree ``n`` at position ``x``.
 If the order ``m`` is supplied then the associated Legendre polynomial ``P_n^{(m)}(x)`` is
@@ -169,7 +169,7 @@ External links: [DLMF - Legendre polynomial](https://dlmf.nist.gov/14.7.E1),
 [Wikipedia - Legendre polynomial](https://en.wikipedia.org/wiki/Legendre_polynomials),
 [Wikipedia - associated Legendre polynomial](https://en.wikipedia.org/wiki/Associated_Legendre_polynomials).
 """
-function legendreP(n::Integer, x::Real)
+function legendrep(n::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -182,7 +182,7 @@ function legendreP(n::Integer, x::Real)
         y->1,                               # P_0(y)
         y->y)                               # P_1(y)
 end
-function legendreP(n::Integer, m::Integer, x::Real)
+function legendrep(n::Integer, m::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -194,7 +194,7 @@ function legendreP(n::Integer, m::Integer, x::Real)
     end
 
     if m == 0
-        return legendreP(n, x)
+        return legendrep(n, x)
     end
 
     # step 1: compute P_m^m(x)
@@ -221,7 +221,7 @@ function legendreP(n::Integer, m::Integer, x::Real)
 end
 
 @doc raw"""
-    legendreQ(n[, m], x)
+    legendreq(n[, m], x)
 
 Evaluate the Legendre function of second kind ``Q_n(x)`` of integer degree ``n`` at position
 ``x``.
@@ -260,7 +260,7 @@ External links: [DLMF - Legendre function](https://dlmf.nist.gov/14.7.E2),
 [Wikipedia - Legendre function](https://en.wikipedia.org/wiki/Legendre_functions#Legendre_functions_of_the_second_kind_(Qn)),
 [Wikipedia - associated Legendre function](https://en.wikipedia.org/wiki/Legendre_function#Associated_Legendre_functions_of_the_second_kind).
 """
-function legendreQ(n::Integer, x::Real)
+function legendreq(n::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -275,13 +275,13 @@ function legendreQ(n::Integer, x::Real)
     end
 
     Q0(y) = 0.5 * log((1+y)/(1-y))
-    Q1(y) = legendreP(1, x) * Q0(y) - 1
+    Q1(y) = legendrep(1, x) * Q0(y) - 1
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
         Q0, Q1)
 end
-function legendreQ(n::Integer, m::Integer, x::Real)
+function legendreq(n::Integer, m::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -289,7 +289,7 @@ function legendreQ(n::Integer, m::Integer, x::Real)
         throw(DomainError(m, "must be non-negative"))
     end
     if m == 0
-        return legendreQ(n, x)
+        return legendreq(n, x)
     end
 
     # x check after: Q^0_n is also implemented for x = +-1
@@ -298,7 +298,7 @@ function legendreQ(n::Integer, m::Integer, x::Real)
     end
 
     # step 1: compute Q_n^0(x)
-    q_n_0 = legendreQ(n, x)
+    q_n_0 = legendreq(n, x)
 
     # step 2: compute Q_n^1(x)
     Q01 = -(1-x^2)^(-0.5)                                                   # = Q_0^1(x)

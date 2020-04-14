@@ -1,7 +1,7 @@
 using Polynomials
 
 @testset "legendre and related functions" begin
-    @testset "legendreP" begin
+    @testset "legendrep" begin
         n_poly  = 6
         c       = zeros(n_poly, n_poly)
         c[1,1]  = 1
@@ -16,24 +16,24 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test legendreP(n, x) ≈ P(x)        rtol=1e-14
+                @test legendrep(n, x) ≈ P(x)        rtol=1e-14
             end
         end
 
-        @test_throws DomainError legendreP(-1, 0)
-        @test_throws DomainError legendreP( 1, 2)
-        @test_throws DomainError legendreP(-1, 2)
+        @test_throws DomainError legendrep(-1, 0)
+        @test_throws DomainError legendrep( 1, 2)
+        @test_throws DomainError legendrep(-1, 2)
 
-        @test_throws MethodError legendreP(0, Complex(1))
+        @test_throws MethodError legendrep(0, Complex(1))
     end
 
-    @testset "assoc legendreP" begin
+    @testset "assoc legendrep" begin
         n_poly  = 6
         n_x     = 20
         x_arr   = range(-1, stop=1, length=n_x)
         for n = 0:n_poly
             for x in x_arr
-                @test legendreP(n, x) ≈ legendreP(n, 0, x)        rtol=1e-14
+                @test legendrep(n, x) ≈ legendrep(n, 0, x)        rtol=1e-14
             end
         end
 
@@ -54,21 +54,21 @@ using Polynomials
         for n = 1:n_max
             for m = 1:n
                 for x in x_arr
-                    @test legendreP(n, m, x) ≈ P[n,m](x)        rtol=1e-14
+                    @test legendrep(n, m, x) ≈ P[n,m](x)        rtol=1e-14
                 end
             end
         end
 
-        @test_throws DomainError legendreP(-1,  0, 0)       # n too small
-        @test_throws DomainError legendreP( 1, -1, 0)       # m too small
-        @test_throws DomainError legendreP( 1,  2, 0)       # m too large
-        @test_throws DomainError legendreP( 0,  0,  1.1)    # x too high
-        @test_throws DomainError legendreP( 0,  0, -1.1)    # x too small
+        @test_throws DomainError legendrep(-1,  0, 0)       # n too small
+        @test_throws DomainError legendrep( 1, -1, 0)       # m too small
+        @test_throws DomainError legendrep( 1,  2, 0)       # m too large
+        @test_throws DomainError legendrep( 0,  0,  1.1)    # x too high
+        @test_throws DomainError legendrep( 0,  0, -1.1)    # x too small
 
-        @test_throws MethodError legendreP(0, 0, Complex(1))
+        @test_throws MethodError legendrep(0, 0, Complex(1))
     end
 
-    @testset "legendreQ" begin
+    @testset "legendreq" begin
         q = Array{Function,1}(undef,  6)
         Q0(x) = 0.5 * log((1+x)/(1-x))
         q[1] = Q0
@@ -82,37 +82,37 @@ using Polynomials
         c[5, 1:5] .= [-8//15,      0, 49//8,      0, -63//8 ]
 
         for i = 1:n_poly
-            q[i+1] = x -> legendreP(i, x) * Q0(x) + polyval(Poly(c[i,:]), x)
+            q[i+1] = x -> legendrep(i, x) * Q0(x) + polyval(Poly(c[i,:]), x)
         end
 
         n_x = 20
         x_arr = range(-0.99, stop=0.99, length=n_x)
         for n = 0:n_poly
             for x in x_arr
-                @test legendreQ(n, x) ≈ q[n+1](x)        rtol=1e-14
+                @test legendreq(n, x) ≈ q[n+1](x)        rtol=1e-14
             end
         end
 
         for n in range(0, stop=3n_poly)
-            @test               Inf == legendreQ(n, 1)
-            @test (-1)^(n+1) *  Inf == legendreQ(n, -1)
+            @test               Inf == legendreq(n, 1)
+            @test (-1)^(n+1) *  Inf == legendreq(n, -1)
         end
 
-        @test_throws DomainError legendreQ(-1, 0)
-        @test_throws DomainError legendreQ( 1, 1.1)
-        @test_throws DomainError legendreQ( 1, -1.1)
-        @test_throws DomainError legendreQ(-1, 1.1)
+        @test_throws DomainError legendreq(-1, 0)
+        @test_throws DomainError legendreq( 1, 1.1)
+        @test_throws DomainError legendreq( 1, -1.1)
+        @test_throws DomainError legendreq(-1, 1.1)
 
-        @test_throws MethodError legendreQ(0, Complex(1))
+        @test_throws MethodError legendreq(0, Complex(1))
     end
 
-    @testset "assoc legendreQ" begin
+    @testset "assoc legendreq" begin
         n_poly  = 6
         n_x     = 20
         x_arr   = range(-1, stop=1, length=n_x)
         for n = 0:n_poly
             for x in x_arr
-                @test legendreQ(n, x) ≈ legendreQ(n, 0, x)        rtol=1e-14
+                @test legendreq(n, x) ≈ legendreq(n, 0, x)        rtol=1e-14
             end
         end
 
@@ -136,19 +136,19 @@ using Polynomials
         for n = 0:n_max
             for m = 1:m_max
                 for x in x_arr
-                    @test legendreQ(n, m, x) ≈ Q[n+1,m](x)        rtol=1e-14
+                    @test legendreq(n, m, x) ≈ Q[n+1,m](x)        rtol=1e-14
                 end
             end
         end
 
-        @test_throws DomainError legendreQ(-1,  0, 0)       # n too small
-        @test_throws DomainError legendreQ( 1, -1, 0)       # m too small
-        @test_throws DomainError legendreQ( 0,  0,  1.1)    # x too high
-        @test_throws DomainError legendreQ( 0,  0, -1.1)    # x too small
-        @test_throws DomainError legendreQ( 0,  1,  1)      # x too high
-        @test_throws DomainError legendreQ( 0,  1, -1)      # x too small
+        @test_throws DomainError legendreq(-1,  0, 0)       # n too small
+        @test_throws DomainError legendreq( 1, -1, 0)       # m too small
+        @test_throws DomainError legendreq( 0,  0,  1.1)    # x too high
+        @test_throws DomainError legendreq( 0,  0, -1.1)    # x too small
+        @test_throws DomainError legendreq( 0,  1,  1)      # x too high
+        @test_throws DomainError legendreq( 0,  1, -1)      # x too small
 
-        @test_throws MethodError legendreQ(0, 0, Complex(1))
+        @test_throws MethodError legendreq(0, 0, Complex(1))
     end
 
     @testset "hermite" begin
@@ -166,13 +166,13 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test hermiteH(n, x) ≈ P(x)        rtol=1e-14
+                @test hermiteh(n, x) ≈ P(x)        rtol=1e-14
             end
         end
 
-        @test_throws DomainError hermiteH(-1, 0)
+        @test_throws DomainError hermiteh(-1, 0)
 
-        @test_throws MethodError hermiteH(0, Complex(1))
+        @test_throws MethodError hermiteh(0, Complex(1))
     end
 
     @testset "laguerre" begin
@@ -190,15 +190,15 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test laguerreL(n, x) ≈ P(x)        rtol=1e-13
+                @test laguerrel(n, x) ≈ P(x)        rtol=1e-13
             end
         end
 
-        @test_throws DomainError laguerreL(-1, 0)
-        @test_throws DomainError laguerreL(0, -1)
-        @test_throws DomainError laguerreL(-1, -1)
+        @test_throws DomainError laguerrel(-1, 0)
+        @test_throws DomainError laguerrel(0, -1)
+        @test_throws DomainError laguerrel(-1, -1)
 
-        @test_throws MethodError laguerreL(0, Complex(1))
+        @test_throws MethodError laguerrel(0, Complex(1))
     end
 
     @testset "chebyshev 1" begin
@@ -216,16 +216,16 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test chebyshevT(n, x) ≈ P(x)        rtol=1e-14
+                @test chebyshevt(n, x) ≈ P(x)        rtol=1e-14
             end
         end
 
-        @test_throws DomainError chebyshevT(-1, 0)
-        @test_throws DomainError chebyshevT(0, 1.1)
-        @test_throws DomainError chebyshevT(0, -1.1)
-        @test_throws DomainError chebyshevT(-1, 2)
+        @test_throws DomainError chebyshevt(-1, 0)
+        @test_throws DomainError chebyshevt(0, 1.1)
+        @test_throws DomainError chebyshevt(0, -1.1)
+        @test_throws DomainError chebyshevt(-1, 2)
 
-        @test_throws MethodError chebyshevT(0, Complex(1))
+        @test_throws MethodError chebyshevt(0, Complex(1))
     end
 
     @testset "chebyshev 2" begin
@@ -243,15 +243,15 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test chebyshevU(n, x) ≈ P(x)        rtol=1e-14
+                @test chebyshevu(n, x) ≈ P(x)        rtol=1e-14
             end
         end
 
-        @test_throws DomainError chebyshevU(-1, 0)
-        @test_throws DomainError chebyshevU(0, 1.1)
-        @test_throws DomainError chebyshevU(0, -1.1)
-        @test_throws DomainError chebyshevU(-1, 2)
+        @test_throws DomainError chebyshevu(-1, 0)
+        @test_throws DomainError chebyshevu(0, 1.1)
+        @test_throws DomainError chebyshevu(0, -1.1)
+        @test_throws DomainError chebyshevu(-1, 2)
 
-        @test_throws MethodError chebyshevU(0, Complex(1))
+        @test_throws MethodError chebyshevu(0, Complex(1))
     end
 end

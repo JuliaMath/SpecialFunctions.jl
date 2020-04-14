@@ -75,14 +75,14 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 ## [Legendre and Related Functions](https://dlmf.nist.gov/14)
 | Function | Description |
 |:-------- |:----------- |
-| [`chebyshevT(n,x)`](@ref SpecialFunctions.chebyshevT) | [Chebyshev polynomial of the first kind](https://en.wikipedia.org/wiki/Chebyshev_polynomials) ``T_n(x)`` |
-| [`chebyshevU(n,x)`](@ref SpecialFunctions.chebyshevU) | [Chebyshev polynomial of the second kind](https://en.wikipedia.org/wiki/Chebyshev_polynomials) ``U_n(x)`` |
-| [`hermiteH(n,x)`](@ref SpecialFunctions.hermiteH)     | [Hermite polynomial](https://en.wikipedia.org/wiki/Hermite_polynomials) ``H_n(x)`` |
-| [`laguerreL(n,x)`](@ref SpecialFunctions.laguerreL)   | [Laguerre polynomial](https://en.wikipedia.org/wiki/Laguerre_polynomials) ``L_n(x)`` |
-| [`legendreP(n,x)`](@ref SpecialFunctions.legendreP)   | [Legendre polynomial](https://en.wikipedia.org/wiki/Legendre_polynomials) ``P_n(x)`` |
-| [`legendreP(n,m,x)`](@ref SpecialFunctions.legendreP) | [Associated Legendre function of the first kind](https://en.wikipedia.org/wiki/Associated_Legendre_polynomials) ``P_n^{(m)}(x)`` |
-| [`legendreQ(n,x)`](@ref SpecialFunctions.legendreQ)   | [Legendre function of the second kind](https://en.wikipedia.org/wiki/Legendre_function#Legendre_functions_of_the_second_kind_(Qn)) ``Q_n(x)`` |
-| [`legendreQ(n,m,x)`](@ref SpecialFunctions.legendreQ) | [Associated Legendre function of the second kind](https://en.wikipedia.org/wiki/Legendre_function#Associated_Legendre_functions_of_the_second_kind) ``Q_n^{(m)}(x)`` |
+| [`chebyshevt(n,x)`](@ref SpecialFunctions.chebyshevt) | [Chebyshev polynomial of the first kind](https://en.wikipedia.org/wiki/Chebyshev_polynomials) ``T_n(x)`` |
+| [`chebyshevu(n,x)`](@ref SpecialFunctions.chebyshevu) | [Chebyshev polynomial of the second kind](https://en.wikipedia.org/wiki/Chebyshev_polynomials) ``U_n(x)`` |
+| [`hermiteh(n,x)`](@ref SpecialFunctions.hermiteh)     | [Hermite polynomial](https://en.wikipedia.org/wiki/Hermite_polynomials) ``H_n(x)`` |
+| [`laguerrel(n,x)`](@ref SpecialFunctions.laguerrel)   | [Laguerre polynomial](https://en.wikipedia.org/wiki/Laguerre_polynomials) ``L_n(x)`` |
+| [`legendrep(n,x)`](@ref SpecialFunctions.legendrep)   | [Legendre polynomial](https://en.wikipedia.org/wiki/Legendre_polynomials) ``P_n(x)`` |
+| [`legendrep(n,m,x)`](@ref SpecialFunctions.legendrep) | [Associated Legendre function of the first kind](https://en.wikipedia.org/wiki/Associated_Legendre_polynomials) ``P_n^{(m)}(x)`` |
+| [`legendreq(n,x)`](@ref SpecialFunctions.legendreq)   | [Legendre function of the second kind](https://en.wikipedia.org/wiki/Legendre_function#Legendre_functions_of_the_second_kind_(Qn)) ``Q_n(x)`` |
+| [`legendreq(n,m,x)`](@ref SpecialFunctions.legendreq) | [Associated Legendre function of the second kind](https://en.wikipedia.org/wiki/Legendre_function#Associated_Legendre_functions_of_the_second_kind) ``Q_n^{(m)}(x)`` |
 
 
 ## [Elliptic Integrals](https://dlmf.nist.gov/19)
