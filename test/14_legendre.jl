@@ -16,7 +16,8 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test legendrep(n, x) ≈ P(x)        rtol=1e-14
+                @test legendrep(n, x          ) ≈ P(x)              rtol=1e-14
+                @test legendrep(n, BigFloat(x)) ≈ P(x)              rtol=1e-13
             end
         end
 
@@ -33,7 +34,8 @@ using Polynomials
         x_arr   = range(-1, stop=1, length=n_x)
         for n = 0:n_poly
             for x in x_arr
-                @test legendrep(n, x) ≈ legendrep(n, 0, x)        rtol=1e-14
+                @test legendrep(n, x          ) ≈ legendrep(n, 0, x)        rtol=1e-14
+                @test legendrep(n, BigFloat(x)) ≈ legendrep(n, 0, x)        rtol=1e-13
             end
         end
 
@@ -54,7 +56,8 @@ using Polynomials
         for n = 1:n_max
             for m = 1:n
                 for x in x_arr
-                    @test legendrep(n, m, x) ≈ P[n,m](x)        rtol=1e-14
+                    @test legendrep(n, m, x          ) ≈ P[n,m](x)        rtol=1e-14
+                    @test legendrep(n, m, BigFloat(x)) ≈ P[n,m](x)        rtol=1e-14
                 end
             end
         end
@@ -89,7 +92,8 @@ using Polynomials
         x_arr = range(-0.99, stop=0.99, length=n_x)
         for n = 0:n_poly
             for x in x_arr
-                @test legendreq(n, x) ≈ q[n+1](x)        rtol=1e-14
+                @test legendreq(n, x          ) ≈ q[n+1](x)        rtol=1e-14
+                @test legendreq(n, BigFloat(x)) ≈ q[n+1](x)        rtol=1e-14
             end
         end
 
@@ -112,7 +116,8 @@ using Polynomials
         x_arr   = range(-1, stop=1, length=n_x)
         for n = 0:n_poly
             for x in x_arr
-                @test legendreq(n, x) ≈ legendreq(n, 0, x)        rtol=1e-14
+                @test legendreq(n, x          ) ≈ legendreq(n, 0, x)        rtol=1e-14
+                @test legendreq(n, BigFloat(x)) ≈ legendreq(n, 0, x)        rtol=1e-14
             end
         end
 
@@ -136,7 +141,8 @@ using Polynomials
         for n = 0:n_max
             for m = 1:m_max
                 for x in x_arr
-                    @test legendreq(n, m, x) ≈ Q[n+1,m](x)        rtol=1e-14
+                    @test legendreq(n, m, x          ) ≈ Q[n+1,m](x)        rtol=1e-14
+                    @test legendreq(n, m, BigFloat(x)) ≈ Q[n+1,m](x)        rtol=1e-14
                 end
             end
         end
@@ -166,7 +172,8 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test hermiteh(n, x) ≈ P(x)        rtol=1e-14
+                @test hermiteh(n, x          ) ≈ P(x)        rtol=1e-14
+                @test hermiteh(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
             end
         end
 
@@ -190,7 +197,8 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test laguerrel(n, x) ≈ P(x)        rtol=1e-13
+                @test laguerrel(n, x          ) ≈ P(x)        rtol=1e-13
+                @test laguerrel(n, BigFloat(x)) ≈ P(x)        rtol=1e-13
             end
         end
 
@@ -216,7 +224,8 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test chebyshevt(n, x) ≈ P(x)        rtol=1e-14
+                @test chebyshevt(n, x          ) ≈ P(x)        rtol=1e-14
+                @test chebyshevt(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
             end
         end
 
@@ -243,7 +252,8 @@ using Polynomials
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
-                @test chebyshevu(n, x) ≈ P(x)        rtol=1e-14
+                @test chebyshevu(n, x          ) ≈ P(x)        rtol=1e-14
+                @test chebyshevu(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
             end
         end
 
