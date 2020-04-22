@@ -9,8 +9,34 @@
         @test erfc(Float64(1))  ≈ 0.15729920705028513066 rtol=2*eps(Float64)
 
         @test_throws MethodError erfcx(Float16(1))
-        @test erfcx(Float32(1)) ≈ 0.42758357615580700442    rtol=2*eps(Float32)
-        @test erfcx(Float64(1)) ≈ 0.42758357615580700442    rtol=2*eps(Float64)
+        @test erfcx(Float32(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float32)
+        @test erfcx(Float64(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float64)
+
+        @test_throws MethodError logerfc(Float16(1))
+        @test_throws MethodError logerfc(Float16(-1))
+        @test logerfc(Float32(-100)) ≈ 0.6931471805599453 rtol=2*eps(Float32)
+        @test logerfc(Float64(-100)) ≈ 0.6931471805599453 rtol=2*eps(Float64)
+        @test logerfc(Float32(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
+        @test logerfc(Float64(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
+        @test logerfc(1000) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
+        @test logerfc(Float32(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float32)
+        @test logerfc(Float64(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float64)
+
+        @test_throws MethodError logerfcx(Float16(1))
+        @test_throws MethodError logerfcx(Float16(-1))
+        @test iszero(logerfcx(0))
+        @test logerfcx(Float32(1)) ≈ -0.849605509933248248576017509499 rtol=2eps(Float32)
+        @test logerfcx(Float64(1)) ≈ -0.849605509933248248576017509499 rtol=2eps(Float32)
+        @test logerfcx(Float32(-1)) ≈ 1.61123231767807049464268192445 rtol=2eps(Float32)
+        @test logerfcx(Float64(-1)) ≈ 1.61123231767807049464268192445 rtol=2eps(Float32)
+        @test logerfcx(Float32(-100)) ≈ 10000.6931471805599453094172321 rtol=2eps(Float32)
+        @test logerfcx(Float64(-100)) ≈ 10000.6931471805599453094172321 rtol=2eps(Float64)
+        @test logerfcx(Float32(100)) ≈ -5.17758512266433257046678208395 rtol=2eps(Float32)
+        @test logerfcx(Float64(100)) ≈ -5.17758512266433257046678208395 rtol=2eps(Float64)
+        @test logerfcx(Float32(-1000)) ≈ 1.00000069314718055994530941723e6 rtol=2eps(Float32)
+        @test logerfcx(Float64(-1000)) ≈ 1.00000069314718055994530941723e6 rtol=2eps(Float64)
+        @test logerfcx(Float32(1000)) ≈ -7.48012072190621214066734919080 rtol=2eps(Float32)
+        @test logerfcx(Float64(1000)) ≈ -7.48012072190621214066734919080 rtol=2eps(Float64)
 
         @test_throws MethodError erfi(Float16(1))
         @test erfi(Float32(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float32)
@@ -68,6 +94,9 @@
         @test erfcx(BigFloat(1.8e8))    ≈ erfcx(1.8e8)              rtol=4*eps()
         @test erfcx(BigFloat(1.8e88))   ≈ erfcx(1.8e88)             rtol=4*eps()
         @test isnan(erfcx(BigFloat(NaN)))
+
+        @test logerfc(BigFloat(1000, 100)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
+        @test isnan(logerfc(BigFloat(NaN)))
 
         @test_throws MethodError erfi(big(1.0))
 

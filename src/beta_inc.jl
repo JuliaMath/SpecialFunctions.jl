@@ -33,16 +33,16 @@ function loggammadiv(a::Float64, b::Float64)
     w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
 
-    #COMBINING 
+    #COMBINING
     u = d*log1p(a/b)
     v = a*(log(b) - 1.0)
     return u <= v ? w - u - v : w - v - u
-end 
+end
 
 """
     stirling_corr(a0,b0)
 
-Compute stirling(a0) + stirling(b0) - stirling(a0 + b0) 
+Compute stirling(a0) + stirling(b0) - stirling(a0 + b0)
 for a0,b0 >= 8
 """
 function stirling_corr(a0::Float64, b0::Float64)
@@ -94,7 +94,7 @@ Compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
 function beta_integrand(a::Float64,b::Float64,x::Float64,y::Float64,mu::Float64=0.0)
     a0, b0 = minmax(a,b)
     if a0 >= 8.0
-        if a > b 
+        if a > b
             h = b/a
             x0 = 1.0/(1.0 + h)
             y0 = h/(1.0 + h)
@@ -166,16 +166,21 @@ function beta_integrand(a::Float64,b::Float64,x::Float64,y::Float64,mu::Float64=
         z = 1.0 + rgamma1pm1(apb)
     end
     c = (1.0 + rgamma1pm1(a))*(1.0 + rgamma1pm1(b))/z
-    return ans*(a0*c)/(1.0 + a0/b0)    
-end  
+    return ans*(a0*c)/(1.0 + a0/b0)
+end
 
 """
     beta_inc_cont_fraction(a,b,x,y,lambda,epps)
 
-Compute ``I_{x}(a,b)`` using continued fraction expansion when a,b > 1.
+Compute ``I_{x}(a,b)`` using continued fraction expansion when `a,b > 1`.
 It is assumed that ``\\lambda = (a+b)*y - b``
-DLMF : https://dlmf.nist.gov/8.17#E22
-BFRAC(A,B,X,Y,LAMBDA,EPS) from Didonato and Morris (1982)
+
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc`](@ref)
+
+# Implementation
+`BFRAC(A,B,X,Y,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
     ans = beta_integrand(a,b,x,y)
@@ -233,9 +238,15 @@ end
 """
     beta_inc_asymptotic_symmetric(a,b,lambda,epps)
 
-Compute ``I_{x}(a,b)`` using asymptotic expansion for a,b >= 15.
-It is assumed that ``\\lambda = (a+b)*y - b``
-BASYM(A,B,LAMBDA,EPS) from Didonato and Morris (1982)
+Compute ``I_{x}(a,b)`` using asymptotic expansion for `a,b >= 15`.
+It is assumed that ``\\lambda = (a+b)*y - b``.
+
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc`](@ref)
+
+# Implemention
+`BASYM(A,B,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)
     a0 =zeros(22)
@@ -321,13 +332,17 @@ function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, 
 
     u = exp(-stirling_corr(a,b))
     return e0*t*u*sm
-end        
+end
 
 """
     beta_inc_asymptotic_asymmetric(a,b,x,y,w,epps)
 
-Evaluation of I_{x}(a,b) when b < min(epps,epps*a) and x <= 0.5 using asymptotic expansion.
-It is assumed a >= 15 and b <= 1, and epps is tolerance used.
+Evaluation of ``I_{x}(a,b)`` when `b < min(epps,epps*a)` and `x <= 0.5` using asymptotic expansion.
+It is assumed `a >= 15` and `b <= 1`, and epps is tolerance used.
+
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc`](@ref)
 """
 function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps::Float64)
     c = zeros(31)
@@ -389,15 +404,21 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
         end
     end
     return w + u*sm
-end 
+end
 
 
 #For b < min(eps, eps*a) and x <= 0.5
 """
     beta_inc_power_series2(a,b,x,epps)
 
-Variant of BPSER(A,B,X,EPS).
-FPSER(A,B,X,EPS) from Didonato and Morris (1982)
+Variant of `BPSER(A,B,X,EPS)`.
+
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc`](@ref)
+
+# Implementation
+`FPSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 1.0
@@ -418,7 +439,7 @@ function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float6
     t *= x
     c = t/an
     s += c
-    while abs(c) > tol 
+    while abs(c) > tol
         an += 1.0
         t *= x
         c = t/an
@@ -432,10 +453,16 @@ end
 """
     beta_inc_power_series1(a,b,x,epps)
 
-Another variant of BPSER(A,B,X,EPS)
-APSER(A,B,X,EPS) from Didonato and Morris (1982)
+Another variant of `BPSER(A,B,X,EPS)`.
+
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc`](@ref)
+
+# Implementation
+`APSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
-function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)         
+function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)
     g = Base.MathConstants.eulergamma
     bx = b*x
     t = x - bx
@@ -464,11 +491,16 @@ end
 """
     beta_inc_power_series(a,b,x,epps)
 
-Computes Ix(a,b) using power series :
+Computes ``I_x(a,b)`` using power series :
 ```math
-I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j}) 
+I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{j=1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j})
 ```
-BPSER(A,B,X,EPS) from Didonato and Morris (1982)
+External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc`](@ref)
+
+# Implementation
+`BPSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64)
     ans = 0.0
@@ -481,7 +513,7 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
         z = a*log(x) - logbeta(a,b)
         ans = exp(z)/a
     else
-        
+
         if b0 >= 8.0
             u = loggamma1p(a0) + loggammadiv(a0,b0)
             z = a*log(x) - u
@@ -559,8 +591,12 @@ end
 """
     beta_inc_diff(a,b,x,y,n,epps)
 
-Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where n is positive integer and epps is tolerance.
-A more generalised version of https://dlmf.nist.gov/8.17#E20
+Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where `n` is positive integer and epps is tolerance.
+A generalised version of [DLMF](https://dlmf.nist.gov/8.17.20).
+
+External links: [DLMF](https://dlmf.nist.gov/8.17.20), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc`](@ref)
 """
 function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Integer, epps::Float64)
     apb = a + b
@@ -570,7 +606,7 @@ function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Intege
     if n != 1 && a >= 1.0 && apb >= 1.1*ap1
         mu = abs(exparg_n)
         k = exparg_p
-        if k < mu 
+        if k < mu
             mu = k
         end
         t = mu
@@ -655,15 +691,17 @@ end
 #Wikipedia : https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function
 
 """
-    beta_inc(a,b,x,y)
+    beta_inc(a,b,x)
 
-Computes Incomplete Beta Function Ratios given by:
+Returns a tuple ``(I_{x}(a,b),1.0-I_{x}(a,b))`` where the Regularized Incomplete Beta Function is given by:
 ```math
-I_{x}(a,b) = G(a,b) \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
+I_{x}(a,b) = \\frac{1}{B(a,b)} \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
 ```
-and ``I_{y}(a,b) = 1.0 - I_{x}(a,b)``.
-given
-``B(a,b) = 1/G(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)`` and ``x+y = 1``.
+where ``B(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)``.
+
+External links: [DLMF](https://dlmf.nist.gov/8.17.1), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+
+See also: [`beta_inc_inv(a,b,p,q)`](@ref SpecialFunctions.beta_inc_inv)
 """
 function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     p = 0.0
@@ -771,7 +809,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         q = beta_inc_power_series1(a0,b0,x0,epps)
         p = 1.0 - q
     elseif max(a0,b0) > 1.0
-        if b0 <= 1.0 
+        if b0 <= 1.0
             p = beta_inc_power_series(a0,b0,x0,epps)
             q = 1.0 - p
         elseif x0 >= 0.3
@@ -828,12 +866,14 @@ beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(be
 
 #GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms AS 63: The Incomplete Beta Integral and AS 64: Inverse of the Incomplete Beta Integeral,
 #Applied Statistics,
-#Volume 26, Number 1, 1977, pages 111-114. 
+#Volume 26, Number 1, 1977, pages 111-114.
 
 """
     beta_inc_inv(a,b,p,q,lb=logbeta(a,b)[1])
 
-Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x` and return tuple (x,y).
+Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x` and return tuple `(x,y)`.
+
+See also: [`beta_inc(a,b,x)`](@ref SpecialFunctions.beta_inc)
 """
 function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbeta(a,b)[1])
     fpu = 1e-30
@@ -847,7 +887,7 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
     #change tail if necessary
 
     if p > 0.5
-        pp = q 
+        pp = q
         aa = b
         bb = a
         indx = true
@@ -926,7 +966,7 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
         end
 
         #check if current estimate is acceptable
-    
+
         if prev <= acu || pp_approx^2 <= acu
             x = tx
             return indx ? (1.0 - x, x) : (x, 1.0-x)

@@ -1,15 +1,7 @@
 module SpecialFunctions
 
-# Load openspecfun libraries from our deps.jl
-let depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
-    if !isfile(depsjl_path)
-        error("SpecialFunctions is not installed properly, run `Pkg.build(\"SpecialFunctions\")`," *
-              "restart Julia and try again")
-    end
-    include(depsjl_path)
-end
+using OpenSpecFun_jll
 
-__init__() = check_deps()
 export
     airyai,
     airyaiprime,
@@ -24,12 +16,14 @@ export
     besseli,
     besselix,
     besselj,
+    sphericalbesselj,
     besselj0,
     besselj1,
     besseljx,
     besselk,
     besselkx,
     bessely,
+    sphericalbessely,
     bessely0,
     bessely1,
     besselyx,
@@ -42,6 +36,8 @@ export
     erfcx,
     erfi,
     erfinv,
+    logerfc,
+    logerfcx,
     eta,
     digamma,
     invdigamma,
@@ -80,7 +76,7 @@ include("deprecated.jl")
 include("14_legendre.jl")
 
 
-for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
+for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
           :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end
