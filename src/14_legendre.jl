@@ -33,7 +33,7 @@ function chebyshevt(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
-        y->1,                               # P_0(y)
+        y->one(x),                          # P_0(y)
         y->y)                               # P_1(y)
 end
 
@@ -72,7 +72,7 @@ function chebyshevu(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
-        y->1,                               # P_0(y)
+        y->one(x),                          # P_0(y)
         y->2y)                              # P_1(y)
 end
 
@@ -99,7 +99,7 @@ function hermiteh(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         2, 0, m->2(m-1),                    # A_m, B_m, C_m
-        y->1,                               # P_0(y)
+        y->one(x),                          # P_0(y)
         y->2y)                              # P_1(y)
 end
 
@@ -128,7 +128,7 @@ function laguerrel(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
-        y->1,                               # P_0(y)
+        y->one(x),                          # P_0(y)
         y->1-y)                             # P_1(y)
 end
 
@@ -176,7 +176,7 @@ function legendrep(n::Integer, x::Real)
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
-        y->1,                               # P_0(y)
+        y->one(x),                          # P_0(y)
         y->y)                               # P_1(y)
 end
 function legendrep(n::Integer, m::Integer, x::Real)
@@ -369,6 +369,12 @@ easily created by anonymous functions.
 Degree 0, and 1 are supplied as a function. Efficiency is not an issue as it is only invoked
 once.
 
+Type stability:
+- `A,B,C` are either functions returning a value of same type as `x` or an integer which will
+be casted to the type of `x`. Thus, variables `x,Am,Bm,Cm` are all of the same type.
+- `p0,p1` are functions which have the same return type as the type of `x`.
+- Thus, all variables: `p_prev_prev,p_prev,p,Am,Bm,Cm` are always of type `x`.
+
 # Reference
 > JIN, J. M.;
 > JJIE, Zhang Shan.
@@ -390,11 +396,11 @@ function ABC_recurrence(n::Integer, x::Real,
         return p_prev
     end
 
-    p = missing
+    p = zero(x)
     for m = 2:n
-        Am  = ABC_eval(m, A)
-        Bm  = ABC_eval(m, B)
-        Cm  = ABC_eval(m, C)
+        Am  = (typeof(A) <: Integer)  ?  (typeof(x)(A))  :  (A(m))
+        Bm  = (typeof(B) <: Integer)  ?  (typeof(x)(B))  :  (B(m))
+        Cm  = (typeof(C) <: Integer)  ?  (typeof(x)(C))  :  (C(m))
         p   = ABC_recurrence_step(x, Am, Bm, Cm, p_prev, p_prev_prev)
 
         p_prev_prev  = p_prev
@@ -402,15 +408,6 @@ function ABC_recurrence(n::Integer, x::Real,
     end
 
     p
-end
-
-# evaluate coefficients A,B,C at m. either constant of given as function.
-# TODO type casting: integer -> float in each iteration. ineffective...
-function ABC_eval(m::Integer, ABC::Integer)
-    Float64(ABC)
-end
-function ABC_eval(m::Integer, ABC::Function)
-    Float64(ABC(m))
 end
 
 function ABC_recurrence_step(x::Real,
