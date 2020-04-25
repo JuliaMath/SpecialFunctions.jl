@@ -12,7 +12,7 @@ using Polynomials
         c[6, 1:6] .= [ 0, 15,   0, -70,  0, 63  ] / 8
 
         n_x = 20
-        x_arr = range(-1, stop=1, length=n_x)
+        x_arr = range(-2, stop=2, length=n_x)
         for n = 0:n_poly-1
             P = Poly(c[n+1,:])
             for x in x_arr
@@ -22,8 +22,6 @@ using Polynomials
         end
 
         @test_throws DomainError legendrep(-1, 0)
-        @test_throws DomainError legendrep( 1, 2)
-        @test_throws DomainError legendrep(-1, 2)
 
         @test_throws MethodError legendrep(0, Complex(1))
     end
@@ -31,7 +29,7 @@ using Polynomials
     @testset "assoc legendrep" begin
         n_poly  = 6
         n_x     = 20
-        x_arr   = range(-1, stop=1, length=n_x)
+        x_arr   = range(-2, stop=2, length=n_x)
         for n = 0:n_poly
             for x in x_arr
                 @test legendrep(n, x          ) ≈ legendrep(n, 0, x)        rtol=1e-14
@@ -53,6 +51,7 @@ using Polynomials
         P[4, 3] = x -> -105 * x * (1-x^2)^1.5
         P[4, 4] = x -> 105 * (1-x^2)^2
 
+        x_arr   = range(-1, stop=1, length=n_x)
         for n = 1:n_max
             for m = 1:n
                 for x in x_arr
@@ -65,8 +64,8 @@ using Polynomials
         @test_throws DomainError legendrep(-1,  0, 0)       # n too small
         @test_throws DomainError legendrep( 1, -1, 0)       # m too small
         @test_throws DomainError legendrep( 1,  2, 0)       # m too large
-        @test_throws DomainError legendrep( 0,  0,  1.1)    # x too high
-        @test_throws DomainError legendrep( 0,  0, -1.1)    # x too small
+        @test_throws DomainError legendrep( 1,  1,  1.1)    # x too high
+        @test_throws DomainError legendrep( 1,  1, -1.1)    # x too small
 
         @test_throws MethodError legendrep(0, 0, Complex(1))
     end

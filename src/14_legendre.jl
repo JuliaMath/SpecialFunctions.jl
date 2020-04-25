@@ -173,9 +173,6 @@ function legendrep(n::Integer, x::Real)
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
-    if x < -1 || x > 1
-        throw(DomainError(x, "must be in the range [-1,1]"))
-    end
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
@@ -183,6 +180,15 @@ function legendrep(n::Integer, x::Real)
         y->y)                               # P_1(y)
 end
 function legendrep(n::Integer, m::Integer, x::Real)
+
+    # special case: m=0  =>  P_n^m = P_n
+    # Legendre polynomial P_n(x) can be evaluated outside of [-1,1].
+    # Thus, we use that routine before checking x interval for associated Legendre polynomial P_n^m(x).
+    if 0 == m
+        return legendrep(n, x)
+    end
+
+    # general argument checks
     if n < 0
         throw(DomainError(n, "must be non-negative"))
     end
@@ -191,10 +197,6 @@ function legendrep(n::Integer, m::Integer, x::Real)
     end
     if x < -1 || x > 1
         throw(DomainError(x, "must be in the range [-1,1]"))
-    end
-
-    if m == 0
-        return legendrep(n, x)
     end
 
     # step 1: compute P_m^m(x)

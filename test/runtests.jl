@@ -13,7 +13,7 @@ relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 ≅(a,b) = relerrc(a,b) ≤ 1e-13
 
 tests = [
-    "14_legendre.jl",
+    "14_legendre",
     "bessel",
     "beta_inc",
     "betanc",
