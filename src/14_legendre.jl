@@ -24,12 +24,8 @@ External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 """
 function chebyshevt(n::Integer, x::Real)
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
-    if x < -1 || x > 1
-        throw(DomainError(x, "must be in the range [-1,1]"))
-    end
+    (n <  0)          && throw(DomainError(n, "must be non-negative"))
+    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
@@ -63,12 +59,8 @@ External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 """
 function chebyshevu(n::Integer, x::Real)
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
-    if x < -1 || x > 1
-        throw(DomainError(x, "must be in the range [-1,1]"))
-    end
+    (n <  0)          && throw(DomainError(n, "must be non-negative"))
+    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
@@ -93,9 +85,7 @@ External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Hermite_polynomials).
 """
 function hermiteh(n::Integer, x::Real)
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
+    (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
         2, 0, m->2(m-1),                    # A_m, B_m, C_m
@@ -119,12 +109,8 @@ External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Laguerre_polynomials).
 """
 function laguerrel(n::Integer, x::Real)
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
-    if x < 0
-        throw(DomainError(x, "must be nonnegative"))
-    end
+    (n < 0) && throw(DomainError(n, "must be non-negative"))
+    (x < 0) && throw(DomainError(x, "must be nonnegative"))
 
     ABC_recurrence(n, x,
         m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
@@ -170,9 +156,7 @@ External links: [DLMF - Legendre polynomial](https://dlmf.nist.gov/14.7.E1),
 [Wikipedia - associated Legendre polynomial](https://en.wikipedia.org/wiki/Associated_Legendre_polynomials).
 """
 function legendrep(n::Integer, x::Real)
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
+    (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
@@ -184,20 +168,12 @@ function legendrep(n::Integer, m::Integer, x::Real)
     # special case: m=0  =>  P_n^m = P_n
     # Legendre polynomial P_n(x) can be evaluated outside of [-1,1].
     # Thus, we use that routine before checking x interval for associated Legendre polynomial P_n^m(x).
-    if 0 == m
-        return legendrep(n, x)
-    end
+    (0 == m) && return legendrep(n, x)
 
     # general argument checks
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
-    if m < 0 || m > n
-        throw(DomainError(m, "must be in the range m = 0,..,n"))
-    end
-    if x < -1 || x > 1
-        throw(DomainError(x, "must be in the range [-1,1]"))
-    end
+    (n <  0)          && throw(DomainError(n, "must be non-negative"))
+    (m <  0 || m > n) && throw(DomainError(m, "must be in the range m = 0,..,n"))
+    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
 
     # step 1: compute P_m^m(x)
     p = 1                                           # = P_0^0(x)
@@ -205,9 +181,7 @@ function legendrep(n::Integer, m::Integer, x::Real)
         p_prev  = p
         p       = -(2k-1) * sqrt(1-x^2) * p_prev    # = P_k^k(x)
     end                                             # on output: p = P_m^m(x)
-    if n == m
-        return p
-    end
+    (n == m) && return p
 
     # step 2: compute P_{m+1}^m(x)
     p_prev  = p                                     # = P_m^m(x)
@@ -263,12 +237,8 @@ External links: [DLMF - Legendre function](https://dlmf.nist.gov/14.7.E2),
 [Wikipedia - associated Legendre function](https://en.wikipedia.org/wiki/Legendre_function#Associated_Legendre_functions_of_the_second_kind).
 """
 function legendreq(n::Integer, x::Real)
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
-    if x < -1 || x > 1
-        throw(DomainError(x, "must be in the range [-1,1]"))
-    end
+    (n <  0)          && throw(DomainError(n, "must be non-negative"))
+    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
 
     if x == 1
         return Inf
@@ -284,20 +254,12 @@ function legendreq(n::Integer, x::Real)
         Q0, Q1)
 end
 function legendreq(n::Integer, m::Integer, x::Real)
-    if n < 0
-        throw(DomainError(n, "must be non-negative"))
-    end
-    if m < 0
-        throw(DomainError(m, "must be non-negative"))
-    end
-    if m == 0
-        return legendreq(n, x)
-    end
+    (n <  0) && throw(DomainError(n, "must be non-negative"))
+    (m <  0) && throw(DomainError(m, "must be non-negative"))
+    (m == 0) && return legendreq(n, x)
 
     # x check after: Q^0_n is also implemented for x = +-1
-    if x <= -1 || x >= 1
-        throw(DomainError(x, "must be in the range (-1,1)"))
-    end
+    (x <= -1 || x >= 1) && throw(DomainError(x, "must be in the range (-1,1)"))
 
     # step 1: compute Q_n^0(x)
     q_n_0 = legendreq(n, x)
