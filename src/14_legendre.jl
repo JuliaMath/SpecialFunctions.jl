@@ -270,9 +270,9 @@ function legendreq(n::Integer, x::Real)
         throw(DomainError(x, "must be in the range [-1,1]"))
     end
 
-    if      x == 1
+    if x == 1
         return Inf
-    elseif  x == -1
+    elseif x == -1
         return (-1)^(n+1) * Inf
     end
 
@@ -390,9 +390,9 @@ function ABC_recurrence(n::Integer, x::Real,
     p_prev_prev = p0(x)
     p_prev      = p1(x)
 
-    if      n == 0
+    if n == 0
         return p_prev_prev
-    elseif  n == 1
+    elseif n == 1
         return p_prev
     end
 
