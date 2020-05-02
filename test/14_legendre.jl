@@ -18,6 +18,8 @@ using Polynomials
             for x in x_arr
                 @test legendrep(n, x          ) ≈ P(x)              rtol=1e-14
                 @test legendrep(n, BigFloat(x)) ≈ P(x)              rtol=1e-13
+                @inferred legendrep(n, x)
+                @inferred legendrep(n, BigFloat(x))
             end
         end
 
@@ -57,6 +59,8 @@ using Polynomials
                 for x in x_arr
                     @test legendrep(n, m, x          ) ≈ P[n,m](x)        rtol=1e-14
                     @test legendrep(n, m, BigFloat(x)) ≈ P[n,m](x)        rtol=1e-14
+                    @inferred legendrep(n, m, x          )
+                    @inferred legendrep(n, m, BigFloat(x))
                 end
             end
         end
@@ -93,18 +97,20 @@ using Polynomials
             for x in x_arr
                 @test legendreq(n, x          ) ≈ q[n+1](x)        rtol=1e-14
                 @test legendreq(n, BigFloat(x)) ≈ q[n+1](x)        rtol=1e-14
+                @inferred Float64 legendreq(n, x          )
+                @inferred Float64 legendreq(n, BigFloat(x))
             end
         end
 
         for n in range(0, stop=3n_poly)
-            @test               Inf == legendreq(n, 1)
+            @test               Inf == legendreq(n,  1)
             @test (-1)^(n+1) *  Inf == legendreq(n, -1)
         end
 
-        @test_throws DomainError legendreq(-1, 0)
-        @test_throws DomainError legendreq( 1, 1.1)
+        @test_throws DomainError legendreq(-1,  0)
+        @test_throws DomainError legendreq( 1,  1.1)
         @test_throws DomainError legendreq( 1, -1.1)
-        @test_throws DomainError legendreq(-1, 1.1)
+        @test_throws DomainError legendreq(-1,  1.1)
 
         @test_throws MethodError legendreq(0, Complex(1))
     end
@@ -142,12 +148,14 @@ using Polynomials
                 for x in x_arr
                     @test legendreq(n, m, x          ) ≈ Q[n+1,m](x)        rtol=1e-14
                     @test legendreq(n, m, BigFloat(x)) ≈ Q[n+1,m](x)        rtol=1e-14
+                    @inferred Float64 legendreq(n, m, x          )
+                    @inferred Float64 legendreq(n, m, BigFloat(x))
                 end
             end
         end
 
-        @test_throws DomainError legendreq(-1,  0, 0)       # n too small
-        @test_throws DomainError legendreq( 1, -1, 0)       # m too small
+        @test_throws DomainError legendreq(-1,  0,  0)      # n too small
+        @test_throws DomainError legendreq( 1, -1,  0)      # m too small
         @test_throws DomainError legendreq( 0,  0,  1.1)    # x too high
         @test_throws DomainError legendreq( 0,  0, -1.1)    # x too small
         @test_throws DomainError legendreq( 0,  1,  1)      # x too high
@@ -173,6 +181,8 @@ using Polynomials
             for x in x_arr
                 @test hermiteh(n, x          ) ≈ P(x)        rtol=1e-14
                 @test hermiteh(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
+                @inferred hermiteh(n, x          )
+                @inferred hermiteh(n, BigFloat(x))
             end
         end
 
@@ -198,6 +208,8 @@ using Polynomials
             for x in x_arr
                 @test laguerrel(n, x          ) ≈ P(x)        rtol=1e-13
                 @test laguerrel(n, BigFloat(x)) ≈ P(x)        rtol=1e-13
+                @inferred laguerrel(n, x          )
+                @inferred laguerrel(n, BigFloat(x))
             end
         end
 
@@ -225,6 +237,8 @@ using Polynomials
             for x in x_arr
                 @test chebyshevt(n, x          ) ≈ P(x)        rtol=1e-14
                 @test chebyshevt(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
+                @inferred chebyshevt(n, x          )
+                @inferred chebyshevt(n, BigFloat(x))
             end
         end
 
@@ -253,6 +267,8 @@ using Polynomials
             for x in x_arr
                 @test chebyshevu(n, x          ) ≈ P(x)        rtol=1e-14
                 @test chebyshevu(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
+                @inferred chebyshevu(n, x          )
+                @inferred chebyshevu(n, BigFloat(x))
             end
         end
 

@@ -176,7 +176,7 @@ function legendrep(n::Integer, m::Integer, x::Real)
     (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
 
     # step 1: compute P_m^m(x)
-    p = 1                                           # = P_0^0(x)
+    p = one(x)                                      # = P_0^0(x)
     for k = 1:m
         p_prev  = p
         p       = -(2k-1) * sqrt(1-x^2) * p_prev    # = P_k^k(x)
