@@ -14,7 +14,7 @@ using Polynomials
         n_x = 20
         x_arr = range(-2, stop=2, length=n_x)
         for n = 0:n_poly-1
-            P = Poly(c[n+1,:])
+            P = ImmutablePolynomial(c[n+1,:])
             for x in x_arr
                 @test legendrep(n, x          ) ≈ P(x)              rtol=1e-14
                 @test legendrep(n, BigFloat(x)) ≈ P(x)              rtol=1e-13
@@ -88,7 +88,8 @@ using Polynomials
         c[5, 1:5] .= [-8//15,      0, 49//8,      0, -63//8 ]
 
         for i = 1:n_poly
-            q[i+1] = x -> legendrep(i, x) * Q0(x) + polyval(Poly(c[i,:]), x)
+            P      = ImmutablePolynomial(c[i,:])
+            q[i+1] = x -> legendrep(i, x) * Q0(x) + P(x)
         end
 
         n_x = 20
@@ -177,7 +178,7 @@ using Polynomials
         n_x = 20
         x_arr = range(-2, stop=3, length=n_x)
         for n = 0:n_poly-1
-            P = Poly(c[n+1,:])
+            P = ImmutablePolynomial(c[n+1,:])
             for x in x_arr
                 @test hermiteh(n, x          ) ≈ P(x)        rtol=1e-14
                 @test hermiteh(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
@@ -204,7 +205,7 @@ using Polynomials
         n_x = 20
         x_arr = range(0, stop=2, length=n_x)
         for n = 0:n_poly-1
-            P = Poly(c[n+1,:])
+            P = ImmutablePolynomial(c[n+1,:])
             for x in x_arr
                 @test laguerrel(n, x          ) ≈ P(x)        rtol=1e-13
                 @test laguerrel(n, BigFloat(x)) ≈ P(x)        rtol=1e-13
@@ -233,7 +234,7 @@ using Polynomials
         n_x = 20
         x_arr = range(-1, stop=1, length=n_x)
         for n = 0:n_poly-1
-            P = Poly(c[n+1,:])
+            P = ImmutablePolynomial(c[n+1,:])
             for x in x_arr
                 @test chebyshevt(n, x          ) ≈ P(x)        rtol=1e-14
                 @test chebyshevt(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
@@ -263,7 +264,7 @@ using Polynomials
         n_x = 20
         x_arr = range(-1, stop=1, length=n_x)
         for n = 0:n_poly-1
-            P = Poly(c[n+1,:])
+            P = ImmutablePolynomial(c[n+1,:])
             for x in x_arr
                 @test chebyshevu(n, x          ) ≈ P(x)        rtol=1e-14
                 @test chebyshevu(n, BigFloat(x)) ≈ P(x)        rtol=1e-14
