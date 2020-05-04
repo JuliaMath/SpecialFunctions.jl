@@ -9,13 +9,13 @@ T_n(x)
 =
 \begin{cases}
     1
-    & \text{for} \quad n = 0\,, \; x \in [-1,1]
+    & \text{for} \quad n = 0
     \\
     x
-    & \text{for} \quad n = 1\,, \; x \in [-1,1]
+    & \text{for} \quad n = 1
     \\
     2 x T_{n-1}(x) - T_{n-2}(x)
-    & \text{for} \quad n \geq 2\,, \; x \in [-1,1]
+    & \text{for} \quad n \geq 2
     \,.
 \end{cases}
 ```
@@ -23,9 +23,8 @@ T_n(x)
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 """
-function chebyshevt(n::Integer, x::Real)
-    (n <  0)          && throw(DomainError(n, "must be non-negative"))
-    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
+function chebyshevt(n::Integer, x)
+    (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
@@ -44,13 +43,13 @@ U_n(x)
 =
 \begin{cases}
     1
-    & \text{for} \quad n = 0\,, \; x \in [-1,1]
+    & \text{for} \quad n = 0
     \\
     2x
-    & \text{for} \quad n = 1\,, \; x \in [-1,1]
+    & \text{for} \quad n = 1
     \\
     2x U_{n-1}(x) - U_{n-2}(x)
-    & \text{for} \quad n \geq 2\,, \; x \in [-1,1]
+    & \text{for} \quad n \geq 2
     \,.
 \end{cases}
 ```
@@ -58,9 +57,8 @@ U_n(x)
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 """
-function chebyshevu(n::Integer, x::Real)
-    (n <  0)          && throw(DomainError(n, "must be non-negative"))
-    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
+function chebyshevu(n::Integer, x)
+    (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
@@ -78,13 +76,13 @@ defined by
 H_n(x)
 = (-1)^n e^{x^2} \frac{\mathrm{d}^n}{\mathrm{d}x^n} e^{-x^2}
 \quad \text{for} \quad
-x \in \mathbb{R}, \; n = 0, 1, 2, \dots
+n = 0, 1, 2, \dots
 ```
 
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Hermite_polynomials).
 """
-function hermiteh(n::Integer, x::Real)
+function hermiteh(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
@@ -108,9 +106,8 @@ x \geq 0, \; n = 0, 1, 2, \dots
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Laguerre_polynomials).
 """
-function laguerrel(n::Integer, x::Real)
+function laguerrel(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
-    (x < 0) && throw(DomainError(x, "must be nonnegative"))
 
     ABC_recurrence(n, x,
         m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
@@ -155,7 +152,7 @@ External links: [DLMF - Legendre polynomial](https://dlmf.nist.gov/14.7.E1),
 [Wikipedia - Legendre polynomial](https://en.wikipedia.org/wiki/Legendre_polynomials),
 [Wikipedia - associated Legendre polynomial](https://en.wikipedia.org/wiki/Associated_Legendre_polynomials).
 """
-function legendrep(n::Integer, x::Real)
+function legendrep(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
@@ -163,7 +160,7 @@ function legendrep(n::Integer, x::Real)
         y->one(x),                          # P_0(y)
         y->y)                               # P_1(y)
 end
-function legendrep(n::Integer, m::Integer, x::Real)
+function legendrep(n::Integer, m::Integer, x)
 
     # special case: m=0  =>  P_n^m = P_n
     # Legendre polynomial P_n(x) can be evaluated outside of [-1,1].
@@ -173,7 +170,6 @@ function legendrep(n::Integer, m::Integer, x::Real)
     # general argument checks
     (n <  0)          && throw(DomainError(n, "must be non-negative"))
     (m <  0 || m > n) && throw(DomainError(m, "must be in the range m = 0,..,n"))
-    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
 
     # step 1: compute P_m^m(x)
     p = one(x)                                      # = P_0^0(x)
@@ -236,9 +232,9 @@ External links: [DLMF - Legendre function](https://dlmf.nist.gov/14.7.E2),
 [Wikipedia - Legendre function](https://en.wikipedia.org/wiki/Legendre_functions#Legendre_functions_of_the_second_kind_(Qn)),
 [Wikipedia - associated Legendre function](https://en.wikipedia.org/wiki/Legendre_function#Associated_Legendre_functions_of_the_second_kind).
 """
-function legendreq(n::Integer, x::Real)
-    (n <  0)          && throw(DomainError(n, "must be non-negative"))
-    (x < -1 || x > 1) && throw(DomainError(x, "must be in the range [-1,1]"))
+function legendreq(n::Integer, x)
+    (0 > n)      && throw(DomainError(n, "must be non-negative"))
+    (1 < abs(x)) && throw(DomainError(x, "must be in the range [-1,1]"))
 
     if x == 1
         return Inf
@@ -253,13 +249,13 @@ function legendreq(n::Integer, x::Real)
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
         Q0, Q1)
 end
-function legendreq(n::Integer, m::Integer, x::Real)
+function legendreq(n::Integer, m::Integer, x)
     (n <  0) && throw(DomainError(n, "must be non-negative"))
     (m <  0) && throw(DomainError(m, "must be non-negative"))
     (m == 0) && return legendreq(n, x)
 
     # x check after: Q^0_n is also implemented for x = +-1
-    (x <= -1 || x >= 1) && throw(DomainError(x, "must be in the range (-1,1)"))
+    (1 <= abs(x)) && throw(DomainError(x, "must be in the range (-1,1)"))
 
     # step 1: compute Q_n^0(x)
     q_n_0 = legendreq(n, x)
@@ -344,7 +340,7 @@ be casted to the type of `x`. Thus, variables `x,Am,Bm,Cm` are all of the same t
 > Wiley, 1996.
 > (p. 23)
 """
-function ABC_recurrence(n::Integer, x::Real,
+function ABC_recurrence(n::Integer, x,
         A::Union{Integer,Function}, B::Union{Integer,Function}, C::Union{Integer,Function},
         p0::Function, p1::Function)
 
@@ -360,21 +356,17 @@ function ABC_recurrence(n::Integer, x::Real,
 
     p = zero(x)
     for m = 2:n
+        # see type stability comment in function doc string
         Am  = (typeof(A) <: Integer)  ?  (typeof(x)(A))  :  (A(m))
         Bm  = (typeof(B) <: Integer)  ?  (typeof(x)(B))  :  (B(m))
         Cm  = (typeof(C) <: Integer)  ?  (typeof(x)(C))  :  (C(m))
-        p   = ABC_recurrence_step(x, Am, Bm, Cm, p_prev, p_prev_prev)
+
+        # recurrence step
+        p = (Am*x + Bm) * p_prev - Cm * p_prev_prev
 
         p_prev_prev  = p_prev
         p_prev       = p
     end
 
     p
-end
-
-function ABC_recurrence_step(x::Real,
-    Am::Real, Bm::Real, Cm::Real,
-    p_prev::Real, p_prev_prev::Real)
-
-    (Am*x + Bm) * p_prev - Cm * p_prev_prev
 end

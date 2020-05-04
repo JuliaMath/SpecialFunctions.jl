@@ -24,8 +24,6 @@ using Polynomials
         end
 
         @test_throws DomainError legendrep(-1, 0)
-
-        @test_throws MethodError legendrep(0, Complex(1))
     end
 
     @testset "assoc legendrep" begin
@@ -68,10 +66,6 @@ using Polynomials
         @test_throws DomainError legendrep(-1,  0, 0)       # n too small
         @test_throws DomainError legendrep( 1, -1, 0)       # m too small
         @test_throws DomainError legendrep( 1,  2, 0)       # m too large
-        @test_throws DomainError legendrep( 1,  1,  1.1)    # x too high
-        @test_throws DomainError legendrep( 1,  1, -1.1)    # x too small
-
-        @test_throws MethodError legendrep(0, 0, Complex(1))
     end
 
     @testset "legendreq" begin
@@ -112,8 +106,6 @@ using Polynomials
         @test_throws DomainError legendreq( 1,  1.1)
         @test_throws DomainError legendreq( 1, -1.1)
         @test_throws DomainError legendreq(-1,  1.1)
-
-        @test_throws MethodError legendreq(0, Complex(1))
     end
 
     @testset "assoc legendreq" begin
@@ -161,8 +153,6 @@ using Polynomials
         @test_throws DomainError legendreq( 0,  0, -1.1)    # x too small
         @test_throws DomainError legendreq( 0,  1,  1)      # x too high
         @test_throws DomainError legendreq( 0,  1, -1)      # x too small
-
-        @test_throws MethodError legendreq(0, 0, Complex(1))
     end
 
     @testset "hermite" begin
@@ -188,8 +178,6 @@ using Polynomials
         end
 
         @test_throws DomainError hermiteh(-1, 0)
-
-        @test_throws MethodError hermiteh(0, Complex(1))
     end
 
     @testset "laguerre" begin
@@ -215,10 +203,6 @@ using Polynomials
         end
 
         @test_throws DomainError laguerrel(-1, 0)
-        @test_throws DomainError laguerrel(0, -1)
-        @test_throws DomainError laguerrel(-1, -1)
-
-        @test_throws MethodError laguerrel(0, Complex(1))
     end
 
     @testset "chebyshev 1" begin
@@ -244,11 +228,6 @@ using Polynomials
         end
 
         @test_throws DomainError chebyshevt(-1, 0)
-        @test_throws DomainError chebyshevt(0, 1.1)
-        @test_throws DomainError chebyshevt(0, -1.1)
-        @test_throws DomainError chebyshevt(-1, 2)
-
-        @test_throws MethodError chebyshevt(0, Complex(1))
     end
 
     @testset "chebyshev 2" begin
@@ -274,10 +253,5 @@ using Polynomials
         end
 
         @test_throws DomainError chebyshevu(-1, 0)
-        @test_throws DomainError chebyshevu(0, 1.1)
-        @test_throws DomainError chebyshevu(0, -1.1)
-        @test_throws DomainError chebyshevu(-1, 2)
-
-        @test_throws MethodError chebyshevu(0, Complex(1))
     end
 end
