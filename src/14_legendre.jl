@@ -28,8 +28,8 @@ function chebyshevt(n::Integer, x)
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
-        y->one(x),                          # P_0(y)
-        y->y)                               # P_1(y)
+        one(x),                             # P_0(x)
+        x)                                  # P_1(x)
 end
 
 @doc raw"""
@@ -62,8 +62,8 @@ function chebyshevu(n::Integer, x)
 
     ABC_recurrence(n, x,
         2, 0, 1,                            # A_m, B_m, C_m
-        y->one(x),                          # P_0(y)
-        y->2y)                              # P_1(y)
+        one(x),                             # P_0(x)
+        2x)                                 # P_1(x)
 end
 
 @doc raw"""
@@ -87,8 +87,8 @@ function hermiteh(n::Integer, x)
 
     ABC_recurrence(n, x,
         2, 0, m->2(m-1),                    # A_m, B_m, C_m
-        y->one(x),                          # P_0(y)
-        y->2y)                              # P_1(y)
+        one(x),                             # P_0(x)
+        2x)                                 # P_1(x)
 end
 
 @doc raw"""
@@ -111,8 +111,8 @@ function laguerrel(n::Integer, x)
 
     ABC_recurrence(n, x,
         m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
-        y->one(x),                          # P_0(y)
-        y->1-y)                             # P_1(y)
+        one(x),                             # P_0(x)
+        one(x)-x)                           # P_1(x)
 end
 
 @doc raw"""
@@ -157,8 +157,8 @@ function legendrep(n::Integer, x)
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
-        y->one(x),                          # P_0(y)
-        y->y)                               # P_1(y)
+        one(x),                             # P_0(x)
+        x)                                  # P_1(x)
 end
 function legendrep(n::Integer, m::Integer, x)
 
@@ -242,8 +242,8 @@ function legendreq(n::Integer, x)
         return (-1)^(n+1) * Inf
     end
 
-    Q0(y) = 0.5 * log((1+y)/(1-y))
-    Q1(y) = legendrep(1, x) * Q0(y) - 1
+    Q0 = 0.5 * log((1+x)/(1-x))
+    Q1 = legendrep(1, x) * Q0 - 1
 
     ABC_recurrence(n, x,
         m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
@@ -312,20 +312,17 @@ and Chebyshev polynomials of 1st kind ``T_n`` and 2nd kind ``U_n``.
 
 # Arguments
 - `n::Integer`:                     Polynomial order
-- `x::Real`:                        evaluation point
+- `x`:                              evaluation point
 - `A::Union{Integer,Function}`:     recurrence coefficient ``A_m``
 - `B::Union{Integer,Function}`:     recurrence coefficient ``B_m``
 - `C::Union{Integer,Function}`:     recurrence coefficient ``C_m``
-- `p0::Function`:                   function of degree 0, i.e. ``p_0``
-- `p1::Function`:                   function of degree 1, i.e. ``p_1``
+- `p0`:                             function of degree 0, i.e. ``p_0``, evaluated at ``x``
+- `p1`:                             function of degree 1, i.e. ``p_1``, evaluated at ``x``
 
 #Implementation
 For some polynomials the coefficients ``A_m, B_m, C_m`` are independent of ``m`` and for
 others they aren't. Which is why we use `Union{Integer,Function}` and functions can be
 easily created by anonymous functions.
-
-Degree 0, and 1 are supplied as a function. Efficiency is not an issue as it is only invoked
-once.
 
 Type stability:
 - `A,B,C` are either functions returning a value of same type as `x` or an integer which will
@@ -340,19 +337,20 @@ be casted to the type of `x`. Thus, variables `x,Am,Bm,Cm` are all of the same t
 > Wiley, 1996.
 > (p. 23)
 """
-function ABC_recurrence(n::Integer, x,
+function ABC_recurrence(n::Integer, x::T,
         A::Union{Integer,Function}, B::Union{Integer,Function}, C::Union{Integer,Function},
-        p0::Function, p1::Function)
+        p0::T, p1::T) where {T}
 
-    # evaluate initial functions
-    p_prev_prev = p0(x)
-    p_prev      = p1(x)
-
+    # handle low orders
     if n == 0
-        return p_prev_prev
+        return p0
     elseif n == 1
-        return p_prev
+        return p1
     end
+
+    # use initial functions for recurrence relation
+    p_prev_prev = p0
+    p_prev      = p1
 
     p = zero(x)
     for m = 2:n
