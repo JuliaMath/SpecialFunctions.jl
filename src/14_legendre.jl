@@ -28,8 +28,8 @@ function chebyshevt(n::Integer, x)
 
     ABC_recurrence(n, x,
         ( (2one(x), zero(x), one(x)) for m=2:n),            # (A_m, B_m, C_m)
-        one(x),                             # P_0(x)
-        x)                                  # P_1(x)
+        one(x),                                             # P_0(x)
+        x)                                                  # P_1(x)
 end
 
 @doc raw"""
@@ -62,8 +62,8 @@ function chebyshevu(n::Integer, x)
 
     ABC_recurrence(n, x,
         ( (2one(x), zero(x), one(x)) for m=2:n),            # (A_m, B_m, C_m)
-        one(x),                             # P_0(x)
-        2x)                                 # P_1(x)
+        one(x),                                             # P_0(x)
+        2x)                                                 # P_1(x)
 end
 
 @doc raw"""
@@ -87,8 +87,8 @@ function hermiteh(n::Integer, x)
 
     ABC_recurrence(n, x,
         ( (2one(x), zero(x), 2(m-one(x))) for m=2:n),               # (A_m, B_m, C_m)
-        one(x),                             # P_0(x)
-        2x)                                 # P_1(x)
+        one(x),                                                     # P_0(x)
+        2x)                                                         # P_1(x)
 end
 
 @doc raw"""
@@ -111,8 +111,8 @@ function laguerrel(n::Integer, x)
 
     ABC_recurrence(n, x,
         ( (-one(x)/m, 2-one(x)/m, 1-one(x)/m) for m=2:n),               # (A_m, B_m, C_m)
-        one(x),                             # P_0(x)
-        one(x)-x)                           # P_1(x)
+        one(x),                                                         # P_0(x)
+        one(x)-x)                                                       # P_1(x)
 end
 
 @doc raw"""
@@ -157,8 +157,8 @@ function legendrep(n::Integer, x)
 
     ABC_recurrence(n, x,
         ( ((2m-one(x))/m, zero(x), (m-one(x))/m) for m=2:n),            # (A_m, B_m, C_m)
-        one(x),                             # P_0(x)
-        x)                                  # P_1(x)
+        one(x),                                                         # P_0(x)
+        x)                                                              # P_1(x)
 end
 function legendrep(n::Integer, m::Integer, x)
 
@@ -168,26 +168,26 @@ function legendrep(n::Integer, m::Integer, x)
     (0 == m) && return legendrep(n, x)
 
     # general argument checks
-    (n <  0)          && throw(DomainError(n, "must be non-negative"))
-    (m <  0 || m > n) && throw(DomainError(m, "must be in the range m = 0,..,n"))
+    (n < 0)          && throw(DomainError(n, "must be non-negative"))
+    (m < 0 || m > n) && throw(DomainError(m, "must be in the range m = 0,..,n"))
 
     # step 1: compute P_m^m(x)
-    p = one(x)                                      # = P_0^0(x)
+    p = one(x)                                                      # = P_0^0(x)
     for k = 1:m
-        p_prev  = p
-        p       = -(2k-1) * sqrt(1-x^2) * p_prev    # = P_k^k(x)
-    end                                             # on output: p = P_m^m(x)
+        p_prev = p
+        p      = -(2k-1) * sqrt(1-x^2) * p_prev                     # = P_k^k(x)
+    end                                                             # on output: p = P_m^m(x)
     (n == m) && return p
 
     # step 2: compute P_{m+1}^m(x)
-    p_prev  = p                                     # = P_m^m(x)
-    p       = (2m+1) * x * p_prev                   # = P_{m+1}^m(x)
+    p_prev = p                                                      # = P_m^m(x)
+    p      = (2m+1) * x * p_prev                                    # = P_{m+1}^m(x)
 
     # step 3: compute P_n^m(x)
     for k = m+2:n
         p_prev, p_prev_prev = p, p_prev
         p = (2k-1)/(k-m)*x*p_prev - (k+m-1)/(k-m)*p_prev_prev       # = P_k^m(x)
-    end                                             # on output: p = P_n^m(x)
+    end                                                             # on output: p = P_n^m(x)
 
     p
 end
@@ -354,8 +354,8 @@ function ABC_recurrence(n::Integer, x::T,
         # recurrence step
         p = (Am*x + Bm) * p_prev - Cm * p_prev_prev
 
-        p_prev_prev  = p_prev
-        p_prev       = p
+        p_prev_prev = p_prev
+        p_prev      = p
     end
 
     p
