@@ -27,7 +27,7 @@ function chebyshevt(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
-        2, 0, 1,                            # A_m, B_m, C_m
+        ( (2one(x), zero(x), one(x)) for m=2:n),            # (A_m, B_m, C_m)
         one(x),                             # P_0(x)
         x)                                  # P_1(x)
 end
@@ -61,7 +61,7 @@ function chebyshevu(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
-        2, 0, 1,                            # A_m, B_m, C_m
+        ( (2one(x), zero(x), one(x)) for m=2:n),            # (A_m, B_m, C_m)
         one(x),                             # P_0(x)
         2x)                                 # P_1(x)
 end
@@ -86,7 +86,7 @@ function hermiteh(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
-        2, 0, m->2(m-1),                    # A_m, B_m, C_m
+        ( (2one(x), zero(x), 2(m-one(x))) for m=2:n),               # (A_m, B_m, C_m)
         one(x),                             # P_0(x)
         2x)                                 # P_1(x)
 end
@@ -110,7 +110,7 @@ function laguerrel(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
-        m->-1//m, m->2-1//m, m->1-1//m,     # A_m, B_m, C_m
+        ( (-one(x)/m, 2-one(x)/m, 1-one(x)/m) for m=2:n),               # (A_m, B_m, C_m)
         one(x),                             # P_0(x)
         one(x)-x)                           # P_1(x)
 end
@@ -156,7 +156,7 @@ function legendrep(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
     ABC_recurrence(n, x,
-        m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
+        ( ((2m-one(x))/m, zero(x), (m-one(x))/m) for m=2:n),            # (A_m, B_m, C_m)
         one(x),                             # P_0(x)
         x)                                  # P_1(x)
 end
@@ -246,7 +246,7 @@ function legendreq(n::Integer, x)
     Q1 = legendrep(1, x) * Q0 - 1
 
     ABC_recurrence(n, x,
-        m->(2m-1)//m, 0, m->(m-1)//m,       # A_m, B_m, C_m
+        ( ((2m-one(x))/m, zero(x), (m-one(x))/m) for m=2:n),            # (A_m, B_m, C_m)
         Q0, Q1)
 end
 function legendreq(n::Integer, m::Integer, x)
@@ -288,7 +288,7 @@ function legendreq(n::Integer, m::Integer, x)
 end
 
 @doc raw"""
-    ABC_recurrence(n, x, A, B, C, p0, p1)
+    ABC_recurrence(n, x, ABC, p0, p1)
 
 Evaluate polynomials by the recurrence
 ```math
@@ -313,20 +313,15 @@ and Chebyshev polynomials of 1st kind ``T_n`` and 2nd kind ``U_n``.
 # Arguments
 - `n::Integer`:                     Polynomial order
 - `x`:                              evaluation point
-- `A::Union{Integer,Function}`:     recurrence coefficient ``A_m``
-- `B::Union{Integer,Function}`:     recurrence coefficient ``B_m``
-- `C::Union{Integer,Function}`:     recurrence coefficient ``C_m``
+- `ABC::Base.Generator`:            recurrence coefficients ``(A_m,B_m,C_m)`` for ``m=2,\dots,n``
 - `p0`:                             function of degree 0, i.e. ``p_0``, evaluated at ``x``
 - `p1`:                             function of degree 1, i.e. ``p_1``, evaluated at ``x``
 
 #Implementation
-For some polynomials the coefficients ``A_m, B_m, C_m`` are independent of ``m`` and for
-others they aren't. Which is why we use `Union{Integer,Function}` and functions can be
-easily created by anonymous functions.
+The coefficients ``A_m, B_m, C_m`` are supplied via a generator which yields them as a tuple ``(A_m,B_m,C_m)``.
 
 Type stability:
-- `A,B,C` are either functions returning a value of same type as `x` or an integer which will
-be casted to the type of `x`. Thus, variables `x,Am,Bm,Cm` are all of the same type.
+- The generator `ABC` yields tuples `(Am,Bm,Cm)`. The tuple's elements are of the same type as `x`.
 - `p0,p1` are functions which have the same return type as the type of `x`.
 - Thus, all variables: `p_prev_prev,p_prev,p,Am,Bm,Cm` are always of type `x`.
 
@@ -338,7 +333,7 @@ be casted to the type of `x`. Thus, variables `x,Am,Bm,Cm` are all of the same t
 > (p. 23)
 """
 function ABC_recurrence(n::Integer, x::T,
-        A::Union{Integer,Function}, B::Union{Integer,Function}, C::Union{Integer,Function},
+        ABC::Base.Generator,
         p0::T, p1::T) where {T}
 
     # handle low orders
@@ -353,11 +348,8 @@ function ABC_recurrence(n::Integer, x::T,
     p_prev      = p1
 
     p = zero(x)
-    for m = 2:n
-        # see type stability comment in function doc string
-        Am  = (typeof(A) <: Integer)  ?  (typeof(x)(A))  :  (A(m))
-        Bm  = (typeof(B) <: Integer)  ?  (typeof(x)(B))  :  (B(m))
-        Cm  = (typeof(C) <: Integer)  ?  (typeof(x)(C))  :  (C(m))
+    for AmBmCm in ABC
+        Am, Bm, Cm = AmBmCm
 
         # recurrence step
         p = (Am*x + Bm) * p_prev - Cm * p_prev_prev
