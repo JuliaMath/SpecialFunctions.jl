@@ -271,7 +271,7 @@ function legendreq(n::Integer, m::Integer, x)
         q, q_prev = Q11, Q01
         for k = 2:n
             q_prev, q_prev_prev = q, q_prev
-            q = (2k-1)//(k-1) * x * q_prev - k//(k-1) * q_prev_prev         # = Q_k^1(x)
+            q = (2k-1) / (k-1) * x * q_prev - k / (k-1) * q_prev_prev       # = Q_k^1(x)
         end                                                                 # on output: q = Q_n^1(x)
     end
     q_n_1 = q
