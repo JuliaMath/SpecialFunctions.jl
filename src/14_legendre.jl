@@ -239,7 +239,7 @@ function legendreq(n::Integer, x)
     if x == 1
         return Inf
     elseif x == -1
-        return (-1)^(n+1) * Inf
+        return iseven(n) ? -Inf : +Inf
     end
 
     Q0 = 0.5 * log((1+x)/(1-x))
