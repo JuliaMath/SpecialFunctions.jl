@@ -67,7 +67,7 @@ erf
 @doc raw"""
     erf(x, y)
 
-Compute the difference `erf(y) - erf(x)`, in an numerically sound way (only for real arguments).
+Compute the difference `erf(y) - erf(x)`, in a numerically sound way (only for real arguments).
 """
 function erf(x::Real, y::Real)
     if 0 ≤ x && 0 ≤ y
