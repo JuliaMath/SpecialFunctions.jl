@@ -34,6 +34,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | Function | Description |
 |:-------- |:----------- |
 | [`erf(x)`](@ref SpecialFunctions.erf)         | [error function](https://en.wikipedia.org/wiki/Error_function) at ``x`` |
+| [`erf(x,y)`](@ref SpecialFunctions.erf)       | accurate version of ``\operatorname{erf}(y) - \operatorname{erf}(x)`` |
 | [`erfc(x)`](@ref SpecialFunctions.erfc)       | complementary error function, i.e. the accurate version of ``1-\operatorname{erf}(x)`` for large ``x`` |
 | [`erfcinv(x)`](@ref SpecialFunctions.erfcinv) | inverse function to [`erfc()`](@ref SpecialFunctions.erfc) |
 | [`erfcx(x)`](@ref SpecialFunctions.erfcx)     | scaled complementary error function, i.e. accurate ``e^{x^2} \operatorname{erfc}(x)`` for large ``x`` |
