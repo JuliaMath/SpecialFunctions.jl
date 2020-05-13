@@ -65,6 +65,21 @@ See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunc
 erf
 
 @doc raw"""
+    erf(x, y)
+
+Compute the difference `erf(y) - erf(x)`, in a numerically sound way (only for real arguments).
+"""
+function erf(x::Real, y::Real)
+    if 0 ≤ x && 0 ≤ y
+        erfc(x) - erfc(y)
+    elseif x ≤ 0 && y ≤ 0
+        erfc(-y) - erfc(-x)
+    else
+        erf(y) - erf(x)
+    end
+end
+
+@doc raw"""
     erfc(x)
 
 Compute the complementary error function of ``x``, defined by

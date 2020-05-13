@@ -131,4 +131,11 @@
         @test erfinv(one(Int))  == erfinv(1.0)
         @test erfcinv(one(Int)) == erfcinv(1.0)
     end
+
+    @testset "two args version" begin
+        @test erf(10, 11) ≈ 2.08848758232167861905709161e-45
+        @test erf(11, 10) ≈ -2.08848758232167861905709161e-45
+        @test erf(-11, -10) ≈ 2.08848758232167861905709161e-45
+        @test erf(-1, 1) ≈ 1.68540158589942973868244127017
+    end
 end
