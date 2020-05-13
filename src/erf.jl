@@ -51,6 +51,10 @@ Compute the error function of ``x``, defined by
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
+    erf(x, y)
+
+Accurate version of `erf(y) - erf(x)` (for real arguments only).
+
 External links: [DLMF](https://dlmf.nist.gov/7.2.1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
 See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunctions.erfcx),
@@ -64,11 +68,6 @@ See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunc
 """
 erf
 
-@doc raw"""
-    erf(x, y)
-
-Compute the difference `erf(y) - erf(x)`, in a numerically sound way (only for real arguments).
-"""
 function erf(x::Real, y::Real)
     if 0 ≤ x && 0 ≤ y
         erfc(x) - erfc(y)
