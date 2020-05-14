@@ -69,7 +69,9 @@ See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunc
 erf
 
 function erf(x::Real, y::Real)
-    if 0 ≤ x && 0 ≤ y
+    if abs(x) ≤ 1/√2 && abs(y) ≤ 1/√2
+        erf(y) - erf(x)
+    elseif 0 ≤ x && 0 ≤ y
         erfc(x) - erfc(y)
     elseif x ≤ 0 && y ≤ 0
         erfc(-y) - erfc(-x)
