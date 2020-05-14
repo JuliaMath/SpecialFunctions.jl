@@ -138,5 +138,8 @@
         @test erf(-11, -10) ≈ 2.08848758232167861905709161e-45
         @test erf(-1, 1) ≈ 1.68540158589942973868244127017
         @test erf(1e-30, 2e-30) ≈ 1.12837916709551257389615890312e-30
+        @test isnan(erf(NaN, 0))
+        @test isnan(erf(0, NaN))
+        @test isnan(erf(NaN, NaN))
     end
 end
