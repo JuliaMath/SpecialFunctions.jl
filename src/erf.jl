@@ -518,10 +518,12 @@ External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 See also: [`erf(x,y)`](@ref SpecialFunctions.erf).
 """
 function logerf(a::Real, b::Real)
-    if a < 0 && b < 0
-        logerfc(-b) + log1mexp(logerfc(-a) - logerfc(-b))
+    if b > a > 0
+        return logerfc(a) + log1mexp(logerfc(b) - logerfc(a))
+    elseif a < b < 0
+        return logerfc(-b) + log1mexp(logerfc(-a) - logerfc(-b))
     else
-        logerfc(a) + log1mexp(logerfc(b) - logerfc(a))
+        return log(erf(a, b))
     end
 end
 

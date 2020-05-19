@@ -147,5 +147,12 @@
         @test logerf(-35, -30) ≈ -903.974117110643878079600243618
         @test logerf(10, Inf) ≈ -102.879889024844888574804787140
         @test logerf(-Inf, Inf) ≈ 0.693147180559945309417232121458
+        @test logerf(Inf, Inf) == -Inf
+        @test logerf(-Inf, -Inf) == -Inf
+        @test logerf(-Inf, Inf) ≈ log(2)
+        @test logerf(-1e-6, 1e-6) ≈ -13.0015811397694169056785314498
+        @test isnan(logerf(NaN, 0))
+        @test isnan(logerf(0, NaN))
+        @test isnan(logerf(NaN, NaN))
     end
 end
