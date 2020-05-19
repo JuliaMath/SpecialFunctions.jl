@@ -141,5 +141,11 @@
         @test isnan(erf(NaN, 0))
         @test isnan(erf(0, NaN))
         @test isnan(erf(NaN, NaN))
+
+        @test logerf(-5, 35) ≈ 0.693147180559176579520017808560
+        @test logerf(30, 35) ≈ -903.974117110643878079600243618
+        @test logerf(-35, -30) ≈ -903.974117110643878079600243618
+        @test logerf(10, Inf) ≈ -102.879889024844888574804787140
+        @test logerf(-Inf, Inf) ≈ 0.693147180559945309417232121458
     end
 end

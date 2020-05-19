@@ -506,3 +506,25 @@ end
 
 logerfcx(x::Real) = logerfcx(float(x))
 logerfcx(x::AbstractFloat) = throw(MethodError(logerfcx, x))
+
+@doc raw"""
+    logerf(x, y)
+
+Compute the natural logarithm of two-argument error function. This is an accurate version of
+ `log(erf(x, y))`, which works for large `x, y`.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erf(x,y)`](@ref SpecialFunctions.erf).
+"""
+function logerf(a::Real, b::Real)
+    if a < 0 && b < 0
+        logerfc(-b) + log1mexp(logerfc(-a) - logerfc(-b))
+    else
+        logerfc(a) + log1mexp(logerfc(b) - logerfc(a))
+    end
+end
+
+two(x::Number) = oftype(x, 2)
+two(::Type{T}) where {T} = convert(T, 2)
+log1mexp(x::Real) = x < -log(two(2)) ? log1p(-exp(x)) : log(-expm1(x))
