@@ -154,5 +154,8 @@
         @test isnan(logerf(NaN, 0))
         @test isnan(logerf(0, NaN))
         @test isnan(logerf(NaN, NaN))
+        @test logerf(-1e-30, 1e-30) ≈ -68.2636233716261799887769930733
+        @test logerf(1e-30, 2e-30) ≈ -68.9567705521861252981942251947   
+        @test logerf(-2e-30, -1e-30) ≈ -68.9567705521861252981942251947   
     end
 end
