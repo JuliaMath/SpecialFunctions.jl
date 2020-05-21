@@ -529,5 +529,4 @@ function logerf(a::Real, b::Real)
     end
 end
 
-two(x::Number) = oftype(x, 2)
-log1mexp(x::Real) = x < -log(two(x)) ? log1p(-exp(x)) : log(-expm1(x))
+log1mexp(x::Real) = x < -log(oftype(x, 2)) ? log1p(-exp(x)) : log(-expm1(x))
