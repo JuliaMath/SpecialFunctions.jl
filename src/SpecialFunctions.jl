@@ -36,6 +36,7 @@ export
     erfcx,
     erfi,
     erfinv,
+    logerf,
     logerfc,
     logerfcx,
     eta,
