@@ -51,6 +51,10 @@ Compute the error function of ``x``, defined by
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
+    erf(x, y)
+
+Accurate version of `erf(y) - erf(x)` (for real arguments only).
+
 External links: [DLMF](https://dlmf.nist.gov/7.2.1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
 See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunctions.erfcx),
@@ -63,6 +67,18 @@ See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunc
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
 erf
+
+function erf(x::Real, y::Real)
+    if abs(x) ≤ 1/√2 && abs(y) ≤ 1/√2
+        erf(y) - erf(x)
+    elseif 0 ≤ x && 0 ≤ y
+        erfc(x) - erfc(y)
+    elseif x ≤ 0 && y ≤ 0
+        erfc(-y) - erfc(-x)
+    else
+        erf(y) - erf(x)
+    end
+end
 
 @doc raw"""
     erfc(x)
@@ -490,3 +506,27 @@ end
 
 logerfcx(x::Real) = logerfcx(float(x))
 logerfcx(x::AbstractFloat) = throw(MethodError(logerfcx, x))
+
+@doc raw"""
+    logerf(x, y)
+
+Compute the natural logarithm of two-argument error function. This is an accurate version of
+ `log(erf(x, y))`, which works for large `x, y`.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erf(x,y)`](@ref SpecialFunctions.erf).
+"""
+function logerf(a::Real, b::Real)
+    if abs(a) ≤ 1/√2 && abs(b) ≤ 1/√2
+        return log(erf(a, b))
+    elseif b > a > 0
+        return logerfc(a) + log1mexp(logerfc(b) - logerfc(a))
+    elseif a < b < 0
+        return logerfc(-b) + log1mexp(logerfc(-a) - logerfc(-b))
+    else
+        return log(erf(a, b))
+    end
+end
+
+log1mexp(x::Real) = x < -log(oftype(x, 2)) ? log1p(-exp(x)) : log(-expm1(x))
