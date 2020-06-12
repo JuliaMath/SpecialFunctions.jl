@@ -14,8 +14,11 @@ T_n(x)
     x
     & \text{for} \quad n = 1
     \\
-    2 x T_{n-1}(x) - T_{n-2}(x)
-    & \text{for} \quad n \geq 2
+    2 T_m^2(x) - 1
+    & \text{for} \quad n = 2m\,, \ m>0
+    \\
+    2 T_m(x) T_{m+1}(x) - x
+    & \text{for} \quad n = 2m+1\,, \ m>0
     \,.
 \end{cases}
 ```
@@ -26,10 +29,18 @@ External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 function chebyshevt(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
-    ABC_recurrence(n, x,
-        ( (2one(x), zero(x), one(x)) for m=2:n),            # (A_m, B_m, C_m)
-        one(x),                                             # P_0(x)
-        x)                                                  # P_1(x)
+    if     n == 0
+        return one(x)
+    elseif n == 1
+        return x
+    elseif iseven(n)
+        Tn2 = chebyshevt(n÷2, x)
+        return 2*Tn2*Tn2-one(x)
+    else
+        Tn2   = chebyshevt(n÷2,   x)
+        Tn2p1 = chebyshevt(n÷2+1, x)
+        return 2*Tn2*Tn2p1-x
+    end
 end
 
 @doc raw"""
@@ -60,10 +71,24 @@ External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 function chebyshevu(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
-    ABC_recurrence(n, x,
-        ( (2one(x), zero(x), one(x)) for m=2:n),            # (A_m, B_m, C_m)
-        one(x),                                             # P_0(x)
-        2x)                                                 # P_1(x)
+    U0 = one(x)
+    U1 = 2x
+
+    if n == 0
+        return U0
+    elseif n == 1
+        return U1
+    else
+        # Um = U_m(x), Um1 = U_{m-1}(x), Um2 = U_{m-2}(x)
+        Um, Um1 = U1, U0
+
+        for m = 2:n
+            Um1, Um2 = Um, Um1
+            Um = 2x*Um1-Um2
+        end
+
+        return Um
+    end
 end
 
 @doc raw"""
@@ -76,7 +101,24 @@ defined by
 H_n(x)
 = (-1)^n e^{x^2} \frac{\mathrm{d}^n}{\mathrm{d}x^n} e^{-x^2}
 \quad \text{for} \quad
-n = 0, 1, 2, \dots
+n = 0, 1, 2, \dots \,.
+```
+
+As a recurrence relation it is defined via
+```math
+H_n(x)
+=
+\begin{cases}
+    1
+    & \text{for} \quad n = 0
+    \\
+    2x
+    & \text{for} \quad n = 1
+    \\
+    2x H_{n-1}(x) - 2 (n-1) H_{n-2}(x)
+    & \text{for} \quad n \geq 2
+    \,.
+\end{cases}
 ```
 
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
@@ -85,10 +127,24 @@ External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 function hermiteh(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
-    ABC_recurrence(n, x,
-        ( (2one(x), zero(x), 2(m-one(x))) for m=2:n),               # (A_m, B_m, C_m)
-        one(x),                                                     # P_0(x)
-        2x)                                                         # P_1(x)
+    H0 = one(x)
+    H1 = 2x
+
+    if n == 0
+        return H0
+    elseif n == 1
+        return H1
+    else
+        # Hm = H_m(x), Hm1 = H_{m-1}(x), Hm2 = H_{m-2}(x)
+        Hm, Hm1 = H1, H0
+
+        for m = 2:n
+            Hm1, Hm2 = Hm, Hm1
+            Hm = 2x*Hm1 - 2(m-1)Hm2
+        end
+
+        return Hm
+    end
 end
 
 @doc raw"""
@@ -103,16 +159,47 @@ L_n(x)
 x \geq 0, \; n = 0, 1, 2, \dots
 ```
 
+As a recurrence relation it is defined via
+```math
+L_n(x)
+=
+\begin{cases}
+    1
+    & \text{for} \quad n = 0
+    \\
+    1-x
+    & \text{for} \quad n = 1
+    \\
+    \frac{2n-1-x}{n} L_{n-1}(x) - \frac{n-1}{n} L_{n-2}(x)
+    & \text{for} \quad n \geq 2
+    \,.
+\end{cases}
+```
+
 External links: [DLMF](https://dlmf.nist.gov/18.3.T1),
 [Wikipedia](https://en.wikipedia.org/wiki/Laguerre_polynomials).
 """
 function laguerrel(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
-    ABC_recurrence(n, x,
-        ( (-one(x)/m, 2-one(x)/m, 1-one(x)/m) for m=2:n),               # (A_m, B_m, C_m)
-        one(x),                                                         # P_0(x)
-        one(x)-x)                                                       # P_1(x)
+    L0 = one(x)
+    L1 = 1-x
+
+    if n == 0
+        return L0
+    elseif n == 1
+        return L1
+    else
+        # Lm = L_m(x), Lm1 = L_{m-1}(x), Lm2 = L_{m-2}(x)
+        Lm, Lm1 = L1, L0
+
+        for m = 2:n
+            Lm1, Lm2 = Lm, Lm1
+            Lm = (2m-1-x)/m*Lm1 - (m-1)/m*Lm2
+        end
+
+        return Lm
+    end
 end
 
 @doc raw"""
@@ -155,10 +242,24 @@ External links: [DLMF - Legendre polynomial](https://dlmf.nist.gov/14.7.E1),
 function legendrep(n::Integer, x)
     (n < 0) && throw(DomainError(n, "must be non-negative"))
 
-    ABC_recurrence(n, x,
-        ( ((2m-one(x))/m, zero(x), (m-one(x))/m) for m=2:n),            # (A_m, B_m, C_m)
-        one(x),                                                         # P_0(x)
-        x)                                                              # P_1(x)
+    P0 = one(x)
+    P1 = x
+
+    if n == 0
+        return P0
+    elseif n == 1
+        return P1
+    else
+        # Pm = P_m(x), Pm1 = P_{m-1}(x), Pm2 = P_{m-2}(x)
+        Pm, Pm1 = P1, P0
+
+        for m = 2:n
+            Pm1, Pm2 = Pm, Pm1
+            Pm = (2m-1)/m*x*Pm1 - (m-1)/m*Pm2
+        end
+
+        return Pm
+    end                                                # P_1(x)
 end
 function legendrep(n::Integer, m::Integer, x)
 
@@ -245,9 +346,21 @@ function legendreq(n::Integer, x)
     Q0 = 0.5 * log((1+x)/(1-x))
     Q1 = legendrep(1, x) * Q0 - 1
 
-    ABC_recurrence(n, x,
-        ( ((2m-one(x))/m, zero(x), (m-one(x))/m) for m=2:n),            # (A_m, B_m, C_m)
-        Q0, Q1)
+    if n == 0
+        return Q0
+    elseif n == 1
+        return Q1
+    else
+        # Qm = Q_m(x), Qm1 = Q_{m-1}(x), Qm2 = Q_{m-2}(x)
+        Qm, Qm1 = Q1, Q0
+
+        for m = 2:n
+            Qm1, Qm2 = Qm, Qm1
+            Qm = (2m-1)/m*x*Qm1 - (m-1)/m*Qm2
+        end
+
+        return Qm
+    end
 end
 function legendreq(n::Integer, m::Integer, x)
     (n <  0) && throw(DomainError(n, "must be non-negative"))
@@ -285,78 +398,4 @@ function legendreq(n::Integer, m::Integer, x)
     end                                                                     # on output: q = Q_n^m(x)
 
     q
-end
-
-@doc raw"""
-    ABC_recurrence(n, x, ABC, p0, p1)
-
-Evaluate polynomials by the recurrence
-```math
-p_n(x)
-=
-\begin{cases}
-    p_0(x)
-    & \text{for} \quad n = 0
-    \\
-    p_1(x)
-    & \text{for} \quad n = 1
-    \\
-    (A_n x + B_n) p_{n-1}(x) - C_n p_{n-2}(x)
-    & \text{for} \quad n \geq 2
-    \,.
-\end{cases}
-```
-
-This will be used to compute Legendre ``P_n``, Laguerre ``L_n``, Hermite ``H_n``,
-and Chebyshev polynomials of 1st kind ``T_n`` and 2nd kind ``U_n``.
-
-# Arguments
-- `n::Integer`:                     Polynomial order
-- `x`:                              evaluation point
-- `ABC::Base.Generator`:            recurrence coefficients ``(A_m,B_m,C_m)`` for ``m=2,\dots,n``
-- `p0`:                             function of degree 0, i.e. ``p_0``, evaluated at ``x``
-- `p1`:                             function of degree 1, i.e. ``p_1``, evaluated at ``x``
-
-#Implementation
-The coefficients ``A_m, B_m, C_m`` are supplied via a generator which yields them as a tuple ``(A_m,B_m,C_m)``.
-
-Type stability:
-- The generator `ABC` yields tuples `(Am,Bm,Cm)`. The tuple's elements are of the same type as `x`.
-- `p0,p1` are functions which have the same return type as the type of `x`.
-- Thus, all variables: `p_prev_prev,p_prev,p,Am,Bm,Cm` are always of type `x`.
-
-# Reference
-> JIN, J. M.;
-> JJIE, Zhang Shan.
-> "Computation of special functions".
-> Wiley, 1996.
-> (p. 23)
-"""
-function ABC_recurrence(n::Integer, x::T,
-        ABC::Base.Generator,
-        p0::T, p1::T) where {T}
-
-    # handle low orders
-    if n == 0
-        return p0
-    elseif n == 1
-        return p1
-    end
-
-    # use initial functions for recurrence relation
-    p_prev_prev = p0
-    p_prev      = p1
-
-    p = zero(x)
-    for AmBmCm in ABC
-        Am, Bm, Cm = AmBmCm
-
-        # recurrence step
-        p = (Am*x + Bm) * p_prev - Cm * p_prev_prev
-
-        p_prev_prev = p_prev
-        p_prev      = p
-    end
-
-    p
 end
