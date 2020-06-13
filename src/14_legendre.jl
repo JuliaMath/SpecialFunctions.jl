@@ -337,10 +337,12 @@ function legendreq(n::Integer, x)
     (0 > n)      && throw(DomainError(n, "must be non-negative"))
     (1 < abs(x)) && throw(DomainError(x, "must be in the range [-1,1]"))
 
+    # handle x=+-1 cases. return +-Inf of correct FloatXY type
+    InfXY = convert(float(typeof(x)), Inf)
     if x == 1
-        return Inf
+        return InfXY
     elseif x == -1
-        return iseven(n) ? -Inf : +Inf
+        return iseven(n) ? -InfXY : +InfXY
     end
 
     Q0 = 0.5 * log((1+x)/(1-x))
