@@ -195,7 +195,7 @@ function laguerrel(n::Integer, x)
 
         for m = 2:n
             Lm1, Lm2 = Lm, Lm1
-            Lm = (2m-1-x)/m*Lm1 - (m-1)/m*Lm2
+            Lm = Lm1*(2m-1-x)/m - Lm2*(m-1)/m
         end
 
         return Lm
@@ -255,7 +255,7 @@ function legendrep(n::Integer, x)
 
         for m = 2:n
             Pm1, Pm2 = Pm, Pm1
-            Pm = (2m-1)/m*x*Pm1 - (m-1)/m*Pm2
+            Pm = x*Pm1*(2m-1)/m - Pm2*(m-1)/m
         end
 
         return Pm
@@ -287,7 +287,7 @@ function legendrep(n::Integer, m::Integer, x)
     # step 3: compute P_n^m(x)
     for k = m+2:n
         p_prev, p_prev_prev = p, p_prev
-        p = (2k-1)/(k-m)*x*p_prev - (k+m-1)/(k-m)*p_prev_prev       # = P_k^m(x)
+        p = x*p_prev*(2k-1)/(k-m) - p_prev_prev*(k+m-1)/(k-m)       # = P_k^m(x)
     end                                                             # on output: p = P_n^m(x)
 
     p
@@ -345,7 +345,7 @@ function legendreq(n::Integer, x)
         return iseven(n) ? -InfXY : +InfXY
     end
 
-    Q0 = 0.5 * log((1+x)/(1-x))
+    Q0 = log((1+x)/(1-x)) / 2
     Q1 = legendrep(1, x) * Q0 - 1
 
     if n == 0
@@ -358,7 +358,7 @@ function legendreq(n::Integer, x)
 
         for m = 2:n
             Qm1, Qm2 = Qm, Qm1
-            Qm = (2m-1)/m*x*Qm1 - (m-1)/m*Qm2
+            Qm = x*Qm1*(2m-1)/m - Qm2*(m-1)/m
         end
 
         return Qm
@@ -376,8 +376,8 @@ function legendreq(n::Integer, m::Integer, x)
     q_n_0 = legendreq(n, x)
 
     # step 2: compute Q_n^1(x)
-    Q01 = -(1-x^2)^(-0.5)                                                   # = Q_0^1(x)
-    Q11 = -sqrt(1-x^2) * (0.5*log((1+x)/(1-x)) + x/(1-x^2))                 # = Q_1^1(x)
+    Q01 = -1/sqrt(1-x^2)                                                    # = Q_0^1(x)
+    Q11 = (log((1+x)/(1-x))/2 + x/(1-x^2)) / Q01                            # = Q_1^1(x)
     if n == 0
         q = Q01
     elseif n == 1
@@ -386,7 +386,7 @@ function legendreq(n::Integer, m::Integer, x)
         q, q_prev = Q11, Q01
         for k = 2:n
             q_prev, q_prev_prev = q, q_prev
-            q = (2k-1) / (k-1) * x * q_prev - k / (k-1) * q_prev_prev       # = Q_k^1(x)
+            q = x*q_prev*(2k-1)/(k-1) - q_prev_prev*k/(k-1)                 # = Q_k^1(x)
         end                                                                 # on output: q = Q_n^1(x)
     end
     q_n_1 = q
