@@ -23,7 +23,7 @@ In this case, the symbols will need to be explicitly imported or called
 with the prefix `SpecialFunctions`.
 This is not necessary for Julia versions 0.6 and later.
 
-On Julia 0.7, [openspecfun](https://github.com/JuliaLang/openspecfun) is not build as
+On Julia 0.7, [openspecfun](https://github.com/JuliaLang/openspecfun) is not built as
 part of Julia.
 Thus for Julia versions 0.7 and later, installing this package downloads openspecfun.
 Binaries of openspecfun are available for macOS, Windows, and Linux (glibc >= 2.6).

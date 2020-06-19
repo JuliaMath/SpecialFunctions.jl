@@ -20,7 +20,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
 | [`logbeta(x,y)`](@ref SpecialFunctions.logbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 | [`logabsbeta(x,y)`](@ref SpecialFunctions.logabsbeta)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
-| [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
+| [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(binomial(n,k)))` for large `n` and `k` near `n/2`     |
 
 
 ## [Trigonometric Integrals](https://dlmf.nist.gov/6)
@@ -34,9 +34,12 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | Function | Description |
 |:-------- |:----------- |
 | [`erf(x)`](@ref SpecialFunctions.erf)         | [error function](https://en.wikipedia.org/wiki/Error_function) at ``x`` |
+| [`erf(x,y)`](@ref SpecialFunctions.erf)       | accurate version of ``\operatorname{erf}(y) - \operatorname{erf}(x)`` |
 | [`erfc(x)`](@ref SpecialFunctions.erfc)       | complementary error function, i.e. the accurate version of ``1-\operatorname{erf}(x)`` for large ``x`` |
 | [`erfcinv(x)`](@ref SpecialFunctions.erfcinv) | inverse function to [`erfc()`](@ref SpecialFunctions.erfc) |
 | [`erfcx(x)`](@ref SpecialFunctions.erfcx)     | scaled complementary error function, i.e. accurate ``e^{x^2} \operatorname{erfc}(x)`` for large ``x`` |
+| [`logerfc(x)`](@ref SpecialFunctions.logerfc) | log of the complementary error function, i.e. accurate ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x`` |
+| [`logerfcx(x)`](@ref SpecialFunctions.logerfcx) | log of the scaled complementary error function, i.e. accurate ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large negative ``x`` |
 | [`erfi(x)`](@ref SpecialFunctions.erfi)       | imaginary error function defined as ``-i \operatorname{erf}(ix)`` |
 | [`erfinv(x)`](@ref SpecialFunctions.erfinv)   | inverse function to [`erf()`](@ref SpecialFunctions.erf) |
 | [`dawson(x)`](@ref SpecialFunctions.dawson)   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)`` for large ``x`` |
@@ -58,10 +61,12 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`besselj0(z)`](@ref SpecialFunctions.besselj0)               | `besselj(0,z)`                                                                                                                                                  |
 | [`besselj1(z)`](@ref SpecialFunctions.besselj1)               | `besselj(1,z)`                                                                                                                                                  |
 | [`besseljx(nu,z)`](@ref SpecialFunctions.besseljx)            | scaled Bessel function of the first kind of order `nu` at `z`                                                                                                   |
+| [`sphericalbesselj(nu,z)`](@ref SpecialFunctions.sphericalbesselj) | [Spherical Bessel function](https://en.wikipedia.org/wiki/Bessel_function#Spherical_Bessel_functions:_jn,_yn) of the first kind of order `nu` at `z`       |
 | [`bessely(nu,z)`](@ref SpecialFunctions.bessely)              | [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the second kind of order `nu` at `z`                                                        |
 | [`bessely0(z)`](@ref SpecialFunctions.bessely0)               | `bessely(0,z)`                                                                                                                                                  |
 | [`bessely1(z)`](@ref SpecialFunctions.bessely1)               | `bessely(1,z)`                                                                                                                                                  |
 | [`besselyx(nu,z)`](@ref SpecialFunctions.besselyx)            | scaled Bessel function of the second kind of order `nu` at `z`                                                                                                  |
+| [`sphericalbessely(nu,z)`](@ref SpecialFunctions.sphericalbessely) | [Spherical Bessel function](https://en.wikipedia.org/wiki/Bessel_function#Spherical_Bessel_functions:_jn,_yn) of the second kind of order `nu` at `z`      |
 | [`besselh(nu,k,z)`](@ref SpecialFunctions.besselh)            | [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the third kind (a.k.a. Hankel function) of order `nu` at `z`; `k` must be either `1` or `2` |
 | [`hankelh1(nu,z)`](@ref SpecialFunctions.hankelh1)            | `besselh(nu, 1, z)`                                                                                                                                             |
 | [`hankelh1x(nu,z)`](@ref SpecialFunctions.hankelh1x)          | scaled `besselh(nu, 1, z)`                                                                                                                                      |
