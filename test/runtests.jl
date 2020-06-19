@@ -246,6 +246,15 @@ end
         @test z(2.0 + im) ≈ f(0, 2.0 + im)
         @test o(2.0 + im) ≈ f(1, 2.0 + im)
     end
+
+    @testset "type stability: $f" for f in [bessely0, bessely1, besselj0, besselj1]
+        for F in [Float16, Float32, Float64]
+            @test         F  == Base.return_types(f, Tuple{        F })[]
+            @test Complex{F} == Base.return_types(f, Tuple{Complex{F}})[]
+        end
+        @test BigFloat == Base.return_types(f, Tuple{BigFloat})[]
+    end
+
     @testset "besselj error throwing" begin
         @test_throws MethodError besselj(1.2,big(1.0))
         @test_throws MethodError besselj(1,complex(big(1.0)))
