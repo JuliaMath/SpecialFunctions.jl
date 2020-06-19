@@ -170,7 +170,9 @@ for jy in ("j","y"), nu in (0,1)
     end
     @eval begin
         $bjynu(x::Real) = $bjynu(float(x))
-        $bjynu(x::Complex) = $(Symbol("bessel",jy))($nu,x)
+        $bjynu(x::Complex{Float64}) = $(Symbol("bessel",jy))($nu,x)
+        $bjynu(x::Complex{Float32}) = Complex{Float32}($bjynu(Complex{Float64}(x)))
+        $bjynu(x::Complex{Float16}) = Complex{Float16}($bjynu(Complex{Float64}(x)))
     end
 end
 
