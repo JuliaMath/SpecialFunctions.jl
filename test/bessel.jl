@@ -54,6 +54,11 @@ end
         end
         @test BigFloat == Base.return_types(f, Tuple{BigFloat})[]
     end
+    @testset "type stability: $f" for f in [besselj]
+        for F in [Float16, Float32, Float64]
+            @test F == Base.return_types(f, Tuple{Int32, F})[]
+        end
+    end
 
     @testset "besselj error throwing" begin
         @test_throws MethodError besselj(1.2,big(1.0))
