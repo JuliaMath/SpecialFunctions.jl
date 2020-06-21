@@ -45,6 +45,10 @@ end
         @test o(2) ≈ o(2.0)
         @test z(2.0 + im) ≈ f(0, 2.0 + im)
         @test o(2.0 + im) ≈ f(1, 2.0 + im)
+        @test z(Complex{Float32}(2.0 + im)) ≈ z(2.0 + im)
+        @test o(Complex{Float32}(2.0 + im)) ≈ o(2.0 + im)
+        @test z(Complex{Float16}(2.0 + im)) ≈ z(2.0 + im)
+        @test o(Complex{Float16}(2.0 + im)) ≈ o(2.0 + im)
     end
 
     @testset "type stability: $f" for f in [bessely0, bessely1, besselj0, besselj1]
