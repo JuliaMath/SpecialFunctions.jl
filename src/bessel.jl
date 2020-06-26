@@ -424,6 +424,7 @@ function bessely(nu::Cint, x::Float32)
     end
     ccall((:ynf, libm), Float32, (Cint, Float32), nu, x)
 end
+bessely(nu::Cint, x::Float16) = Float16(bessely(nu, Float32(x)))
 
 function bessely(nu::Float64, z::Complex{Float64})
     if nu < 0

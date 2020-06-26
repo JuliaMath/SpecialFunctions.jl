@@ -49,6 +49,10 @@ end
         @test o(Complex{Float32}(2.0 + im)) ≈ o(2.0 + im)
         @test z(Complex{Float16}(2.0 + im)) ≈ z(2.0 + im)
         @test o(Complex{Float16}(2.0 + im)) ≈ o(2.0 + im)
+        @test f(3, Float32(2.0)) ≈ f(3, 2.0)
+        @test f(3, Float16(2.0)) ≈ f(3, 2.0)
+        @test f(3, Complex{Float32}(2.0 + im)) ≈ f(3, 2.0 + im)
+        @test f(3, Complex{Float16}(2.0 + im)) ≈ f(3, 2.0 + im)
     end
 
     @testset "type stability: $f" for f in [bessely0, bessely1, besselj0, besselj1]
@@ -58,7 +62,7 @@ end
         end
         @test BigFloat == Base.return_types(f, Tuple{BigFloat})[]
     end
-    @testset "type stability: $f" for f in [besselj]
+    @testset "type stability: $f" for f in [besselj, bessely]
         for F in [Float16, Float32, Float64]
             @test F == Base.return_types(f, Tuple{Int32, F})[]
         end
