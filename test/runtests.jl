@@ -18,6 +18,7 @@ tests = [
     "betanc",
     "ellip",
     "erf",
+    "expint",
     "gamma_inc",
     "gamma",
     "sincosint",
