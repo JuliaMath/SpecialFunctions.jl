@@ -74,7 +74,7 @@ function E₁(x::Float64)
 end
 
 
-function En_cf(x::Number, ν::Number, n::Int=1000)
+function En_cf_nogamma(x::Number, ν::Number, n::Int=1000)
     B = float(x + ν)
     Bprev::typeof(B) = x
     A::typeof(B) = 1
@@ -111,9 +111,65 @@ function En_cf(x::Number, ν::Number, n::Int=1000)
         end
     end
     
-    return A/B * exp(-x), iters
+    cfpart = A/B
+    exppart = exp(-x)
+    if abs(real(exppart)) == Inf && abs(imag(exppart)) == Inf
+        # "factor" out Inf to avoid NaN
+        factor = sign(real(exppart)) + sign(imag(exppart))*im
+        return Inf * (factor * cfpart), iters
+    else
+        return cfpart * exppart, iters
+    end
 end
 
+
+function En_cf_gamma(x::Number, ν::Number, n::Int=1000)
+    A = float(1 - ν)
+    B::typeof(A) = 1
+    Bprev::typeof(A) = 0
+    Aprev::typeof(A) = 1
+    
+    iters = 0
+    j = 1
+    for i = 2:n
+        iters += 1
+
+        A′ = A
+        term = iseven(i) ? (i - 1 - ν)*x : x
+        A = (i - ν)*A - term * Aprev
+        Aprev = A′
+        B′ = B
+        B = (i - ν)*B - term * Bprev
+        Bprev = B′
+        
+        conv = abs(Aprev*B - A*Bprev) < 1e-15 * abs(B*Bprev)
+        conv && break
+
+        if max(abs(real(A)), abs(imag(A))) > 1e50
+            A /= 1e50
+            Aprev /= 1e50
+            B /= 1e50
+            Bprev /= 1e50
+        end
+    end
+    
+    gammapart = float(x)^(ν-1) * SpecialFunctions.gamma(1 - ν)
+    cfpart = - exp(-x)*A/B
+    return gammapart, cfpart, iters
+end
+
+# picks between En_cf_nogamma and En_cf_gamma
+function En_cf(x::Number, ν::Number, niter::Int=1000)
+    gammapart, cfpart, iters = En_cf_gamma(x, ν, niter)
+    gammaabs, cfabs = abs(gammapart), abs(cfpart)
+    if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
+        # significant gamma part, use this
+        return gammapart + cfpart, iters, true
+
+    else
+        return En_cf_nogamma(x, ν, niter)..., false
+    end
+end
 
 # Compute expint(ν, z₀+Δ) given start = expint(ν, z₀)
 function En_taylor(ν::Number, start::Number, z₀::Number, Δ::Number)
@@ -149,7 +205,11 @@ function En_expand_origin(x::Number, ν::Number)
         # go to special case for integer ν
         return En_expand_origin(x, Int(ν))
     end
-    gammaterm = gamma(1 - ν) * x^(ν-1)
+    gammaterm = gamma(1 - ν)
+    if abs(gammaterm) != 0
+        # don't multiply by NaN
+        gammaterm *= x^(ν-1)
+    end
     frac = 1
     sumterm = frac / (1 - ν)
     k, maxiter = 1, 100
@@ -212,12 +272,20 @@ function En(ν::Number, x::Number, niter::Int=1000, debug=false)
     if ν == 0
         return exp(-x) / x
     end
-    
+    # asymptotic test
+    if exp(-x) / x == 0
+        return zero(x)
+    end
+
     if abs(x) < ORIGIN_EXPAND_THRESH
         return En_expand_origin(x, ν)
     end
+    E_guess, _, g = En_cf(x, ν, niter)
+    if g
+        return E_guess
+    end
     if real(x) > 0
-        res, i = En_cf(x, ν, niter)
+        res, i, _ = En_cf(x, ν, niter)
         return res
     elseif real(x) < 0
         doconj = imag(x) < 0
@@ -228,7 +296,7 @@ function En(ν::Number, x::Number, niter::Int=1000, debug=false)
         # empirical boundary for 500 iterations
         boundary = min(1 + 0.5*abs(ν), 50)
         if imx > boundary
-            res, i = En_cf(x, ν, niter)
+            res, i, _ = En_cf(x, ν, niter)
             return doconj ? conj(res) : res
         else
             # iterate with taylor
@@ -236,11 +304,11 @@ function En(ν::Number, x::Number, niter::Int=1000, debug=false)
             # TODO: switch back to CF for large ν
             imstart = boundary
             z₀ = rex + imstart*im
-            E_start, i = En_cf(z₀, ν, niter)
+            E_start, i, _ = En_cf(z₀, ν, niter)
             while i >= niter
                 imstart *= 2
                 z₀ = rex + imstart*im
-                E_start, i = En_cf(z₀, ν, niter)
+                E_start, i, _ = En_cf(z₀, ν, niter)
             end
             
             # nsteps chosen so |Δ| ≤ 0.5
