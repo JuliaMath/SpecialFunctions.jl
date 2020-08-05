@@ -73,12 +73,14 @@ function E₁(x::Float64)
     end
 end
 
-
-function En_cf_nogamma(x::Number, ν::Number, n::Int=1000)
-    B = float(x + ν)
-    Bprev::typeof(B) = x
+# Continued fraction for En(ν, z) that doesn't use a term with
+# the gamma function: https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0001/
+function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
+    B = float(z + ν)
+    Bprev::typeof(B) = z
     A::typeof(B) = 1
     Aprev::typeof(B) = 1
+    ϵ = 10*eps(real(B))
     
     # two recurrence steps / loop
     iters = 0
@@ -86,10 +88,10 @@ function En_cf_nogamma(x::Number, ν::Number, n::Int=1000)
         iters += 1
 
         A′ = A
-        A = x*A + (i-1) * Aprev
+        A = z*A + (i-1) * Aprev
         Aprev = A′
         B′ = B
-        B = x*B + (i-1) * Bprev
+        B = z*B + (i-1) * Bprev
         Bprev = B′
         
         A′ = A
@@ -99,7 +101,7 @@ function En_cf_nogamma(x::Number, ν::Number, n::Int=1000)
         B = B + (ν+i-1) * Bprev
         Bprev = B′
         
-        conv = abs(Aprev*B - A*Bprev) < 1e-15 * abs(B*Bprev)
+        conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
         conv && break
         
         # rescale 
@@ -112,7 +114,7 @@ function En_cf_nogamma(x::Number, ν::Number, n::Int=1000)
     end
     
     cfpart = A/B
-    exppart = exp(-x)
+    exppart = exp(-z)
     if abs(real(exppart)) == Inf && abs(imag(exppart)) == Inf
         # "factor" out Inf to avoid NaN
         factor = sign(real(exppart)) + sign(imag(exppart))*im
@@ -122,12 +124,30 @@ function En_cf_nogamma(x::Number, ν::Number, n::Int=1000)
     end
 end
 
+# Calculate Γ(1 - ν) * z^(ν-1) safely
+function En_safe_gamma_term(ν::Number, z::Number)
+    g = gamma(1 - ν)
+    p = float(z)^(ν - 1)
+    if abs(g) == Inf || abs(p) == Inf
+        return exp((ν - 1)*log(complex(z)) + loggamma(1 - ν))
+    else
+        if g == 0
+            return 0
+        else
+            return g*p
+        end
+    end
+end
 
-function En_cf_gamma(x::Number, ν::Number, n::Int=1000)
+# continued fraction for En(ν, z) that uses the gamma function:
+# https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
+# returns the two terms from the above equation separately
+function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     A = float(1 - ν)
     B::typeof(A) = 1
     Bprev::typeof(A) = 0
     Aprev::typeof(A) = 1
+    ϵ = 10*eps(real(B))
     
     iters = 0
     j = 1
@@ -135,14 +155,14 @@ function En_cf_gamma(x::Number, ν::Number, n::Int=1000)
         iters += 1
 
         A′ = A
-        term = iseven(i) ? (i - 1 - ν)*x : x
+        term = iseven(i) ? (i - 1 - ν)*z : z
         A = (i - ν)*A - term * Aprev
         Aprev = A′
         B′ = B
         B = (i - ν)*B - term * Bprev
         Bprev = B′
         
-        conv = abs(Aprev*B - A*Bprev) < 1e-15 * abs(B*Bprev)
+        conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
         conv && break
 
         if max(abs(real(A)), abs(imag(A))) > 1e50
@@ -153,71 +173,70 @@ function En_cf_gamma(x::Number, ν::Number, n::Int=1000)
         end
     end
     
-    gammapart = float(x)^(ν-1) * SpecialFunctions.gamma(1 - ν)
-    cfpart = - exp(-x)*A/B
+    gammapart = En_safe_gamma_term(ν, z)
+    cfpart = -exp(-z)*A/B
     return gammapart, cfpart, iters
 end
 
-# picks between En_cf_nogamma and En_cf_gamma
-function En_cf(x::Number, ν::Number, niter::Int=1000)
-    gammapart, cfpart, iters = En_cf_gamma(x, ν, niter)
+# picks between continued fraction representations in 
+# En_cf_nogamma and En_cf_gamma
+# returns (evaluated result, # iterations used, whether En_cf_gamma was chosen)
+function En_cf(ν::Number, z::Number, niter::Int=1000)
+    gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
     gammaabs, cfabs = abs(gammapart), abs(cfpart)
     if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
         # significant gamma part, use this
         return gammapart + cfpart, iters, true
-
     else
-        return En_cf_nogamma(x, ν, niter)..., false
+        return En_cf_nogamma(ν, z, niter)..., false
     end
 end
 
-# Compute expint(ν, z₀+Δ) given start = expint(ν, z₀)
+# Compute expint(ν, z₀+Δ) given start = expint(ν, z₀), as described by [Amos 1980]
 function En_taylor(ν::Number, start::Number, z₀::Number, Δ::Number)
     a = exp(z₀) * start
     k, iters = 0, 0
     asum = a
     Δ_prod_fact = -Δ
+    ϵ = 10*eps(real(asum))
     
-    while iters < 100 # perhaps
-        a_pre = Δ_prod_fact + a*Δ*(ν - k - 1)/(k+1)
+    for k = 0:100
+        a_pre = Δ_prod_fact + a*Δ*(ν - k - 1)/(k + 1)
         a = a_pre / z₀
         asum_prev = asum
         asum += a
         
-        if abs(asum_prev - asum) < 1e-15
+        if abs(asum_prev - asum) < ϵ
             break
         end
         
-        Δ_prod_fact *= -Δ / (k+2)
+        Δ_prod_fact *= -Δ / (k + 2)
         
-        iters += 1
-        k += 1
+        #iters += 1
+        #k += 1
     end
 
     res = exp(-z₀) * asum
     return res
 end
 
-# series about origin
+# series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
-function En_expand_origin(x::Number, ν::Number)
-    if isreal(ν) && floor(ν) == ν
+function En_expand_origin(ν::Number, z::Number)
+    if isinteger(ν)
         # go to special case for integer ν
-        return En_expand_origin(x, Int(ν))
+        return En_expand_origin(Int(ν), z)
     end
-    gammaterm = gamma(1 - ν)
-    if abs(gammaterm) != 0
-        # don't multiply by NaN
-        gammaterm *= x^(ν-1)
-    end
+    gammaterm = En_safe_gamma_term(ν, z)
     frac = 1
     sumterm = frac / (1 - ν)
     k, maxiter = 1, 100
+    ϵ = 10*eps(real(sumterm))
     while k < maxiter
-        frac *= -x / k
+        frac *= -z / k
         prev = sumterm
         sumterm += frac / (k + 1 - ν)
-        if abs(sumterm - prev) < 1e-15 * abs(prev)
+        if abs(sumterm - prev) < ϵ
             break
         end
         k += 1
@@ -227,23 +246,26 @@ function En_expand_origin(x::Number, ν::Number)
 end
 
 # series about the origin, special case for integer n
-function En_expand_origin(x::Number, n::Integer)
+# https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
+function En_expand_origin(n::Integer, z::Number)
     gammaterm = 1
+    # (-z)^(n-1) / (n-1)!
     for i = 1:n-1
         gammaterm *= -x / i
     end
 
-    gammaterm *= digamma(n) - log(x)
+    gammaterm *= digamma(n) - log(z)
     sumterm = n == 1 ? 0 : 1 / (1 - n)
     frac = 1
     k, maxiter = 1, 100
+    ϵ = 10*eps(real(sumterm))
     while k < maxiter
-        frac *= -x / k
+        frac *= -z / k
         # skip term with zero denominator
         if k != n-1
             prev = sumterm
             sumterm += frac / (k + 1 - n)
-            if abs(sumterm - prev) < 1e-15 * abs(prev)
+            if abs(sumterm - prev) < ϵ
                 break
             end
         end
@@ -253,16 +275,22 @@ function En_expand_origin(x::Number, n::Integer)
 end
 
 # can find imaginary part of E_ν(x) for x on negative real axis analytically
-function imagbranchcut(x::Number, ν::Number)
-    a = real(x)
+# https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
+function En_imagbranchcut(ν::Number, z::Number)
+    a = real(z)
     impart = π * im * exp(-π*im*ν) * a^(ν-1) / gamma(ν)
     # exp(n*log(z) - loggamma(n))
     return imag(impart) * im # get rid of any real error
 end
 
 const ORIGIN_EXPAND_THRESH = 3
-function En(ν::Number, x::Number, niter::Int=1000, debug=false)
-    if x == 0.0
+"""
+    En(ν, z)
+
+Compute the exponential integral of complex `z` with complex order `ν`.
+"""
+function En(ν::Number, z::Number, niter::Int=1000)
+    if z == 0.0
         if real(ν) > 0
             return 1.0 / (ν - 1)
         else
@@ -270,59 +298,62 @@ function En(ν::Number, x::Number, niter::Int=1000, debug=false)
         end
     end
     if ν == 0
-        return exp(-x) / x
+        return exp(-z) / z
     end
-    # asymptotic test
-    if exp(-x) / x == 0
-        return zero(x)
+    # asymptotic test for |z| → ∞
+    # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/02/0003/
+    if exp(-z) / z == 0
+        return zero(z)
     end
 
-    if abs(x) < ORIGIN_EXPAND_THRESH
-        return En_expand_origin(x, ν)
+    if abs(z) < ORIGIN_EXPAND_THRESH
+        # use Taylor series about the origin for small z
+        return En_expand_origin(ν, z)
     end
-    E_guess, _, g = En_cf(x, ν, niter)
+    E_guess, _, g = En_cf(ν, z, niter)
     if g
         return E_guess
     end
-    if real(x) > 0
-        res, i, _ = En_cf(x, ν, niter)
+    if real(z) > 0
+        res, i, _ = En_cf(ν, z, niter)
         return res
-    elseif real(x) < 0
-        doconj = imag(x) < 0
-        rex, imx = real(x), abs(imag(x))
-        x = doconj ? conj(x) : x
+    elseif real(z) < 0
+        doconj = imag(z) < 0
+        rez, imz = real(z), abs(imag(z))
+        z = doconj ? conj(z) : z
         ν = doconj ? conj(ν) : ν
         
         # empirical boundary for 500 iterations
         boundary = min(1 + 0.5*abs(ν), 50)
-        if imx > boundary
-            res, i, _ = En_cf(x, ν, niter)
+        if imz > boundary
+            res, i, _ = En_cf(ν, z, niter)
             return doconj ? conj(res) : res
         else
             # iterate with taylor
             # first find starting point
             # TODO: switch back to CF for large ν
             imstart = boundary
-            z₀ = rex + imstart*im
-            E_start, i, _ = En_cf(z₀, ν, niter)
+            z₀ = rez + imstart*im
+            E_start, i, _ = En_cf(ν, z₀, niter)
             while i >= niter
                 imstart *= 2
-                z₀ = rex + imstart*im
-                E_start, i, _ = En_cf(z₀, ν, niter)
+                z₀ = rez + imstart*im
+                E_start, i, _ = En_cf(ν, z₀, niter)
             end
             
             # nsteps chosen so |Δ| ≤ 0.5
-            nsteps = ceil(2 * (imstart - imx))
-            Δ = (imx - imstart)*im / nsteps
+            nsteps = ceil(2 * (imstart - imz))
+            Δ = (imz - imstart)*im / nsteps
 
             for j = 1:nsteps
+                # take Δ sized steps towards the desired z
                 E_start = En_taylor(ν, E_start, z₀, Δ)
                 z₀ += Δ
             end
             
             # more exact imaginary part available for non-integer ν
-            if imx == 0
-                E_start = real(E_start) + imagbranchcut(x, ν)
+            if imz == 0
+                E_start = real(E_start) + En_imagbranchcut(ν, z)
             end
             
             return doconj ? conj(E_start) : E_start
