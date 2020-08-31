@@ -102,7 +102,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
         Bprev = B′
         
         conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
-        conv && break
+        conv && i > 4 && break
         
         # rescale 
         if max(abs(real(A)), abs(imag(A))) > 1e50
@@ -126,17 +126,7 @@ end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
 function En_safe_gamma_term(ν::Number, z::Number)
-    g = gamma(1 - ν)
-    p = float(z)^(ν - 1)
-    if abs(g) == Inf || abs(p) == Inf
-        return exp((ν - 1)*log(complex(z)) + loggamma(1 - ν))
-    else
-        if g == 0
-            return 0
-        else
-            return g*p
-        end
-    end
+    return exp((ν - 1)*log(complex(z)) + loggamma(1 - ν))
 end
 
 # continued fraction for En(ν, z) that uses the gamma function:
@@ -155,11 +145,11 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
         iters += 1
 
         A′ = A
-        term = iseven(i) ? (i - 1 - ν)*z : z
-        A = (i - ν)*A - term * Aprev
+        term = iseven(i) ? -(i÷2 - 1 - ν)*z : z*(i÷2)
+        A = (i - ν)*A + term * Aprev
         Aprev = A′
         B′ = B
-        B = (i - ν)*B - term * Bprev
+        B = (i - ν)*B + term * Bprev
         Bprev = B′
         
         conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
@@ -174,7 +164,13 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     end
     
     gammapart = En_safe_gamma_term(ν, z)
-    cfpart = -exp(-z)*A/B
+    cfpart = -exp(-z)
+    if abs(real(cfpart)) == Inf || abs(imag(cfpart)) == Inf
+        factor = sign(real(cfpart)) + sign(imag(cfpart))*im
+        cfpart = Inf * (factor * (A/B))
+    else
+        cfpart *= B/A
+    end
     return gammapart, cfpart, iters
 end
 
@@ -184,10 +180,13 @@ end
 function En_cf(ν::Number, z::Number, niter::Int=1000)
     gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
     gammaabs, cfabs = abs(gammapart), abs(cfpart)
+    println(">>> $gammapart /// $cfpart")
     if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
         # significant gamma part, use this
+        println("use gamma / $gammapart / $cfpart")
         return gammapart + cfpart, iters, true
     else
+        println("use nogamma")
         return En_cf_nogamma(ν, z, niter)..., false
     end
 end
@@ -278,8 +277,7 @@ end
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
 function En_imagbranchcut(ν::Number, z::Number)
     a = real(z)
-    impart = π * im * exp(-π*im*ν) * a^(ν-1) / gamma(ν)
-    # exp(n*log(z) - loggamma(n))
+    impart = π * im * exp(-π*im*ν) * exp((ν-1)*log(complex(a)) - loggamma(ν))
     return imag(impart) * im # get rid of any real error
 end
 
@@ -315,7 +313,7 @@ function En(ν::Number, z::Number, niter::Int=1000)
         return E_guess
     end
     if real(z) > 0
-        res, i, _ = En_cf(ν, z, niter)
+        res, i = En_cf_nogamma(ν, z, niter)
         return res
     elseif real(z) < 0
         doconj = imag(z) < 0
@@ -332,10 +330,14 @@ function En(ν::Number, z::Number, niter::Int=1000)
             # iterate with taylor
             # first find starting point
             # TODO: switch back to CF for large ν
-            imstart = boundary
+            imstart = (imz == 0) ? abs(z)*1e-5 : imz # boundary
             z₀ = rez + imstart*im
             E_start, i, _ = En_cf(ν, z₀, niter)
-            while i >= niter
+            if i < niter - 5
+                println("returning first")
+                return doconj ? conj(E_start) : E_start
+            end
+            while i > niter - 5
                 imstart *= 2
                 z₀ = rez + imstart*im
                 E_start, i, _ = En_cf(ν, z₀, niter)
