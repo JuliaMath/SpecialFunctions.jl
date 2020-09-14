@@ -1,6 +1,15 @@
 import Polynomials
 using Base.MathConstants
 
+#function polymult(p1::Vector{T}, p2::Vector{T}) where {T}
+#    n, m = length(p1) - 1, length(p2) - 1
+#    c = zeros(T, m + n + 1)
+#    for i in 0:n, j in 0:m
+#        c[i + j + 1] += p1[i + 1] * p2[j + 1]
+#    end
+#    return c
+#end
+
 function E₁_cfpoly_approx(n::Integer, pstart::Polynomials.Polynomial{T}, ::Type{T}=BigInt) where {T<:Real}
     q = Polynomials.Polynomial(T[1])
     p = pstart
@@ -50,10 +59,9 @@ macro E₁_taylor64(z, n::Integer)
     :( $taylor - log($zesc) )
 end
 
-E₁(x::Real) = E₁(float(x))
-
+# adapted from Steven G Johnson's initial implementation: issue #19
 function E₁(x::Float64)
-    x < 0 && throw(DomainError(x, "negative argument"))
+    x < 0 && throw(DomainError(x, "negative argument, convert to complex first"))
     x == 0 && return Inf
     if x > 2.15
         # specially chosen approximants for faster convergence
@@ -73,6 +81,38 @@ function E₁(x::Float64)
     end
 end
 
+function E₁(z::Complex{Float64})
+    if real(z) < 0
+        return En(1, z)
+    end
+    x² = real(z)^2
+    y² = imag(z)^2
+    if x² + 0.233*y² ≥ 7.84 # use cf expansion, ≤ 30 terms
+        if (x² ≥ 546121) & (real(z) > 0) # underflow
+            return zero(z)
+        elseif x² + 0.401*y² ≥ 58.0 # ≤ 15 terms
+            if x² + 0.649*y² ≥ 540.0 # ≤ 8 terms
+                x² + y² ≥ 4e4 && return @E₁_cf64(z, 4, [0.0, 1.0])
+                return @E₁_cf64(z, 8, [0.0, 1.0])
+            end
+            return @E₁_cf64(z, 15, [0.0, 1.0])
+        end
+        return @E₁_cf64(z, 30, [0.0, 1.0])
+    else # use Taylor expansion, ≤ 37 terms
+        r² = x² + y²
+        return r² ≤ 0.36 ? (r² ≤ 2.8e-3 ? (r² ≤ 2e-7 ? @E₁_taylor64(z,4) :
+                                                       @E₁_taylor64(z,8)) :
+                                         @E₁_taylor64(z,15)) :
+                          @E₁_taylor64(z,37)
+    end
+end
+
+E₁(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = E₁(float(z))
+
+function E₁(x::Number)
+    return En(1, x)
+end
+
 # Continued fraction for En(ν, z) that doesn't use a term with
 # the gamma function: https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0001/
 function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
@@ -81,6 +121,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
     A::typeof(B) = 1
     Aprev::typeof(B) = 1
     ϵ = 10*eps(real(B))
+    scale = sqrt(floatmax(real(A)))
     
     # two recurrence steps / loop
     iters = 0
@@ -105,11 +146,11 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
         conv && i > 4 && break
         
         # rescale 
-        if max(abs(real(A)), abs(imag(A))) > 1e50
-            A /= 1e50
-            Aprev /= 1e50
-            B /= 1e50
-            Bprev /= 1e50
+        if max(abs(real(A)), abs(imag(A))) > scale
+            A     /= scale
+            Aprev /= scale
+            B     /= scale
+            Bprev /= scale
         end
     end
     
@@ -118,16 +159,15 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
     if abs(real(exppart)) == Inf && abs(imag(exppart)) == Inf
         # "factor" out Inf to avoid NaN
         factor = sign(real(exppart)) + sign(imag(exppart))*im
-        return Inf * (factor * cfpart), iters
+        #return Inf * (factor * cfpart), iters
+        return exp(-z + log(A) - log(B)), iters
     else
         return cfpart * exppart, iters
     end
 end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
-function En_safe_gamma_term(ν::Number, z::Number)
-    return exp((ν - 1)*log(complex(z)) + loggamma(1 - ν))
-end
+En_safe_gamma_term(ν::Number, z::Number) = exp((ν - 1)*log(z) + loggamma(1 - ν))
 
 # continued fraction for En(ν, z) that uses the gamma function:
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
@@ -138,6 +178,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     Bprev::typeof(A) = 0
     Aprev::typeof(A) = 1
     ϵ = 10*eps(real(B))
+    scale = sqrt(floatmax(real(A)))
     
     iters = 0
     j = 1
@@ -155,23 +196,23 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
         conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
         conv && break
 
-        if max(abs(real(A)), abs(imag(A))) > 1e50
-            A /= 1e50
-            Aprev /= 1e50
-            B /= 1e50
-            Bprev /= 1e50
+        if max(abs(real(A)), abs(imag(A))) > scale
+            A     /= scale
+            Aprev /= scale
+            B     /= scale
+            Bprev /= scale
         end
     end
     
     gammapart = En_safe_gamma_term(ν, z)
-    cfpart = -exp(-z)
+    cfpart = exp(-z)
     if abs(real(cfpart)) == Inf || abs(imag(cfpart)) == Inf
         factor = sign(real(cfpart)) + sign(imag(cfpart))*im
-        cfpart = Inf * (factor * (A/B))
+        cfpart = exp(-z + log(B) - log(A))
     else
         cfpart *= B/A
     end
-    return gammapart, cfpart, iters
+    return gammapart, -cfpart, iters
 end
 
 # picks between continued fraction representations in 
@@ -180,13 +221,10 @@ end
 function En_cf(ν::Number, z::Number, niter::Int=1000)
     gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
     gammaabs, cfabs = abs(gammapart), abs(cfpart)
-    println(">>> $gammapart /// $cfpart")
     if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
         # significant gamma part, use this
-        println("use gamma / $gammapart / $cfpart")
         return gammapart + cfpart, iters, true
     else
-        println("use nogamma")
         return En_cf_nogamma(ν, z, niter)..., false
     end
 end
@@ -210,9 +248,6 @@ function En_taylor(ν::Number, start::Number, z₀::Number, Δ::Number)
         end
         
         Δ_prod_fact *= -Δ / (k + 2)
-        
-        #iters += 1
-        #k += 1
     end
 
     res = exp(-z₀) * asum
@@ -247,14 +282,13 @@ end
 # series about the origin, special case for integer n
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
 function En_expand_origin(n::Integer, z::Number)
-    gammaterm = 1
-    # (-z)^(n-1) / (n-1)!
-    for i = 1:n-1
-        gammaterm *= -x / i
+    gammaterm = 1 # (-z)^(n-1) / (n-1)!
+    for i = 1:n-1 
+        gammaterm *= -z / i
     end
 
     gammaterm *= digamma(n) - log(z)
-    sumterm = n == 1 ? 0 : 1 / (1 - n)
+    sumterm = float(n == 1 ? 0 : 1 / (1 - n))
     frac = 1
     k, maxiter = 1, 100
     ϵ = 10*eps(real(sumterm))
@@ -277,7 +311,9 @@ end
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
 function En_imagbranchcut(ν::Number, z::Number)
     a = real(z)
-    impart = π * im * exp(-π*im*ν) * exp((ν-1)*log(complex(a)) - loggamma(ν))
+    e1 = exp(π*imag(ν))
+    e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
+    impart = π * im * e1 * e2 * exp((ν-1)*log(complex(a)) - loggamma(ν))
     return imag(impart) * im # get rid of any real error
 end
 
@@ -285,18 +321,30 @@ const ORIGIN_EXPAND_THRESH = 3
 """
     En(ν, z)
 
-Compute the exponential integral of complex `z` with complex order `ν`.
+Compute the exponential integral of `z` with order `ν`.
+
+External links: [DLMF](https://dlmf.nist.gov/8.19)
 """
 function En(ν::Number, z::Number, niter::Int=1000)
+    if abs(ν) > 50
+        throw(ArgumentError("Unsupported order |ν| > 50"))
+    end
+    ν, z = promote(ν, float(z))
+    if typeof(z) <: Real && z < 0
+        throw(DomainError(z, "En will only return a complex result if called with a complex argument"))
+    end
+
     if z == 0.0
         if real(ν) > 0
-            return 1.0 / (ν - 1)
+            return 1 / (ν - 1)
         else
-            return Inf
+            return oftype(z, Inf)
         end
     end
     if ν == 0
         return exp(-z) / z
+    elseif ν == 1 && real(z) > 0 && (typeof(z) == Float64 || typeof(z) == Complex{Float64})
+        return E₁(z)
     end
     # asymptotic test for |z| → ∞
     # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/02/0003/
@@ -315,50 +363,48 @@ function En(ν::Number, z::Number, niter::Int=1000)
     if real(z) > 0
         res, i = En_cf_nogamma(ν, z, niter)
         return res
-    elseif real(z) < 0
+    elseif typeof(z) <: Complex
+        # Procedure for z near the negative real axis based on
+        # (without looking at the accompanying source code):
+        #   Amos, D. E. (1990). Computation of exponential integrals
+        #   of a complex argument. ACM Transactions on Mathematical Software,
+        #   16(2), 169–177. https://doi.org/10.1145/78928.78933
         doconj = imag(z) < 0
         rez, imz = real(z), abs(imag(z))
         z = doconj ? conj(z) : z
         ν = doconj ? conj(ν) : ν
         
-        # empirical boundary for 500 iterations
-        boundary = min(1 + 0.5*abs(ν), 50)
-        if imz > boundary
-            res, i, _ = En_cf(ν, z, niter)
-            return doconj ? conj(res) : res
-        else
-            # iterate with taylor
-            # first find starting point
-            # TODO: switch back to CF for large ν
-            imstart = (imz == 0) ? abs(z)*1e-5 : imz # boundary
-            z₀ = rez + imstart*im
-            E_start, i, _ = En_cf(ν, z₀, niter)
-            if i < niter - 5
-                println("returning first")
-                return doconj ? conj(E_start) : E_start
-            end
-            while i > niter - 5
-                imstart *= 2
-                z₀ = rez + imstart*im
-                E_start, i, _ = En_cf(ν, z₀, niter)
-            end
-            
-            # nsteps chosen so |Δ| ≤ 0.5
-            nsteps = ceil(2 * (imstart - imz))
-            Δ = (imz - imstart)*im / nsteps
-
-            for j = 1:nsteps
-                # take Δ sized steps towards the desired z
-                E_start = En_taylor(ν, E_start, z₀, Δ)
-                z₀ += Δ
-            end
-            
-            # more exact imaginary part available for non-integer ν
-            if imz == 0
-                E_start = real(E_start) + En_imagbranchcut(ν, z)
-            end
-            
+        quick_niter = 100
+        imstart = (imz == 0) ? abs(z)*1e-8 : imz # boundary
+        z₀ = rez + imstart*im
+        E_start, i, _ = En_cf(ν, z₀, quick_niter)
+        if i < quick_niter - 5
+            # didn't need to take any steps
             return doconj ? conj(E_start) : E_start
         end
+        while i > quick_niter - 5
+            # double imaginary part until in region with fast convergence
+            imstart *= 2
+            z₀ = rez + imstart*im
+            E_start, i, _ = En_cf(ν, z₀, quick_niter)
+        end
+        
+        # nsteps chosen so |Δ| ≤ 0.5
+        nsteps = ceil(2 * (imstart - imz))
+        Δ = (imz - imstart)*im / nsteps
+
+        for j = 1:nsteps
+            # take Δ sized steps towards the desired z
+            E_start = En_taylor(ν, E_start, z₀, Δ)
+            z₀ += Δ
+        end
+        
+        # more exact imaginary part available for non-integer ν
+        if imz == 0
+            E_start = real(E_start) + En_imagbranchcut(ν, z)
+        end
+        
+        return doconj ? conj(E_start) : E_start
     end
+    throw("unreachable")
 end
