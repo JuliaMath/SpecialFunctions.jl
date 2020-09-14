@@ -1,5 +1,7 @@
 module SpecialFunctions
 
+import ChainRulesCore
+
 using OpenSpecFun_jll
 
 export
@@ -71,6 +73,7 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
+include("chainrules.jl")
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
