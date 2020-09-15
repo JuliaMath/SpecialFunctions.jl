@@ -1,4 +1,6 @@
 @testset "chainrules" begin
+    Random.seed!(1)
+
     @testset "general" begin
         for x in (1.0, -1.0, 0.0, 0.5, 10.0, -17.1, 1.5 + 0.7im)
             test_scalar(erf, x)

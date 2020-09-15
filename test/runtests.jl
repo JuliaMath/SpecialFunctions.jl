@@ -2,6 +2,7 @@
 
 using SpecialFunctions
 using ChainRulesTestUtils
+using Random
 using Test
 using Base.MathConstants: γ
 
