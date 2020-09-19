@@ -11,7 +11,7 @@ Computes ``log(\\Gamma(b)/\\Gamma(a+b))`` when b >= 8
 """
 loggammadiv(a::Number, b::Number) = _loggammadiv(float(a), float(b))
 
-_loggammadiv(a::T, b::T) where {T<:Base.IEEEFloat} = T(_loggammadiv(Float64(a), Float64(b)) # handle Float16, Float32
+_loggammadiv(a::T, b::T) where {T<:Base.IEEEFloat} = T(_loggammadiv(Float64(a), Float64(b))) # handle Float16, Float32
 function _loggammadiv(a::Float64, b::Float64)
     if a > b
         h = b/a
