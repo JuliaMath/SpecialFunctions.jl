@@ -36,23 +36,26 @@ end
 
 @testset "bessel functions" begin
     @testset "bessel{j,y}{0,1}: check return value wrt bessel{j,y}" begin
-        for jy in ("j","y")
-            bjy = Symbol("bessel",jy)
+        # fixme can Symbol/eval combinations be simplified???
+        for jy in ("j", "y")
+            bjy  = Symbol("bessel", jy)
+            bjy_ = @eval begin $bjy end
             for F in [Float16, Float32]
                 for nu in (0, 1)
-                    bjynu = Symbol("bessel",jy,nu)
+                    bjynu  = Symbol("bessel", jy, nu)
+                    bjynu_ = @eval begin $bjynu end
 
-                    @test $bjynu(         F(2.0)   ) ≈ $bjynu(Float64(2.0)  )
-                    @test $bjynu(           2      ) ≈ $bjynu(        2.0   )
-                    @test $bjynu(           2.0    ) ≈ $bjy(nu,       2.0   )
-                    @test $bjynu(           2.0+im ) ≈ $bjy(nu,       2.0+im)
-                    @test $bjynu(Complex{F}(2.0+im)) ≈ $bjynu(        2.0+im)
+                    @test bjynu_(         F(2.0)   ) ≈ bjynu_(Float64(2.0)  )
+                    @test bjynu_(           2      ) ≈ bjynu_(        2.0   )
+                    @test bjynu_(           2.0    ) ≈ bjy_(nu,       2.0   )
+                    @test bjynu_(           2.0+im ) ≈ bjy_(nu,       2.0+im)
+                    @test bjynu_(Complex{F}(2.0+im)) ≈ bjynu_(        2.0+im)
                 end
             end
         end
     end
 
-    @testset "besselj, bessely: correct return type" begin
+    @testset "bessel{j,y}{,0,1}: correct return type" begin
         @testset "type stability: $f" for f in [bessely0, bessely1, besselj0, besselj1]
             for F in [Float16, Float32, Float64]
                 @test         F  == Base.return_types(f, Tuple{        F })[]
@@ -62,7 +65,14 @@ end
         end
         @testset "type stability: $f" for f in [besselj, bessely]
             for F in [Float16, Float32, Float64]
-                @test F == Base.return_types(f, Tuple{Int, F})[]
+                for I in [Int16, Int32, Int64]
+                    @test                               F   == typeof(f(I(2),         F( 2)))
+                    @test Complex{promote_type(float(I),F)} == typeof(f(I(2), Complex{F}(2)))
+                    for F2 in [Float16, Float32, Float64]
+                        @test                      F      == typeof(f(F2(2),         F( 2)))
+                        @test Complex{promote_type(F,F2)} == typeof(f(F2(2), Complex{F}(2)))
+                    end
+                end
             end
         end
     end
@@ -127,15 +137,15 @@ end
         #                   { 0     else
         for nu in [-5 -3 -1 0 1 3 5]
             for I in [Int16, Int32, Int64]
-                @test besselj(nu, zero(        I )) == (nu == 0 ? 1 : 1)
+                @test besselj(nu, zero(        I )) == (nu == 0 ? 1 : 0)
             end
             for F in [Float16, Float32, Float64]
-                @test besselj(nu, zero(        F )) == (nu == 0 ? 1 : 1)
-                @test besselj(nu, zero(Complex{F})) == (nu == 0 ? 1 : 1)
+                @test besselj(nu, zero(        F )) == (nu == 0 ? 1 : 0)
+                @test besselj(nu, zero(Complex{F})) == (nu == 0 ? 1 : 0)
             end
         end
 
-        const j33 = besselj(3, 3.0)
+        j33 = besselj( 3,  3.0)
         @test besselj( 3,  3) ==  j33
         @test besselj(-3, -3) ==  j33
         @test besselj(-3,  3) == -j33
@@ -145,11 +155,11 @@ end
             @test besselj(3, Complex{F}(3)) ≈ j33
         end
 
-        const j43 = besselj(4, 3.0)
-        @test besselj( 4,  3) ==  j43
-        @test besselj(-4, -3) ==  j43
-        @test besselj(-4,  3) == -j43
-        @test besselj( 4, -3) == -j43
+        j43 = besselj( 4,  3.0)
+        @test besselj( 4,  3) == j43
+        @test besselj(-4, -3) == j43
+        @test besselj(-4,  3) == j43
+        @test besselj( 4, -3) == j43
         for F in [Float16, Float32, Float64]
             @test besselj(4,         F( 3)) ≈ j43
             @test besselj(4, Complex{F}(3)) ≈ j43
@@ -190,7 +200,7 @@ end
     end
 
     @testset "bessely: specific values and (domain) errors" begin
-        const y33 = bessely(3, 3.0)
+        y33 = bessely(3, 3.0)
         @test bessely(3, 3) == y33
         @test bessely(3.0,3.0) == y33
         @test bessely(3,Float32(3.0)) ≈ y33
