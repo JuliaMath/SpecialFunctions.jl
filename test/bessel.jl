@@ -35,44 +35,48 @@
 end
 
 @testset "bessel functions" begin
-    bessel_funcs = [(bessely0, bessely1, bessely), (besselj0, besselj1, besselj)]
-    @testset "$z, $o" for (z, o, f) in bessel_funcs
-        @test z(Float32(2.0)) ≈ z(Float64(2.0))
-        @test o(Float32(2.0)) ≈ o(Float64(2.0))
-        @test z(Float16(2.0)) ≈ z(Float64(2.0))
-        @test o(Float16(2.0)) ≈ o(Float64(2.0))
-        @test z(2) ≈ z(2.0)
-        @test o(2) ≈ o(2.0)
-        @test z(2.0 + im) ≈ f(0, 2.0 + im)
-        @test o(2.0 + im) ≈ f(1, 2.0 + im)
-        @test z(Complex{Float32}(2.0 + im)) ≈ z(2.0 + im)
-        @test o(Complex{Float32}(2.0 + im)) ≈ o(2.0 + im)
-        @test z(Complex{Float16}(2.0 + im)) ≈ z(2.0 + im)
-        @test o(Complex{Float16}(2.0 + im)) ≈ o(2.0 + im)
-        @test f(3, Float32(2.0)) ≈ f(3, 2.0)
-        @test f(3, Float16(2.0)) ≈ f(3, 2.0)
-        @test f(3, Complex{Float32}(2.0 + im)) ≈ f(3, 2.0 + im)
-        @test f(3, Complex{Float16}(2.0 + im)) ≈ f(3, 2.0 + im)
-    end
+    @testset "bessel{j,y}{0,1}: check return value wrt bessel{j,y}" begin
+        for jy in ("j","y")
+            bjy = Symbol("bessel",jy)
+            for F in [Float16, Float32]
+                for nu in (0, 1)
+                    bjynu = Symbol("bessel",jy,nu)
 
-    @testset "type stability: $f" for f in [bessely0, bessely1, besselj0, besselj1]
-        for F in [Float16, Float32, Float64]
-            @test         F  == Base.return_types(f, Tuple{        F })[]
-            @test Complex{F} == Base.return_types(f, Tuple{Complex{F}})[]
-        end
-        @test BigFloat == Base.return_types(f, Tuple{BigFloat})[]
-    end
-    @testset "type stability: $f" for f in [besselj, bessely]
-        for F in [Float16, Float32, Float64]
-            @test F == Base.return_types(f, Tuple{Int32, F})[]
+                    @test $bjynu(         F(2.0)   ) ≈ $bjynu(Float64(2.0)  )
+                    @test $bjynu(           2      ) ≈ $bjynu(        2.0   )
+                    @test $bjynu(           2.0    ) ≈ $bjy(nu,       2.0   )
+                    @test $bjynu(           2.0+im ) ≈ $bjy(nu,       2.0+im)
+                    @test $bjynu(Complex{F}(2.0+im)) ≈ $bjynu(        2.0+im)
+                end
+            end
         end
     end
 
-    @testset "besselj error throwing" begin
-        @test_throws MethodError besselj(1.2,big(1.0))
-        @test_throws MethodError besselj(1,complex(big(1.0)))
-        @test_throws MethodError besseljx(1,big(1.0))
-        @test_throws MethodError besseljx(1,complex(big(1.0)))
+    @testset "besselj, bessely: correct return type" begin
+        @testset "type stability: $f" for f in [bessely0, bessely1, besselj0, besselj1]
+            for F in [Float16, Float32, Float64]
+                @test         F  == Base.return_types(f, Tuple{        F })[]
+                @test Complex{F} == Base.return_types(f, Tuple{Complex{F}})[]
+            end
+            @test BigFloat == Base.return_types(f, Tuple{BigFloat})[]
+        end
+        @testset "type stability: $f" for f in [besselj, bessely]
+            for F in [Float16, Float32, Float64]
+                @test F == Base.return_types(f, Tuple{Int, F})[]
+            end
+        end
+    end
+
+    @testset "besselj: undefined argument types" begin
+        @test_throws MethodError   besselj(     1.2 ,         big( 1.0        ))
+        @test_throws MethodError   besselj(     1   , complex(big( 1.0       )))
+        @test_throws MethodError   besselj(big( 1.0),                     3im  )
+        @test_throws DomainError   besselj(     0.1 ,             -0.4         )
+        @test_throws AmosException besselj(    20   ,                  1000im  )
+
+        @test_throws MethodError besseljx(1,  big(        1.0) )
+        @test_throws MethodError besseljx(1,  complex(big(1.0)))
+
     end
     @testset "besselh" begin
         true_h133 = 0.30906272225525164362 - 0.53854161610503161800im
@@ -118,49 +122,49 @@ end
             @test_throws MethodError besselix(1,complex(big(1.0)))
         end
     end
-    @testset "besselj" begin
-        @test besselj(0,0) == 1
-        for i in [-5 -3 -1 1 3 5]
-            @test besselj(i,0) == 0
-            @test besselj(i,Float32(0)) == 0
-            @test besselj(i,Complex{Float32}(0)) == 0.0
+    @testset "besselj: specific values and (domain) errors" begin
+        # besselj(nu, 0) == { 1     for nu == 0
+        #                   { 0     else
+        for nu in [-5 -3 -1 0 1 3 5]
+            for I in [Int16, Int32, Int64]
+                @test besselj(nu, zero(        I )) == (nu == 0 ? 1 : 1)
+            end
+            for F in [Float16, Float32, Float64]
+                @test besselj(nu, zero(        F )) == (nu == 0 ? 1 : 1)
+                @test besselj(nu, zero(Complex{F})) == (nu == 0 ? 1 : 1)
+            end
         end
 
-        j33 = besselj(3,3.)
-        @test besselj(3,3) == j33
-        @test besselj(-3,-3) == j33
-        @test besselj(-3,3) == -j33
-        @test besselj(3,-3) == -j33
-        @test besselj(3,3f0) ≈ j33
-        @test besselj(3,complex(3.)) ≈ j33
-        @test besselj(3,complex(3f0)) ≈ j33
-        @test besselj(3,complex(3)) ≈ j33
+        const j33 = besselj(3, 3.0)
+        @test besselj( 3,  3) ==  j33
+        @test besselj(-3, -3) ==  j33
+        @test besselj(-3,  3) == -j33
+        @test besselj( 3, -3) == -j33
+        for F in [Float16, Float32, Float64]
+            @test besselj(3,         F( 3)) ≈ j33
+            @test besselj(3, Complex{F}(3)) ≈ j33
+        end
 
-        j43 = besselj(4,3.)
-        @test besselj(4,3) == j43
-        @test besselj(-4,-3) == j43
-        @test besselj(-4,3) == j43
-        @test besselj(4,-3) == j43
-        @test besselj(4,3f0) ≈ j43
-        @test besselj(4,complex(3.)) ≈ j43
-        @test besselj(4,complex(3f0)) ≈ j43
-        @test besselj(4,complex(3)) ≈ j43
+        const j43 = besselj(4, 3.0)
+        @test besselj( 4,  3) ==  j43
+        @test besselj(-4, -3) ==  j43
+        @test besselj(-4,  3) == -j43
+        @test besselj( 4, -3) == -j43
+        for F in [Float16, Float32, Float64]
+            @test besselj(4,         F( 3)) ≈ j43
+            @test besselj(4, Complex{F}(3)) ≈ j43
+        end
 
-        @test j33 ≈ 0.30906272225525164362
-        @test j43 ≈ 0.13203418392461221033
-        @test besselj(0.1, complex(-0.4)) ≈ 0.820421842809028916 + 0.266571215948350899im
-        @test besselj(3.2, 1.3+0.6im) ≈ 0.01135309305831220201 + 0.03927719044393515275im
-        @test besselj(1, 3im) ≈ 3.953370217402609396im
-        @test besselj(1.0,3im) ≈ besselj(1,3im)
+        @test besselj(1.0, 3im) ≈ besselj(1, 3im)
 
-        true_jm3p1_3 = -0.45024252862270713882
-        @test besselj(-3.1,3) ≈ true_jm3p1_3
-        @test besselj(Float16(-3.1),Float16(3)) ≈ true_jm3p1_3
-
-        @testset "Error throwing" begin
-            @test_throws DomainError    besselj(0.1, -0.4)
-            @test_throws AmosException besselj(20,1000im)
-            @test_throws MethodError besselj(big(1.0),3im)
+        # specific values
+        @test j33                      ≈ 0.30906272225525164362
+        @test j43                      ≈ 0.13203418392461221033
+        @test besselj(0.1, -0.4+  0im) ≈ 0.820421842809028916   + 0.266571215948350899im
+        @test besselj(3.2,  1.3+0.6im) ≈ 0.01135309305831220201 + 0.03927719044393515275im
+        @test besselj(1,          3im) ≈                          3.953370217402609396im
+        for F in [Float16, Float32, Float64]
+            @test besselj(F(-3.1), F(3)) ≈ -0.45024252862270713882
         end
     end
 
@@ -185,14 +189,15 @@ end
         end
     end
 
-    @testset "bessely" begin
-        y33 = bessely(3,3.)
-        @test bessely(3,3) == y33
-        @test bessely(3.,3.) == y33
-        @test bessely(3,Float32(3.)) ≈ y33
+    @testset "bessely: specific values and (domain) errors" begin
+        const y33 = bessely(3, 3.0)
+        @test bessely(3, 3) == y33
+        @test bessely(3.0,3.0) == y33
+        @test bessely(3,Float32(3.0)) ≈ y33
         @test bessely(-3,3) ≈ -y33
         @test y33 ≈ -0.53854161610503161800
         @test bessely(3,complex(-3)) ≈ 0.53854161610503161800 - 0.61812544451050328724im
+
         @testset "Error throwing" begin
             @test_throws AmosException bessely(200.5,0.1)
             @test_throws DomainError bessely(3,-3)
@@ -201,8 +206,8 @@ end
             @test_throws DomainError bessely(1,Float32(-1.0))
             @test_throws DomainError bessely(0.4,BigFloat(-1.0))
             @test_throws DomainError bessely(1,BigFloat(-1.0))
-            @test_throws DomainError bessely(Cint(3),Float32(-3.))
-            @test_throws DomainError bessely(Cint(3),Float64(-3.))
+            @test_throws DomainError bessely(Cint(3),Float32(-3.0))
+            @test_throws DomainError bessely(Cint(3),Float64(-3.0))
 
             @test_throws MethodError bessely(1.2,big(1.0))
             @test_throws MethodError bessely(1,complex(big(1.0)))
