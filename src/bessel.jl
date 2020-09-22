@@ -184,7 +184,7 @@ end
 
 # besselj0, besselj1, bessely0, bessely1
 for jy in ("j","y"), nu in (0,1)
-    jynu = Expr(:quote, Symbol(jy,nu))
+    jynu  = Expr(:quote, Symbol(jy,nu))
     jynuf = Expr(:quote, Symbol(jy,nu,"f"))
     bjynu = Symbol("bessel",jy,nu)
     if jy == "y"
@@ -201,7 +201,7 @@ for jy in ("j","y"), nu in (0,1)
         end
     end
     @eval begin
-        $bjynu(x::Real) = $bjynu(float(x))
+        $bjynu(x::Real            ) = $bjynu(float(x))
         $bjynu(x::Complex{Float64}) = $(Symbol("bessel",jy))($nu,x)
         $bjynu(x::Complex{Float32}) = Complex{Float32}($bjynu(Complex{Float64}(x)))
         $bjynu(x::Complex{Float16}) = Complex{Float16}($bjynu(Complex{Float64}(x)))
@@ -391,9 +391,9 @@ function besselj(nu::Float64, z::Complex{Float64})
     end
 end
 
-besselj(nu::Cint, x::Float64) = ccall((:jn, libm), Float64, (Cint, Float64), nu, x)
-besselj(nu::Cint, x::Float32) = ccall((:jnf, libm), Float32, (Cint, Float32), nu, x)
-besselj(nu::Cint, x::Float16) = Float16(besselj(nu, Float32(x)))
+besselj(nu::Cint, x::Float64)          = ccall((:jn,  libm), Float64, (Cint, Float64), nu, x)
+besselj(nu::Cint, x::Float32)          = ccall((:jnf, libm), Float32, (Cint, Float32), nu, x)
+besselj(nu::Cint, x::Float16)::Float16 = besselj(nu, Float32(x))
 
 
 function besseljx(nu::Float64, z::Complex{Float64})
