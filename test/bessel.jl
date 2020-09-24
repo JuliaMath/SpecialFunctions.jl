@@ -199,30 +199,48 @@ end
         end
     end
 
-    @testset "bessely: specific values and (domain) errors" begin
+    @testset "bessely" begin
         y33 = bessely(3, 3.0)
-        @test bessely(3, 3) == y33
-        @test bessely(3.0,3.0) == y33
-        @test bessely(3,Float32(3.0)) ≈ y33
-        @test bessely(-3,3) ≈ -y33
-        @test y33 ≈ -0.53854161610503161800
-        @test bessely(3,complex(-3)) ≈ 0.53854161610503161800 - 0.61812544451050328724im
+
+        @testset "same arguments, different data types" begin
+            @test bessely(3,   3  ) ==  y33
+            @test bessely(3.0, 3.0) ==  y33
+            @test bessely(3.0, 3  ) ==  y33
+            for I in [Int16, Int32, Int64]
+                for F in [Float16, Float32, Float64]
+                    @test bessely(I(3),         F( 3)) ≈ y33
+                    @test bessely(I(3), Complex{F}(3)) ≈ y33
+                end
+            end
+        end
+
+        @testset "symmetry" begin
+            @test bessely(-3, 3) == -y33
+        end
+
+        @testset "specific values" begin
+            @test y33                     ≈ -0.53854161610503161800
+            @test bessely(3, complex(-3)) ≈ -y33                    - 0.61812544451050328724im
+        end
 
         @testset "Error throwing" begin
             @test_throws AmosException bessely(200.5,0.1)
-            @test_throws DomainError bessely(3,-3)
-            @test_throws DomainError bessely(0.4,-1.0)
-            @test_throws DomainError bessely(0.4,Float32(-1.0))
-            @test_throws DomainError bessely(1,Float32(-1.0))
-            @test_throws DomainError bessely(0.4,BigFloat(-1.0))
-            @test_throws DomainError bessely(1,BigFloat(-1.0))
-            @test_throws DomainError bessely(Cint(3),Float32(-3.0))
-            @test_throws DomainError bessely(Cint(3),Float64(-3.0))
 
-            @test_throws MethodError bessely(1.2,big(1.0))
-            @test_throws MethodError bessely(1,complex(big(1.0)))
-            @test_throws MethodError besselyx(1,big(1.0))
-            @test_throws MethodError besselyx(1,complex(big(1.0)))
+            @test_throws DomainError bessely(     3,          -3   )
+            @test_throws DomainError bessely(Cint(3),         -3.0 )
+            @test_throws DomainError bessely(Cint(3), Float32(-3.0))
+            @test_throws DomainError bessely(0.4,          -1.0 )
+            @test_throws DomainError bessely(0.4, Float32( -1.0))
+            @test_throws DomainError bessely(0.4, BigFloat(-1.0))
+            @test_throws DomainError bessely(1,          -1.0 )
+            @test_throws DomainError bessely(1, Float32( -1.0))
+            @test_throws DomainError bessely(1, BigFloat(-1.0))
+
+            @test_throws MethodError bessely(1.2,         big(1.0) )
+            @test_throws MethodError bessely(1,   complex(big(1.0)))
+            @test_throws MethodError besselyx(1,           big(1.0) )
+            @test_throws MethodError besselyx(1.2,         big(1.0) )
+            @test_throws MethodError besselyx(1,   complex(big(1.0)))
         end
     end
 
