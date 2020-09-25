@@ -3,6 +3,8 @@
 
 Owen's T function
 
+Ported from Matlab implementation of John Burkardt, which is distributed under the GNU LGPL license.
+
 Reference:
     MA Porter, DJ Winstanley, Remark AS R30: A Remark on Algorithm AS76: An Integral Useful in 
     Calculating Noncentral T and Bivariate Normal Probabilities, Applied Statistics, Volume 28, 
