@@ -9,8 +9,8 @@ using SpecialFunctions: AmosException, f64
 # useful test functions for relative error, which differ from isapprox
 # in that relerrc separately looks at the real and imaginary parts
 relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
-relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
-≅(a,b) = relerrc(a,b) ≤ 1e-13
+relerrc(z, x) = max(relerr(real(z), real(x)), relerr(imag(z), imag(x)))
+≅(a,b) = relerrc(a, b) ≤ 1e-13
 
 tests = [
     "bessel",
@@ -21,7 +21,8 @@ tests = [
     "gamma_inc",
     "gamma",
     "sincosint",
-    "other_tests"
+    "other_tests",
+    "owens_t"
 ]
 
 const testdir = dirname(@__FILE__)
@@ -30,6 +31,6 @@ const testdir = dirname(@__FILE__)
 for t in tests
     tp = joinpath(testdir, "$(t).jl")
     @testset "$(t)" begin
-      include(tp)
+        include(tp)
     end
 end
