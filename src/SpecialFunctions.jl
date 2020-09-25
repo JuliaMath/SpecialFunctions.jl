@@ -2,8 +2,7 @@ module SpecialFunctions
 
 using OpenSpecFun_jll
 
-export
-    airyai,
+export airyai,
     airyaiprime,
     airybi,
     airybiprime,
@@ -57,7 +56,8 @@ export
     zeta,
     sinint,
     cosint,
-    lbinomial
+    lbinomial,
+    owens_t
 
 include("bessel.jl")
 include("erf.jl")
@@ -68,12 +68,13 @@ include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
 include("deprecated.jl")
+include("owens_t.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
           :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end
-for f in (:beta, :lbeta)
+for f in (:beta, :lbeta, :owens_t)
     @eval $(f)(::Number, ::Missing) = missing
     @eval $(f)(::Missing, ::Number) = missing
     @eval $(f)(::Missing, ::Missing) = missing
