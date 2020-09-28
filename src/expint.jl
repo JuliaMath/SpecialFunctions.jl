@@ -6,7 +6,7 @@ struct SimplePoly{T}
 end 
 
 Base.:*(p::SimplePoly, c) = SimplePoly(p.coeffs * c)
-Base.:*(c::T, p::SimplePoly{S}) where {S, T} = p * c
+Base.:*(c, p::SimplePoly) = p * c
 
 function Base.:+(p::SimplePoly{S}, q::SimplePoly{T}) where {S, T}
     n, m = length(p.coeffs), length(q.coeffs)
