@@ -126,10 +126,9 @@ function E₁(z::Complex{Float64})
 end
 
 E₁(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = E₁(float(z))
-
-function E₁(x::Number)
-    return En(1, x)
-end
+E₁(x::Number) = En(1, x)
+E₁(z::Float32) = Float32(E₁(Float64(z)))
+E₁(z::ComplexF32) = ComplexF32(E₁(ComplexF64(z)))
 
 # Continued fraction for En(ν, z) that doesn't use a term with
 # the gamma function: https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0001/
@@ -423,3 +422,7 @@ function En(ν::Number, z::Number, niter::Int=1000)
     end
     throw("unreachable")
 end
+
+# aliases
+const E1 = E₁
+const Eₙ = En

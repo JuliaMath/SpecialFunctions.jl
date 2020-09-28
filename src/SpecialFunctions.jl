@@ -58,8 +58,10 @@ export
     sinint,
     cosint,
     lbinomial,
+    E1,
     E₁,
-    En
+    En,
+    Eₙ
 
 include("bessel.jl")
 include("erf.jl")
