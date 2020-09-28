@@ -1,19 +1,37 @@
-import Polynomials
 using Base.MathConstants
 
-#function polymult(p1::Vector{T}, p2::Vector{T}) where {T}
-#    n, m = length(p1) - 1, length(p2) - 1
-#    c = zeros(T, m + n + 1)
-#    for i in 0:n, j in 0:m
-#        c[i + j + 1] += p1[i + 1] * p2[j + 1]
-#    end
-#    return c
-#end
+# barebones polynomial type supporting +, -, *
+struct SimplePoly{T}
+    coeffs::Vector{T}
+end 
 
-function E₁_cfpoly_approx(n::Integer, pstart::Polynomials.Polynomial{T}, ::Type{T}=BigInt) where {T<:Real}
-    q = Polynomials.Polynomial(T[1])
+Base.:*(p::SimplePoly, c) = SimplePoly(p.coeffs * c)
+Base.:*(c::T, p::SimplePoly{S}) where {S, T} = p * c
+
+function Base.:+(p::SimplePoly{S}, q::SimplePoly{T}) where {S, T}
+    n, m = length(p.coeffs), length(q.coeffs)
+    ext1, ext2 = max(0, m - n), max(0, n - m)
+    c1 = [p.coeffs ; zeros(S, ext1)]
+    c2 = [q.coeffs ; zeros(T, ext2)]
+    return SimplePoly(c1 + c2)
+end
+
+Base.:-(p::SimplePoly) = -1 * p
+Base.:-(p::SimplePoly, q::SimplePoly) = p + (-q)
+
+function Base.:*(p::SimplePoly{S}, q::SimplePoly{T}) where {S, T}
+    n, m = length(p.coeffs) - 1, length(q.coeffs) - 1
+    c = zeros(promote_type(S, T), m + n + 1)
+    for i in 0:n, j in 0:m
+        c[i + j + 1] += p.coeffs[i + 1] * q.coeffs[j + 1]
+    end
+    return SimplePoly(c)
+end
+
+function E₁_cfpoly_approx(n::Integer, pstart::SimplePoly{T}, ::Type{T}=BigInt) where {T<:Real}
+    q = SimplePoly(T[1])
     p = pstart
-    x = Polynomials.Polynomial(T[0,1])
+    x = SimplePoly(T[0,1])
     for i = n:-1:1
         p, q = x*p+(1+i)*q, p # from cf = x + (1+i)/cf = x + (1+i)*q/p
         p, q = p + i*q, p     # from cf = 1 + i/cf = 1 + i*q/p
@@ -23,15 +41,15 @@ function E₁_cfpoly_approx(n::Integer, pstart::Polynomials.Polynomial{T}, ::Typ
 end
 
 macro E₁_cf64(x, n::Integer, start)
-    pstart = Polynomials.Polynomial(eval(start))
+    pstart = SimplePoly(eval(start))
     # consider using BigFloat?
     p, q = E₁_cfpoly_approx(n, pstart, Float64)
     xesc = esc(x)
     
     num_expr =  :(@evalpoly $xesc)
-    append!(num_expr.args, Float64.(Polynomials.coeffs(p)))
+    append!(num_expr.args, Float64.(p.coeffs))
     den_expr = :(@evalpoly $xesc)
-    append!(den_expr.args, Float64.(Polynomials.coeffs(q)))
+    append!(den_expr.args, Float64.(q.coeffs))
     :( exp(-$xesc) * $num_expr / $den_expr )
 end
 
@@ -154,14 +172,11 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
         end
     end
     
-    cfpart = A/B
     exppart = exp(-z)
     if abs(real(exppart)) == Inf && abs(imag(exppart)) == Inf
-        # "factor" out Inf to avoid NaN
-        factor = sign(real(exppart)) + sign(imag(exppart))*im
-        #return Inf * (factor * cfpart), iters
         return exp(-z + log(A) - log(B)), iters
     else
+        cfpart = A/B
         return cfpart * exppart, iters
     end
 end
@@ -229,7 +244,8 @@ function En_cf(ν::Number, z::Number, niter::Int=1000)
     end
 end
 
-# Compute expint(ν, z₀+Δ) given start = expint(ν, z₀), as described by [Amos 1980]
+# Compute expint(ν, z₀+Δ) given start = expint(ν, z₀), as described by [Amos 1980].
+# This is used to incrementally approach the negative real axis.
 function En_taylor(ν::Number, start::Number, z₀::Number, Δ::Number)
     a = exp(z₀) * start
     k, iters = 0, 0
@@ -314,6 +330,7 @@ function En_imagbranchcut(ν::Number, z::Number)
     e1 = exp(π*imag(ν))
     e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
     impart = π * im * e1 * e2 * exp((ν-1)*log(complex(a)) - loggamma(ν))
+    impart *= signbit(imag(z)) ? -1 : 1
     return imag(impart) * im # get rid of any real error
 end
 
@@ -326,8 +343,8 @@ Compute the exponential integral of `z` with order `ν`.
 External links: [DLMF](https://dlmf.nist.gov/8.19)
 """
 function En(ν::Number, z::Number, niter::Int=1000)
-    if abs(ν) > 50
-        throw(ArgumentError("Unsupported order |ν| > 50"))
+    if abs(ν) > 50 && !(isreal(ν) && real(ν) > 0)
+        throw(ArgumentError("Unsupported order |ν| > 50 off the positive real axis"))
     end
     ν, z = promote(ν, float(z))
     if typeof(z) <: Real && z < 0
@@ -343,7 +360,7 @@ function En(ν::Number, z::Number, niter::Int=1000)
     end
     if ν == 0
         return exp(-z) / z
-    elseif ν == 1 && real(z) > 0 && (typeof(z) == Float64 || typeof(z) == Complex{Float64})
+    elseif ν == 1 && real(z) > 0 && z isa Union{Float64, Complex{Float64}}
         return E₁(z)
     end
     # asymptotic test for |z| → ∞
@@ -356,14 +373,11 @@ function En(ν::Number, z::Number, niter::Int=1000)
         # use Taylor series about the origin for small z
         return En_expand_origin(ν, z)
     end
-    E_guess, _, g = En_cf(ν, z, niter)
-    if g
-        return E_guess
-    end
-    if real(z) > 0
+
+    if real(z) > 0 && real(ν) > 0
         res, i = En_cf_nogamma(ν, z, niter)
         return res
-    elseif typeof(z) <: Complex
+    else
         # Procedure for z near the negative real axis based on
         # (without looking at the accompanying source code):
         #   Amos, D. E. (1990). Computation of exponential integrals
@@ -374,15 +388,16 @@ function En(ν::Number, z::Number, niter::Int=1000)
         z = doconj ? conj(z) : z
         ν = doconj ? conj(ν) : ν
         
-        quick_niter = 100
-        imstart = (imz == 0) ? abs(z)*1e-8 : imz # boundary
+        quick_niter, nmax = 100, 95
+        # start with small imaginary part if exactly on negative real axis
+        imstart = (imz == 0) ? abs(z)*1e-8 : imz
         z₀ = rez + imstart*im
         E_start, i, _ = En_cf(ν, z₀, quick_niter)
-        if i < quick_niter - 5
+        if imz > 0 && i < nmax
             # didn't need to take any steps
             return doconj ? conj(E_start) : E_start
         end
-        while i > quick_niter - 5
+        while i > nmax
             # double imaginary part until in region with fast convergence
             imstart *= 2
             z₀ = rez + imstart*im
