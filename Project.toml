@@ -4,7 +4,6 @@ version = "0.10.3"
 
 [deps]
 OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
-Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 
 [compat]
 OpenSpecFun_jll = "0.5.3"
