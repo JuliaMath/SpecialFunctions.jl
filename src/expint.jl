@@ -53,7 +53,6 @@ macro E₁_cf64(x, n::Integer, start)
     :( exp(-$xesc) * $num_expr / $den_expr )
 end
 
-
 function E₁_taylor_coefficients(::Type{T}, n::Integer) where {T<:Number}
     n < 0 && throw(ArgumentError("$n ≥ 0 is required"))
     n == 0 && return T[]
@@ -78,7 +77,7 @@ macro E₁_taylor64(z, n::Integer)
 end
 
 # adapted from Steven G Johnson's initial implementation: issue #19
-function E₁(x::Float64)
+function expint(x::Float64)
     x < 0 && throw(DomainError(x, "negative argument, convert to complex first"))
     x == 0 && return Inf
     if x > 2.15
@@ -99,9 +98,9 @@ function E₁(x::Float64)
     end
 end
 
-function E₁(z::Complex{Float64})
+function expint(z::Complex{Float64})
     if real(z) < 0
-        return En(1, z)
+        return expint(1, z)
     end
     x² = real(z)^2
     y² = imag(z)^2
@@ -125,10 +124,10 @@ function E₁(z::Complex{Float64})
     end
 end
 
-E₁(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = E₁(float(z))
-E₁(x::Number) = En(1, x)
-E₁(z::Float32) = Float32(E₁(Float64(z)))
-E₁(z::ComplexF32) = ComplexF32(E₁(ComplexF64(z)))
+expint(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = expint(float(z))
+expint(x::Number) = expint(1, x)
+expint(z::Float32) = Float32(expint(Float64(z)))
+expint(z::ComplexF32) = ComplexF32(expint(ComplexF64(z)))
 
 # Continued fraction for En(ν, z) that doesn't use a term with
 # the gamma function: https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0001/
@@ -335,13 +334,15 @@ end
 
 const ORIGIN_EXPAND_THRESH = 3
 """
-    En(ν, z)
+    expint(z)
+    expint(ν, z)
 
-Compute the exponential integral of `z` with order `ν`.
+Computes the exponential integral ``E_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary ``\\nu`` and ``z`` are supported.
 
-External links: [DLMF](https://dlmf.nist.gov/8.19)
+External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
 """
-function En(ν::Number, z::Number, niter::Int=1000)
+function expint(ν::Number, z::Number, niter::Int=1000)
     if abs(ν) > 50 && !(isreal(ν) && real(ν) > 0)
         throw(ArgumentError("Unsupported order |ν| > 50 off the positive real axis"))
     end
@@ -422,7 +423,3 @@ function En(ν::Number, z::Number, niter::Int=1000)
     end
     throw("unreachable")
 end
-
-# aliases
-const E1 = E₁
-const Eₙ = En
