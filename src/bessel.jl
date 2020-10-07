@@ -434,14 +434,6 @@ function bessely(nu::Float64, z::Complex{Float64})
     end
 end
 
-function besselyx(nu::Float64, z::Complex{Float64})
-    if nu < 0
-        return _bessely(-nu,z,Int32(2))*cospi(nu) - _besselj(-nu,z,Int32(2))*sinpi(nu)
-    else
-        return _bessely(nu,z,Int32(2))
-    end
-end
-
 """
     besseli(nu, x)
 
@@ -578,13 +570,21 @@ function besselyx(nu::Real, x::AbstractFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    real(besselyx(float(nu), complex(x)))
+    convert(typeof(x), besselyx(float(nu), complex(x)))
+end
+
+function besselyx(nu::Float64, z::Complex{Float64})
+    if nu < 0
+        return _bessely(-nu,z,Int32(2))*cospi(nu) - _besselj(-nu,z,Int32(2))*sinpi(nu)
+    else
+        return _bessely(nu,z,Int32(2))
+    end
 end
 
 for f in ("i", "ix", "j", "jx", "k", "kx", "y", "yx")
     bfn = Symbol("bessel", f)
     @eval begin
-        $bfn(nu::Real, x::Real) = $bfn(nu, float(x))
+        $bfn(nu::Real, x::Real) = typeof(float(x))($bfn(float(nu), float(x)))
         function $bfn(nu::Real, z::Complex)
             Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
             $bfn(Tf(nu), Complex{Tf}(z))

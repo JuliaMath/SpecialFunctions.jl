@@ -244,6 +244,27 @@ end
         end
     end
 
+    @testset "besselyx" begin
+        @testset "return type" begin
+            for I in [Int16, Int32, Int64], I2 in [Int16, Int32, Int64]
+                @test Float64 == typeof(besselyx(I(2), I2(2)))
+            end
+
+            for F in [Float16, Float32, Float64], F2 in [Float16, Float32, Float64]
+                @test                         F2   == typeof(besselyx(F(2),         F2( 2)))
+                @test promote_type(F, Complex{F2}) == typeof(besselyx(F(2), Complex{F2}(2)))
+            end
+
+            for F in [Float16, Float32, Float64], I in [Int16, Int32, Int64]
+                @test                          float(I)  == typeof(besselyx(F(2),         I( 2)))
+                @test                                F   == typeof(besselyx(I(2),         F( 2)))
+                @test promote_type(float(I), Complex{F}) == typeof(besselyx(I(2), Complex{F}(2)))
+            end
+        end
+
+
+    end
+
     @testset "sphericalbesselj" begin
         @test sphericalbesselj(1, 1)      ≈ 0.3011686789397568
         @test sphericalbesselj(10, 5.5)   ≈ 0.0009369210263385842
