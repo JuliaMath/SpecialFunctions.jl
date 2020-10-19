@@ -388,7 +388,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         z = doconj ? conj(z) : z
         ν = doconj ? conj(ν) : ν
         
-        quick_niter, nmax = 100, 95
+        quick_niter, nmax = 50, 45
         # start with small imaginary part if exactly on negative real axis
         imstart = (imz == 0) ? abs(z)*1e-8 : imz
         z₀ = rez + imstart*im
