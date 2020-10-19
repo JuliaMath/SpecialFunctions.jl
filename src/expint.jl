@@ -28,10 +28,9 @@ function Base.:*(p::SimplePoly{S}, q::SimplePoly{T}) where {S, T}
     return SimplePoly(c)
 end
 
-function E₁_cfpoly_approx(n::Integer, pstart::SimplePoly{T}, ::Type{T}=BigInt) where {T<:Real}
+function E₁_cfpoly_approx(n::Integer, ::Type{T}=BigInt) where {T<:Real}
     q = SimplePoly(T[1])
-    p = pstart
-    x = SimplePoly(T[0,1])
+    p = x = SimplePoly(T[0,1])
     for i = n:-1:1
         p, q = x*p+(1+i)*q, p # from cf = x + (1+i)/cf = x + (1+i)*q/p
         p, q = p + i*q, p     # from cf = 1 + i/cf = 1 + i*q/p
@@ -40,10 +39,9 @@ function E₁_cfpoly_approx(n::Integer, pstart::SimplePoly{T}, ::Type{T}=BigInt)
     return p, x*p + q
 end
 
-macro E₁_cf64(x, n::Integer, start)
-    pstart = SimplePoly(eval(start))
+macro E₁_cf64(x, n::Integer)
     # consider using BigFloat?
-    p, q = E₁_cfpoly_approx(n, pstart, Float64)
+    p, q = E₁_cfpoly_approx(n, Float64)
     xesc = esc(x)
     
     num_expr =  :(@evalpoly $xesc)
@@ -76,19 +74,55 @@ macro E₁_taylor64(z, n::Integer)
     :( $taylor - log($zesc) )
 end
 
+# minimax rational approximations to E_1(x)/exp(-x)
+const num_2_4 = (3.600530862438501481559423277418128014798,
+   28.73031134165011013783185685393062481126,
+   46.04314409968065653003548224846863877481,
+   21.47189493062368074985000918414086604187,
+   2.719957622921613321844755385973197500235,
+   1.508750885580864752293599048121678438568e-6)
+const denom_2_4 = (1.0,
+   18.06743589038646654075831055159865459831,
+   61.19456872238615922515377354442679999566,
+   64.81772518730116701207299231777089576859,
+   24.19034591054828198408354214931112970741,
+   2.720026796991567940556850921390829046015)
+
+const num_4_10 = (3.149019890512432117647119992448352099575,
+   14.77395058090815888166486507990452627136,
+   14.78214309058953358717796744960600201013,
+   4.559401130686434886620102186841739864936,
+   0.4027858394909585103775445204576054721422,
+   2.302781920509468929446800686773538387432e-9)
+const denom_4_10 = (1.0,
+   11.65960373479520446458792926669115987821,
+   26.20023773503894444535165299118172674849,
+   18.93899893550582921168134979000319186841,
+   4.962178168140565906794561070524079194193,
+   0.4027860481050182948737116109665534358805)
+
+const num_10_20 = (2.564801308922428705318296668924369454617,
+   5.482252510134574167659359513298970499768,
+   2.379528224853089764405551768869103662657,
+   0.2523431276282591480166881146593592650031,
+   1.444719769329975045925053905197199934930e-9,
+   -8.977332061106791470409502623202677045468e-12)
+const denom_10_20 = (1.0,
+   6.421214405318108272004472721910023284626,
+   7.609584052290707052877352911548283916247,
+   2.631866613851763364839413823973711355890,
+   0.2523432345539146248733539983749722854603)
+
 # adapted from Steven G Johnson's initial implementation: issue #19
 function expint(x::Float64)
     x < 0 && throw(DomainError(x, "negative argument, convert to complex first"))
     x == 0 && return Inf
     if x > 2.15
-        # specially chosen approximants for faster convergence
-        x < 3.0   && return @E₁_cf64(x, 18, [6.267445506556548, -2.278962735947262, 0.5577231261815463, -0.05413049191473329])
-        x < 4.0   && return @E₁_cf64(x, 16, [5.114292670961982, -1.2789140459431323, 0.22066200334871455, -0.015067049382830766])
-        x < 6.1   && return @E₁_cf64(x, 14, [4.194988480897909, -0.7263593325667503, 0.08956574399359891, -0.00434973529065973])
-        x < 8.15  && return @E₁_cf64(x, 9,  [3.0362016309948228, -0.33793806630590445, 0.029410409377178114, -0.0010060498260648586])
-        x < 25.0  && return @E₁_cf64(x, 8,  [2.5382065303376895, -0.18352177433259526, 0.011141562002742184, -0.0002634921890930066])
-        x < 200.0 && return @E₁_cf64(x, 8,  [0.0, 1.0])
-        return x < 740.0 ? @E₁_cf64(x, 4, [0.0, 1.0]) : 0.0 # underflow
+        x < 4.0     && return exp(-x) * evalpoly(x, num_2_4) / evalpoly(x, denom_2_4)
+        x < 10.0    && return exp(-x) * evalpoly(x, num_4_10) / evalpoly(x, denom_4_10)
+        x < 20.0    && return exp(-x) * evalpoly(x, num_10_20) / evalpoly(x, denom_10_20)
+        x < 200.0 && return @E₁_cf64(x, 8)
+        return x < 740.0 ? @E₁_cf64(x, 4) : 0.0 # underflow
     else
         # crossover point to taylor should be tuned more
         return x ≤ 0.6 ? (x ≤ 0.053 ? (x ≤ 4.4e-3 ? @E₁_taylor64(x,4) :
@@ -109,12 +143,12 @@ function expint(z::Complex{Float64})
             return zero(z)
         elseif x² + 0.401*y² ≥ 58.0 # ≤ 15 terms
             if x² + 0.649*y² ≥ 540.0 # ≤ 8 terms
-                x² + y² ≥ 4e4 && return @E₁_cf64(z, 4, [0.0, 1.0])
-                return @E₁_cf64(z, 8, [0.0, 1.0])
+                x² + y² ≥ 4e4 && return @E₁_cf64(z, 4)
+                return @E₁_cf64(z, 8)
             end
-            return @E₁_cf64(z, 15, [0.0, 1.0])
+            return @E₁_cf64(z, 15)
         end
-        return @E₁_cf64(z, 30, [0.0, 1.0])
+        return @E₁_cf64(z, 30)
     else # use Taylor expansion, ≤ 37 terms
         r² = x² + y²
         return r² ≤ 0.36 ? (r² ≤ 2.8e-3 ? (r² ≤ 2e-7 ? @E₁_taylor64(z,4) :
