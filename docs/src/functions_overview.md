@@ -23,9 +23,10 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(binomial(n,k)))` for large `n` and `k` near `n/2`     |
 
 
-## [Trigonometric Integrals](https://dlmf.nist.gov/6)
+## [Exponential and Trigonometric Integrals](https://dlmf.nist.gov/6)
 | Function | Description |
 |:-------- |:----------- |
+| [`expint(nu, z)`](@ref SpecialFunctions.expint) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``E_\nu(z)`` |
 | [`sinint(x)`](@ref SpecialFunctions.sinint) | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``Si(x)`` |
 | [`cosint(x)`](@ref SpecialFunctions.cosint) | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``Ci(x)`` |
 

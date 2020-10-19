@@ -57,11 +57,13 @@ export
     zeta,
     sinint,
     cosint,
-    lbinomial
+    lbinomial,
+    expint
 
 include("bessel.jl")
 include("erf.jl")
 include("ellip.jl")
+include("expint.jl")
 include("sincosint.jl")
 include("gamma.jl")
 include("gamma_inc.jl")
