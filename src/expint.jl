@@ -372,7 +372,7 @@ const ORIGIN_EXPAND_THRESH = 3
     expint(ν, z)
 
 Computes the exponential integral ``E_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
-If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary ``\\nu`` and ``z`` are supported.
+If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
 External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
 """
