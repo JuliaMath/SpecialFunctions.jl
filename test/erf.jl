@@ -19,8 +19,8 @@
         @test logerfc(Float32(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
         @test logerfc(Float64(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
         @test logerfc(1000) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
-        @test logerfc(Float32(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float32)
-        @test logerfc(Float64(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float64)
+        @test logerfc(Float32(10000)) ≈ log(erfc(BigFloat(10000, precision=100))) rtol=2*eps(Float32)
+        @test logerfc(Float64(10000)) ≈ log(erfc(BigFloat(10000, precision=100))) rtol=2*eps(Float64)
 
         @test_throws MethodError logerfcx(Float16(1))
         @test_throws MethodError logerfcx(Float16(-1))
@@ -95,7 +95,7 @@
         @test erfcx(BigFloat(1.8e88))   ≈ erfcx(1.8e88)             rtol=4*eps()
         @test isnan(erfcx(BigFloat(NaN)))
 
-        @test logerfc(BigFloat(1000, 100)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
+        @test logerfc(BigFloat(1000, precision=100)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
         @test isnan(logerfc(BigFloat(NaN)))
 
         @test_throws MethodError erfi(big(1.0))
@@ -155,7 +155,7 @@
         @test isnan(logerf(0, NaN))
         @test isnan(logerf(NaN, NaN))
         @test logerf(-1e-30, 1e-30) ≈ -68.2636233716261799887769930733
-        @test logerf(1e-30, 2e-30) ≈ -68.9567705521861252981942251947   
+        @test logerf(1e-30, 2e-30) ≈ -68.9567705521861252981942251947
         @test logerf(-2e-30, -1e-30) ≈ -68.9567705521861252981942251947
         @test_throws DomainError logerf(2, 1)
     end
