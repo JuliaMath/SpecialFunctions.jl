@@ -114,7 +114,7 @@ const denom_10_20 = (1.0,
    0.2523432345539146248733539983749722854603)
 
 # adapted from Steven G Johnson's initial implementation: issue #19
-function expint(x::Float64)
+function expint_opt(x::Float64)
     x < 0 && throw(DomainError(x, "negative argument, convert to complex first"))
     x == 0 && return Inf
     if x > 2.15
@@ -132,10 +132,7 @@ function expint(x::Float64)
     end
 end
 
-function expint(z::Complex{Float64})
-    if real(z) < 0
-        return expint(1, z)
-    end
+function expint_opt(z::Complex{Float64})
     x² = real(z)^2
     y² = imag(z)^2
     if x² + 0.233*y² ≥ 7.84 # use cf expansion, ≤ 30 terms
@@ -157,6 +154,15 @@ function expint(z::Complex{Float64})
                           @E₁_taylor64(z,37)
     end
 end
+
+function expint(z::Complex{Float64})
+    if real(z) < 0
+        return expint(1, z)
+    else
+        return expint_opt(z)
+    end
+end
+expint(x::Float64) = expint_opt(x)
 
 expint(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = expint(float(z))
 expint(x::Number) = expint(1, x)
@@ -214,7 +220,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
 end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
-En_safe_gamma_term(ν::Number, z::Number) = exp((ν - 1)*log(z) + loggamma(1 - ν))
+En_safe_gamma_term(ν::Number, z::Number) = exp((ν - 1)*log(z) + loggamma(1 - oftype(z, ν)))
 
 # continued fraction for En(ν, z) that uses the gamma function:
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
@@ -380,22 +386,24 @@ function expint(ν::Number, z::Number, niter::Int=1000)
     if abs(ν) > 50 && !(isreal(ν) && real(ν) > 0)
         throw(ArgumentError("Unsupported order |ν| > 50 off the positive real axis"))
     end
-    ν, z = promote(ν, float(z))
-    if typeof(z) <: Real && z < 0
+
+    z, = promote(float(z), ν)
+    if isnan(ν) || isnan(z)
+        return oftype(z, NaN)
+    end
+
+    if z isa Real && (isinteger(ν) ? (z < 0 && ν > 0) : (z < 0 || ν < 0))
         throw(DomainError(z, "En will only return a complex result if called with a complex argument"))
     end
 
-    if z == 0.0
-        if real(ν) > 0
-            return 1 / (ν - 1)
-        else
-            return oftype(z, Inf)
-        end
+    if z == 0
+        return oftype(z, real(ν) > 0 ? 1/(ν-1) : Inf)
     end
+
     if ν == 0
         return exp(-z) / z
     elseif ν == 1 && real(z) > 0 && z isa Union{Float64, Complex{Float64}}
-        return E₁(z)
+        return expint_opt(z)
     end
     # asymptotic test for |z| → ∞
     # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/02/0003/
@@ -408,9 +416,8 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         return En_expand_origin(ν, z)
     end
 
-    if real(z) > 0 && real(ν) > 0
-        res, i = En_cf_nogamma(ν, z, niter)
-        return res
+    if z isa Real
+        return first(z > 0 ? En_cf(ν, z, niter) : En_cf_nogamma(ν, z, niter))
     else
         # Procedure for z near the negative real axis based on
         # (without looking at the accompanying source code):
@@ -424,7 +431,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         
         quick_niter, nmax = 50, 45
         # start with small imaginary part if exactly on negative real axis
-        imstart = (imz == 0) ? abs(z)*1e-8 : imz
+        imstart = (imz == 0) ? abs(z)*sqrt(eps(real(z))) : imz
         z₀ = rez + imstart*im
         E_start, i, _ = En_cf(ν, z₀, quick_niter)
         if imz > 0 && i < nmax
