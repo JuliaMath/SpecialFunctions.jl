@@ -389,7 +389,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
 
     z, = promote(float(z), ν)
     if isnan(ν) || isnan(z)
-        return oftype(z, NaN)
+        return oftype(z, NaN) * z
     end
 
     if z isa Real && (isinteger(ν) ? (z < 0 && ν > 0) : (z < 0 || ν < 0))
