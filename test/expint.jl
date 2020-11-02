@@ -63,6 +63,17 @@ using Base.MathConstants
         @test expint(100000, 10+10im) ⩭ -3.8087890502240534e-10 + 2.470010601657554e-10im
         @test expint(1000000, 10+10im) ⩭ -3.8093198659567175e-11 + 2.4698678867697097e-11im
 
+        @test expint(-2, 3.3) ≅ 0.0200031425174657791728529428002375552480803611197081245457722070
+        @test expint(-2, 3.3) isa Real
+        @test expint(-2, -3.3) ≅ -4.745485121488663825992363318400378114254141655964565963
+        @test expint(-2, -3.3) isa Real
+
+        @test isnan(expint(NaN))
+        @test isnan(expint(NaN+NaN*im))
+        @test isnan(expint(NaN, 1.0))
+        @test isnan(expint(NaN, NaN))
+        @test isnan(expint(NaN+NaN*im, NaN+NaN*im))
+
         # |ν| > 50 not currently supported
         @test_throws ArgumentError expint(-100, 5) ⩭ 2.3661006604908971561634280511260954613666084788690790e87
         @test_throws ArgumentError expint(-50+100im, 5+5im) ⩭ 0.00004495913300988524775299480665674170202100859018442234 - 0.00003791061255142431660134050245626121520797056806394134im
