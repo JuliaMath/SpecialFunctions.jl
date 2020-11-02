@@ -431,7 +431,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         
         quick_niter, nmax = 50, 45
         # start with small imaginary part if exactly on negative real axis
-        imstart = (imz == 0) ? abs(z)*sqrt(eps(real(z))) : imz
+        imstart = (imz == 0) ? abs(z)*sqrt(eps(typeof(real(z)))) : imz
         z₀ = rez + imstart*im
         E_start, i, _ = En_cf(ν, z₀, quick_niter)
         if imz > 0 && i < nmax
