@@ -3,7 +3,7 @@ using Base.MathConstants
 # barebones polynomial type supporting +, -, *
 struct SimplePoly{T}
     coeffs::Vector{T}
-end 
+end
 
 Base.:*(p::SimplePoly, c) = SimplePoly(p.coeffs * c)
 Base.:*(c, p::SimplePoly) = p * c
@@ -43,7 +43,7 @@ macro E₁_cf64(x, n::Integer)
     # consider using BigFloat?
     p, q = E₁_cfpoly_approx(n, Float64)
     xesc = esc(x)
-    
+
     num_expr =  :(@evalpoly $xesc)
     append!(num_expr.args, Float64.(p.coeffs))
     den_expr = :(@evalpoly $xesc)
@@ -74,54 +74,22 @@ macro E₁_taylor64(z, n::Integer)
     :( $taylor - log($zesc) )
 end
 
-# minimax rational approximations to E_1(x)/exp(-x)
-const num_2_4 = (3.600530862438501481559423277418128014798,
-   28.73031134165011013783185685393062481126,
-   46.04314409968065653003548224846863877481,
-   21.47189493062368074985000918414086604187,
-   2.719957622921613321844755385973197500235,
-   1.508750885580864752293599048121678438568e-6)
-const denom_2_4 = (1.0,
-   18.06743589038646654075831055159865459831,
-   61.19456872238615922515377354442679999566,
-   64.81772518730116701207299231777089576859,
-   24.19034591054828198408354214931112970741,
-   2.720026796991567940556850921390829046015)
-
-const num_4_10 = (3.149019890512432117647119992448352099575,
-   14.77395058090815888166486507990452627136,
-   14.78214309058953358717796744960600201013,
-   4.559401130686434886620102186841739864936,
-   0.4027858394909585103775445204576054721422,
-   2.302781920509468929446800686773538387432e-9)
-const denom_4_10 = (1.0,
-   11.65960373479520446458792926669115987821,
-   26.20023773503894444535165299118172674849,
-   18.93899893550582921168134979000319186841,
-   4.962178168140565906794561070524079194193,
-   0.4027860481050182948737116109665534358805)
-
-const num_10_20 = (2.564801308922428705318296668924369454617,
-   5.482252510134574167659359513298970499768,
-   2.379528224853089764405551768869103662657,
-   0.2523431276282591480166881146593592650031,
-   1.444719769329975045925053905197199934930e-9,
-   -8.977332061106791470409502623202677045468e-12)
-const denom_10_20 = (1.0,
-   6.421214405318108272004472721910023284626,
-   7.609584052290707052877352911548283916247,
-   2.631866613851763364839413823973711355890,
-   0.2523432345539146248733539983749722854603)
-
 # adapted from Steven G Johnson's initial implementation: issue #19
 function expint_opt(x::Float64)
     x < 0 && throw(DomainError(x, "negative argument, convert to complex first"))
     x == 0 && return Inf
     if x > 2.15
-        x < 4.0     && return exp(-x) * evalpoly(x, num_2_4) / evalpoly(x, denom_2_4)
-        x < 10.0    && return exp(-x) * evalpoly(x, num_4_10) / evalpoly(x, denom_4_10)
-        x < 20.0    && return exp(-x) * evalpoly(x, num_10_20) / evalpoly(x, denom_10_20)
-        x < 200.0 && return @E₁_cf64(x, 8)
+        # minimax rational approximations to E_1(x)/exp(-x):
+        x < 4.0     && return exp(-x) *
+            @evalpoly(x, 3.600530862438501481559423277418128014798, 28.73031134165011013783185685393062481126, 46.04314409968065653003548224846863877481, 21.47189493062368074985000918414086604187, 2.719957622921613321844755385973197500235, 1.508750885580864752293599048121678438568e-6) /
+            @evalpoly(x, 1.0, 18.06743589038646654075831055159865459831, 61.19456872238615922515377354442679999566, 64.81772518730116701207299231777089576859, 24.19034591054828198408354214931112970741, 2.720026796991567940556850921390829046015)
+        x < 10.0    && return exp(-x) *
+            @evalpoly(x, 3.149019890512432117647119992448352099575, 14.77395058090815888166486507990452627136, 14.78214309058953358717796744960600201013, 4.559401130686434886620102186841739864936, 0.4027858394909585103775445204576054721422, 2.302781920509468929446800686773538387432e-9) /
+            @evalpoly(x, 1.0, 11.65960373479520446458792926669115987821, 26.20023773503894444535165299118172674849, 18.93899893550582921168134979000319186841, 4.962178168140565906794561070524079194193, 0.4027860481050182948737116109665534358805)
+        x < 20.0    && return exp(-x) *
+            @evalpoly(x, 2.564801308922428705318296668924369454617, 5.482252510134574167659359513298970499768, 2.379528224853089764405551768869103662657, 0.2523431276282591480166881146593592650031, 1.444719769329975045925053905197199934930e-9, -8.977332061106791470409502623202677045468e-12) /
+            @evalpoly(x, 1.0, 6.421214405318108272004472721910023284626, 7.609584052290707052877352911548283916247, 2.631866613851763364839413823973711355890, 0.2523432345539146248733539983749722854603)
+        x < 200.0 && return @E₁_cf64(x, 8) # fallback continued fraction
         return x < 740.0 ? @E₁_cf64(x, 4) : 0.0 # underflow
     else
         # crossover point to taylor should be tuned more
@@ -178,7 +146,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
     Aprev::typeof(B) = 1
     ϵ = 10*eps(real(B))
     scale = sqrt(floatmax(real(A)))
-    
+
     # two recurrence steps / loop
     iters = 0
     for i = 2:n
@@ -190,18 +158,18 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
         B′ = B
         B = z*B + (i-1) * Bprev
         Bprev = B′
-        
+
         A′ = A
         A = A + (ν+i-1) * Aprev
         Aprev = A′
         B′ = B
         B = B + (ν+i-1) * Bprev
         Bprev = B′
-        
+
         conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
         conv && i > 4 && break
-        
-        # rescale 
+
+        # rescale
         if max(abs(real(A)), abs(imag(A))) > scale
             A     /= scale
             Aprev /= scale
@@ -209,7 +177,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
             Bprev /= scale
         end
     end
-    
+
     exppart = exp(-z)
     if abs(real(exppart)) == Inf && abs(imag(exppart)) == Inf
         return exp(-z + log(A) - log(B)), iters
@@ -232,7 +200,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     Aprev::typeof(A) = 1
     ϵ = 10*eps(real(B))
     scale = sqrt(floatmax(real(A)))
-    
+
     iters = 0
     j = 1
     for i = 2:n
@@ -245,7 +213,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
         B′ = B
         B = (i - ν)*B + term * Bprev
         Bprev = B′
-        
+
         conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
         conv && break
 
@@ -256,7 +224,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
             Bprev /= scale
         end
     end
-    
+
     gammapart = En_safe_gamma_term(ν, z)
     cfpart = exp(-z)
     if abs(real(cfpart)) == Inf || abs(imag(cfpart)) == Inf
@@ -268,7 +236,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     return gammapart, -cfpart, iters
 end
 
-# picks between continued fraction representations in 
+# picks between continued fraction representations in
 # En_cf_nogamma and En_cf_gamma
 # returns (evaluated result, # iterations used, whether En_cf_gamma was chosen)
 function En_cf(ν::Number, z::Number, niter::Int=1000)
@@ -290,17 +258,17 @@ function En_taylor(ν::Number, start::Number, z₀::Number, Δ::Number)
     asum = a
     Δ_prod_fact = -Δ
     ϵ = 10*eps(real(asum))
-    
+
     for k = 0:100
         a_pre = Δ_prod_fact + a*Δ*(ν - k - 1)/(k + 1)
         a = a_pre / z₀
         asum_prev = asum
         asum += a
-        
+
         if abs(asum_prev - asum) < ϵ
             break
         end
-        
+
         Δ_prod_fact *= -Δ / (k + 2)
     end
 
@@ -329,7 +297,7 @@ function En_expand_origin(ν::Number, z::Number)
         end
         k += 1
     end
-    
+
     return gammaterm - sumterm
 end
 
@@ -337,7 +305,7 @@ end
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
 function En_expand_origin(n::Integer, z::Number)
     gammaterm = 1 # (-z)^(n-1) / (n-1)!
-    for i = 1:n-1 
+    for i = 1:n-1
         gammaterm *= -z / i
     end
 
@@ -428,7 +396,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         rez, imz = real(z), abs(imag(z))
         z = doconj ? conj(z) : z
         ν = doconj ? conj(ν) : ν
-        
+
         quick_niter, nmax = 50, 45
         # start with small imaginary part if exactly on negative real axis
         imstart = (imz == 0) ? abs(z)*sqrt(eps(typeof(real(z)))) : imz
@@ -444,7 +412,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
             z₀ = rez + imstart*im
             E_start, i, _ = En_cf(ν, z₀, quick_niter)
         end
-        
+
         # nsteps chosen so |Δ| ≤ 0.5
         nsteps = ceil(2 * (imstart - imz))
         Δ = (imz - imstart)*im / nsteps
@@ -454,12 +422,12 @@ function expint(ν::Number, z::Number, niter::Int=1000)
             E_start = En_taylor(ν, E_start, z₀, Δ)
             z₀ += Δ
         end
-        
+
         # more exact imaginary part available for non-integer ν
         if imz == 0
             E_start = real(E_start) + En_imagbranchcut(ν, z)
         end
-        
+
         return doconj ? conj(E_start) : E_start
     end
     throw("unreachable")
