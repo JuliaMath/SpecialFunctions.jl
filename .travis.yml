@@ -3,6 +3,7 @@ os:
   - freebsd
 julia:
   - 1.3
+  - 1
   - nightly
 notifications:
   email: false
