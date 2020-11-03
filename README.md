@@ -6,6 +6,7 @@ Most of these functions were formerly part of Base in early versions of Julia.
 
 CI (Linux, macOS, FreeBSD, Windows):
 [![Travis](https://travis-ci.org/JuliaMath/SpecialFunctions.jl.svg?branch=master)](https://travis-ci.org/JuliaMath/SpecialFunctions.jl)
+![CI](https://github.com/JuliaMath/SpecialFunctions.jl/workflows/CI/badge.svg)
 [![Coveralls](https://coveralls.io/repos/github/JuliaMath/SpecialFunctions.jl/badge.svg?branch=master)](https://coveralls.io/github/JuliaMath/SpecialFunctions.jl?branch=master)
 
 Documentation:
