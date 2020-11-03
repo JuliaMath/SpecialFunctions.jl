@@ -55,10 +55,11 @@ export
     hankelh2,
     hankelh2x,
     zeta,
+    expint,
+    expinti,
     sinint,
     cosint,
-    lbinomial,
-    expint
+    lbinomial
 
 include("bessel.jl")
 include("erf.jl")
