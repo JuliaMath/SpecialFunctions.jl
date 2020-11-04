@@ -102,13 +102,15 @@ end
         @test expinti(x) ≈ -real(expint(complex(-x)))  rtol=5e-12
         @test expinti(-x) == -expint(x)
     end
-    @test expinti(0) === -Inf
-    root = 0.37250741078136663446
 
+    @test expinti(0) === -Inf
+    @test expinti(800) === expinti(Inf) === Inf
+    @test expinti(NaN) === NaN
     @test expinti(3) == expinti(3.0)
     @test expinti(3.0f0) == Float32(expinti(3.0))
 
     # check points near the real root
+    root = 0.37250741078136663446
     @test abs(expinti(root)) < 1e-15
     Δx = exp.(range(log(1e-6), log(0.2), length=20))
     sympy_root = [3.89621245215038e-6, 7.40702617097888e-6, 1.40813674435599e-5, 2.67698056843265e-5, 5.08914157754375e-5, 9.67479578259126e-5, 0.000183922644011209, 0.000349640090408084, 0.000664650344488254, 0.00126339345150350, 0.00240122828337440, 0.00456280970793513, 0.00866661707677154, 0.0164484140957318, 0.0311713546178166, 0.0589110794497449, 0.110785930897301, 0.206557627755203, 0.379870926936718, 0.685589861886268]
