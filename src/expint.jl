@@ -432,3 +432,67 @@ function expint(ν::Number, z::Number, niter::Int=1000)
     end
     throw("unreachable")
 end
+
+##############################################################################
+# expinti function Ei
+
+"""
+    expinti(x::Real)
+
+Computes the exponential integral function ``\\operatorname{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt``,
+which is equivalent to ``-\\Re[E_1(-x)]`` where ``E_1`` is the `expint` function.
+"""
+expinti(x::Real) = x ≤ 0 ? -expint(-x) : -real(expint(complex(-x)))
+
+# inline the Taylor expansion of Ei for a given order n, in double precision
+macro Ei_taylor64(z, n::Integer)
+    c = .- E₁_taylor_coefficients(Float64, n) .* (-1).^(0:n)
+    zesc = esc(z)
+    taylor = :(@evalpoly $zesc)
+    append!(taylor.args, c)
+    :( $taylor + log($zesc) )
+end
+
+# optimized double-precision version
+function expinti(x::Float64)
+    x ≤ 0 && return -expint(-x)
+
+    if x > 2.15
+        # minimax rational approximants:
+        x < 4 && return @evalpoly(x,-2.43791466332154621,3.09402100064798205,9.35202477109609955,0.152659977028953397,0.0157273683896079142,0.0345566671015011426,-0.000421531433157416203) /
+                        @evalpoly(x,1.0,4.28055563991564399,0.537599625698465573,-0.511064414527643313,0.0867748262262250088,-0.00623913330836521800,0.000172066498182538260)
+        x < 10 && return exp(x) *
+            @evalpoly(x,-1.58447018083420958,4.71806833998906997,-0.587691572500210206,0.125012472861504555,-0.00178055441724967428,0.000633648975971195928,0.0000147213934578379204,2.12391754244415544e-6) /
+            @evalpoly(x,1.0,1.93297600031287800,0.660790440069106542,0.198322636197663277,0.0272447293513279631,0.00399501571688512611,0.000362510989191199243,0.0000182930089855534336,2.06800780072894204e-6)
+        x < 20 && return exp(x) *
+            @evalpoly(x,-1.77183291754640123,0.795659966861260409,-0.221223333413388642,0.0328877243243796815,-0.00331846947191676458,0.000180945604349930285,-5.97641401680304362e-6,2.42151808626299747e-11) /
+            @evalpoly(x,1.0,-2.10926998628216150,0.933357955421497965,-0.245433884954174394,0.0356954809772243699,-0.00348034743685382360,0.000186615220328647350,-5.97232581353392099e-6)
+
+        x > 710 && return Inf # overflow
+        x⁻¹ = inv(x)
+
+        # minimax rational approximant in x⁻¹ for x ∈ [20,200]
+        x < 200 && return exp(x) *
+            @evalpoly(x⁻¹, -5.29842699621003563e-14, +1.00000000004732488, -60.4361334939888359, +1327.83891720487710, -6810.63668974273961, -177755.383525765400,+3.00773484037048848e6, -1.53642380695372707e7, +2.08174653368702692e7) /
+            @evalpoly(x⁻¹, 1.0, -61.4361334756161381, +1387.27504658395142, -8081.03888544858393, -172104.333927401741, +3.18903576285551101e6, -1.81873890267574206e7, +3.37312131843327704e7, -1.22198734384213631e7)
+
+        # asymptotic series eˣ/x ∑k!/xᵏ for x ≥ 200:
+        return exp(x)*x⁻¹ * @evalpoly(x⁻¹, 1,1,2,6,24,120,720,5040)
+    end
+
+    root = 0.37250741078136663446 # OEIS A091723
+    dx = x - root
+    if abs(dx) < 0.03
+        # taylor series around real root of Ei
+        return dx * @evalpoly(dx, 3.896215733907167310, -3.281607866398561671, 6.52237614543892570, -12.96969738353651704, 27.88629796294204998, -62.3788015289154187, 143.5349488096750988, -337.155827178746892, 804.531839982138251, -1943.79664572349884, 4743.76565040243084, -11673.46399116716364, 28926.9553054354509)
+    else
+        # TODO: crossover points and degrees could be tuned more
+        return x ≤ 0.6 ? (x ≤ 0.053 ? (x ≤ 4.4e-3 ? @Ei_taylor64(x,4) :
+                                                    @Ei_taylor64(x,8)) :
+                                       @Ei_taylor64(x,15)) :
+                          @Ei_taylor64(x,37)
+    end
+end
+
+expinti(z::Union{T,Rational{T}}) where {T<:Integer} = expinti(float(z))
+expinti(z::Float32) = Float32(expinti(Float64(z)))

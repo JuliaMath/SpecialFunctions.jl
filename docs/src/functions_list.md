@@ -14,6 +14,8 @@ SpecialFunctions.erfi
 SpecialFunctions.dawson
 SpecialFunctions.erfinv
 SpecialFunctions.erfcinv
+SpecialFunctions.expint
+SpecialFunctions.expinti
 SpecialFunctions.sinint
 SpecialFunctions.cosint
 SpecialFunctions.digamma
@@ -63,5 +65,4 @@ SpecialFunctions.beta
 SpecialFunctions.logbeta
 SpecialFunctions.logabsbeta
 SpecialFunctions.logabsbinomial
-SpecialFunctions.expint
 ```
