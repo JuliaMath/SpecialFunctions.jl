@@ -117,7 +117,7 @@ end
     for (Δx,e) in zip(Δx, sympy_root)
         # error tolerance gets worse as we approach the root
         # because of cancellation errors in computing (root+Δx)-root
-        @test expinti(root + Δx) ≈ e    rtol=1e-16/Δx
+        @test expinti(root + Δx) ≈ e    rtol=max(1e-14, 1e-16/Δx)
     end
 
 end
