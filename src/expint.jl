@@ -132,10 +132,18 @@ function expint(z::Complex{Float64})
 end
 expint(x::Float64) = expint_opt(x)
 
+function expint(x::BigFloat)
+    iszero(x) && return Inf
+    signbit(x) && throw(DomainError(x, "negative argument, convert to complex first"))
+    return -expinti(-x)
+end
+
 expint(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = expint(float(z))
 expint(x::Number) = expint(1, x)
 expint(z::Float32) = Float32(expint(Float64(z)))
 expint(z::ComplexF32) = ComplexF32(expint(ComplexF64(z)))
+expint(z::Float16) = Float16(expint(Float64(z)))
+expint(z::ComplexF16) = ComplexF16(expint(ComplexF64(z)))
 
 # Continued fraction for En(ν, z) that doesn't use a term with
 # the gamma function: https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0001/
@@ -496,3 +504,10 @@ end
 
 expinti(z::Union{T,Rational{T}}) where {T<:Integer} = expinti(float(z))
 expinti(z::Float32) = Float32(expinti(Float64(z)))
+expinti(z::Float16) = Float16(expinti(Float64(z)))
+
+function expinti(x::BigFloat)
+    z = BigFloat()
+    ccall((:mpfr_eint, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Base.MPFR.MPFRRoundingMode), z, x, Base.MPFR.ROUNDING_MODE[])
+    return z
+end
