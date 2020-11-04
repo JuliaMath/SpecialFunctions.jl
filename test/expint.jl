@@ -36,6 +36,11 @@ using Base.MathConstants
         end
     end
 
+    @test expint(3.0f0) == Float32(expint(3.0))
+    @test expint(Float16(3.0)) == Float16(expint(3.0))
+    @test expint(3.0f0+4.0f0im) == ComplexF32(expint(3.0+4.0im))
+    @test expint(ComplexF16(3+4im)) == ComplexF16(expint(3.0+4.0im))
+
     @testset "En" begin
         # ≅ but worse
         ⩭(x, y) = relerrc(x, y) ≤ 5e-12
