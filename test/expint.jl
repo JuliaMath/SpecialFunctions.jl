@@ -15,8 +15,10 @@ using Base.MathConstants
         @test_throws DomainError expint(-1)
 
         inputs = exp.(-20:0.1:10)
-        for x in inputs
-            @test expint(x) ≅ Float64(expint(big(x)))
+        setprecision(BigFloat, 256) do
+            for x in inputs
+                @test expint(x) ≅ Float64(expint(big(x)))
+            end
         end
     end
 
