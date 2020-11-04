@@ -439,7 +439,7 @@ end
 """
     expinti(x::Real)
 
-Computes the exponential integral function ``\\mathrm{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt``,
+Computes the exponential integral function ``\\operatorname{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt``,
 which is equivalent to ``-\\Re[E_1(-x)]`` where ``E_1`` is the `expint` function.
 """
 expinti(x::Real) = x ≤ 0 ? -expint(-x) : -real(expint(complex(-x)))
