@@ -818,7 +818,7 @@ end
 # doi>10.1145/22721.23109
 
 """
-    gamma_inc(a,x,IND)
+    gamma_inc(a,x,IND=0)
 
 Returns a tuple ``(p, q)`` where ``p + q = 1``, and
 ``p=P(a,x)`` is the Incomplete gamma function ratio given by:
@@ -829,6 +829,9 @@ and ``q=Q(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
 Q(x,a)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
 ```
+In terms of these, the lower incomplete gamma function is
+``\\gamma(a,x) = P(a,x) \\Gamma(a)`` and the upper incomplete
+gamma function is ``\\Gamma(a,x) = Q(a,x) \\Gamma(a)``.
 
 `IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
 
@@ -836,7 +839,7 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
-function gamma_inc(a::Float64,x::Float64,ind::Integer)
+function gamma_inc(a::Float64,x::Float64,ind::Integer=0)
     iop = ind + 1
     acc = acc0[iop]
     if a<0.0 || x<0.0
@@ -933,17 +936,16 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
 
 end
 
-function gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
+function gamma_inc(a::BigFloat,x::BigFloat,ind::Integer=0) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
     q = z/gamma(a)
     return (1.0 - q, q)
 end
-gamma_inc(a::Float32,x::Float32,ind::Integer) = ( Float32(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float32(gamma_inc(Float64(a),Float64(x),ind)[2]) )
-gamma_inc(a::Float16,x::Float16,ind::Integer) = ( Float16(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float16(gamma_inc(Float64(a),Float64(x),ind)[2]) )
-gamma_inc(a::Real,x::Real,ind::Integer) = (gamma_inc(float(a),float(x),ind))
-gamma_inc(a::Integer,x::Integer,ind::Integer) = gamma_inc(Float64(a),Float64(x),ind)
-gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError(gamma_inc,(a,x,ind,"")))
+gamma_inc(a::Float32,x::Float32,ind::Integer=0) = ( Float32(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float32(gamma_inc(Float64(a),Float64(x),ind)[2]) )
+gamma_inc(a::Float16,x::Float16,ind::Integer=0) = ( Float16(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float16(gamma_inc(Float64(a),Float64(x),ind)[2]) )
+gamma_inc(a::Real,x::Real,ind::Integer=0) = (gamma_inc(float(a),float(x),ind))
+gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer=0) = throw(MethodError(gamma_inc,(a,x,ind,"")))
 
 #EFFICIENT AND ACCURATE ALGORITHMS FOR THECOMPUTATION AND INVERSION OF THE INCOMPLETEGAMMA FUNCTION RATIOS by Amparo Gil, Javier Segura, Nico M. Temme
 #SIAM Journal on Scientific Computing 34(6) (2012), A2965-A2981
@@ -1030,6 +1032,5 @@ end
 
 gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
 gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
-gamma_inc_inv(a::Real, p::Real, q::Real) = ( gamma_inc_inv(float(a), float(p), float(q)) )
-gamma_inc_inv(a::Integer, p::Integer, q::Integer) = ( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
+gamma_inc_inv(a::Real, p::Real, q::Real) = gamma_inc_inv(float(a), float(p), float(q))
 gamma_inc_inv(a::AbstractFloat, p::AbstractFloat, q::AbstractFloat) = throw(MethodError(gamma_inc_inv,(a,p,q,"")))
