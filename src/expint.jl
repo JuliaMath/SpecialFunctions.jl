@@ -355,7 +355,7 @@ end
     expint(z)
     expint(ν, z)
 
-Computes the exponential integral ``E_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+Computes the exponential integral ``\\operatorname{E}_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
 If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
 External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
@@ -451,7 +451,7 @@ end
     expinti(x::Real)
 
 Computes the exponential integral function ``\\operatorname{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt``,
-which is equivalent to ``-\\Re[E_1(-x)]`` where ``E_1`` is the `expint` function.
+which is equivalent to ``-\\Re[\\operatorname{E}_1(-x)]`` where ``\\operatorname{E}_1`` is the `expint` function.
 """
 expinti(x::Real) = x ≤ 0 ? -expint(-x) : -real(expint(complex(-x)))
 
