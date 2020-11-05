@@ -839,6 +839,8 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
+gamma_inc(a::Real,x::Real,ind::Integer=0) = (gamma_inc(float(a),float(x),ind))
+
 function gamma_inc(a::Float64,x::Float64,ind::Integer=0)
     iop = ind + 1
     acc = acc0[iop]
@@ -944,7 +946,6 @@ function gamma_inc(a::BigFloat,x::BigFloat,ind::Integer=0) #BigFloat version fro
 end
 gamma_inc(a::Float32,x::Float32,ind::Integer=0) = ( Float32(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float32(gamma_inc(Float64(a),Float64(x),ind)[2]) )
 gamma_inc(a::Float16,x::Float16,ind::Integer=0) = ( Float16(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float16(gamma_inc(Float64(a),Float64(x),ind)[2]) )
-gamma_inc(a::Real,x::Real,ind::Integer=0) = (gamma_inc(float(a),float(x),ind))
 gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer=0) = throw(MethodError(gamma_inc,(a,x,ind,"")))
 
 #EFFICIENT AND ACCURATE ALGORITHMS FOR THECOMPUTATION AND INVERSION OF THE INCOMPLETEGAMMA FUNCTION RATIOS by Amparo Gil, Javier Segura, Nico M. Temme
@@ -1034,3 +1035,28 @@ gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32( gamma_inc_inv(Float
 gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
 gamma_inc_inv(a::Real, p::Real, q::Real) = gamma_inc_inv(float(a), float(p), float(q))
 gamma_inc_inv(a::AbstractFloat, p::AbstractFloat, q::AbstractFloat) = throw(MethodError(gamma_inc_inv,(a,p,q,"")))
+
+"""
+    gamma(a,x)
+
+Returns the upper incomplete gamma function
+```math
+\\Gamma(a,x) = \\int_x^\\infty t^{a-1} e^{-t} dt \\, ,
+```
+supporting arbitrary real or complex `a` and `x`.
+
+(The ordinary gamma function [`gamma(x)`](@ref) corresponds to ``\\Gamma(a) = \\Gamma(a,0)``.
+See also the [`gamma_inc`](@ref) function to compute both the upper and lower
+(``\\gamma(a,x)``) incomplete gamma functions scaled by ``\\Gamma(a)``.
+
+External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+"""
+gamma(a::Number,x::Number) = iszero(x) ? gamma(a) : x^a * expint(1-a, x)
+
+gamma(a::BigFloat,x::Real) = gamma(a,BigFloat(x))
+gamma(a::Real,x::BigFloat) = gamma(BigFloat(a),x)
+function gamma(a::BigFloat,x::BigFloat)
+    z = BigFloat()
+    ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
+    return z
+end
