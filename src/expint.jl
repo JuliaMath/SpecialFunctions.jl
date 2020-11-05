@@ -187,7 +187,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
     end
 
     exppart = exp(-z)
-    if abs(real(exppart)) == Inf && abs(imag(exppart)) == Inf
+    if isinf(exppart)
         return exp(-z + log(A) - log(B)), iters
     else
         cfpart = A/B
@@ -235,7 +235,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
 
     gammapart = En_safe_gamma_term(ν, z)
     cfpart = exp(-z)
-    if abs(real(cfpart)) == Inf || abs(imag(cfpart)) == Inf
+    if isinf(cfpart)
         factor = sign(real(cfpart)) + sign(imag(cfpart))*im
         cfpart = exp(-z + log(B) - log(A))
     else
@@ -351,12 +351,11 @@ function En_imagbranchcut(ν::Number, z::Number)
     return imag(impart) * im # get rid of any real error
 end
 
-const ORIGIN_EXPAND_THRESH = 3
 """
     expint(z)
     expint(ν, z)
 
-Computes the exponential integral ``E_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+Computes the exponential integral ``\\operatorname{E}_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
 If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
 External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
@@ -384,13 +383,13 @@ function expint(ν::Number, z::Number, niter::Int=1000)
     elseif ν == 1 && real(z) > 0 && z isa Union{Float64, Complex{Float64}}
         return expint_opt(z)
     end
-    # asymptotic test for |z| → ∞
+    # asymptotic test for underflow when Re z → ∞
     # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/02/0003/
-    if exp(-z) / z == 0
+    if real(z) > -log(nextfloat(zero(real(z))))+1 # exp(-z) is zero
         return zero(z)
     end
 
-    if abs(z) < ORIGIN_EXPAND_THRESH
+    if abs2(z) < 9
         # use Taylor series about the origin for small z
         return En_expand_origin(ν, z)
     end
@@ -413,6 +412,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         imstart = (imz == 0) ? abs(z)*sqrt(eps(typeof(real(z)))) : imz
         z₀ = rez + imstart*im
         E_start, i, _ = En_cf(ν, z₀, quick_niter)
+        isnan(E_start) && return E_start
         if imz > 0 && i < nmax
             # didn't need to take any steps
             return doconj ? conj(E_start) : E_start
@@ -451,7 +451,7 @@ end
     expinti(x::Real)
 
 Computes the exponential integral function ``\\operatorname{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt``,
-which is equivalent to ``-\\Re[E_1(-x)]`` where ``E_1`` is the `expint` function.
+which is equivalent to ``-\\Re[\\operatorname{E}_1(-x)]`` where ``\\operatorname{E}_1`` is the `expint` function.
 """
 expinti(x::Real) = x ≤ 0 ? -expint(-x) : -real(expint(complex(-x)))
 

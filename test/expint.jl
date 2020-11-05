@@ -3,6 +3,7 @@ using Base.MathConstants
 @testset "exponential integral" begin
     @testset "E1 real" begin
         @test expint(0) == Inf
+        @test expint(Inf) == 0
         @test expint(1) ≅ 0.219383934395520273677163775460121649031047293406908207577
         @test expint(2) ≅ 0.048900510708061119567239835228049522314492184963023116327
         @test expint(4) ≅ 0.0037793524098489064788748601324664148517165470424895803607340203
@@ -80,6 +81,10 @@ using Base.MathConstants
         @test isnan(expint(NaN, 1.0))
         @test isnan(expint(NaN, NaN))
         @test isnan(expint(NaN+NaN*im, NaN+NaN*im))
+        @test expint(4, Inf) == expint(4, Inf + 3im) == expint(-4, Inf) == expint(4+1im, Inf) == expint(4+1im, Inf + Inf*im) == 0
+        @test isnan(expint(-Inf+0im))
+        @test isnan(expint(4, -Inf+3im))
+        @test isnan(expint(4, -Inf+Inf*im))
 
         # |ν| > 50 not currently supported
         @test_throws ArgumentError expint(-100, 5) ⩭ 2.3661006604908971561634280511260954613666084788690790e87
