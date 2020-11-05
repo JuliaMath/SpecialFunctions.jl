@@ -98,6 +98,18 @@ using Base.MathConstants
             abs(ν) ≤ 50 ? (@test expint(ν, z) ⩭ E) : (@test_throws ArgumentError expint(ν, z) ⩭ E)
         end
     end
+
+    # issue #259: positive vs. negative integer order for small/larger args
+    @test expint(-4, 0.7) ≈ 142.685471227614252544 rtol=1e-14
+    @test expint(+4, 0.7) ≈ 0.1267808300929215658  rtol=1e-14
+    @test expint(-4, 5.7) ≈ 0.0013051784816041558 rtol=1e-14
+    @test expint(+4, 5.7) ≈ 0.0003585161998373381 rtol=1e-13
+    setprecision(BigFloat, 256) do
+        @test expint(-4, big"0.7") ≈ big"142.68547122761425254403329916322251663998829971602071820534499366398779205282" rtol=1e-76
+        @test expint(+4, big"0.7") ≈ big"0.12678083009292156580635697928870772316601035828975150623334903100558297079388567" rtol=1e-76
+        @test expint(-4, big"5.7") ≈ big"0.0013051784816041557674219259305064008704427556690521012788554962045721241678128274" rtol=1e-76
+        @test expint(+4, big"5.7") ≈ big"0.00035851619983733810063957822090566023258844652925986297947736355731994111784745604432" rtol=1e-74
+    end
 end
 
 expinti_real(x) = invoke(expinti, Tuple{Real}, x)

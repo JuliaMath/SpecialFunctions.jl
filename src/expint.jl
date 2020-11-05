@@ -286,13 +286,9 @@ end
 
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
-function En_expand_origin(ν::Number, z::Number)
-    if isinteger(ν)
-        # go to special case for integer ν
-        return En_expand_origin(Int(ν), z)
-    end
+function En_expand_origin_general(ν::Number, z::Number)
     gammaterm = En_safe_gamma_term(ν, z)
-    frac = 1
+    frac = one(real(z))
     sumterm = frac / (1 - ν)
     k, maxiter = 1, 100
     ϵ = 10*eps(real(sumterm))
@@ -305,21 +301,20 @@ function En_expand_origin(ν::Number, z::Number)
         end
         k += 1
     end
-
     return gammaterm - sumterm
 end
 
-# series about the origin, special case for integer n
+# series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
-function En_expand_origin(n::Integer, z::Number)
+function En_expand_origin_posint(n::Integer, z::Number)
     gammaterm = 1 # (-z)^(n-1) / (n-1)!
     for i = 1:n-1
         gammaterm *= -z / i
     end
 
-    gammaterm *= digamma(n) - log(z)
-    sumterm = float(n == 1 ? 0 : 1 / (1 - n))
-    frac = 1
+    frac = one(real(z))
+    gammaterm *= digamma(oftype(frac,n)) - log(z)
+    sumterm = n == 1 ? zero(frac) : frac / (1 - n)
     k, maxiter = 1, 100
     ϵ = 10*eps(real(sumterm))
     while k < maxiter
@@ -335,6 +330,14 @@ function En_expand_origin(n::Integer, z::Number)
         k += 1
     end
     return gammaterm - sumterm
+end
+
+function En_expand_origin(ν::Number, z::Number)
+    if isinteger(ν) && real(ν) > 0
+        return En_expand_origin_posint(Integer(ν), z)
+    else
+        return En_expand_origin_general(ν, z)
+    end
 end
 
 # can find imaginary part of E_ν(x) for x on negative real axis analytically
