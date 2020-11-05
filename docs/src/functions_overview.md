@@ -26,10 +26,10 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 ## [Exponential and Trigonometric Integrals](https://dlmf.nist.gov/6)
 | Function | Description |
 |:-------- |:----------- |
-| [`expint(ν, z)`](@ref SpecialFunctions.expint) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``E_\nu(z)`` |
+| [`expint(ν, z)`](@ref SpecialFunctions.expint) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{E}_\nu(z)`` |
 | [`expinti(x)`](@ref SpecialFunctions.expinti) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{Ei}(z)`` |
-| [`sinint(x)`](@ref SpecialFunctions.sinint) | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``Si(x)`` |
-| [`cosint(x)`](@ref SpecialFunctions.cosint) | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``Ci(x)`` |
+| [`sinint(x)`](@ref SpecialFunctions.sinint) | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``\operatorname{Si}(x)`` |
+| [`cosint(x)`](@ref SpecialFunctions.cosint) | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``\operatorname{Ci}(x)`` |
 
 
 ## [Error Functions, Dawson’s and Fresnel Integrals](https://dlmf.nist.gov/7)
