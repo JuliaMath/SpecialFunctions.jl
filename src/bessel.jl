@@ -759,17 +759,6 @@ See also: [`hankelh2(nu,x)`](@ref SpecialFunctions.hankelh2)
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
 
-    
- # In future just use `fastabs` from Base.Math
- # https://github.com/JuliaLang/julia/blob/93fb785831dcfcc442f82fab8746f0244c5274ae/base/special/trig.jl#L1057
-function fastabs(x)
-    @static if isdefined(Base.Math, :fastabs)
-        return Base.Math.fastabs(x)
-    else
-       return abs(real(x)) + abs(imag(x))  
-    end
-end
-
 """
     jinc(x)
 
@@ -779,15 +768,21 @@ Sometimes known as sombrero or besinc function.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Sombrero_function)
 """
-jinc(x::Number) = iszero(x) ? oftype(x, 1) : _jinc(float(x))
-_jinc(x::Number) = _jinc_core(x)
+jinc(x::Number) = _jinc(float(x))
+_jinc(x::Number) = iszero(x) ? one(x) : _jinc_core(x)
+_jinc(x::Float16) = Float16(_jinc(Float32(x)))
+_jinc(x::ComplexF16) = ComplexF16(_jinc(ComplexF32(x)))
 
 # below these thresholds we evaluate a fourth order Taylor polynomial
-_jinc_threshold(::Type{Float64}) = 0.001
-_jinc_threshold(::Type{Float32}) = 0.01f0
+_jinc_threshold(::Type{Float64}) = 0.002
+_jinc_threshold(::Type{Float32}) = 0.05f0
+
 
  # for small arguments, a Taylor series is faster
 @inline function _jinc(x::Union{T,Complex{T}}) where {T<:Union{Float32,Float64}}
+    if iszero(x)
+        return one(x)
+    end
     if fastabs(x) < _jinc_threshold(T)
         return @evalpoly(x^2, T(1), -T(π)^2/8, T(π)^4/192)
     else
