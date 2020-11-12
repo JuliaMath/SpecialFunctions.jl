@@ -281,11 +281,26 @@ end
             @test jinc(T(x)) + T(1) ≈ T(1)
             @test jinc(T(-x)) + T(1) ≈ T(1)
 
+
+            # check for symmetry
+            for x = -5.0:1.0:3.0
+                @test jinc(T(10^x)) ≈ jinc(T(- 10^x))
+
+            end
+
+
             x = T(1e-5)
-            @test jinc(x) ≈ jinc(-x)
+            res = T(0.999999999876629944991456407422485505370463)
+            @test jinc(x) ≈ res
+
+            x = T(2e-2)
+            res = T(0.9995066009475120760121935544369072906921634576)
+            @test jinc(x) ≈ res
+
             # type stability for 0
             @test typeof(jinc(T(0))) == T
         end
+
         # check also some complex numbers
         for T in [Complex{Float32},Complex{Float64}]
             x = T(1.0 + 1e-4im)
@@ -295,6 +310,15 @@ end
             x = T(0.00001 + 10im)
             res = T(1.9711055391966202105429045e11 - 5.8991758919624680543883276981419682858011e6im)
             @test jinc(x) ≈ res
+
+            x = T(2e-2im)
+            res = T(1.0004935614009736395843006872722377134486845776)
+            @test jinc(x) ≈ res
+
+            x = T(2e-5im)
+            res = T(1.00000000049348022013564217347673622820211024436)
+            @test jinc(x) ≈ res
+
         end
     end
 end
