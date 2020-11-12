@@ -271,4 +271,30 @@ end
             @test f(0,1) ≈ f(0,Complex{Float16}(1))
         end
     end
+
+    @testset "jinc function" begin
+        for T in [Float16, Float32, Float64, Complex{Float16}, Complex{Float32},Complex{Float64}]
+            @test jinc(T(1.8)) ≈ T(-0.116401402395234261196060221416100814277048989838340270527643894)
+            @test jinc(T(0)) ≈ T(1)
+            x = 1.21966989126650445492653884746525517788
+            # check the first root for negative and positive
+            @test jinc(T(x)) + T(1) ≈ T(1)
+            @test jinc(T(-x)) + T(1) ≈ T(1)
+
+            x = T(1e-5)
+            @test jinc(x) ≈ jinc(-x)
+            # type stability for 0
+            @test typeof(jinc(T(0))) == T
+        end
+        # check also some complex numbers
+        for T in [Complex{Float32},Complex{Float64}]
+            x = T(1.0 + 1e-4im)
+            res = T(0.1811917493658519438199345187518953 - 0.00009708678707572518990476095729998795756624im)
+            @test jinc(x) ≈ res
+
+            x = T(0.00001 + 10im)
+            res = T(1.9711055391966202105429045e11 - 5.8991758919624680543883276981419682858011e6im)
+            @test jinc(x) ≈ res
+        end
+    end
 end
