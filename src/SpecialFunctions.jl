@@ -27,6 +27,7 @@ export
     bessely0,
     bessely1,
     besselyx,
+    jinc,
     dawson,
     ellipk,
     ellipe,
