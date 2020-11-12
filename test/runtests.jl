@@ -8,7 +8,7 @@ using SpecialFunctions: AmosException, f64
 
 # useful test functions for relative error, which differ from isapprox
 # in that relerrc separately looks at the real and imaginary parts
-relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
+relerr(z, x) = z == x ? zero(z) : abs(z - x) / abs(x)
 relerr(z::T, x::T) where {T <: Complex} = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
 checktol(err::Float16) = err ≤ 5e-2
 checktol(err::Float32) = err ≤ 1e-6
