@@ -759,12 +759,9 @@ See also: [`hankelh2(nu,x)`](@ref SpecialFunctions.hankelh2)
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
 
-"""
-    fastabs(x)
     
-In future just use `fastabs` from Base.Math
-https://github.com/JuliaLang/julia/blob/93fb785831dcfcc442f82fab8746f0244c5274ae/base/special/trig.jl#L1057
-"""
+ # In future just use `fastabs` from Base.Math
+ # https://github.com/JuliaLang/julia/blob/93fb785831dcfcc442f82fab8746f0244c5274ae/base/special/trig.jl#L1057
 function fastabs(x)
     @static if isdefined(Base.Math, :fastabs)
         return Base.Math.fastabs(x)
@@ -777,7 +774,7 @@ end
     jinc(x)
 
 Bessel function of the first kind divided by `x`.
-Same convention as sinc: ``\\operatorname{jinc}{x} = \\frac{2 \\cdot J_1{\\pi x}}{\\pi x}``.
+Following convention: ``\\operatorname{jinc}{x} = \\frac{2 \\cdot J_1{\\pi x}}{\\pi x}``.
 Sometimes known as sombrero or besinc function.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Sombrero_function)
@@ -797,5 +794,5 @@ _jinc_threshold(::Type{Float32}) = 0.01f0
         return _jinc_core(x)
     end
 end
-
+ # the actual definition of jinc
 _jinc_core(x::Number) =  2 * besselj1(π*x) / (π*x)
