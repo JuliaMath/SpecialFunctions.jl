@@ -84,3 +84,15 @@ end
     @test beta(missing, missing) === missing
     @test polygamma(4, missing) === missing
 end
+
+@testset "Test fastabs" begin
+    numbers = [1, 2, 0, 1e3]
+    for n in numbers
+        @test abs(n) == SpecialFunctions.fastabs(n)
+    end
+            
+    numbers = [1im, 2 + 2im, 0 + 100im, 1e3 + 1e-10im]
+    for n in numbers
+        @test abs(real(n)) + abs(imag(n)) == SpecialFunctions.fastabs(n)
+    end
+end
