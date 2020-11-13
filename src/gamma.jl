@@ -474,7 +474,7 @@ Dirichlet eta function ``\\eta(s) = \\sum^\\infty_{n=1}(-1)^{n-1}/n^{s}``.
 """
 function eta(z::ComplexOrReal{Float64})
     δz = 1 - z
-    if abs(real(δz)) + abs(imag(δz)) < 7e-3 # Taylor expand around z==1
+    if fastabs(δz) < 7e-3 # Taylor expand around z==1
         return 0.6931471805599453094172321214581765 *
                @evalpoly(δz,
                          1.0,
