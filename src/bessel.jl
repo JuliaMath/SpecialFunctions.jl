@@ -780,9 +780,6 @@ _jinc_threshold(::Type{Float32}) = 0.05f0
 
  # for small arguments, a Taylor series is faster
 @inline function _jinc(x::Union{T,Complex{T}}) where {T<:Union{Float32,Float64}}
-    if iszero(x)
-        return one(x)
-    end
     if fastabs(x) < _jinc_threshold(T)
         return @evalpoly(x^2, T(1), -T(π)^2/8, T(π)^4/192)
     else
