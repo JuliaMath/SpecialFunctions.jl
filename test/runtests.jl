@@ -10,10 +10,13 @@ using SpecialFunctions: AmosException, f64
 # in that relerrc separately looks at the real and imaginary parts
 relerr(z, x) = z == x ? zero(z) : abs(z - x) / abs(x)
 relerr(z::T, x::T) where {T <: Complex} = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
+relerr(z::T, x) where {T <: Complex} = relerr(z, complex(x))
+relerr(z, x::T) where {T <: Complex} = relerr(complex(z), x)
 checktol(err::Float16) = err ≤ 5e-2
-checktol(err::Float32) = err ≤ 1e-6
+checktol(err::Float32) = err ≤ 5e-5
 checktol(err::Float64) = err ≤ 1e-13
 ≅(a,b) = checktol(relerr(a,b))
+≅(a::Complex,b::Complex) = checktol(relerr(a,b)) || checktol(abs(a-b)/abs(b))
 
 
 tests = [
