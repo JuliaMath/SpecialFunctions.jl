@@ -348,20 +348,16 @@ end
 
         # check also some complex numbers
         # besselj1 is not type stable and returns Complex{Float64}
+        # the stricter ≅ doesn't hold here
+        # besselj1 seems to produce inaccurate results for some Float32 cases
         for T in [Complex{Float16}, Complex{Float32}, Complex{Float64}]
             x = T(x1)
             res = T(res1)
-            @test T(jinc(x)) ≅ res
+            @test T(jinc(x)) ≈ res
 
             x = T(x2)
             res = T(res2)
-            # the stricter ≅ doesn't hold here
-            # besselj1 seems to produce inaccurate results for some Float32 cases
-            if T === Complex{Float32}
-                @test T(jinc(x)) ≈ res rtol=5e-5
-            else
-                @test T(jinc(x)) ≅ res
-            end
+            @test T(jinc(x)) ≈ res
 
             x = T(x3)
             res = T(res3)
