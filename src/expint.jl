@@ -347,8 +347,7 @@ function En_imagbranchcut(ν::Number, z::Number)
     e1 = exp(oftype(a, π) * imag(ν))
     e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
     lgamma, lgammasign = ν isa Real ? logabsgamma(ν) : (loggamma(ν), 1)
-    bc = -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
-    return bc
+    return -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
 end
 
 """
