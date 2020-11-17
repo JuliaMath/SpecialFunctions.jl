@@ -344,11 +344,10 @@ end
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
 function En_imagbranchcut(ν::Number, z::Number)
     a = real(z)
-    e1 = exp(π*imag(ν))
+    e1 = exp(oftype(a, π) * imag(ν))
     e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
-    impart = π * im * e1 * e2 * exp((ν-1)*log(complex(a)) - loggamma(ν))
-    impart *= signbit(imag(z)) ? -1 : 1
-    return imag(impart) * im # get rid of any real error
+    bc = -2 * e1 * π * e2 * exp((ν-1)*log(complex(a)) - loggamma(ν)) * im
+    return bc
 end
 
 """
@@ -375,7 +374,8 @@ function expint(ν::Number, z::Number, niter::Int=1000)
     end
 
     if z == 0
-        return oftype(z, real(ν) > 0 ? 1/(ν-1) : Inf)
+        typ = typeof(real(z))
+        return oftype(z, real(ν) > 0 ? one(typ)/(ν-1) : convert(typ, Inf))
     end
 
     if ν == 0
@@ -394,8 +394,8 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         return En_expand_origin(ν, z)
     end
 
-    if z isa Real
-        return first(z > 0 ? En_cf(ν, z, niter) : En_cf_nogamma(ν, z, niter))
+    if z isa Real || real(z) > 0
+        return first(real(z) > 0 ? En_cf(ν, z, niter) : En_cf_nogamma(ν, z, niter))
     else
         # Procedure for z near the negative real axis based on
         # (without looking at the accompanying source code):
@@ -434,12 +434,20 @@ function expint(ν::Number, z::Number, niter::Int=1000)
             z₀ += Δ
         end
 
-        # more exact imaginary part available for non-integer ν
-        if imz == 0
-            E_start = real(E_start) + En_imagbranchcut(ν, z)
-        end
+        En = doconj ? conj(E_start) : E_start
 
-        return doconj ? conj(E_start) : E_start
+        # handle branch cut
+        if imz == 0
+            bc = En_imagbranchcut(ν, z)
+            if isreal(ν)
+                # can separate real/im in case of real ν
+                return real(En) - imag(bc)/2 * im
+            else
+                return !signbit(imag(z)) ? En : En + bc
+            end
+        else
+            return En
+        end
     end
     throw("unreachable")
 end

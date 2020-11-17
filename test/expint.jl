@@ -76,6 +76,8 @@ using Base.MathConstants
         @test expint(-2, -3.3) ≅ -4.745485121488663825992363318400378114254141655964565963
         @test expint(-2, -3.3) isa Real
 
+        @test expint(-2.1+3im, 4.2 +0im) ⩭ 0.003387565626497080536855067510744646235748203589175196673362104 - 0.003355838600814825542988272289126728631565803782052141768321840im
+
         @test isnan(expint(NaN))
         @test isnan(expint(NaN+NaN*im))
         @test isnan(expint(NaN, 1.0))
