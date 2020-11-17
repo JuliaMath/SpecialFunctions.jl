@@ -346,7 +346,8 @@ function En_imagbranchcut(ν::Number, z::Number)
     a = real(z)
     e1 = exp(oftype(a, π) * imag(ν))
     e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
-    bc = -2 * e1 * π * e2 * exp((ν-1)*log(complex(a)) - loggamma(ν)) * im
+    lgamma, lgammasign = ν isa Real ? logabsgamma(ν) : (loggamma(ν), 1)
+    bc = -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
     return bc
 end
 
@@ -439,11 +440,13 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         # handle branch cut
         if imz == 0
             bc = En_imagbranchcut(ν, z)
+            bit = !signbit(imag(z))
+            sign = bit ? 1 : -1
             if isreal(ν)
                 # can separate real/im in case of real ν
-                return real(En) - imag(bc)/2 * im
+                return real(En) - sign * imag(bc)/2 * im
             else
-                return !signbit(imag(z)) ? En : En + bc
+                return bit ? En : En + bc
             end
         else
             return En
