@@ -78,6 +78,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`besselix(nu,z)`](@ref SpecialFunctions.besselix)            | scaled modified Bessel function of the first kind of order `nu` at `z`                                                                                          |
 | [`besselk(nu,z)`](@ref SpecialFunctions.besselk)              | modified [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the second kind of order `nu` at `z`                                               |
 | [`besselkx(nu,z)`](@ref SpecialFunctions.besselkx)            | scaled modified Bessel function of the second kind of order `nu` at `z`                                                                                         |
+| [`jinc(x)`](@ref SpecialFunctions.jinc)                       | scaled [Bessel function of the first kind divided by `x`](https://en.wikipedia.org/wiki/Sombrero_function). A.k.a. sombrero or besinc                           |
 
 
 ## [Elliptic Integrals](https://dlmf.nist.gov/19)

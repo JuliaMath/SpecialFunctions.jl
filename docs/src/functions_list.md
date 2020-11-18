@@ -50,6 +50,7 @@ SpecialFunctions.besseli
 SpecialFunctions.besselix
 SpecialFunctions.besselk
 SpecialFunctions.besselkx
+SpecialFunctions.jinc
 SpecialFunctions.ellipk
 SpecialFunctions.ellipe
 SpecialFunctions.eta

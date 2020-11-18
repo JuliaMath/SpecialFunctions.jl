@@ -178,7 +178,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
         conv && i > 4 && break
 
         # rescale
-        if max(abs(real(A)), abs(imag(A))) > scale
+        if fastabs(A) > scale
             A     /= scale
             Aprev /= scale
             B     /= scale
