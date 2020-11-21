@@ -30,31 +30,52 @@ ChainRulesCore.@scalar_rule(trigamma(x), polygamma(2, x))
 # binary
 ChainRulesCore.@scalar_rule(
     besselj(ν, x),
-    (@thunk error("not implemented"), (besselj(ν - 1, x) - besselj(ν + 1, x)) / 2),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        (besselj(ν - 1, x) - besselj(ν + 1, x)) / 2
+    ),
 )
 ChainRulesCore.@scalar_rule(
     besseli(ν, x),
-    (@thunk error("not implemented"), (besseli(ν - 1, x) + besseli(ν + 1, x)) / 2),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        (besseli(ν - 1, x) + besseli(ν + 1, x)) / 2,
+    ),
 )
 ChainRulesCore.@scalar_rule(
     bessely(ν, x),
-    (@thunk error("not implemented"), (bessely(ν - 1, x) - bessely(ν + 1, x)) / 2),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        (bessely(ν - 1, x) - bessely(ν + 1, x)) / 2,
+    ),
 )
 ChainRulesCore.@scalar_rule(
     besselk(ν, x),
-    (@thunk error("not implemented"), -(besselk(ν - 1, x) + besselk(ν + 1, x)) / 2),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        -(besselk(ν - 1, x) + besselk(ν + 1, x)) / 2,
+    ),
 )
 ChainRulesCore.@scalar_rule(
     hankelh1(ν, x),
-    (@thunk error("not implemented"), (hankelh1(ν - 1, x) - hankelh1(ν + 1, x)) / 2),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        (hankelh1(ν - 1, x) - hankelh1(ν + 1, x)) / 2,
+    ),
 )
 ChainRulesCore.@scalar_rule(
     hankelh2(ν, x),
-    (@thunk error("not implemented"), (hankelh2(ν - 1, x) - hankelh2(ν + 1, x)) / 2),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        (hankelh2(ν - 1, x) - hankelh2(ν + 1, x)) / 2,
+    ),
 )
 ChainRulesCore.@scalar_rule(
     polygamma(m, x),
-    (@thunk error("not implemented"), polygamma(m + 1, x))
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        polygamma(m + 1, x),
+    ),
 )
 # todo: setup for common expr
 ChainRulesCore.@scalar_rule(
