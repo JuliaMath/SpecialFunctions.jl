@@ -839,9 +839,9 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
-gamma_inc(a::Real,x::Real,ind::Integer=0) = (gamma_inc(float(a),float(x),ind))
+gamma_inc(a::Real,x::Real,ind::Integer=0) = _gamma_inc(promote(float(a),float(x))...,ind)
 
-function gamma_inc(a::Float64,x::Float64,ind::Integer=0)
+function _gamma_inc(a::Float64,x::Float64,ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
     if a<0.0 || x<0.0
@@ -938,15 +938,14 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer=0)
 
 end
 
-function gamma_inc(a::BigFloat,x::BigFloat,ind::Integer=0) #BigFloat version from GNU MPFR wrapped via ccall
+function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
     q = z/gamma(a)
     return (1.0 - q, q)
 end
-gamma_inc(a::Float32,x::Float32,ind::Integer=0) = ( Float32(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float32(gamma_inc(Float64(a),Float64(x),ind)[2]) )
-gamma_inc(a::Float16,x::Float16,ind::Integer=0) = ( Float16(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float16(gamma_inc(Float64(a),Float64(x),ind)[2]) )
-gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer=0) = throw(MethodError(gamma_inc,(a,x,ind,"")))
+_gamma_inc(a::Float32,x::Float32,ind::Integer) = Float32.(_gamma_inc(Float64(a),Float64(x),ind))
+_gamma_inc(a::Float16,x::Float16,ind::Integer) = Float16.(_gamma_inc(Float64(a),Float64(x),ind))
 
 #EFFICIENT AND ACCURATE ALGORITHMS FOR THECOMPUTATION AND INVERSION OF THE INCOMPLETEGAMMA FUNCTION RATIOS by Amparo Gil, Javier Segura, Nico M. Temme
 #SIAM Journal on Scientific Computing 34(6) (2012), A2965-A2981
@@ -961,7 +960,9 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
-function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
+gamma_inc_inv(a::Real, p::Real, q::Real) = _gamma_inc_inv(promote(float(a), float(p), float(q))...)
+
+function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     if p < 0.5
         pcase = true
         porq = p
@@ -1031,10 +1032,8 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     return x
 end
 
-gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
-gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
-gamma_inc_inv(a::Real, p::Real, q::Real) = gamma_inc_inv(float(a), float(p), float(q))
-gamma_inc_inv(a::AbstractFloat, p::AbstractFloat, q::AbstractFloat) = throw(MethodError(gamma_inc_inv,(a,p,q,"")))
+_gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
+_gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
 
 """
     gamma(a,x)
@@ -1051,10 +1050,15 @@ See also the [`gamma_inc`](@ref) function to compute both the upper and lower
 
 External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 """
-gamma(a::Number,x::Number) = iszero(x) ? gamma(a) : x^a * expint(1-a, x)
+function gamma(a::Number,x::Number)
+    _a, _x = promote(float(a), float(x))
+    __a = a isa Real ? real(_a) : _a # don't complexify a unnecessarily
+    __x = x isa Real ? real(_x) : _x # don't complexify x unnecessarily
+    return iszero(x) ? oftype(_a, gamma(__a)) : __x^__a * expint(1-__a, __x)
+end
 
-gamma(a::BigFloat,x::Real) = gamma(a,BigFloat(x))
-gamma(a::Real,x::BigFloat) = gamma(BigFloat(a),x)
+gamma(a::Union{BigFloat,BigInt},x::Real) = gamma(BigFloat(a),BigFloat(x))
+gamma(a::Real,x::Union{BigFloat,BigInt}) = gamma(BigFloat(a),BigFloat(x))
 function gamma(a::BigFloat,x::BigFloat)
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
