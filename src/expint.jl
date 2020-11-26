@@ -197,6 +197,7 @@ end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
 En_safe_gamma_term(ν::Number, z::Number) = exp((ν - 1)*log(z) + loggamma(1 - oftype(z, ν)))
+En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp((ν - 1)*log(abs(z)) + loggamma(1 - oftype(z, ν)))
 
 # continued fraction for En(ν, z) that uses the gamma function:
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
@@ -369,7 +370,7 @@ function expint(ν::Number, z::Number, niter::Int=1000)
         return oftype(z, NaN) * z
     end
 
-    if z isa Real && (isinteger(ν) ? (z < 0 && ν > 0) : (z < 0 || ν < 0))
+    if z isa Real && (isinteger(ν) ? (z < 0 && ν > 0) : z < 0)
         throw(DomainError(z, "En will only return a complex result if called with a complex argument"))
     end
 
