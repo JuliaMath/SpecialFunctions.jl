@@ -1035,6 +1035,12 @@ end
 _gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
 _gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
 
+# like promote(x,y), but don't complexify real values
+promotereal(x::Real,y::Real) = promote(x,y)
+promotereal(x::Real,y::Number) = let (u,v) = promote(x,y); real(u),v; end
+promotereal(x::Number,y::Real) = let (u,v) = promote(x,y); u,real(v); end
+promotereal(x,y) = promote(x,y)
+
 """
     gamma(a,x)
 
@@ -1050,16 +1056,14 @@ See also the [`gamma_inc`](@ref) function to compute both the upper and lower
 
 External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 """
-function gamma(a::Number,x::Number)
-    _a, _x = promote(float(a), float(x))
-    __a = a isa Real ? real(_a) : _a # don't complexify a unnecessarily
-    __x = x isa Real ? real(_x) : _x # don't complexify x unnecessarily
-    return iszero(x) ? oftype(_a, gamma(__a)) : __x^__a * expint(1-__a, __x)
-end
+gamma(a::Number,x::Number) = _gamma(promotereal(float(a),float(x))...)
+gamma(a::Integer,x::Number) = _gamma(a, float(x))
 
-gamma(a::Union{BigFloat,BigInt},x::Real) = gamma(BigFloat(a),BigFloat(x))
-gamma(a::Real,x::Union{BigFloat,BigInt}) = gamma(BigFloat(a),BigFloat(x))
-function gamma(a::BigFloat,x::BigFloat)
+_gamma(a::Number,x::Number) = iszero(x) ? one(x)*gamma(a) : x^a * expint(1-a, x)
+
+_gamma(a::Integer, x::BigFloat) = _gamma(BigFloat(a), x)
+_gamma(a::BigInt, x::Real) = _gamma(BigFloat(a), BigFloat(x))
+function _gamma(a::BigFloat,x::BigFloat)
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
     return z
