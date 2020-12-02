@@ -249,14 +249,15 @@ end
 # En_cf_nogamma and En_cf_gamma
 # returns (evaluated result, # iterations used, whether En_cf_gamma was chosen)
 function En_cf(ν::Number, z::Number, niter::Int=1000)
-    gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
-    gammaabs, cfabs = abs(gammapart), abs(cfpart)
-    if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
-        # significant gamma part, use this
-        return gammapart + cfpart, iters, true
-    else
-        return En_cf_nogamma(ν, z, niter)..., false
+    if real(1-ν) > 0
+        gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
+        gammaabs, cfabs = abs(gammapart), abs(cfpart)
+        if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
+            # significant gamma part, use this
+            return gammapart + cfpart, iters, true
+        end
     end
+    return En_cf_nogamma(ν, z, niter)..., false
 end
 
 # Compute expint(ν, z₀+Δ) given start = expint(ν, z₀), as described by [Amos 1980].
