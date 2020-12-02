@@ -75,7 +75,7 @@ macro E₁_taylor64(z, n::Integer)
 end
 
 # adapted from Steven G Johnson's initial implementation: issue #19
-function expint_opt(x::Float64, expscaled::Bool=false)
+function expint_opt(x::Float64, ::Val{expscaled}=Val{false}()) where {expscaled}
     x < 0 && throw(DomainError(x, "negative argument, convert to complex first"))
     x == 0 && return Inf
     # E_1(inf) * exp(inf) is indeterminate
@@ -104,7 +104,7 @@ function expint_opt(x::Float64, expscaled::Bool=false)
     end
 end
 
-function expint_opt(z::Complex{Float64}, expscaled::Bool=false)
+function expint_opt(z::Complex{Float64}, ::Val{expscaled}=Val{false}()) where {expscaled}
     x² = real(z)^2
     y² = imag(z)^2
     if x² + 0.233*y² ≥ 7.84 # use cf expansion, ≤ 30 terms
@@ -121,7 +121,7 @@ function expint_opt(z::Complex{Float64}, expscaled::Bool=false)
         return mult * @E₁_cf64(z, 30)
     else # use Taylor expansion, ≤ 37 terms
         r² = x² + y²
-        mult = expscaled ? exp(x) : 1
+        mult = expscaled ? exp(z) : 1
         return mult * (r² ≤ 0.36 ? (r² ≤ 2.8e-3 ? (r² ≤ 2e-7 ? @E₁_taylor64(z,4) :
                                                        @E₁_taylor64(z,8)) :
                                          @E₁_taylor64(z,15)) :
@@ -129,16 +129,17 @@ function expint_opt(z::Complex{Float64}, expscaled::Bool=false)
     end
 end
 
-function expint(z::Complex{Float64}, expscaled::Bool=false)
+function _expint(z::Complex{Float64}, ::Val{expscaled}=Val{false}()) where {expscaled}
     if real(z) < 0
-        return expint(1, z)
+        return _expint(1, z, 1000, Val{expscaled}())
     else
-        return expint_opt(z, expscaled)
+        return expint_opt(z, Val{expscaled}())
     end
 end
-expintx(z::Complex{Float64}) = expint(z, true)
+expint(z::Complex{Float64}) = _expint(z)
+expintx(z::Complex{Float64}) = _expint(z, Val{true}())
 expint(x::Float64) = expint_opt(x)
-expintx(x::Float64) = expint_opt(x, true)
+expintx(x::Float64) = expint_opt(x, Val{true}())
 
 function expint(x::BigFloat)
     iszero(x) && return Inf
@@ -146,15 +147,16 @@ function expint(x::BigFloat)
     return -expinti(-x)
 end
 
-expint(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = expint(float(z))
 expint(x::Number) = expint(1, x)
-expint(z::Float32) = Float32(expint(Float64(z)))
-expint(z::ComplexF32) = ComplexF32(expint(ComplexF64(z)))
-expint(z::Float16) = Float16(expint(Float64(z)))
-expint(z::ComplexF16) = ComplexF16(expint(ComplexF64(z)))
-
-expintx(x::Number) = expint(1, x, true)
-expintx(ν::Number, z::Number) = expint(ν, z, true)
+expint(z::Union{T,Complex{T},Rational{T},Complex{Rational{T}}}) where {T<:Integer} = expint(float(z))
+for f in (:expint, :expintx)
+    for T in (Float16, Float32)
+        @eval $f(x::$T) = $T($f(Float64(x)))
+    end
+    for CT in (ComplexF16, ComplexF32)
+        @eval $f(x::$CT) = $CT($f(ComplexF64(x)))
+    end
+end
 
 # Continued fraction for En(ν, z) that doesn't use a term with
 # the gamma function: https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0001/
@@ -201,7 +203,11 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
 end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
-En_safe_gamma_term(ν::Number, z::Number) = exp((ν - 1)*log(z) + loggamma(1 - oftype(z, ν)))
+function En_safe_gamma_term(ν::Number, z::Number)
+    arg = 1 - oftype(z, ν)
+    lgamma, lgammasign = arg isa Real ? logabsgamma(arg) : (loggamma(arg), 1)
+    return lgammasign * exp((ν - 1)*log(z) + lgamma)
+end
 
 # continued fraction for En(ν, z) that uses the gamma function:
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
@@ -248,11 +254,11 @@ end
 function En_cf(ν::Number, z::Number, niter::Int=1000)
     gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
     gammaabs, cfabs = abs(gammapart), abs(exp(-z + cfpart))
-    if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
+    if real(1-ν) > 0 && gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
         # significant gamma part, use this
         return gammapart, cfpart, iters, true
     else
-        return 0, En_cf_nogamma(ν, z, niter)..., false
+        return zero(z), En_cf_nogamma(ν, z, niter)..., false
     end
 end
 
@@ -350,19 +356,14 @@ end
 
 function En_safeexpmult(z, a)
     zexp = exp(z)
-    return isinf(zexp) ? exp(z + log(a)) : zexp*a
+    if isinf(zexp) || iszero(zexp)
+        return a isa Real ? sign(a) * exp(z + log(abs(a))) : exp(z + log(a))
+    else
+        return zexp*a
+    end
 end
 
-"""
-    expint(z)
-    expint(ν, z)
-
-Computes the exponential integral ``\\operatorname{E}_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
-If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
-
-External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
-"""
-function expint(ν::Number, z::Number, expscaled::Bool=false, niter::Int=1000)
+function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{false}()) where {expscaled}
     if abs(ν) > 50 && !(isreal(ν) && real(ν) > 0)
         throw(ArgumentError("Unsupported order |ν| > 50 off the positive real axis"))
     end
@@ -384,11 +385,11 @@ function expint(ν::Number, z::Number, expscaled::Bool=false, niter::Int=1000)
     if ν == 0
         return expscaled ? one(z)/z : exp(-z)/z
     elseif ν == 1 && real(z) > 0 && z isa Union{Float64, Complex{Float64}}
-        return expint_opt(z, expscaled)
+        return expint_opt(z, Val{expscaled}())
     end
     # asymptotic test for underflow when Re z → ∞
     # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/02/0003/
-    if real(z) > -log(nextfloat(zero(real(z))))+1 # exp(-z) is zero
+    if !expscaled && real(z) > -log(nextfloat(zero(real(z))))+1 # exp(-z) is zero
         return expscaled ? oftype(z, NaN)*z : zero(z)
     end
 
@@ -403,10 +404,10 @@ function expint(ν::Number, z::Number, expscaled::Bool=false, niter::Int=1000)
         if real(z) > 0
             g, cf, _ = En_cf(ν, z, niter)
         else
-            g, cf, _ = 0, En_cf_nogamma(ν, z, niter)...
+            g, cf, _ = zero(z), En_cf_nogamma(ν, z, niter)...
         end
-        g *= gmult
-        cf = expscaled ? cf : En_safeexpmult(-z, cf)
+        g != 0 && (g *= gmult)
+        cf = expscaled ? cf : En_safeexpmult(-z, cf) 
         return g + cf
     else
         # Procedure for z near the negative real axis based on
@@ -464,8 +465,30 @@ function expint(ν::Number, z::Number, expscaled::Bool=false, niter::Int=1000)
         end
         return expscaled ? exp(z) * En : En
     end
-    throw("unreachable")
 end
+
+"""
+    expint(z)
+    expint(ν, z)
+
+Computes the exponential integral ``\\operatorname{E}_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
+
+External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
+"""
+expint(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{false}())
+
+
+"""
+    expintx(z)
+    expintx(ν, z)
+
+Computes the scaled exponential integral ``\\exp(z) \\operatorname{E}_\\nu(z) = \\exp(z) \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
+
+See also: [`expint(ν, z)`](@ref SpecialFunctions.expint)
+"""
+expintx(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{true}())
 
 ##############################################################################
 # expinti function Ei
