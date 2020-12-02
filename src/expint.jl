@@ -385,14 +385,14 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
     end
 
     if ν == 0
-        return expscaled ? one(z)/z : exp(-z)/z
+        return expscaled ? inv(z) : exp(-z)/z
     elseif ν == 1 && real(z) > 0 && z isa Union{Float64, Complex{Float64}}
         return expint_opt(z, Val{expscaled}())
     end
     # asymptotic test for underflow when Re z → ∞
     # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/02/0003/
     if !expscaled && real(z) > -log(nextfloat(zero(real(z))))+1 # exp(-z) is zero
-        return expscaled ? oftype(z, NaN)*z : zero(z)
+        return zero(z)
     end
 
     if abs2(z) < 9
