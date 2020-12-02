@@ -208,6 +208,7 @@ function En_safe_gamma_term(ν::Number, z::Number)
     lgamma, lgammasign = arg isa Real ? logabsgamma(arg) : (loggamma(arg), 1)
     return lgammasign * exp((ν - 1)*log(z) + lgamma)
 end
+En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp((ν - 1)*log(abs(z)) + loggamma(1 - oftype(z, ν)))
 
 # continued fraction for En(ν, z) that uses the gamma function:
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
@@ -252,14 +253,15 @@ end
 # En_cf_nogamma and En_cf_gamma
 # returns (evaluated result, # iterations used, whether En_cf_gamma was chosen)
 function En_cf(ν::Number, z::Number, niter::Int=1000)
-    gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
-    gammaabs, cfabs = abs(gammapart), abs(exp(-z + cfpart))
-    if real(1-ν) > 0 && gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
-        # significant gamma part, use this
-        return gammapart, cfpart, iters, true
-    else
-        return zero(z), En_cf_nogamma(ν, z, niter)..., false
+    if real(1-ν) > 0
+        gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
+        gammaabs, cfabs = abs(gammapart), abs(cfpart)
+        if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
+            # significant gamma part, use this
+            return gammapart + cfpart, iters, true
+        end
     end
+    return En_cf_nogamma(ν, z, niter)..., false
 end
 
 # Compute expint(ν, z₀+Δ) given start = expint(ν, z₀), as described by [Amos 1980].
@@ -373,7 +375,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
         return oftype(z, NaN) * z
     end
 
-    if z isa Real && (isinteger(ν) ? (z < 0 && ν > 0) : (z < 0 || ν < 0))
+    if z isa Real && (isinteger(ν) ? (z < 0 && ν > 0) : z < 0)
         throw(DomainError(z, "En will only return a complex result if called with a complex argument"))
     end
 
