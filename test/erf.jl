@@ -42,12 +42,12 @@
         @test erfi(Float32(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float32)
         @test erfi(Float64(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float64)
 
-        @test erfinv(Integer(0)) == 0
+        @test erfinv(Integer(0)) == 0 == erfinv(0//1)
         @test_throws MethodError erfinv(Float16(1))
         @test erfinv(Float32(0.84270079294971486934)) ≈ 1 rtol=2*eps(Float32)
         @test erfinv(Float64(0.84270079294971486934)) ≈ 1 rtol=2*eps(Float64)
 
-        @test erfcinv(Integer(1)) == 0
+        @test erfcinv(Integer(1)) == 0 == erfcinv(1//1)
         @test_throws MethodError erfcinv(Float16(1))
         @test erfcinv(Float32(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float32)
         @test erfcinv(Float64(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float64)
@@ -100,11 +100,20 @@
 
         @test_throws MethodError erfi(big(1.0))
 
-        @test_throws MethodError erfinv(BigFloat(1))
-
-        @test_throws MethodError erfcinv(BigFloat(1))
-
         @test_throws MethodError dawson(BigFloat(1))
+
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1+big"1e-50", big"1.2", 2-big"1e-50")
+            @test erfc(erfcinv(y)) ≈ y
+        end
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", 1-big"1e-50")
+            @test erf(erfinv(y)) ≈ y
+            @test erf(erfinv(-y)) ≈ -y
+        end
+        @test erfcinv(big(0)) == -erfcinv(big(2)) == erfinv(big(1)) == -erfinv(big(-1)) == Inf
+        for x in (1+big"1e-3", -1-big"1e-3")
+            @test_throws DomainError erfinv(x)
+            @test_throws DomainError erfcinv(1-x)
+        end
     end
 
     @testset "inverse" begin
