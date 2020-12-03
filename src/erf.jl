@@ -448,7 +448,7 @@ function erfcinv(y::BigFloat)
         if yfloat < 1
             x = sqrt(-log(y*sqrtπ))
         else # y must be close to 2
-            @show x = -sqrt(-log((2-y)*sqrtπ))
+            x = -sqrt(-log((2-y)*sqrtπ))
         end
         # TODO: Newton convergence is slow near y=0 singularity; accelerate?
     end
