@@ -424,8 +424,8 @@ function erfinv(y::BigFloat)
         # Float64 overflowed, use asymptotic estimate instead
         # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
         x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
+        isfinite(x) || return x
     end
-    isfinite(x) || return x
     sqrtπhalf = sqrtπ * 0.5
     tol = 2eps(abs(x))
     while true # Newton iterations
@@ -451,8 +451,8 @@ function erfcinv(y::BigFloat)
             x = -sqrt(-log((2-y)*sqrtπ))
         end
         # TODO: Newton convergence is slow near y=0 singularity; accelerate?
+        isfinite(x) || return x
     end
-    isfinite(x) || return x
     sqrtπhalf = sqrtπ * 0.5
     tol = 2eps(abs(x))
     while true # Newton iterations
