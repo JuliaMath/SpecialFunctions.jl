@@ -89,14 +89,14 @@ double(x::Complex) = ComplexF64(x)
                 @test gamma(a, x) ≈ exact atol=eps(abs(exact))*1000
             end
             @test gamma(double(a), double(x)) ≈ double(exact) rtol=1e-13
-            @test gamma(30, big(-1000)) ≈ big"-1.914496653187781420578078670260160511219745144309147121829045802464973219500799e+521" rtol=1e-70
-            @test gamma(30, -1000) == -Inf
-            @test gamma(Inf, 51.2) == Inf
-            @test gamma(-Inf, -51.2) == 0.0
-            @test_throws DomainError gamma(Inf, -51.2)
-            @test gamma(2.3, Inf) == 0.0
-            @test gamma(2, -Inf) == -Inf
-            @test_throws DomainError gamma(2.2, -Inf)
         end
     end
+    @test gamma(30, big(-1000)) ≈ big"-1.914496653187781420578078670260160511219745144309147121829045802464973219500799e+521" rtol=1e-70
+    @test gamma(30, -1000) == -Inf
+    @test gamma(Inf, 51.2) == Inf
+    @test gamma(-Inf, -51.2) == 0.0
+    @test_throws DomainError gamma(Inf, -51.2)
+    @test gamma(2.3, Inf) == 0.0
+    @test gamma(2, -Inf) == -Inf
+    @test_throws DomainError gamma(2.2, -Inf)
 end
