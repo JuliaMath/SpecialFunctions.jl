@@ -1061,8 +1061,6 @@ gamma(a::Integer,x::Number) = _gamma(a, float(x))
 
 _gamma(a::Number,x::Number) = iszero(x) ? one(x)*gamma(a) : x^a * expint(1-a, x)
 
-_gamma_int(a, x) = invoke(_gamma, Tuple{Number,Number}, a,x)
-
 _gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
 _gamma(a::BigInt, x::Real) = _gamma_big(a, x)
 _gamma(a::BigInt, x::BigFloat) = _gamma_big(a, x)
