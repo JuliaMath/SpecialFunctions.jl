@@ -128,7 +128,8 @@ using Base.MathConstants
     @test expint(-2, 2.2) ≈ 0.11696351427428933590118175681379776 rtol=1e-14
     @test expint(-2, -2.2) ≈ -2.0680909972407264331884989 rtol=1e-14
     @test expint(-2.2, 3.2) ≈ 0.024950173497409329191241353395358 rtol=1e-14
-    #@test expint(+2.2, 3.2) ≈ 0.008044603700773423319087602010 rtol=1e-14
+    @test expint(+2.2, 3.2) ≈ 0.008044603700773423319087602010 rtol=1e-12
+    @test expint(3.2, 1.3) ≈ 0.070147692224611216675759479422283315452559216337905 rtol=1e-14
 end
 
 expinti_real(x) = invoke(expinti, Tuple{Real}, x)

@@ -196,7 +196,11 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
 end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
-En_safe_gamma_term(ν::Number, z::Number) = exp((ν - 1)*log(z) + loggamma(1 - oftype(z, ν)))
+function En_safe_gamma_term(ν::Number, z::Number)
+    ν1 = 1 - oftype(z, ν)
+    lgamma, lgammasign = ν1 isa Real ? logabsgamma(ν1) : (loggamma(ν1), 1)
+    return lgammasign * exp((ν - 1)*log(z) + lgamma)
+end
 En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp((ν - 1)*log(abs(z)) + loggamma(1 - oftype(z, ν)))
 
 # continued fraction for En(ν, z) that uses the gamma function:
