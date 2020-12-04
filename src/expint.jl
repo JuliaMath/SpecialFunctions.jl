@@ -188,7 +188,11 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
 
     exppart = exp(-z)
     if isinf(exppart)
-        return exp(-z + log(A) - log(B)), iters
+        if A isa Real
+            return sign(A)*sign(B)*exp(-z + log(abs(A)) - log(abs(B))), iters
+        else
+            exp(-z + log(A) - log(B)), iters
+        end
     else
         cfpart = A/B
         return cfpart * exppart, iters
