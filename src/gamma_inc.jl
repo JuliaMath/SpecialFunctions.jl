@@ -1059,7 +1059,28 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wiki
 gamma(a::Number,x::Number) = _gamma(promotereal(float(a),float(x))...)
 gamma(a::Integer,x::Number) = _gamma(a, float(x))
 
-_gamma(a::Number,x::Number) = iszero(x) ? one(x)*gamma(a) : x^a * expint(1-a, x)
+function _gamma(a::Number,x::Number)
+    if a isa Real && x isa Real && !isfinite(a*x)
+        if isinf(x) && isfinite(a)
+            if x > 0 # == +Inf
+                return one(a)*zero(x)
+            elseif a > 0 && isinteger(a) # x == -Inf
+                return one(a)*x # -Inf
+            end
+        elseif isinf(a) && isfinite(x)
+            if a > 0
+                if x ≥ 0
+                    return a*one(x) # +Inf
+                else
+                    throw(DomainError((a,x), "gamma will only return a complex result if called with a complex argument"))
+                end
+            elseif a < 0
+                return zero(a)*one(x)
+            end
+        end
+    end
+    return iszero(x) ? one(x)*gamma(a) : x^a * expint(1-a, x)
+end
 
 _gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
 _gamma(a::BigInt, x::Real) = _gamma_big(a, x)
