@@ -1067,7 +1067,7 @@ _gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
 _gamma(a::BigInt, x::Real) = _gamma_big(a, x)
 _gamma(a::BigInt, x::BigFloat) = _gamma_big(a, x)
 _gamma(a::BigFloat,x::BigFloat) = _gamma_big(a, x)
-function _gamma_big(a,x)
+function _gamma_big(a::Real,x::Real)
     if x < 0
         # MPFR returns NaN in this case
         if isinteger(a) && a > 0
