@@ -55,7 +55,8 @@ SpecialFunctions.ellipk
 SpecialFunctions.ellipe
 SpecialFunctions.eta
 SpecialFunctions.zeta
-SpecialFunctions.gamma
+SpecialFunctions.gamma(::Number)
+SpecialFunctions.gamma(::Number,::Number)
 SpecialFunctions.gamma_inc
 SpecialFunctions.gamma_inc_inv
 SpecialFunctions.beta_inc
