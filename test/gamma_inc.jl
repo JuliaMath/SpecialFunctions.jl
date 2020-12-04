@@ -63,3 +63,24 @@ end
         @test SpecialFunctions.stirling(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
     end
 end
+
+double(x::Real) = Float64(x)
+double(x::Integer) = Int(x)
+double(x::Complex) = ComplexF64(x)
+
+@testset "upper incomplete gamma function" begin
+    setprecision(BigFloat, 256) do
+        for a in Any[0:0.4:3; 1:3], x in 0:0.2:2
+            @test gamma(a,x) ≈ gamma(big(a),big(x))
+        end
+        for (a,x, exact) in (
+            (2, big"+1.3", big"0.6268231239782289871813662853957039889809398944861850589869804057956189274569818"),
+            (2, big"-1.3", big"-1.100789000285773266137246974803445875429455665367265440176867948378982424804222"),
+            (big"2.2", big"1.3", big"0.7550934853735524106456916078787596171599416239996064979513848803118671763945577"),
+            (big"-2.2", big"1.3", big"0.03938564959393195337328006806473296774233286427565465045140458665248322893076784"),
+            )
+            @test gamma(a, x) ≈ exact atol=eps(exact)*1000
+            @test gamma(double(a), double(x)) ≈ double(exact) rtol=1e-13
+        end
+    end
+end

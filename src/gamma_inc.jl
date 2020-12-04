@@ -1061,9 +1061,21 @@ gamma(a::Integer,x::Number) = _gamma(a, float(x))
 
 _gamma(a::Number,x::Number) = iszero(x) ? one(x)*gamma(a) : x^a * expint(1-a, x)
 
-_gamma(a::Integer, x::BigFloat) = _gamma(BigFloat(a), x)
-_gamma(a::BigInt, x::Real) = _gamma(BigFloat(a), BigFloat(x))
-function _gamma(a::BigFloat,x::BigFloat)
+_gamma_int(a, x) = invoke(_gamma, Tuple{Number,Number}, a,x)
+
+_gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
+_gamma(a::BigInt, x::Real) = _gamma_big(a, x)
+_gamma(a::BigInt, x::BigFloat) = _gamma_big(a, x)
+_gamma(a::BigFloat,x::BigFloat) = _gamma_big(a, x)
+function _gamma_big(a,x)
+    if x < 0
+        # MPFR returns NaN in this case
+        if isinteger(a) && a > 0
+            return invoke(_gamma, Tuple{Number,Number}, a, BigFloat(x))
+        else
+            throw(DomainError((a,x), "gamma will only return a complex result if called with a complex argument"))
+        end
+    end
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
     return z
