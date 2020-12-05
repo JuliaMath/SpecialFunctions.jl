@@ -297,21 +297,46 @@ end
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
 function En_expand_origin_general(ν::Number, z::Number)
-    gammaterm = En_safe_gamma_term(ν, z)
+    # gammaterm = En_safe_gamma_term(ν, z)
+    gammaterm = gamma(1-ν)*z^(ν-1)
     frac = one(real(z))
     sumterm = frac / (1 - ν)
     k, maxiter = 1, 100
     ϵ = 10*eps(real(sumterm))
+    blowup = 0
+
     while k < maxiter
         frac *= -z / k
         prev = sumterm
-        sumterm += frac / (k + 1 - ν)
-        if abs(sumterm - prev) < ϵ
-            break
+        if abs(k + 1 - ν) < 0.5
+            blowup += frac / (k + 1 - ν)
+        else
+            sumterm += frac / (k + 1 - ν)
+            if abs(sumterm - prev) < ϵ
+                break
+            end
         end
         k += 1
     end
-    return gammaterm - sumterm
+    
+    if isreal(round(ν)) && real(round(ν)) > 0
+        if abs(gammaterm - blowup)/abs(blowup) < 1e-4
+            δ = round(ν) - ν
+            n = real(round(ν)) - 1
+
+            # (1 - z^δ)/δ series 
+            logz = log(z)
+            series1 = -logz - logz^2*δ/2 - logz^3*δ^2/6 - logz^4*δ^3/24
+
+            # due to https://functions.wolfram.com/GammaBetaErf/Gamma/06/01/05/01/0004/
+            ψ₀, ψ₁, ψ₂, ψ₃ = digamma(n+1), trigamma(n+1), polygamma(2, n+1), polygamma(3, n+1)
+            series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
+            series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
+
+            return (series1 + series2)/factorial(n)*z^(ν-1) - sumterm
+        end
+    end
+    return gammaterm - (blowup + sumterm)
 end
 
 # series about the origin, special case for integer n > 0
