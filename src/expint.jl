@@ -204,8 +204,8 @@ end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
 function En_safe_gamma_term(ν::Number, z::Number)
-    arg = 1 - oftype(z, ν)
-    lgamma, lgammasign = arg isa Real ? logabsgamma(arg) : (loggamma(arg), 1)
+    ν1 = 1 - oftype(z, ν)
+    lgamma, lgammasign = ν1 isa Real ? logabsgamma(ν1) : (loggamma(ν1), 1)
     return lgammasign * exp((ν - 1)*log(z) + lgamma)
 end
 En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp((ν - 1)*log(abs(z)) + loggamma(1 - oftype(z, ν)))

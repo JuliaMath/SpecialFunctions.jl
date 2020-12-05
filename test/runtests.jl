@@ -1,6 +1,8 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
 using SpecialFunctions
+using ChainRulesTestUtils
+using Random
 using Test
 using Base.MathConstants: γ
 
@@ -28,7 +30,8 @@ tests = [
     "gamma_inc",
     "gamma",
     "sincosint",
-    "other_tests"
+    "other_tests",
+    "chainrules"
 ]
 
 const testdir = dirname(@__FILE__)
