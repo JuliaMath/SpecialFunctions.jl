@@ -607,7 +607,7 @@ External links:
 
 See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log \Gamma(z)`` and
 [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number)) for
-the upper incomplete gamma function ``\\Gamma(a,z)``.
+the upper incomplete gamma function ``\Gamma(a,z)``.
 
 # Implementation by
 - `Float`: C standard math library
