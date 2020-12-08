@@ -300,10 +300,10 @@ function En_expand_origin_general(ν::Number, z::Number)
     # gammaterm = En_safe_gamma_term(ν, z)
     gammaterm = gamma(1-ν)*z^(ν-1)
     frac = one(real(z))
-    sumterm = frac / (1 - ν)
+    blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(real(z))
+    sumterm = abs(1 - ν) < 0.5 ? zero(real(z)) : frac / (1 - ν)
     k, maxiter = 1, 100
-    ϵ = 10*eps(real(sumterm))
-    blowup = 0
+    ϵ = 10*eps(typeof(real(sumterm)))
 
     while k < maxiter
         frac *= -z / k
@@ -320,7 +320,7 @@ function En_expand_origin_general(ν::Number, z::Number)
     end
     
     if ν isa Union{Float64, ComplexF64} && isreal(round(ν)) && real(round(ν)) > 0
-        if abs(gammaterm - blowup)/abs(blowup) < 1e-3
+        if abs(blowup) > 0 && abs(gammaterm - blowup)/abs(blowup) < 1e-3
             δ = round(ν) - ν
             n = real(round(ν)) - 1
 
@@ -335,7 +335,7 @@ function En_expand_origin_general(ν::Number, z::Number)
             series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
             series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
             series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
-            return (series1 + series2)/factorial(n)*z^(ν-1) - sumterm
+            return (-1)^n * (series1 + series2)/factorial(n)*z^(ν-1) - sumterm
         end
     end
     return gammaterm - (blowup + sumterm)
