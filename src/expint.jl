@@ -345,8 +345,12 @@ end
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
 function En_expand_origin_posint(n::Integer, z::Number)
     gammaterm = 1 # (-z)^(n-1) / (n-1)!
-    for i = 1:n-1
-        gammaterm *= -z / i
+    if n < 100
+        for i = 1:n-1
+            gammaterm *= -z / i
+        end
+    else
+        gammaterm = (z ≥ 0 || isodd(n) ? 1 : -1) * exp((n - 1)*log(abs(z)) - loggamma(n))
     end
 
     frac = one(real(z))
