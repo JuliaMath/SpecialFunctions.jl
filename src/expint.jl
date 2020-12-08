@@ -319,7 +319,7 @@ function En_expand_origin_general(ν::Number, z::Number)
         k += 1
     end
     
-    if ν isa Union{Float64, ComplexF64} && isreal(round(ν)) && real(round(ν)) > 0
+    if ν isa Union{Float64, ComplexF64, Float32, ComplexF32} && isreal(round(ν)) && real(round(ν)) > 0
         if abs(blowup) > 0 && abs(gammaterm - blowup)/abs(blowup) < 1e-3
             δ = round(ν) - ν
             n = real(round(ν)) - 1
