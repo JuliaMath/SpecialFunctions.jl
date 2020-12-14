@@ -303,7 +303,7 @@ function En_expand_origin_general(ν::Number, z::Number)
     blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
     sumterm = abs(1 - ν) < 0.5 ? zero(z) : frac / (1 - ν)
     k, maxiter = 1, 100
-
+    ε = 10*eps(typeof(abs(frac)))
     while k < maxiter
         frac *= -z / k
         prev = sumterm
@@ -311,7 +311,7 @@ function En_expand_origin_general(ν::Number, z::Number)
             blowup += frac / (k + 1 - ν)
         else
             sumterm += frac / (k + 1 - ν)
-            if abs(sumterm - prev) < 10*eps(real(prev))
+            if abs(sumterm - prev) < 10*abs(prev)
                 break
             end
         end
@@ -371,8 +371,8 @@ function En_expand_origin_posint(n::Integer, z::Number)
 end
 
 function En_expand_origin(ν::Number, z::Number)
-    if isinteger(ν) && real(ν) > 0
-        return En_expand_origin_posint(Integer(ν), z)
+    if isinteger(ν) && 0 < real(ν) ≤ typemax(Int)
+        return En_expand_origin_posint(Int(ν), z)
     else
         return En_expand_origin_general(ν, z)
     end
