@@ -60,6 +60,7 @@ export
     zeta,
     expint,
     expinti,
+    expintx,
     sinint,
     cosint,
     lbinomial

@@ -16,6 +16,7 @@ SpecialFunctions.erfinv
 SpecialFunctions.erfcinv
 SpecialFunctions.expint
 SpecialFunctions.expinti
+SpecialFunctions.expintx
 SpecialFunctions.sinint
 SpecialFunctions.cosint
 SpecialFunctions.digamma
