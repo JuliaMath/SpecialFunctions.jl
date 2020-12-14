@@ -311,7 +311,7 @@ function En_expand_origin_general(ν::Number, z::Number)
             blowup += frac / (k + 1 - ν)
         else
             sumterm += frac / (k + 1 - ν)
-            if abs(sumterm - prev) < 10*abs(prev)
+            if abs(sumterm - prev) < ε*abs(prev)
                 break
             end
         end
