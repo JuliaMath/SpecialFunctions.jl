@@ -258,10 +258,10 @@ function En_cf(ν::Number, z::Number, niter::Int=1000)
         gammaabs, cfabs = abs(gammapart), abs(cfpart)
         if gammaabs != Inf && gammaabs > 1.0 && gammaabs > cfabs
             # significant gamma part, use this
-            return gammapart + cfpart, iters, true
+            return gammapart, cfpart, iters, true
         end
     end
-    return En_cf_nogamma(ν, z, niter)..., false
+    return zero(z), En_cf_nogamma(ν, z, niter)..., false
 end
 
 # Compute expint(ν, z₀+Δ) given start = expint(ν, z₀), as described by [Amos 1980].
