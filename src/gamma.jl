@@ -573,7 +573,6 @@ export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, lo
 gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libm), Float64, (Float64,), x), x)
 gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x), x)
 gamma(x::Float16)       = Float16(gamma(Float32(x)))
-gamma(x::Real)          = gamma(float(x))
 gamma(x::AbstractFloat) = throw(MethodError(gamma, x))
 
 function gamma(x::BigFloat)
@@ -606,7 +605,9 @@ External links:
 [DLMF](https://dlmf.nist.gov/5.2.1),
 [Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
 
-See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma).
+See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log \Gamma(z)`` and
+[`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number)) for
+the upper incomplete gamma function ``\Gamma(a,z)``.
 
 # Implementation by
 - `Float`: C standard math library
@@ -614,7 +615,7 @@ See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma).
 - `Complex`: by `exp(loggamma(z))`.
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
-gamma
+gamma(x::Number) = gamma(float(x))
 
 function logabsgamma(x::Float64)
     signp = Ref{Int32}()
