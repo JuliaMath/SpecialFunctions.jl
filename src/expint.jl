@@ -299,11 +299,10 @@ end
 function En_expand_origin_general(ν::Number, z::Number)
     # gammaterm = En_safe_gamma_term(ν, z)
     gammaterm = gamma(1-ν)*z^(ν-1)
-    frac = one(real(z))
-    blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(real(z))
-    sumterm = abs(1 - ν) < 0.5 ? zero(real(z)) : frac / (1 - ν)
+    frac = one(z)
+    blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
+    sumterm = abs(1 - ν) < 0.5 ? zero(z) : frac / (1 - ν)
     k, maxiter = 1, 100
-    ϵ = 10*eps(typeof(real(sumterm)))
 
     while k < maxiter
         frac *= -z / k
@@ -312,7 +311,7 @@ function En_expand_origin_general(ν::Number, z::Number)
             blowup += frac / (k + 1 - ν)
         else
             sumterm += frac / (k + 1 - ν)
-            if abs(sumterm - prev) < ϵ
+            if abs(sumterm - prev) < 10*eps(real(prev))
                 break
             end
         end
