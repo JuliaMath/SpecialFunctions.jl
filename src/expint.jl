@@ -314,7 +314,7 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
         k += 1
     end
 
-    if ν+real(z) isa Union{Float64, ComplexF64, Float32, ComplexF32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
+    if real(ν+z) isa Union{Float64, Float32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
         δ = round(ν) - ν
         n = real(round(ν)) - 1
 
