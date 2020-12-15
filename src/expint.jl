@@ -336,7 +336,7 @@ end
 
 # series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
-function En_expand_origin_posint(n::Integer, z::Number)
+function En_expand_origin_posint(n, z::Number)
     gammaterm = 1 # (-z)^(n-1) / (n-1)!
     if n < 100
         for i = 1:n-1
@@ -367,8 +367,8 @@ function En_expand_origin_posint(n::Integer, z::Number)
 end
 
 function En_expand_origin(ν::Number, z::Number)
-    if isinteger(ν) && 0 < real(ν) ≤ typemax(Int)
-        return En_expand_origin_posint(Int(ν), z)
+    if isinteger(ν) && real(ν) > 0
+        return real(ν) < (typemax(Int)>>2) ? En_expand_origin_posint(Int(real(ν)), z) : En_expand_origin_posint(real(ν), z)
     else
         return En_expand_origin_general(ν, z)
     end
