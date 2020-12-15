@@ -314,7 +314,7 @@ function En_expand_origin_general(ν::Number, z::Number)
         k += 1
     end
     
-    if ν isa Union{Float64, ComplexF64, Float32, ComplexF32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
+    if ν+real(z) isa Union{Float64, ComplexF64, Float32, ComplexF32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
         δ = round(ν) - ν
         n = real(round(ν)) - 1
 
@@ -329,23 +329,34 @@ function En_expand_origin_general(ν::Number, z::Number)
         series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
         series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
         series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
-        return (-1)^n * (series1 + series2)/factorial(n)*z^(ν-1) - sumterm
+
+        return (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
     end
     return gammaterm - (blowup + sumterm)
+end
+
+# compute (-z)^n / n!, avoiding overflow if possible, where n is an integer ≥ 0 (but not necessarily an Integer)
+function En_safe_expfact(n::Real, z::Number)
+    if n < 100
+        powerterm = one(z)
+        for i = 1:Int(n)
+            powerterm *= -z/i
+        end
+        return powerterm
+    else
+        if z isa Real
+            sgn = z ≤ 0 ? one(n) ? (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
+            return sgn * exp(n * log(abs(z)) - loggamma(n+1))
+        else
+            return exp(n * log(-z) - loggamma(n+1))
+        end
+    end
 end
 
 # series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
 function En_expand_origin_posint(n, z::Number)
-    gammaterm = 1 # (-z)^(n-1) / (n-1)!
-    if n < 100
-        for i = 1:n-1
-            gammaterm *= -z / i
-        end
-    else
-        gammaterm = (z ≥ 0 || isodd(n) ? 1 : -1) * exp((n - 1)*log(abs(z)) - loggamma(n))
-    end
-
+    gammaterm = En_safe_expfact(n-1, z) # (-z)^(n-1) / (n-1)!
     frac = one(real(z))
     gammaterm *= digamma(oftype(frac,n)) - log(z)
     sumterm = n == 1 ? zero(frac) : frac / (1 - n)
