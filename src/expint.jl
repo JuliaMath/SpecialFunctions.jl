@@ -325,7 +325,7 @@ function En_expand_origin_general(ν::Number, z::Number)
         # due to https://functions.wolfram.com/GammaBetaErf/Gamma/06/01/05/01/0004/
         # expressions for higher order terms found using:
         # https://gist.github.com/augustt198/348e8f9ba33c0248f1548309c47c6d0e
-        ψ₀, ψ₁, ψ₂, ψ₃, ψ₄ = polygamma.(0:4, n+1)
+        ψ₀, ψ₁, ψ₂, ψ₃, ψ₄ = polygamma.((0,1,2,3,4), n+1)
         series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
         series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
         series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
