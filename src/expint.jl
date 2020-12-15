@@ -292,15 +292,15 @@ end
 
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
-function En_expand_origin_general(ν::Number, z::Number)
+function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
     # gammaterm = En_safe_gamma_term(ν, z)
     gammaterm = gamma(1-ν)*z^(ν-1)
     frac = one(z)
     blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
     sumterm = abs(1 - ν) < 0.5 ? zero(z) : frac / (1 - ν)
-    k, maxiter = 1, 100
+    k = 1
     ε = 10*eps(typeof(abs(frac)))
-    while k < maxiter
+    while k < niter
         frac *= -z / k
         prev = sumterm
         if abs(k + 1 - ν) < 0.5
@@ -313,12 +313,12 @@ function En_expand_origin_general(ν::Number, z::Number)
         end
         k += 1
     end
-    
+
     if ν+real(z) isa Union{Float64, ComplexF64, Float32, ComplexF32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
         δ = round(ν) - ν
         n = real(round(ν)) - 1
 
-        # (1 - z^δ)/δ series 
+        # (1 - z^δ)/δ series
         logz = log(z)
         series1 = -logz - logz^2*δ/2 - logz^3*δ^2/6 - logz^4*δ^3/24 - logz^5*δ^4/120
 
@@ -355,14 +355,14 @@ end
 
 # series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
-function En_expand_origin_posint(n, z::Number)
+function En_expand_origin_posint(n, z::Number, niter::Integer)
     gammaterm = En_safe_expfact(n-1, z) # (-z)^(n-1) / (n-1)!
     frac = one(real(z))
     gammaterm *= digamma(oftype(frac,n)) - log(z)
     sumterm = n == 1 ? zero(frac) : frac / (1 - n)
-    k, maxiter = 1, 100
+    k = 1
     ϵ = 10*eps(real(sumterm))
-    while k < maxiter
+    while k < niter
         frac *= -z / k
         # skip term with zero denominator
         if k != n-1
@@ -377,11 +377,11 @@ function En_expand_origin_posint(n, z::Number)
     return gammaterm - sumterm
 end
 
-function En_expand_origin(ν::Number, z::Number)
+function En_expand_origin(ν::Number, z::Number, niter::Integer)
     if isinteger(ν) && real(ν) > 0
-        return real(ν) < (typemax(Int)>>2) ? En_expand_origin_posint(Int(real(ν)), z) : En_expand_origin_posint(real(ν), z)
+        return real(ν) < (typemax(Int)>>2) ? En_expand_origin_posint(Int(real(ν)), z, niter) : En_expand_origin_posint(real(ν), z, niter)
     else
-        return En_expand_origin_general(ν, z)
+        return En_expand_origin_general(ν, z, niter)
     end
 end
 
@@ -437,7 +437,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
     if abs2(z) < 9
         # use Taylor series about the origin for small z
         mult = expscaled ? exp(z) : 1
-        return mult * En_expand_origin(ν, z)
+        return mult * En_expand_origin(ν, z, niter)
     end
 
     if z isa Real || real(z) > 0
@@ -448,7 +448,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
             g, cf, _ = zero(z), En_cf_nogamma(ν, z, niter)...
         end
         g != 0 && (g *= gmult)
-        cf = expscaled ? cf : En_safeexpmult(-z, cf) 
+        cf = expscaled ? cf : En_safeexpmult(-z, cf)
         return g + cf
     else
         # Procedure for z near the negative real axis based on
