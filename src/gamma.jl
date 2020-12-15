@@ -660,14 +660,13 @@ throws a `DomainError` if `gamma(x)` is negative.
 
 See also [`logabsgamma`](@ref).
 """
-function loggamma end
+loggamma(x::Number) = loggamma(float(x))
 
 function loggamma(x::Real)
     (y, s) = logabsgamma(x)
     s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
-loggamma(x::Number) = loggamma(float(x))
 
 # asymptotic series for log(gamma(z)), valid for sufficiently large real(z) or |imag(z)|
 function loggamma_asymptotic(z::Complex{Float64})
