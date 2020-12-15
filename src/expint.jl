@@ -292,38 +292,77 @@ end
 
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
-function En_expand_origin_general(ν::Number, z::Number)
-    gammaterm = En_safe_gamma_term(ν, z)
-    frac = one(real(z))
-    sumterm = frac / (1 - ν)
-    k, maxiter = 1, 100
-    ϵ = 10*eps(real(sumterm))
-    while k < maxiter
+function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
+    # gammaterm = En_safe_gamma_term(ν, z)
+    gammaterm = gamma(1-ν)*z^(ν-1)
+    frac = one(z)
+    blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
+    sumterm = abs(1 - ν) < 0.5 ? zero(z) : frac / (1 - ν)
+    k = 1
+    ε = 10*eps(typeof(abs(frac)))
+    while k < niter
         frac *= -z / k
         prev = sumterm
-        sumterm += frac / (k + 1 - ν)
-        if abs(sumterm - prev) < ϵ
-            break
+        if abs(k + 1 - ν) < 0.5
+            blowup += frac / (k + 1 - ν)
+        else
+            sumterm += frac / (k + 1 - ν)
+            if abs(sumterm - prev) < ε*abs(prev)
+                break
+            end
         end
         k += 1
     end
-    return gammaterm - sumterm
+
+    if real(ν+z) isa Union{Float64, Float32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
+        δ = round(ν) - ν
+        n = real(round(ν)) - 1
+
+        # (1 - z^δ)/δ series
+        logz = log(z)
+        series1 = -logz - logz^2*δ/2 - logz^3*δ^2/6 - logz^4*δ^3/24 - logz^5*δ^4/120
+
+        # due to https://functions.wolfram.com/GammaBetaErf/Gamma/06/01/05/01/0004/
+        # expressions for higher order terms found using:
+        # https://gist.github.com/augustt198/348e8f9ba33c0248f1548309c47c6d0e
+        ψ₀, ψ₁, ψ₂, ψ₃, ψ₄ = polygamma.((0,1,2,3,4), n+1)
+        series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
+        series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
+        series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
+
+        return (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
+    end
+    return gammaterm - (blowup + sumterm)
+end
+
+# compute (-z)^n / n!, avoiding overflow if possible, where n is an integer ≥ 0 (but not necessarily an Integer)
+function En_safe_expfact(n::Real, z::Number)
+    if n < 100
+        powerterm = one(z)
+        for i = 1:Int(n)
+            powerterm *= -z/i
+        end
+        return powerterm
+    else
+        if z isa Real
+            sgn = z ≤ 0 ? one(n) : (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
+            return sgn * exp(n * log(abs(z)) - loggamma(n+1))
+        else
+            return exp(n * log(-z) - loggamma(n+1))
+        end
+    end
 end
 
 # series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
-function En_expand_origin_posint(n::Integer, z::Number)
-    gammaterm = 1 # (-z)^(n-1) / (n-1)!
-    for i = 1:n-1
-        gammaterm *= -z / i
-    end
-
+function En_expand_origin_posint(n, z::Number, niter::Integer)
+    gammaterm = En_safe_expfact(n-1, z) # (-z)^(n-1) / (n-1)!
     frac = one(real(z))
     gammaterm *= digamma(oftype(frac,n)) - log(z)
     sumterm = n == 1 ? zero(frac) : frac / (1 - n)
-    k, maxiter = 1, 100
+    k = 1
     ϵ = 10*eps(real(sumterm))
-    while k < maxiter
+    while k < niter
         frac *= -z / k
         # skip term with zero denominator
         if k != n-1
@@ -338,11 +377,11 @@ function En_expand_origin_posint(n::Integer, z::Number)
     return gammaterm - sumterm
 end
 
-function En_expand_origin(ν::Number, z::Number)
+function En_expand_origin(ν::Number, z::Number, niter::Integer)
     if isinteger(ν) && real(ν) > 0
-        return En_expand_origin_posint(Integer(ν), z)
+        return real(ν) < (typemax(Int)>>2) ? En_expand_origin_posint(Int(real(ν)), z, niter) : En_expand_origin_posint(real(ν), z, niter)
     else
-        return En_expand_origin_general(ν, z)
+        return En_expand_origin_general(ν, z, niter)
     end
 end
 
@@ -398,7 +437,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
     if abs2(z) < 9
         # use Taylor series about the origin for small z
         mult = expscaled ? exp(z) : 1
-        return mult * En_expand_origin(ν, z)
+        return mult * En_expand_origin(ν, z, niter)
     end
 
     if z isa Real || real(z) > 0
@@ -409,7 +448,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
             g, cf, _ = zero(z), En_cf_nogamma(ν, z, niter)...
         end
         g != 0 && (g *= gmult)
-        cf = expscaled ? cf : En_safeexpmult(-z, cf) 
+        cf = expscaled ? cf : En_safeexpmult(-z, cf)
         return g + cf
     else
         # Procedure for z near the negative real axis based on
