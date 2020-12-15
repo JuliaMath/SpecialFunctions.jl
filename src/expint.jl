@@ -345,7 +345,7 @@ function En_safe_expfact(n::Real, z::Number)
         return powerterm
     else
         if z isa Real
-            sgn = z ≤ 0 ? one(n) ? (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
+            sgn = z ≤ 0 ? one(n) : (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
             return sgn * exp(n * log(abs(z)) - loggamma(n+1))
         else
             return exp(n * log(-z) - loggamma(n+1))
