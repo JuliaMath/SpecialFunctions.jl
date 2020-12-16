@@ -150,6 +150,8 @@ using Base.MathConstants
         for ν in (1,2,-2,2+3im,2-3im,-2+3im,-2-3im), z in (0.1+0.2im, -0.1+0.2im, 4+5im, -4+5im, -4-5im, -10+1e-4im, -10-1e-4im)
             @test expintx(ν, z) ≅ exp(z) * expint(ν, z)
         end
+
+        @test expintx(4, 1e300) == 1e-300
     end
 
     # issue #272: more cases with real results

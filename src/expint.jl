@@ -173,22 +173,15 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
     for i = 2:n
         iters += 1
 
-        A′ = A
-        A = z*A + (i-1) * Aprev
-        Aprev = A′
-        B′ = B
-        B = z*B + (i-1) * Bprev
-        Bprev = B′
+        A, Aprev = z*A + (i-1) * Aprev, A
+        B, Bprev = z*B + (i-1) * Bprev, B
 
-        A′ = A
-        A = A + (ν+i-1) * Aprev
-        Aprev = A′
-        B′ = B
-        B = B + (ν+i-1) * Bprev
-        Bprev = B′
+        (isinf(A) | isinf(B)) && return Aprev/Bprev, iters-1
 
-        conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
-        conv && i > 4 && break
+        A, Aprev = A + (ν+i-1) * Aprev, A
+        B, Bprev = B + (ν+i-1) * Bprev, B
+
+        i > 4 && abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev) && break
 
         # rescale
         if fastabs(A) > scale
@@ -226,13 +219,9 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     for i = 2:n
         iters += 1
 
-        A′ = A
         term = iseven(i) ? -(i÷2 - 1 - ν)*z : z*(i÷2)
-        A = (i - ν)*A + term * Aprev
-        Aprev = A′
-        B′ = B
-        B = (i - ν)*B + term * Bprev
-        Bprev = B′
+        A, Aprev = (i - ν)*A + term * Aprev, A
+        B, Bprev = (i - ν)*B + term * Bprev, B
 
         conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
         conv && break
