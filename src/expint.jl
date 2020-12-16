@@ -169,7 +169,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
     scale = sqrt(floatmax(real(A)))
 
     # two recurrence steps / loop
-    iters = 0
+    iters = 1
     for i = 2:n
         iters += 1
 
@@ -221,7 +221,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     ϵ = 10*eps(real(B))
     scale = sqrt(floatmax(real(A)))
 
-    iters = 0
+    iters = 1
     j = 1
     for i = 2:n
         iters += 1
@@ -458,21 +458,25 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
         #   16(2), 169–177. https://doi.org/10.1145/78928.78933
         doconj = imag(z) < 0
         rez, imz = real(z), abs(imag(z))
+        zorig = z
         z = doconj ? conj(z) : z
         ν = doconj ? conj(ν) : ν
 
-        quick_niter, nmax = 50, 45
+        quick_niter = niter >> 4
         # start with small imaginary part if exactly on negative real axis
         imstart = (imz == 0) ? abs(z)*sqrt(eps(typeof(real(z)))) : imz
         z₀ = rez + imstart*im
         g_start, cf_start, i, _ = En_cf(ν, z₀, quick_niter)
         E_start = g_start + En_safeexpmult(-z₀, cf_start)
         isnan(E_start) && return E_start
-        if imz > 0 && i < nmax
+        if imz > 0 && i < quick_niter
             # didn't need to take any steps
+            if expscaled
+                E_start = En_safeexpmult(z₀, g_start) + cf_start
+            end
             return doconj ? conj(E_start) : E_start
         end
-        while i > nmax
+        while i == quick_niter
             # double imaginary part until in region with fast convergence
             imstart *= 2
             z₀ = rez + imstart*im
@@ -504,7 +508,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
                 En = bit ? En : En + bc
             end
         end
-        return expscaled ? exp(z) * En : En
+        return expscaled ? En_safeexpmult(zorig, En) : En
     end
 end
 
