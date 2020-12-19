@@ -63,7 +63,8 @@ export
     expintx,
     sinint,
     cosint,
-    lbinomial
+    lbinomial,
+    logmultinomial
 
 include("bessel.jl")
 include("erf.jl")
