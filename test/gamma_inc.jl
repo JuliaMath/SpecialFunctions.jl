@@ -101,9 +101,8 @@ double(x::Complex) = ComplexF64(x)
     @test_throws DomainError gamma(2.2, -Inf)
 end
 
-@testset "upper incomplete gamma function" begin
+@testset "upper incomplete gamma function logarithm" begin
     for (a,z) in ((3,5), (3,5+4im), (3,-5+4im), (3,5-4im), (-3,5+4im), (-3,-5+4im))
-        @show a,z
-        @test loggamma(a,z) ≈ log(gamma(a,z)) rtol=1e-13
+        @test exp(loggamma(a,z)) ≈ gamma(a,z) rtol=1e-13
     end
 end

@@ -1109,6 +1109,10 @@ Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
 ```
 supporting arbitrary real or complex `a` and `x`.
 
+If `a` and/or `x` is complex, then `exp(loggamma(a,x))` matches `gamma(a,x)` (up to floating-point error),
+but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2\\pi i``
+(i.e. it may employ a different branch cut).
+
 See also [`loggamma(x)`](@ref).
 """
 loggamma(a::Number,x::Number) = _loggamma(promotereal(float(a),float(x))...)
@@ -1133,5 +1137,6 @@ function _loggamma(a::Number,x::Number)
             end
         end
     end
+    # from gamma(a,x) = x^a * expintx(1-a, x) * exp(-x):
     return iszero(x) ? loggamma(one(x)*a) : a*log(x) + log(expintx(1-a, x)) - x
 end
