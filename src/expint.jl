@@ -517,7 +517,7 @@ expint(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{false
     expintx(z)
     expintx(ν, z)
 
-Computes the scaled exponential integral ``\\exp(z) \\operatorname{E}_\\nu(z) = \\exp(z) \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+Computes the scaled exponential integral ``\\exp(z) \\operatorname{E}_\\nu(z) = e^z \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
 If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
 See also: [`expint(ν, z)`](@ref SpecialFunctions.expint)
