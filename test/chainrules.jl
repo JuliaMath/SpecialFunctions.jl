@@ -66,7 +66,7 @@
                 Δx, x̄ = randn(2)
                 Δz = (randn(), randn())
 
-                # frule_test(logabsgamma, (x, Δx))   # uncomment when #288 is fixed
+                frule_test(logabsgamma, (x, Δx))
                 rrule_test(logabsgamma, Δz, (x, x̄))
             end
         end
