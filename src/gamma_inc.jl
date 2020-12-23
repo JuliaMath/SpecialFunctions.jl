@@ -1122,21 +1122,22 @@ function _loggamma(a::Number,x::Number)
         if isinf(x) && isfinite(a)
             if x > 0 # == +Inf
                 return -one(a)*x
-            elseif a > 0 && isinteger(a) # x == -Inf
-                return throw(DomainError((a,x), "loggamma will only return a complex result if called with a complex argument"))
+            elseif x < 0
+                throw(DomainError((a,x), "loggamma will only return a complex result if called with a complex argument"))
             end
         elseif isinf(a) && isfinite(x)
-            if a > 0
-                if x ≥ 0
-                    return a*one(x) # +Inf
-                else
-                    throw(DomainError((a,x), "loggamma will only return a complex result if called with a complex argument"))
-                end
+            if a > 0 && x ≥ 0
+                return a*one(x) # +Inf
             elseif a < 0
                 return a*one(x) # -Inf
             end
         end
     end
     # from gamma(a,x) = x^a * expintx(1-a, x) * exp(-x):
-    return iszero(x) ? loggamma(one(x)*a) : a*log(x) + log(expintx(1-a, x)) - x
+    iszero(x) && return loggamma(one(x)*a)
+    if x isa Real && x < 0 && a isa Integer && isodd(a)
+        # minus signs in expintx and x^a may cancel
+        return a*log(-x) + log(-expintx(1-a, x)) - x
+    end
+    return a*log(x) + log(expintx(1-a, x)) - x
 end
