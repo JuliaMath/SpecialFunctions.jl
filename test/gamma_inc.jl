@@ -100,3 +100,23 @@ double(x::Complex) = ComplexF64(x)
     @test gamma(2, -Inf) == -Inf
     @test_throws DomainError gamma(2.2, -Inf)
 end
+
+@testset "upper incomplete gamma function logarithm" begin
+    for (a,z) in ((3,5), (3,-5), (3,5+4im), (3,-5+4im), (3,5-4im), (-3,5+4im), (-3,-5+4im))
+        @test exp(loggamma(a,z)) ≈ gamma(a,z) rtol=1e-13
+    end
+    @test loggamma(50, 1e7) ≅ -9.9992102133082030308153473164868727954977460876571275797855e6
+    @test real(loggamma(50, 1e7 + 1e8im)) ≅ -9.999097142860392e6
+    @test cis(imag(loggamma(50, 1e7 + 1e8im))) ≈ cis(1.0275220422549918) rtol=1e-8
+    @test real(loggamma(10+20im, -1e5 + 1e8im)) ≈ 100134.3502048662475864409896160245625409130538724704329203542339
+    @test cis(imag(loggamma(10+20im, -1e5 + 1e8im))) ≈ cis(-2.6572071454623347) rtol=1e-8
+    @test loggamma(-1e8, 1e9) ≅ -3.0723266045132171331933746054573197040165846554476396719312e9
+    @test loggamma(3, Inf) == -Inf
+    @test_throws DomainError loggamma(3, -Inf)
+    @test loggamma(Inf, 3.2) == Inf
+    @test loggamma(-Inf, 3.2) == -Inf
+    @test_throws DomainError loggamma(Inf, -3.2)
+    @test loggamma(117.3, 0) == loggamma(117.3)
+    @test loggamma(7, -300.2) ≅ log(gamma(7, -300.2))
+    @test_throws DomainError loggamma(6, -3.2)
+end

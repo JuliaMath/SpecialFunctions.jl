@@ -57,13 +57,14 @@ SpecialFunctions.ellipe
 SpecialFunctions.eta
 SpecialFunctions.zeta
 SpecialFunctions.gamma(::Number)
+SpecialFunctions.loggamma(::Number)
+SpecialFunctions.logabsgamma
+SpecialFunctions.logfactorial
 SpecialFunctions.gamma(::Number,::Number)
+SpecialFunctions.loggamma(::Number,::Number)
 SpecialFunctions.gamma_inc
 SpecialFunctions.gamma_inc_inv
 SpecialFunctions.beta_inc
-SpecialFunctions.loggamma
-SpecialFunctions.logabsgamma
-SpecialFunctions.logfactorial
 SpecialFunctions.beta
 SpecialFunctions.logbeta
 SpecialFunctions.logabsbeta

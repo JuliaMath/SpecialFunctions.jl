@@ -658,16 +658,19 @@ function logabsgamma end
 Computes the logarithm of [`gamma`](@ref) for given `x`. If `x` is a `Real`, then it
 throws a `DomainError` if `gamma(x)` is negative.
 
-See also [`logabsgamma`](@ref).
+If `x` is complex, then `exp(loggamma(x))` matches `gamma(x)` (up to floating-point error),
+but `loggamma(x)` may differ from `log(gamma(x))` by an integer multiple of ``2\\pi i``
+(i.e. it may employ a different branch cut).
+
+See also [`logabsgamma`](@ref) for real `x`.
 """
-function loggamma end
+loggamma(x::Number) = loggamma(float(x))
 
 function loggamma(x::Real)
     (y, s) = logabsgamma(x)
     s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
-loggamma(x::Number) = loggamma(float(x))
 
 # asymptotic series for log(gamma(z)), valid for sufficiently large real(z) or |imag(z)|
 function loggamma_asymptotic(z::Complex{Float64})

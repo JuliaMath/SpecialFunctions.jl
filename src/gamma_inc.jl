@@ -1079,7 +1079,7 @@ function _gamma(a::Number,x::Number)
             end
         end
     end
-    return iszero(x) ? one(x)*gamma(a) : x^a * expint(1-a, x)
+    return iszero(x) ? gamma(one(x)*a) : x^a * expint(1-a, x)
 end
 
 _gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
@@ -1098,4 +1098,46 @@ function _gamma_big(a::Real,x::Real)
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
     return z
+end
+
+"""
+    loggamma(a,x)
+
+Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
+```math
+\\log \\Gamma(a,x) = \\log \\int_x^\\infty t^{a-1} e^{-t} dt \\, ,
+```
+supporting arbitrary real or complex `a` and `x`.
+
+If `a` and/or `x` is complex, then `exp(loggamma(a,x))` matches `gamma(a,x)` (up to floating-point error),
+but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2\\pi i``
+(i.e. it may employ a different branch cut).
+
+See also [`loggamma(x)`](@ref).
+"""
+loggamma(a::Number,x::Number) = _loggamma(promotereal(float(a),float(x))...)
+loggamma(a::Integer,x::Number) = _loggamma(a, float(x))
+function _loggamma(a::Number,x::Number)
+    if a isa Real && x isa Real && !isfinite(a*x)
+        if isinf(x) && isfinite(a)
+            if x > 0 # == +Inf
+                return -one(a)*x
+            elseif x < 0
+                throw(DomainError((a,x), "loggamma will only return a complex result if called with a complex argument"))
+            end
+        elseif isinf(a) && isfinite(x)
+            if a > 0 && x ≥ 0
+                return a*one(x) # +Inf
+            elseif a < 0
+                return a*one(x) # -Inf
+            end
+        end
+    end
+    # from gamma(a,x) = x^a * expintx(1-a, x) * exp(-x):
+    iszero(x) && return loggamma(one(x)*a)
+    if x isa Real && x < 0 && a isa Integer && isodd(a)
+        # minus signs in expintx and x^a may cancel
+        return a*log(-x) + log(-expintx(1-a, x)) - x
+    end
+    return a*log(x) + log(expintx(1-a, x)) - x
 end
