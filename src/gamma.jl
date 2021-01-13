@@ -934,4 +934,14 @@ logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)
 end
 binomial(n, k) = Base.binomial(n, k) # to make SpecialFunctions.binomial work unconditionally
 
+"""
+    binomial(x, y)
+
+Generalized binomial coefficient
+``{x \\choose y} = \\frac{1}{(x+1) \\Beta(x-y+1,y+1)}``.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficient#Two_real_or_complex_valued_arguments)
+
+See also [`beta(a,b)`](@ref SpecialFunctions.beta).
+"""
 binomial(x::Number, y::Number) = inv((x+1) * beta(x-y+1, y+1))
