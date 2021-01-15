@@ -927,13 +927,6 @@ function logabsbinomial(n::T, k::T) where {T<:Integer}
 end
 logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)
 
-
-# this trickery is needed while the deprecated method in Base exists
-@static if !hasmethod(Base.binomial, Tuple{Number, Number})
-    import Base: binomial
-end
-binomial(n, k) = Base.binomial(n, k) # to make SpecialFunctions.binomial work unconditionally
-
 """
     binomial(x, y)
 
@@ -944,4 +937,4 @@ External links: [Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficient#T
 
 See also [`beta(a,b)`](@ref SpecialFunctions.beta).
 """
-binomial(x::Number, y::Number) = inv((x+1) * beta(x-y+1, y+1))
+Base.binomial(x::Number, y::Number) = inv((x+1) * beta(x-y+1, y+1))
