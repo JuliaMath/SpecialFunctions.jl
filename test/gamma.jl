@@ -267,3 +267,14 @@ end
 
     @test beta(big(1.0),big(1.2)) ≈ beta(1.0,1.2) rtol=4*eps()
 end
+
+@testset "binomial" begin
+    # type stability tests
+    #   (combinations of real/complex/integer arguments of sizes 16/32/63/Big lead to correct data types)
+
+    # check some specific, real/complex arguments
+
+    # check some Big arguments
+
+    # compare integer arguments type casted to complex wrt integer arguments
+end
