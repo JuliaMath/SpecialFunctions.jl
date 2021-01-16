@@ -570,10 +570,11 @@ export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, lo
 
 ## from base/special/gamma.jl
 
-gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libm), Float64, (Float64,), x), x)
-gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x), x)
-gamma(x::Float16)       = Float16(gamma(Float32(x)))
-gamma(x::AbstractFloat) = throw(MethodError(gamma, x))
+gamma(x::Float64)           = nan_dom_err(ccall((:tgamma,  libm), Float64, (Float64,), x), x)
+gamma(x::Float32)           = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x), x)
+gamma(x::Float16)           = Float16(gamma(Float32(x)))
+gamma(x::AbstractFloat)     = throw(MethodError(gamma, x))
+gamma(x::Complex{BigFloat}) = throw(MethodError(gamma, x))
 
 function gamma(x::BigFloat)
     isnan(x) && return x
