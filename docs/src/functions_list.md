@@ -51,7 +51,7 @@ SpecialFunctions.besseli
 SpecialFunctions.besselix
 SpecialFunctions.besselk
 SpecialFunctions.besselkx
-SpecialFunctions.binomial
+Base.binomial
 SpecialFunctions.jinc
 SpecialFunctions.ellipk
 SpecialFunctions.ellipe

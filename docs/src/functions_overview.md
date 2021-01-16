@@ -22,7 +22,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`logbeta(x,y)`](@ref SpecialFunctions.logbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 | [`logabsbeta(x,y)`](@ref SpecialFunctions.logabsbeta)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
 | [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(binomial(n,k)))` for large `n` and `k` near `n/2`     |
-| [`binomial(x,y)`](@ref SpecialFunctions.binomial)                                                      | generalized binomial coefficient ``{ x \choose y}`` for ``x,y \in \mathbb{C}``|
+| [`binomial(x,y)`](@ref Base.binomial)                                                      | generalized binomial coefficient ``{ x \choose y}`` for ``x,y \in \mathbb{C}``|
 
 
 ## [Exponential and Trigonometric Integrals](https://dlmf.nist.gov/6)

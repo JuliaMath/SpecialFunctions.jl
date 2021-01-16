@@ -930,8 +930,9 @@ logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)
 """
     binomial(x, y)
 
-Generalized binomial coefficient
-``{x \\choose y} = \\frac{1}{(x+1) \\Beta(x-y+1,y+1)}``.
+Generalized binomial coefficient for complex arguments
+``{x \\choose y} = \\frac{1}{(x+1) \\Beta(x-y+1,y+1)}``
+for ``x, y \\ \\mathbb{C}``.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficient#Two_real_or_complex_valued_arguments)
 
