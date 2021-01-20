@@ -72,10 +72,6 @@
         @test loggamma(1.4+3.7im) ≈ -3.7094025330996841898 + 2.4568090502768651184im
         @test loggamma(1.4+3.7im) ≈ log(gamma(1.4+3.7im))
         @test loggamma(-4.2+0im) ≈ logabsgamma(-4.2)[1] - 5pi*im
-        @test SpecialFunctions.factorial(3.0) == gamma(4.0) == factorial(3)
-        for x in (3.2, 2+1im, 3//2, 3.2+0.1im)
-            @test SpecialFunctions.factorial(x) == gamma(1+x)
-        end
         @test logfactorial(0) == logfactorial(1) == 0
         @test logfactorial(2) == loggamma(3)
         # Ensure that the domain of logfactorial matches that of factorial (issue #21318)
