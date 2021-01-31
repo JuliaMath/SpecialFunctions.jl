@@ -1,17 +1,22 @@
-name = "SpecialFunctions"
-uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "0.10.3"
+name    = "SpecialFunctions"
+uuid    = "276daf66-3868-5448-9aa4-cd146d93841b"
+version = "1.2.1"
 
 [deps]
+ChainRulesCore  = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
 
 [compat]
-julia = "1.3"
-OpenSpecFun_jll = "0.5.3"
+ChainRulesCore      = "0.9"
+ChainRulesTestUtils = "0.5.10, 0.6"
+OpenSpecFun_jll     = "0.5"
+julia               = "1.3"
 
 [extras]
-Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+ChainRulesTestUtils = "cdddcdb0-9152-4a09-a978-84456f9df70a"
+Polynomials         = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
+Random              = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Test                = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Polynomials"]
+test = ["ChainRulesTestUtils", "Polynomials", "Random", "Test"]

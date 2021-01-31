@@ -1,16 +1,24 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
 using SpecialFunctions
+using ChainRulesTestUtils
+using Random
 using Test
 using Base.MathConstants: γ
 
 using SpecialFunctions: AmosException, f64
 
 # useful test functions for relative error, which differ from isapprox
-# in that relerrc separately looks at the real and imaginary parts
-relerr(z, x) = z == x ? 0.0 : abs(z - x) / abs(x)
-relerrc(z, x) = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
-≅(a,b) = relerrc(a,b) ≤ 1e-13
+# relerr separately looks at the real and imaginary parts if one of the arguments is complex
+relerr(z, x) = z == x ? zero(z) : abs(z - x) / abs(x)
+relerr(z::T, x::T) where {T <: Complex} = max(relerr(real(z),real(x)), relerr(imag(z),imag(x)))
+relerr(z::Complex, x) = relerr(z, Complex(x))
+relerr(z, x::Complex) = relerr(Complex(z), x)
+checktol(err::Float16) = err ≤ 5e-2
+checktol(err::Float32) = err ≤ 1e-6
+checktol(err::Float64) = err ≤ 1e-13
+≅(a,b) = checktol(relerr(a,b))
+
 
 tests = [
     "14_legendre",
@@ -19,10 +27,12 @@ tests = [
     "betanc",
     "ellip",
     "erf",
+    "expint",
     "gamma_inc",
     "gamma",
     "sincosint",
-    "other_tests"
+    "other_tests",
+    "chainrules"
 ]
 
 const testdir = dirname(@__FILE__)

@@ -818,7 +818,7 @@ end
 # doi>10.1145/22721.23109
 
 """
-    gamma_inc(a,x,IND)
+    gamma_inc(a,x,IND=0)
 
 Returns a tuple ``(p, q)`` where ``p + q = 1``, and
 ``p=P(a,x)`` is the Incomplete gamma function ratio given by:
@@ -829,6 +829,9 @@ and ``q=Q(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
 Q(x,a)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
 ```
+In terms of these, the lower incomplete gamma function is
+``\\gamma(a,x) = P(a,x) \\Gamma(a)`` and the upper incomplete
+gamma function is ``\\Gamma(a,x) = Q(a,x) \\Gamma(a)``.
 
 `IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
 
@@ -836,7 +839,9 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
-function gamma_inc(a::Float64,x::Float64,ind::Integer)
+gamma_inc(a::Real,x::Real,ind::Integer=0) = _gamma_inc(promote(float(a),float(x))...,ind)
+
+function _gamma_inc(a::Float64,x::Float64,ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
     if a<0.0 || x<0.0
@@ -933,17 +938,14 @@ function gamma_inc(a::Float64,x::Float64,ind::Integer)
 
 end
 
-function gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
+function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
     q = z/gamma(a)
     return (1.0 - q, q)
 end
-gamma_inc(a::Float32,x::Float32,ind::Integer) = ( Float32(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float32(gamma_inc(Float64(a),Float64(x),ind)[2]) )
-gamma_inc(a::Float16,x::Float16,ind::Integer) = ( Float16(gamma_inc(Float64(a),Float64(x),ind)[1]) , Float16(gamma_inc(Float64(a),Float64(x),ind)[2]) )
-gamma_inc(a::Real,x::Real,ind::Integer) = (gamma_inc(float(a),float(x),ind))
-gamma_inc(a::Integer,x::Integer,ind::Integer) = gamma_inc(Float64(a),Float64(x),ind)
-gamma_inc(a::AbstractFloat,x::AbstractFloat,ind::Integer) = throw(MethodError(gamma_inc,(a,x,ind,"")))
+_gamma_inc(a::Float32,x::Float32,ind::Integer) = Float32.(_gamma_inc(Float64(a),Float64(x),ind))
+_gamma_inc(a::Float16,x::Float16,ind::Integer) = Float16.(_gamma_inc(Float64(a),Float64(x),ind))
 
 #EFFICIENT AND ACCURATE ALGORITHMS FOR THECOMPUTATION AND INVERSION OF THE INCOMPLETEGAMMA FUNCTION RATIOS by Amparo Gil, Javier Segura, Nico M. Temme
 #SIAM Journal on Scientific Computing 34(6) (2012), A2965-A2981
@@ -958,7 +960,9 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
-function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
+gamma_inc_inv(a::Real, p::Real, q::Real) = _gamma_inc_inv(promote(float(a), float(p), float(q))...)
+
+function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     if p < 0.5
         pcase = true
         porq = p
@@ -1028,8 +1032,112 @@ function gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     return x
 end
 
-gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
-gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
-gamma_inc_inv(a::Real, p::Real, q::Real) = ( gamma_inc_inv(float(a), float(p), float(q)) )
-gamma_inc_inv(a::Integer, p::Integer, q::Integer) = ( gamma_inc_inv(Float64(a), Float64(p), Float64(q)) )
-gamma_inc_inv(a::AbstractFloat, p::AbstractFloat, q::AbstractFloat) = throw(MethodError(gamma_inc_inv,(a,p,q,"")))
+_gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
+_gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
+
+# like promote(x,y), but don't complexify real values
+promotereal(x::Real,y::Real) = promote(x,y)
+promotereal(x::Real,y::Number) = let (u,v) = promote(x,y); real(u),v; end
+promotereal(x::Number,y::Real) = let (u,v) = promote(x,y); u,real(v); end
+promotereal(x,y) = promote(x,y)
+
+"""
+    gamma(a,x)
+
+Returns the upper incomplete gamma function
+```math
+\\Gamma(a,x) = \\int_x^\\infty t^{a-1} e^{-t} dt \\, ,
+```
+supporting arbitrary real or complex `a` and `x`.
+
+(The ordinary gamma function [`gamma(x)`](@ref) corresponds to ``\\Gamma(a) = \\Gamma(a,0)``.
+See also the [`gamma_inc`](@ref) function to compute both the upper and lower
+(``\\gamma(a,x)``) incomplete gamma functions scaled by ``\\Gamma(a)``.
+
+External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+"""
+gamma(a::Number,x::Number) = _gamma(promotereal(float(a),float(x))...)
+gamma(a::Integer,x::Number) = _gamma(a, float(x))
+
+function _gamma(a::Number,x::Number)
+    if a isa Real && x isa Real && !isfinite(a*x)
+        if isinf(x) && isfinite(a)
+            if x > 0 # == +Inf
+                return one(a)*zero(x)
+            elseif a > 0 && isinteger(a) # x == -Inf
+                return one(a)*x # -Inf
+            end
+        elseif isinf(a) && isfinite(x)
+            if a > 0
+                if x ≥ 0
+                    return a*one(x) # +Inf
+                else
+                    throw(DomainError((a,x), "gamma will only return a complex result if called with a complex argument"))
+                end
+            elseif a < 0
+                return zero(a)*one(x)
+            end
+        end
+    end
+    return iszero(x) ? gamma(one(x)*a) : x^a * expint(1-a, x)
+end
+
+_gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
+_gamma(a::BigInt, x::Real) = _gamma_big(a, x)
+_gamma(a::BigInt, x::BigFloat) = _gamma_big(a, x)
+_gamma(a::BigFloat,x::BigFloat) = _gamma_big(a, x)
+function _gamma_big(a::Real,x::Real)
+    if x < 0
+        # MPFR returns NaN in this case
+        if isinteger(a) && a > 0
+            return invoke(_gamma, Tuple{Number,Number}, a, BigFloat(x))
+        else
+            throw(DomainError((a,x), "gamma will only return a complex result if called with a complex argument"))
+        end
+    end
+    z = BigFloat()
+    ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
+    return z
+end
+
+"""
+    loggamma(a,x)
+
+Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
+```math
+\\log \\Gamma(a,x) = \\log \\int_x^\\infty t^{a-1} e^{-t} dt \\, ,
+```
+supporting arbitrary real or complex `a` and `x`.
+
+If `a` and/or `x` is complex, then `exp(loggamma(a,x))` matches `gamma(a,x)` (up to floating-point error),
+but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2\\pi i``
+(i.e. it may employ a different branch cut).
+
+See also [`loggamma(x)`](@ref).
+"""
+loggamma(a::Number,x::Number) = _loggamma(promotereal(float(a),float(x))...)
+loggamma(a::Integer,x::Number) = _loggamma(a, float(x))
+function _loggamma(a::Number,x::Number)
+    if a isa Real && x isa Real && !isfinite(a*x)
+        if isinf(x) && isfinite(a)
+            if x > 0 # == +Inf
+                return -one(a)*x
+            elseif x < 0
+                throw(DomainError((a,x), "loggamma will only return a complex result if called with a complex argument"))
+            end
+        elseif isinf(a) && isfinite(x)
+            if a > 0 && x ≥ 0
+                return a*one(x) # +Inf
+            elseif a < 0
+                return a*one(x) # -Inf
+            end
+        end
+    end
+    # from gamma(a,x) = x^a * expintx(1-a, x) * exp(-x):
+    iszero(x) && return loggamma(one(x)*a)
+    if x isa Real && x < 0 && a isa Integer && isodd(a)
+        # minus signs in expintx and x^a may cancel
+        return a*log(-x) + log(-expintx(1-a, x)) - x
+    end
+    return a*log(x) + log(expintx(1-a, x)) - x
+end

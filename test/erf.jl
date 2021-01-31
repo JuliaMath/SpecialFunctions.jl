@@ -19,8 +19,8 @@
         @test logerfc(Float32(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
         @test logerfc(Float64(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
         @test logerfc(1000) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
-        @test logerfc(Float32(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float32)
-        @test logerfc(Float64(10000)) ≈ log(erfc(BigFloat(10000, 100))) rtol=2*eps(Float64)
+        @test logerfc(Float32(10000)) ≈ log(erfc(BigFloat(10000, precision=100))) rtol=2*eps(Float32)
+        @test logerfc(Float64(10000)) ≈ log(erfc(BigFloat(10000, precision=100))) rtol=2*eps(Float64)
 
         @test_throws MethodError logerfcx(Float16(1))
         @test_throws MethodError logerfcx(Float16(-1))
@@ -42,12 +42,12 @@
         @test erfi(Float32(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float32)
         @test erfi(Float64(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float64)
 
-        @test erfinv(Integer(0)) == 0
+        @test erfinv(Integer(0)) == 0 == erfinv(0//1)
         @test_throws MethodError erfinv(Float16(1))
         @test erfinv(Float32(0.84270079294971486934)) ≈ 1 rtol=2*eps(Float32)
         @test erfinv(Float64(0.84270079294971486934)) ≈ 1 rtol=2*eps(Float64)
 
-        @test erfcinv(Integer(1)) == 0
+        @test erfcinv(Integer(1)) == 0 == erfcinv(1//1)
         @test_throws MethodError erfcinv(Float16(1))
         @test erfcinv(Float32(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float32)
         @test erfcinv(Float64(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float64)
@@ -95,16 +95,25 @@
         @test erfcx(BigFloat(1.8e88))   ≈ erfcx(1.8e88)             rtol=4*eps()
         @test isnan(erfcx(BigFloat(NaN)))
 
-        @test logerfc(BigFloat(1000, 100)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
+        @test logerfc(BigFloat(1000, precision=100)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
         @test isnan(logerfc(BigFloat(NaN)))
 
         @test_throws MethodError erfi(big(1.0))
 
-        @test_throws MethodError erfinv(BigFloat(1))
-
-        @test_throws MethodError erfcinv(BigFloat(1))
-
         @test_throws MethodError dawson(BigFloat(1))
+
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1+big"1e-50", big"1.2", 2-big"1e-50")
+            @test erfc(erfcinv(y)) ≈ y
+        end
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", 1-big"1e-50")
+            @test erf(erfinv(y)) ≈ y
+            @test erf(erfinv(-y)) ≈ -y
+        end
+        @test erfcinv(big(0)) == -erfcinv(big(2)) == erfinv(big(1)) == -erfinv(big(-1)) == Inf
+        for x in (1+big"1e-3", -1-big"1e-3")
+            @test_throws DomainError erfinv(x)
+            @test_throws DomainError erfcinv(1-x)
+        end
     end
 
     @testset "inverse" begin
@@ -155,7 +164,7 @@
         @test isnan(logerf(0, NaN))
         @test isnan(logerf(NaN, NaN))
         @test logerf(-1e-30, 1e-30) ≈ -68.2636233716261799887769930733
-        @test logerf(1e-30, 2e-30) ≈ -68.9567705521861252981942251947   
+        @test logerf(1e-30, 2e-30) ≈ -68.9567705521861252981942251947
         @test logerf(-2e-30, -1e-30) ≈ -68.9567705521861252981942251947
         @test_throws DomainError logerf(2, 1)
     end

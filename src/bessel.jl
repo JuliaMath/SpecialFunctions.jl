@@ -758,3 +758,33 @@ External links: [DLMF](https://dlmf.nist.gov/10.2.6), [Wikipedia](https://en.wik
 See also: [`hankelh2(nu,x)`](@ref SpecialFunctions.hankelh2)
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
+
+"""
+    jinc(x)
+
+Bessel function of the first kind divided by `x`.
+Following convention: ``\\operatorname{jinc}{x} = \\frac{2 \\cdot J_1{\\pi x}}{\\pi x}``.
+Sometimes known as sombrero or besinc function.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Sombrero_function)
+"""
+jinc(x::Number) = _jinc(float(x))
+_jinc(x::Number) = iszero(x) ? one(x) : _jinc_core(x)
+_jinc(x::Float16) = Float16(_jinc(Float32(x)))
+_jinc(x::ComplexF16) = ComplexF16(_jinc(ComplexF32(x)))
+
+# below these thresholds we evaluate a fourth order Taylor polynomial
+_jinc_threshold(::Type{Float64}) = 0.002
+_jinc_threshold(::Type{Float32}) = 0.05f0
+
+
+ # for small arguments, a Taylor series is faster
+@inline function _jinc(x::Union{T,Complex{T}}) where {T<:Union{Float32,Float64}}
+    if fastabs(x) < _jinc_threshold(T)
+        return @evalpoly(x^2, T(1), -T(π)^2/8, T(π)^4/192)
+    else
+        return _jinc_core(x)
+    end
+end
+ # the actual definition of jinc
+_jinc_core(x::Number) =  2 * besselj1(π*x) / (π*x)

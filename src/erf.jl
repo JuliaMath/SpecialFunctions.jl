@@ -57,9 +57,9 @@ Accurate version of `erf(y) - erf(x)` (for real arguments only).
 
 External links: [DLMF](https://dlmf.nist.gov/7.2.1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
-See also: [`erfc(x)`](@ref SpecialFunctions.erfc), [`erfcx(x)`](@ref SpecialFunctions.erfcx),
-[`erfi(x)`](@ref SpecialFunctions.erfi), [`dawson(x)`](@ref SpecialFunctions.dawson),
-[`erfinv(x)`](@ref SpecialFunctions.erfinv), [`erfcinv(x)`](@ref SpecialFunctions.erfcinv).
+See also: [`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
+[`erfi(x)`](@ref erfi), [`dawson(x)`](@ref dawson),
+[`erfinv(x)`](@ref erfinv), [`erfcinv(x)`](@ref erfcinv).
 
 # Implementation by
 - `Float32`/`Float64`: C standard math library
@@ -97,7 +97,7 @@ This is the accurate version of `1-erf(x)` for large ``x``.
 External links: [DLMF](https://dlmf.nist.gov/7.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
-See also: [`erf(x)`](@ref SpecialFunctions.erf).
+See also: [`erf(x)`](@ref erf).
 
 # Implementation by
 - `Float32`/`Float64`: C standard math library
@@ -123,7 +123,7 @@ Note also that ``\operatorname{erfcx}(-ix)`` computes the Faddeeva function `w(x
 External links: [DLMF](https://dlmf.nist.gov/7.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
-See also: [`erfc(x)`](@ref SpecialFunctions.erfc).
+See also: [`erfc(x)`](@ref erfc).
 
 # Implementation by
 - `Float32`/`Float64`: C standard math library
@@ -147,7 +147,7 @@ Compute the imaginary error function of ``x``, defined by
 External links:
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Imaginary_error_function).
 
-See also: [`erf(x)`](@ref SpecialFunctions.erf).
+See also: [`erf(x)`](@ref erf).
 
 # Implementation by
 - `Float32`/`Float64`: C standard math library
@@ -172,7 +172,7 @@ for large ``x``.
 External links: [DLMF](https://dlmf.nist.gov/7.2.5),
 [Wikipedia](https://en.wikipedia.org/wiki/Dawson_function).
 
-See also: [`erfi(x)`](@ref SpecialFunctions.erfi).
+See also: [`erfi(x)`](@ref erfi).
 
 # Implementation by
 - `Float32`/`Float64`: C standard math library
@@ -193,7 +193,7 @@ Compute the inverse error function of a real ``x``, that is
 External links:
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Inverse_functions).
 
-See also: [`erf(x)`](@ref SpecialFunctions.erf).
+See also: [`erf(x)`](@ref erf).
 
 # Implementation
 Using the rational approximants tabulated in:
@@ -202,6 +202,7 @@ Using the rational approximants tabulated in:
 > Math. Comp. 30, pp. 827--830 (1976).
 > <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
 > <http://www.jstor.org/stable/2005402>
+combined with Newton iterations for `BigFloat`.
 """
 function erfinv(x::Float64)
     a = abs(x)
@@ -314,7 +315,7 @@ function erfinv(x::Float32)
     end
 end
 
-erfinv(x::Integer) = erfinv(float(x))
+erfinv(x::Union{Integer,Rational}) = erfinv(float(x))
 
 @doc raw"""
     erfcinv(x)
@@ -329,7 +330,7 @@ Compute the inverse error complementary function of a real ``x``, that is
 External links:
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Inverse_functions).
 
-See also: [`erfc(x)`](@ref SpecialFunctions.erfc).
+See also: [`erfc(x)`](@ref erfc).
 
 # Implementation
 Using the rational approximants tabulated in:
@@ -338,6 +339,7 @@ Using the rational approximants tabulated in:
 > Math. Comp. 30, pp. 827--830 (1976).
 > <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
 > <http://www.jstor.org/stable/2005402>
+combined with Newton iterations for `BigFloat`.
 """
 function erfcinv(y::Float64)
     if y > 0.0625
@@ -413,7 +415,55 @@ function erfcinv(y::Float32)
     end
 end
 
-erfcinv(x::Integer) = erfcinv(float(x))
+function erfinv(y::BigFloat)
+    xfloat = erfinv(Float64(y))
+    sqrtπ = sqrt(big(pi))
+    if isfinite(xfloat)
+        x = BigFloat(xfloat)
+    else
+        # Float64 overflowed, use asymptotic estimate instead
+        # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
+        x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
+        isfinite(x) || return x
+    end
+    sqrtπhalf = sqrtπ * 0.5
+    tol = 2eps(abs(x))
+    while true # Newton iterations
+        Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
+        x -= Δx
+        abs(Δx) < tol && break
+    end
+    return x
+end
+
+function erfcinv(y::BigFloat)
+    yfloat = Float64(y)
+    xfloat = erfcinv(yfloat)
+    sqrtπ = sqrt(big(pi))
+    if isfinite(xfloat)
+        x = BigFloat(xfloat)
+    else
+        # Float64 overflowed, use asymptotic estimate instead
+        # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
+        if yfloat < 1
+            x = sqrt(-log(y*sqrtπ))
+        else # y must be close to 2
+            x = -sqrt(-log((2-y)*sqrtπ))
+        end
+        # TODO: Newton convergence is slow near y=0 singularity; accelerate?
+        isfinite(x) || return x
+    end
+    sqrtπhalf = sqrtπ * 0.5
+    tol = 2eps(abs(x))
+    while true # Newton iterations
+        Δx = sqrtπhalf * (erfc(x) - y) * exp(x^2)
+        x += Δx
+        abs(Δx) < tol && break
+    end
+    return x
+end
+
+erfcinv(x::Union{Integer,Rational}) = erfcinv(float(x))
 
 # MPFR has an open TODO item for this function
 # until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
@@ -457,10 +507,10 @@ This is the accurate version of ``\operatorname{ln}(\operatorname{erfc}(x))`` fo
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
-See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
+See also: [`erfcx(x)`](@ref erfcx).
 
 # Implementation
-Based on the [`erfc(x)`](@ref SpecialFunctions.erfc) and [`erfcx(x)`](@ref SpecialFunctions.erfcx) functions.
+Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
 Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
 function logerfc(x::Union{Float32, Float64, BigFloat})
@@ -489,10 +539,10 @@ This is the accurate version of ``\operatorname{ln}(\operatorname{erfcx}(x))`` f
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
-See also: [`erfcx(x)`](@ref SpecialFunctions.erfcx).
+See also: [`erfcx(x)`](@ref erfcx).
 
 # Implementation
-Based on the [`erfc(x)`](@ref SpecialFunctions.erfc) and [`erfcx(x)`](@ref SpecialFunctions.erfcx) functions.
+Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
 Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
 function logerfcx(x::Union{Float32, Float64, BigFloat})
@@ -515,7 +565,7 @@ Compute the natural logarithm of two-argument error function. This is an accurat
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
-See also: [`erf(x,y)`](@ref SpecialFunctions.erf).
+See also: [`erf(x,y)`](@ref erf).
 """
 function logerf(a::Real, b::Real)
     if abs(a) ≤ 1/√2 && abs(b) ≤ 1/√2

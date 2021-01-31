@@ -5,29 +5,33 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 ## [Gamma Function](https://dlmf.nist.gov/5)
 | Function | Description |
 |:-------- |:----------- |
-| [`gamma(z)`](@ref SpecialFunctions.gamma) | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) ``\Gamma(z)`` |
-| [`digamma(x)`](@ref SpecialFunctions.digamma)                 | [digamma function](https://en.wikipedia.org/wiki/Digamma_function) (i.e. the derivative of `lgamma` at `x`)                                                     |
+| [`gamma(z)`](@ref SpecialFunctions.gamma(::Number)) | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) ``\Gamma(z)`` |
+| [`loggamma(x)`](@ref SpecialFunctions.loggamma(::Number))                                           | accurate `log(gamma(x))` for large `x`                 |
+| [`logabsgamma(x)`](@ref SpecialFunctions.logabsgamma)                                           | accurate `log(abs(gamma(x)))` for large `x`                                                                                  |
+| [`logfactorial(x)`](@ref SpecialFunctions.logfactorial)                                            | accurate `log(factorial(x))` for large `x`; same as `loggamma(x+1)` for `x > 1`, zero otherwise                                                                   |
+| [`digamma(x)`](@ref SpecialFunctions.digamma)                 | [digamma function](https://en.wikipedia.org/wiki/Digamma_function) (i.e. the derivative of `loggamma` at `x`)                                                     |
 | [`invdigamma(x)`](@ref SpecialFunctions.invdigamma)   | [invdigamma function](http://bariskurt.com/calculating-the-inverse-of-digamma-function/) (i.e. inverse of `digamma` function at `x` using fixed-point iteration algorithm) |
 | [`trigamma(x)`](@ref SpecialFunctions.trigamma)     | [trigamma function](https://en.wikipedia.org/wiki/Trigamma_function) (i.e the logarithmic second derivative of `gamma` at `x`) |
-| [`polygamma(m,x)`](@ref SpecialFunctions.polygamma)  | [polygamma function](https://en.wikipedia.org/wiki/Polygamma_function) (i.e the (m+1)-th derivative of the `lgamma` function at `x`) |
+| [`polygamma(m,x)`](@ref SpecialFunctions.polygamma)  | [polygamma function](https://en.wikipedia.org/wiki/Polygamma_function) (i.e the (m+1)-th derivative of the `loggamma` function at `x`) |
+| [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number))  | [upper incomplete gamma function ``\Gamma(a,z)``](https://en.wikipedia.org/wiki/Incomplete_gamma_function) |
+| [`loggamma(a,z)`](@ref SpecialFunctions.loggamma(::Number,::Number))                                           | accurate `log(gamma(a,x))` for large arguments                 |
 | [`gamma_inc(a,x,IND)`](@ref SpecialFunctions.gamma_inc)  | [incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates P(a,x) and Q(a,x)for accuracy specified by IND and returns tuple (p,q)) |
 | [`beta_inc(a,b,x,y)`](@ref SpecialFunctions.beta_inc)  | [incomplete beta function ratio Ix(a,b) and Iy(a,b)](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function) (i.e evaluates Ix(a,b) and Iy(a,b) and returns tuple (p,q)) |
 | [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)  | [inverse of incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates x given P(a,x)=p and Q(a,x)=q  |
-| [`loggamma(x)`](@ref SpecialFunctions.loggamma)                                           | accurate `log(gamma(x))` for large `x`                 |
-| [`logabsgamma(x)`](@ref SpecialFunctions.logabsgamma)                                           | accurate `log(abs(gamma(x)))` for large `x`                                                                                  |
-| [`lgamma(x)`](@ref SpecialFunctions.lgamma)                                           | accurate `log(gamma(x))` for large `x`                                                                                                                          |
-| [`logfactorial(x)`](@ref SpecialFunctions.logfactorial)                                            | accurate `log(factorial(x))` for large `x`; same as `lgamma(x+1)` for `x > 1`, zero otherwise                                                                   |
 | [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
 | [`logbeta(x,y)`](@ref SpecialFunctions.logbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 | [`logabsbeta(x,y)`](@ref SpecialFunctions.logabsbeta)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
 | [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(binomial(n,k)))` for large `n` and `k` near `n/2`     |
 
 
-## [Trigonometric Integrals](https://dlmf.nist.gov/6)
+## [Exponential and Trigonometric Integrals](https://dlmf.nist.gov/6)
 | Function | Description |
 |:-------- |:----------- |
-| [`sinint(x)`](@ref SpecialFunctions.sinint) | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``Si(x)`` |
-| [`cosint(x)`](@ref SpecialFunctions.cosint) | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``Ci(x)`` |
+| [`expint(ν, z)`](@ref SpecialFunctions.expint) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{E}_\nu(z)`` |
+| [`expinti(x)`](@ref SpecialFunctions.expinti) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{Ei}(x)`` |
+| [`expintx(x)`](@ref SpecialFunctions.expintx) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``e^z \operatorname{E}_\nu(z)`` |
+| [`sinint(x)`](@ref SpecialFunctions.sinint) | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``\operatorname{Si}(x)`` |
+| [`cosint(x)`](@ref SpecialFunctions.cosint) | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``\operatorname{Ci}(x)`` |
 
 
 ## [Error Functions, Dawson’s and Fresnel Integrals](https://dlmf.nist.gov/7)
@@ -76,6 +80,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`besselix(nu,z)`](@ref SpecialFunctions.besselix)            | scaled modified Bessel function of the first kind of order `nu` at `z`                                                                                          |
 | [`besselk(nu,z)`](@ref SpecialFunctions.besselk)              | modified [Bessel function](https://en.wikipedia.org/wiki/Bessel_function) of the second kind of order `nu` at `z`                                               |
 | [`besselkx(nu,z)`](@ref SpecialFunctions.besselkx)            | scaled modified Bessel function of the second kind of order `nu` at `z`                                                                                         |
+| [`jinc(x)`](@ref SpecialFunctions.jinc)                       | scaled [Bessel function of the first kind divided by `x`](https://en.wikipedia.org/wiki/Sombrero_function). A.k.a. sombrero or besinc                           |
 
 ## [Legendre and Related Functions](https://dlmf.nist.gov/14)
 | Function | Description |

@@ -1,41 +1,41 @@
 @testset "incomplete gamma ratios" begin
 #Computed using Wolframalpha gamma(a,x)/gamma(a) ~ gamma_q(a,x,0) function.
-    @test gamma_inc(10,10,0)[2] ≈ 0.45792971447185221
-    @test gamma_inc(1,1,0)[2] ≈ 0.3678794411714423216
-    @test gamma_inc(0.5,0.5,0)[2] ≈ 0.31731050786291410
-    @test gamma_inc(BigFloat(30.5),BigFloat(30.5),0)[2] ≈ parse(BigFloat,"0.47591691193354987004") rtol=eps()
-    @test gamma_inc(5.5,0.5,0)[2] ≈ 0.9999496100513121669
-    @test gamma_inc(0.5,7.4,0)[2] ≈ 0.0001195355018130302
-    @test gamma_inc(0.5,0.22,0)[2] ≈ 0.507122455359825146
-    @test gamma_inc(0.5,0.8,0)[2] ≈ 0.20590321073206830887
-    @test gamma_inc(11.5,0.5,0)[2] ≈ 0.999999999998406112
-    @test gamma_inc(0.19,0.99,0)[2] ≈ 0.050147247342905857
-    @test gamma_inc(0.9999,0.9999,0)[2] ≈ 0.3678730556923103
-    @test gamma_inc(24,23.9999999999,0)[2] ≈ 0.472849720555859138
-    @test gamma_inc(0.5,0.55,0)[2] ≈ 0.29426610430496289
-    @test gamma_inc(Float32(0.5),Float32(0.55),0)[2] ≈ Float32(gamma_inc(0.5,0.55,0)[2])
-    @test gamma_inc(Float16(0.5),Float16(0.55),0)[2] ≈ Float16(gamma_inc(0.5,0.55,0)[2])
-    @test gamma_inc(30,29.99999,0)[2] ≈ 0.475717712451705704
-    @test gamma_inc(30,29.9,0)[2] ≈ 0.482992166284958565
-    @test gamma_inc(10,0.0001,0)[2] ≈ 1.0000
-    @test gamma_inc(0.0001,0.0001,0)[2] ≈ 0.000862958131006599
-    @test gamma_inc(0.0001,10.5,0)[1] ≈ 0.999999999758896146
-    @test gamma_inc(1,1,0)[1] ≈ 0.63212055882855768
-    @test gamma_inc(13,15.1,0)[2] ≈ 0.25940814264863701
-    @test gamma_inc(0.6,1.3,0)[2] ≈ 0.136458554006505355
-    @test gamma_inc((100),(80),0)[2] ≈ 0.9828916869648668
+    @test gamma_inc(10,10)[2] ≈ 0.45792971447185221
+    @test gamma_inc(1,1)[2] ≈ 0.3678794411714423216
+    @test gamma_inc(0.5,0.5)[2] ≈ 0.31731050786291410
+    @test gamma_inc(BigFloat(30.5),BigFloat(30.5))[2] ≈ parse(BigFloat,"0.47591691193354987004") rtol=eps()
+    @test gamma_inc(5.5,0.5)[2] ≈ 0.9999496100513121669
+    @test gamma_inc(0.5,7.4)[2] ≈ 0.0001195355018130302
+    @test gamma_inc(0.5,0.22)[2] ≈ 0.507122455359825146
+    @test gamma_inc(0.5,0.8)[2] ≈ 0.20590321073206830887
+    @test gamma_inc(11.5,0.5)[2] ≈ 0.999999999998406112
+    @test gamma_inc(0.19,0.99)[2] ≈ 0.050147247342905857
+    @test gamma_inc(0.9999,0.9999)[2] ≈ 0.3678730556923103
+    @test gamma_inc(24,23.9999999999)[2] ≈ 0.472849720555859138
+    @test gamma_inc(0.5,0.55)[2] ≈ 0.29426610430496289
+    @test gamma_inc(Float32(0.5),Float32(0.55))[2] ≈ Float32(gamma_inc(0.5,0.55)[2])
+    @test gamma_inc(Float16(0.5),Float16(0.55))[2] ≈ Float16(gamma_inc(0.5,0.55)[2])
+    @test gamma_inc(30,29.99999)[2] ≈ 0.475717712451705704
+    @test gamma_inc(30,29.9)[2] ≈ 0.482992166284958565
+    @test gamma_inc(10,0.0001)[2] ≈ 1.0000
+    @test gamma_inc(0.0001,0.0001)[2] ≈ 0.000862958131006599
+    @test gamma_inc(0.0001,10.5)[1] ≈ 0.999999999758896146
+    @test gamma_inc(1,1)[1] ≈ 0.63212055882855768
+    @test gamma_inc(13,15.1)[2] ≈ 0.25940814264863701
+    @test gamma_inc(0.6,1.3)[2] ≈ 0.136458554006505355
+    @test gamma_inc((100),(80))[2] ≈ 0.9828916869648668
     @test gamma_inc((100),(80),1)[2] ≈ 0.9828916869
     @test Float16(gamma_inc((100),(80),2)[2]) ≈ Float16(.983)
-    @test gamma_inc(13.5,15.1,0)[2] ≈ 0.305242642543419087
-    @test gamma_inc(11,9,0)[1] ≈ 0.2940116796594881834
-    @test gamma_inc(8,32,0)[1] ≈ 0.99999989060651042057
-    @test gamma_inc(15,16,0)[2] ≈ 0.3675273597655649298
-    @test gamma_inc(15.5,16,0)[2] ≈ 0.4167440299455427811
-    @test gamma_inc(0.9,0.8,0)[1] ≈ 0.59832030278768172
-    @test gamma_inc(1.7,2.5,0)[1] ≈ 0.78446115627678957
-    @test gamma_inc(11.1,0.001,0)[2] ≈ 1.0000
-    @test gamma_inc(1e7, (1e7)+1, 0)[1] ≈ 0.5001682088254367
-    @test gamma_inc(1e7, (1e7)+1, 0)[2] ≈ 0.4998317911745633
+    @test gamma_inc(13.5,15.1)[2] ≈ 0.305242642543419087
+    @test gamma_inc(11,9)[1] ≈ 0.2940116796594881834
+    @test gamma_inc(8,32)[1] ≈ 0.99999989060651042057
+    @test gamma_inc(15,16)[2] ≈ 0.3675273597655649298
+    @test gamma_inc(15.5,16)[2] ≈ 0.4167440299455427811
+    @test gamma_inc(0.9,0.8)[1] ≈ 0.59832030278768172
+    @test gamma_inc(1.7,2.5)[1] ≈ 0.78446115627678957
+    @test gamma_inc(11.1,0.001)[2] ≈ 1.0000
+    @test gamma_inc(1e7, (1e7)+1)[1] ≈ 0.5001682088254367
+    @test gamma_inc(1e7, (1e7)+1)[2] ≈ 0.4998317911745633
     @test_throws DomainError gamma_inc(-1,2,2)
     @test_throws DomainError gamma_inc(0,0,1)
 end
@@ -62,4 +62,61 @@ end
     for x = .5:5.0:100.0
         @test SpecialFunctions.stirling(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
     end
+end
+
+double(x::Real) = Float64(x)
+double(x::Integer) = Int(x)
+double(x::Complex) = ComplexF64(x)
+
+@testset "upper incomplete gamma function" begin
+    setprecision(BigFloat, 256) do
+        for a in Any[0:0.4:3; 1:3], x in 0:0.2:2
+            @test gamma(a,x) ≈ gamma(big(a),big(x))
+        end
+        @test_throws DomainError gamma(-2.2, -1.3)
+        for (a,x, exact) in (
+            (2, big"+1.3", big"0.6268231239782289871813662853957039889809398944861850589869804057956189274569818"),
+            (2, big"-1.3", big"-1.100789000285773266137246974803445875429455665367265440176867948378982424804222"),
+            (big"2.2", big"1.3", big"0.7550934853735524106456916078787596171599416239996064979513848803118671763945577"),
+            (big"-2.2", big"1.3", big"0.03938564959393195337328006806473296774233286427565465045140458665248322893076784"),
+            (big"-2.2", big"-1.3"+0im, Complex(big"0.1688350167695890519002747177035271528716667324397453142169971691104641885370081", big"-1.724677939954414412829215929952389349929001266936564849801773346878175589599461")),
+            (2, big"1.3"+2im, Complex(big"0.2347744561498965806069446787000456827042253434143074251879541754828136789074293", big"-0.7967951407674886396960561446265346226800340382780520672369163777061700801594228")),
+            (big"2.2", big"1.3"+2im, Complex(big"0.4226969694490623767886715572749155659150206342283251276656790859161308520476838", big"-0.9507541450333763666696561254491461255244463810462729822382144498284499948680099")),
+            (big"2.2"-2im, big"1.3"+2im, Complex(big"-3.858698824275578861673404086439928163791926530897603434146764316225759116935376", big"0.2105970967650200831829566202893410569725743566037534990454186505024476246014339")),
+            (30, big"-1e2", big"-2.080142496354742431762923569133534773079637504483999408076147454085194055640495e+101"),
+            )
+            if !(exact isa Complex) # we don't yet have a Complex{BigFloat} gamma function
+                @test gamma(a, x) ≈ exact atol=eps(abs(exact))*1000
+            end
+            @test gamma(double(a), double(x)) ≈ double(exact) rtol=1e-13
+        end
+    end
+    @test gamma(30, big(-1000)) ≈ big"-1.914496653187781420578078670260160511219745144309147121829045802464973219500799e+521" rtol=1e-70
+    @test gamma(30, -1000) == -Inf
+    @test gamma(Inf, 51.2) == Inf
+    @test gamma(-Inf, -51.2) == 0.0
+    @test_throws DomainError gamma(Inf, -51.2)
+    @test gamma(2.3, Inf) == 0.0
+    @test gamma(2, -Inf) == -Inf
+    @test_throws DomainError gamma(2.2, -Inf)
+end
+
+@testset "upper incomplete gamma function logarithm" begin
+    for (a,z) in ((3,5), (3,-5), (3,5+4im), (3,-5+4im), (3,5-4im), (-3,5+4im), (-3,-5+4im))
+        @test exp(loggamma(a,z)) ≈ gamma(a,z) rtol=1e-13
+    end
+    @test loggamma(50, 1e7) ≅ -9.9992102133082030308153473164868727954977460876571275797855e6
+    @test real(loggamma(50, 1e7 + 1e8im)) ≅ -9.999097142860392e6
+    @test cis(imag(loggamma(50, 1e7 + 1e8im))) ≈ cis(1.0275220422549918) rtol=1e-8
+    @test real(loggamma(10+20im, -1e5 + 1e8im)) ≈ 100134.3502048662475864409896160245625409130538724704329203542339
+    @test cis(imag(loggamma(10+20im, -1e5 + 1e8im))) ≈ cis(-2.6572071454623347) rtol=1e-8
+    @test loggamma(-1e8, 1e9) ≅ -3.0723266045132171331933746054573197040165846554476396719312e9
+    @test loggamma(3, Inf) == -Inf
+    @test_throws DomainError loggamma(3, -Inf)
+    @test loggamma(Inf, 3.2) == Inf
+    @test loggamma(-Inf, 3.2) == -Inf
+    @test_throws DomainError loggamma(Inf, -3.2)
+    @test loggamma(117.3, 0) == loggamma(117.3)
+    @test loggamma(7, -300.2) ≅ log(gamma(7, -300.2))
+    @test_throws DomainError loggamma(6, -3.2)
 end
