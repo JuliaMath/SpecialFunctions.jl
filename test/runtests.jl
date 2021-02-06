@@ -1,6 +1,7 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
 using SpecialFunctions
+using ChainRulesCore
 using ChainRulesTestUtils
 using Random
 using Test

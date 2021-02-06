@@ -41,17 +41,11 @@
             for _x in test_points, _y in test_points
                 # ensure all complex if any complex for FiniteDifferences
                 x, y = promote(_x, _y)
-                T = typeof(x)
+                test_frule(beta, x, y)
+                test_rrule(beta, x, y)
 
-                Δx, x̄ = randn(T, 2)
-                Δy, ȳ = randn(T, 2)
-                Δz = randn(T)
-
-                frule_test(beta, (x, Δx), (y, Δy))
-                rrule_test(beta, Δz, (x, x̄), (y, ȳ))
-
-                frule_test(logbeta, (x, Δx), (y, Δy))
-                rrule_test(logbeta, Δz, (x, x̄), (y, ȳ))
+                test_frule(logbeta, x, y)
+                test_rrule(logbeta, x, y)
             end
         end
 
@@ -62,12 +56,8 @@
                 test_scalar(loggamma, x)
 
                 isreal(x) || continue
-
-                Δx, x̄ = randn(2)
-                Δz = (randn(), randn())
-
-                frule_test(logabsgamma, (x, Δx))
-                rrule_test(logabsgamma, Δz, (x, x̄))
+                test_frule(logabsgamma, x)
+                test_rrule(logabsgamma, x; output_tangent=(randn(), randn()))
             end
         end
     end
