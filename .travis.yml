@@ -11,6 +11,10 @@ matrix:
 notifications:
   email: false
 
+env:
+  # Disable PkgServer
+  - JULIA_PKG_SERVER=""
+
 branches:
   only:
   - master
