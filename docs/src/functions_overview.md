@@ -29,7 +29,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 |:-------- |:----------- |
 | [`expint(ν, z)`](@ref SpecialFunctions.expint) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{E}_\nu(z)`` |
 | [`expinti(x)`](@ref SpecialFunctions.expinti) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{Ei}(x)`` |
-| [`expintx(x)`](@ref SpecialFunctions.expintx) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``e^z \operatorname{E}_\nu(z)`` |
+| [`expintx(x)`](@ref SpecialFunctions.expintx) | scaled [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``e^z \operatorname{E}_\nu(z)`` |
 | [`sinint(x)`](@ref SpecialFunctions.sinint) | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``\operatorname{Si}(x)`` |
 | [`cosint(x)`](@ref SpecialFunctions.cosint) | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``\operatorname{Ci}(x)`` |
 
