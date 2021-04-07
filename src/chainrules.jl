@@ -114,3 +114,10 @@ ChainRulesCore.@scalar_rule(
 ChainRulesCore.@scalar_rule(logabsgamma(x), digamma(x), ChainRulesCore.Zero())
 
 ChainRulesCore.@scalar_rule(loggamma(x), digamma(x))
+ChainRulesCore.@scalar_rule(
+    loggamma(a, x),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        -exp(- (x + Ω)) * x^(a - 1),
+    )
+)
