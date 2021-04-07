@@ -22,6 +22,27 @@ ChainRulesCore.@scalar_rule(erfi(x), (2 / sqrt(π)) * exp(x * x))
 ChainRulesCore.@scalar_rule(erfinv(x), (sqrt(π) / 2) * exp(Ω^2))
 ChainRulesCore.@scalar_rule(gamma(x), Ω * digamma(x))
 ChainRulesCore.@scalar_rule(
+    gamma(a, x),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        - exp(-x) * x^(a - 1),
+    ),
+)
+ChainRulesCore.@scalar_rule(
+    gamma_inc(a, x, IND),
+    @setup(z = exp(-x) * x^(a - 1) / gamma(a)),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        z,
+        ChainRulesCore.DoesNotExist(),
+    ),
+    (
+        ChainRulesCore.@thunk(error("not implemented")),
+        -z,
+        ChainRulesCore.DoesNotExist(),
+    ),
+)
+ChainRulesCore.@scalar_rule(
     invdigamma(x),
     inv(trigamma(invdigamma(x))),
 )
