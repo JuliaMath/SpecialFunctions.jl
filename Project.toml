@@ -7,8 +7,8 @@ ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
 
 [compat]
-ChainRulesCore = "0.9"
-ChainRulesTestUtils = "0.6.3"
+ChainRulesCore = "0.9.40"
+ChainRulesTestUtils = "0.6.8"
 OpenSpecFun_jll = "0.5"
 julia = "1.3"
 
