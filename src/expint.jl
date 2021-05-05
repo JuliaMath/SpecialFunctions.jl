@@ -214,17 +214,19 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     ϵ = 10*eps(real(B))
     scale = sqrt(floatmax(real(A)))
 
-    iters = 1
-    j = 1
-    for i = 2:n
+    iters = 0
+    for i = 1:n
         iters += 1
 
-        term = iseven(i) ? -(i÷2 - 1 - ν)*z : z*(i÷2)
-        A, Aprev = (i - ν)*A + term * Aprev, A
-        B, Bprev = (i - ν)*B + term * Bprev, B
+        a = iseven(i) ? (i÷2)*z : -((i + 1)÷2 - ν)*z
+        b = (i + 1 - ν)
 
-        conv = abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev)
-        conv && break
+        A, Aprev = b*A + a*Aprev, A
+        B, Bprev = b*B + a*Bprev, B
+
+        if abs(Aprev*B - A*Bprev) < ϵ*abs(Aprev*B)
+            break
+        end
 
         if max(abs(real(A)), abs(imag(A))) > scale
             A     /= scale
@@ -436,6 +438,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
         else
             g, cf, _ = zero(z), En_cf_nogamma(ν, z, niter)...
         end
+
         g != 0 && (g *= gmult)
         cf = expscaled ? cf : En_safeexpmult(-z, cf)
         return g + cf
