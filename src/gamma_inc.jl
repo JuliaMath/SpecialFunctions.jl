@@ -30,65 +30,6 @@ const d60 = .531307936463992E-03
 const d6=[-.592166437353694E-03]
 const d70 = .344367606892378E-03
 const d80 = -.652623918595309E-03
-#Source of logmxp1(x): https://github.com/JuliaStats/StatsFuns.jl/blob/master/src/basicfuns.jl
-# The kernel of log1pmx
-# Accuracy within ~2ulps for -0.227 < x < 0.315
-function _log1pmx_ker(x::Float64)
-    r = x/(x+2.0)
-    t = r*r
-    w = @horner(t,
-                6.66666666666666667e-1, # 2/3
-                4.00000000000000000e-1, # 2/5
-                2.85714285714285714e-1, # 2/7
-                2.22222222222222222e-1, # 2/9
-                1.81818181818181818e-1, # 2/11
-                1.53846153846153846e-1, # 2/13
-                1.33333333333333333e-1, # 2/15
-                1.17647058823529412e-1) # 2/17
-    hxsq = 0.5*x*x
-    r*(hxsq+w*t)-hxsq
-end
-"""
-    log1pmx(x::Float64)
-Return `log(1 + x) - x`
-Use naive calculation or range reduction outside kernel range.  Accurate ~2ulps for all `x`.
-"""
-function log1pmx(x::Float64)
-    if !(-0.7 < x < 0.9)
-        return log1p(x) - x
-    elseif x > 0.315
-        u = (x-0.5)/1.5
-        return _log1pmx_ker(u) - 9.45348918918356180e-2 - 0.5*u
-    elseif x > -0.227
-        return _log1pmx_ker(x)
-    elseif x > -0.4
-        u = (x+0.25)/0.75
-        return _log1pmx_ker(u) - 3.76820724517809274e-2 + 0.25*u
-    elseif x > -0.6
-        u = (x+0.5)*2.0
-        return _log1pmx_ker(u) - 1.93147180559945309e-1 + 0.5*u
-    else
-        u = (x+0.625)/0.375
-        return _log1pmx_ker(u) - 3.55829253011726237e-1 + 0.625*u
-    end
-end
-"""
-    logmxp1(x::Float64)
-Return `log(x) - x + 1` carefully evaluated.
-"""
-function logmxp1(x::Float64)
-    if x <= 0.3
-        return (log(x) + 1.0) - x
-    elseif x <= 0.4
-        u = (x-0.375)/0.375
-        return _log1pmx_ker(u) - 3.55829253011726237e-1 + 0.625*u
-    elseif x <= 0.6
-        u = 2.0*(x-0.5)
-        return _log1pmx_ker(u) - 1.93147180559945309e-1 + 0.5*u
-    else
-        return log1pmx(x - 1.0)
-    end
-end
 
 """
    rgamma1pm1(a)
@@ -129,7 +70,7 @@ function rgammax(a::Float64,x::Float64)
         end
         t = (1.0/a)^2
         t1 = (((0.75*t - 1.0)*t + 3.5)*t - 105.0)/(a*1260.0) #Using stirling Series : https://dlmf.nist.gov/5.11.1
-        t1 = t1 + a*logmxp1(u)
+        t1 = t1 + a*LogExpFunctions.logmxp1(u)
         if t1 >= exparg
             return rt2pin*sqrt(a)*exp(t1)
         end
@@ -554,7 +495,7 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
     l = x/a
     s = 1.0 - l
-    y = -a*logmxp1(l)
+    y = -a*LogExpFunctions.logmxp1(l)
     c = exp(-y)
     w = 0.5*erfcx(sqrt(y))
 
@@ -614,7 +555,7 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_temme(a::Float64, x::Float64, z::Float64)
     l = x/a
-    y = -a*logmxp1(x/a)
+    y = -a*LogExpFunctions.logmxp1(x/a)
     c = exp(-y)
     w = 0.5*erfcx(sqrt(y))
     c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3] , d0[4] , d0[5] , d0[6])
@@ -647,7 +588,7 @@ External links: [DLMF](https://dlmf.nist.gov/8.12.8)
 function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     iop = ind + 1
     l = x/a
-    y = -a * logmxp1(l)
+    y = -a * LogExpFunctions.logmxp1(l)
     if a*eps()*eps() > 3.28e-3
         throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
     end
@@ -863,7 +804,7 @@ function _gamma_inc(a::Float64,x::Float64,ind::Integer)
                 return (0.0,1.0)
             end
             s = 1.0 - l
-            z = -logmxp1(l)
+            z = -LogExpFunctions.logmxp1(l)
             if z >= 700.0/a
                 return (0.0,1.0)
             end
