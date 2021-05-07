@@ -1,6 +1,7 @@
 module SpecialFunctions
 
 import ChainRulesCore
+import LogExpFunctions
 
 using OpenSpecFun_jll
 
