@@ -782,7 +782,7 @@ See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@re
 """
 gamma_inc(a::Real,x::Real,ind::Integer=0) = _gamma_inc(promote(float(a),float(x))...,ind)
 
-function _gamma_inc(a::Float64,x::Float64,ind::Integer)
+function _gamma_inc(a::Float64, x::Float64, ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
     if a<0.0 || x<0.0
@@ -801,12 +801,19 @@ function _gamma_inc(a::Float64,x::Float64,ind::Integer)
         if a >= big1[iop]
             l = x/a
             if l == 0.0
-                return (0.0,1.0)
+                return (0.0, 1.0)
             end
             s = 1.0 - l
             z = -LogExpFunctions.logmxp1(l)
             if z >= 700.0/a
-                return (0.0,1.0)
+                if abs(s) <= 2*eps(Float64)
+                    throw(DomainError((a, x, ind, "P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+                end
+                if x <= a
+                    return (0.0, 1.0)
+                else
+                    return (1.0, 0.0)
+                end
             end
             y = a*z
             rta = sqrt(a)
@@ -820,7 +827,7 @@ function _gamma_inc(a::Float64,x::Float64,ind::Integer)
 
             if abs(s) <= 0.4
                 if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
-                    throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+                    throw(DomainError((a, x, ind, "P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
                 end
                 c = exp(-y)
                 w = 0.5*erfcx(sqrt(y))
@@ -830,33 +837,20 @@ function _gamma_inc(a::Float64,x::Float64,ind::Integer)
                     z=-z
                 end
                 if iop == 1
-                    return gamma_inc_minimax(a,x,z)
+                    return gamma_inc_minimax(a, x, z)
                 elseif iop == 2
-                    return gamma_inc_temme(a,x,z)
+                    return gamma_inc_temme(a, x, z)
                 else
-                    t = @horner(z , d00 , d0[1] , d0[2] , d0[3])
+                    t = @horner(z, d00, d0[1], d0[2], d0[3])
                     return gamma_inc_temme_1(a, x, z, ind)
                 end
+            else
+                return _gamma_inc_choose_algorithm(a, x, ind)
             end
         elseif a > x || x >= x0[iop] || !isinteger(2*a)
-            r = rgammax(a,x)
-            if r == 0.0
-                if x <= a
-                    return (0.0,1.0)
-                else
-                    return (1.0,0.0)
-                end
-            end
-            if x <= max(a,alog10)
-                return gamma_inc_taylor(a, x, ind)
-            elseif x < x0[iop]
-                return gamma_inc_cf(a, x, ind)
-            else
-                return gamma_inc_asym(a, x, ind)
-            end
+            return _gamma_inc_choose_algorithm(a, x, ind)
         else
             return gamma_inc_fsum(a,x)
-
         end
     elseif a == 0.5
         if x >= 0.25
@@ -868,15 +862,12 @@ function _gamma_inc(a::Float64,x::Float64,ind::Integer)
     elseif x < 1.1
         return gamma_inc_taylor_x(a, x, ind)
     end
-    r = rgammax(a,x)
+    r = rgammax(a, x)
     if r == 0.0
         return (1.0, 0.0)
     else
         return gamma_inc_cf(a, x, ind)
     end
-
-
-
 end
 
 function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
@@ -887,6 +878,24 @@ function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from
 end
 _gamma_inc(a::Float32,x::Float32,ind::Integer) = Float32.(_gamma_inc(Float64(a),Float64(x),ind))
 _gamma_inc(a::Float16,x::Float16,ind::Integer) = Float16.(_gamma_inc(Float64(a),Float64(x),ind))
+
+function _gamma_inc_choose_algorithm(a::Float64, x::Float64, ind::Int)
+    r = rgammax(a, x)
+    if r == 0.0
+        if x <= a
+            return (0.0, 1.0)
+        else
+            return (1.0, 0.0)
+        end
+    end
+    if x <= max(a, alog10)
+        return gamma_inc_taylor(a, x, ind)
+    elseif x < x0[ind + 1]
+        return gamma_inc_cf(a, x, ind)
+    else
+        return gamma_inc_asym(a, x, ind)
+    end
+end
 
 #EFFICIENT AND ACCURATE ALGORITHMS FOR THECOMPUTATION AND INVERSION OF THE INCOMPLETEGAMMA FUNCTION RATIOS by Amparo Gil, Javier Segura, Nico M. Temme
 #SIAM Journal on Scientific Computing 34(6) (2012), A2965-A2981
