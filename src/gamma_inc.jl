@@ -1,33 +1,32 @@
 using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
 #useful constants
-const acc0 = [5.0e-15 , 5.0e-7 , 5.0e-4] #accuracy options
-const big1 = [25.0 , 14.0, 10.0]
-const e0 = [0.25e-3 , 0.25e-1 , 0.14]
-const x0=[31.0 , 17.0 , 9.7]
+const acc0 = [5.0e-15, 5.0e-7, 5.0e-4] #accuracy options
+const big1 = [25.0, 14.0, 10.0]
+const e0 = [0.25e-3, 0.25e-1, 0.14]
+const x0 = [31.0, 17.0, 9.7]
 const alog10 = log(10)
 const rt2pin = 1.0/sqrt(2*pi)
 const rtpi = sqrt(pi)
-const exparg = -745.1
 const stirling_coef = [1.996379051590076518221, -0.17971032528832887213e-2, 0.131292857963846713e-4, -0.2340875228178749e-6, 0.72291210671127e-8, -0.3280997607821e-9, 0.198750709010e-10, -0.15092141830e-11, 0.1375340084e-12, -0.145728923e-13, 0.17532367e-14, -0.2351465e-15, 0.346551e-16, -0.55471e-17, 0.9548e-18, -0.1748e-18, 0.332e-19, -0.58e-20]
 const auxgam_coef = [-1.013609258009865776949, 0.784903531024782283535e-1, 0.67588668743258315530e-2, -0.12790434869623468120e-2, 0.462939838642739585e-4, 0.43381681744740352e-5, -0.5326872422618006e-6, 0.172233457410539e-7, 0.8300542107118e-9, -0.10553994239968e-9, 0.39415842851e-11, 0.362068537e-13, -0.107440229e-13, 0.5000413e-15, -0.62452e-17, -0.5185e-18, 0.347e-19, -0.9e-21]
 
 #----------------COEFFICIENTS FOR TEMME EXPANSION------------------
 
 const d00 = -.333333333333333E+00
-const d0=[.833333333333333E-01 , -.148148148148148E-01 , .115740740740741E-02 , .352733686067019E-03 , -.178755144032922E-03 , .391926317852244E-04]
+const d0  = [.833333333333333E-01, -.148148148148148E-01, .115740740740741E-02, .352733686067019E-03, -.178755144032922E-03, .391926317852244E-04]
 const d10 = -.185185185185185E-02
-const d1=[-.347222222222222E-02 , .264550264550265E-02 , -.990226337448560E-03 , .205761316872428E-03]
+const d1  = [-.347222222222222E-02, .264550264550265E-02, -.990226337448560E-03, .205761316872428E-03]
 const d20 = .413359788359788E-02
-const d2=[-.268132716049383E-02 , .771604938271605E-03]
+const d2  = [-.268132716049383E-02, .771604938271605E-03]
 const d30 = .649434156378601E-03
-const d3=[.229472093621399E-03 , -.469189494395256E-03]
+const d3  =[.229472093621399E-03, -.469189494395256E-03]
 const d40 = -.861888290916712E-03
-const d4=[.784039221720067E-03]
+const d4  = [.784039221720067E-03]
 const d50 = -.336798553366358E-03
-const d5=[-.697281375836586E-04]
+const d5  = [-.697281375836586E-04]
 const d60 = .531307936463992E-03
-const d6=[-.592166437353694E-03]
+const d6  = [-.592166437353694E-03]
 const d70 = .344367606892378E-03
 const d80 = -.652623918595309E-03
 
@@ -38,53 +37,49 @@ const d80 = -.652623918595309E-03
    Uses the relation `gamma(a+1) = a*gamma(a)`.
 """
 function rgamma1pm1(a::Float64)
-    t=a
+    t = a
     rangereduce = a > 0.5
     t = rangereduce ? a-1 : a #-0.5<= t <= 0.5
     if t == 0.0
         return 0.0
     elseif t < 0.0
-        top = @horner(t , -.422784335098468E+00 , -.771330383816272E+00 , -.244757765222226E+00 , .118378989872749E+00 , .930357293360349E-03 , -.118290993445146E-01 , .223047661158249E-02 , .266505979058923E-03 , -.132674909766242E-03)
-        bot = @horner(t , 1.0 , .273076135303957E+00 , .559398236957378E-01)
+        top = @horner(t, -.422784335098468E+00, -.771330383816272E+00, -.244757765222226E+00, .118378989872749E+00, .930357293360349E-03, -.118290993445146E-01, .223047661158249E-02, .266505979058923E-03, -.132674909766242E-03)
+        bot = @horner(t, 1.0, .273076135303957E+00, .559398236957378E-01)
         w = top/bot
-        return rangereduce ? t*w/a : a*(w+1)
+        return rangereduce ? t*w/a : a*(w + 1)
     else
-        top = @horner(t , .577215664901533E+00 , -.409078193005776E+00 , -.230975380857675E+00 , .597275330452234E-01 , .766968181649490E-02 , -.514889771323592E-02 , .589597428611429E-03)
-        bot = @horner(t , 1.0 , .427569613095214E+00 , .158451672430138E+00 , .261132021441447E-01 , .423244297896961E-02)
+        top = @horner(t, .577215664901533E+00, -.409078193005776E+00, -.230975380857675E+00, .597275330452234E-01, .766968181649490E-02, -.514889771323592E-02, .589597428611429E-03)
+        bot = @horner(t, 1.0, .427569613095214E+00, .158451672430138E+00, .261132021441447E-01, .423244297896961E-02)
         w = top/bot
         return rangereduce ? (t/a)*(w - 1.0) : a*w
     end
 end
+
 """
     rgammax(a,x)
 
-Evaluation of ``1/\\Gamma(a) e^{-x} x^{a}``.
+Evaluation of ``1/\\Gamma(a) e^{-x} x^{a}``. Based on `DRCOMP` from the `NSWC` library.
 """
-function rgammax(a::Float64,x::Float64)
+function rgammax(a::Float64, x::Float64)
     if x == 0.0
         return 0.0
-    elseif a >= 20.0
-        u =x/a
-        if u == 0.0
+    elseif a > 20.0
+        t = x/a
+        if t == 0.0
             return 0.0
         end
-        t = (1.0/a)^2
-        t1 = (((0.75*t - 1.0)*t + 3.5)*t - 105.0)/(a*1260.0) #Using stirling Series : https://dlmf.nist.gov/5.11.1
-        t1 = t1 + a*LogExpFunctions.logmxp1(u)
-        if t1 >= exparg
-            return rt2pin*sqrt(a)*exp(t1)
-        end
+        w = -(stirling_error(a) - a*LogExpFunctions.logmxp1(t))
+        return 1/sqrt(2*Float64(π))*sqrt(a)*exp(w)
     else
         t = a*log(x) - x
-        if t < exparg
-            return 0.0
-        elseif a >= 1.0
-            return exp(t)/gamma(a)
+        if a >= 1.0
+            exp(t)/gamma(a)
         else
-            return (a*exp(t))*(1.0 + rgamma1pm1(a))
+            return a*exp(t)*(1.0 + rgamma1pm1(a))
         end
     end
 end
+
 """
     auxgam(x)
 
@@ -92,7 +87,7 @@ Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, `-1 <= x <= 1`.
 """
 function auxgam(x::Float64)
     if x < 0
-        return -(1.0+(1+x)*(1+x)*auxgam(1+x))/(1.0-x)
+        return -(1.0 + (1.0 + x)*(1.0 + x)*auxgam(1.0 + x))/(1.0 - x)
     else
         t = 2*x - 1.0
         return chepolsum(t, auxgam_coef)
@@ -105,7 +100,7 @@ end
 Compute ``log(\\Gamma(1+a))`` for `-1 < a <= 1`.
 """
 function loggamma1p(x::Float64)
-    return -log1p(x*(x-1.0)*auxgam(x))
+    return -log1p(x*(x - 1.0)*auxgam(x))
 end
 
 """
@@ -122,31 +117,30 @@ function chepolsum(x::Float64, a::Array{Float64,1})
     else
         tx = 2*x
         r = a[n]
-        h = a[n-1] + r*tx
+        h = a[n - 1] + r*tx
         for k = n-2:-1:2
-            s=r
-            r=h
-            h=a[k]+r*tx-s
+            s = r
+            r = h
+            h = a[k] + r*tx - s
         end
         return a[1]/2.0 - r + h*x
     end
 end
 
 """
-    stirling(x)
+    stirling_error(x)
 
-Compute ``\\ln{\\Gamma(x)} - (x-0.5)*\\ln{x} + x - \\ln{(2\\pi)}/2`` using stirling series for asymptotic part
-in https://dlmf.nist.gov/5.11.1
+Compute ``\\ln{\\Gamma(x)} - (x-0.5)*\\ln{x} + x - \\ln{(2\\pi)}/2``. Adapted from `stirling` in `IncgamFI`.
 """
-function stirling(x::Float64)
+function stirling_error(x::Float64)
     if x < floatmin(Float64)*1000.0
         return floatmax(Float64)/1000.0
     elseif x < 1
-        return loggamma1p(x) - (x+0.5)*log(x) + x - log((2*pi))/2.0
+        return loggamma1p(x) - (x + 0.5)*log(x) + x - log((2*pi))/2.0
     elseif x < 2
-        return loggamma1p(x-1) - (x-0.5)*log(x) + x - log((2*pi))/2.0
+        return loggamma1p(x - 1) - (x - 0.5)*log(x) + x - log((2*pi))/2.0
     elseif x < 3
-        return loggamma1p(x-2) - (x-0.5)*log(x) + x  - log((2*pi))/2.0 + log(x-1)
+        return loggamma1p(x - 2) - (x - 0.5)*log(x) + x  - log((2*pi))/2.0 + log(x - 1)
     elseif x < 12
         z=18.0/(x*x)-1.0
         return chepolsum(z, stirling_coef)/(12.0*x)
@@ -155,10 +149,11 @@ function stirling(x::Float64)
         if x < 1000
             return @horner(z, 0.25721014990011306473e-1, 0.82475966166999631057e-1, -0.25328157302663562668e-2, 0.60992926669463371e-3, -0.33543297638406e-3, 0.250505279903e-3)/((0.30865217988013567769 + z)*x)
         else
-            return (((-z/1680.0+1.0/1260.0)*z-1.0/360.0)*z+1.0/12.0)/x
+            return (((-z/1680.0 + 1.0/1260.0)*z - 1.0/360.0)*z + 1.0/12.0)/x
         end
     end
 end
+
 @doc raw"""
     gammax(x)
 
@@ -170,13 +165,14 @@ end
 """
 function gammax(x::Float64)
     if x >= 3
-        return exp(stirling(x))
+        return exp(stirling_error(x))
     elseif x > 0
-        return gamma(x)/(exp(-x+(x-0.5)*log(x))*sqrt(2*pi))
+        return gamma(x)/(exp(-x + (x - 0.5)*log(x))*sqrt(2*pi))
     else
         return floatmax(Float64)/1000.0
     end
 end
+
 """
     lambdaeta(eta)
 
@@ -187,7 +183,7 @@ function lambdaeta(eta::Float64)
     if eta == 0.0
         la = 1
     elseif eta < -1.0
-        r = exp(-1-s)
+        r = exp(-1 - s)
         la = @horner(r, 0.0, 1.0, 1.0, 1.5, 8.0/3.0, 125.0/24.0, 15.0/5.0)
     elseif eta < 1.0
         r = eta
@@ -195,28 +191,29 @@ function lambdaeta(eta::Float64)
     else
         r = 11 + s
         l = log(r)
-        la = r+l
+        la = r + l
         r = 1.0/r
         ak1 = 1.0
         ak2 = (2 - l)*0.5
-        ak3 = (@horner(l,6,-9,2))/6.0
-        ak4 = -(@horner(l,-12,36,-22,3))/12.0
-        ak5 = (@horner(l,60,-300,350,-125,12))/60.0
-        ak6 = -(@horner(l,-120,900,-1700,1125,-274,20))/120.0
+        ak3 = (@horner(l, 6, -9, 2))/6.0
+        ak4 = -(@horner(l, -12, 36, -22, 3))/12.0
+        ak5 = (@horner(l, 60, -300, 350, -125, 12))/60.0
+        ak6 = -(@horner(l, -120, 900, -1700, 1125, -274, 20))/120.0
         la = la + l*@horner(r,0.0, ak1, ak2, ak3, ak4, ak5, ak6)
     end
     r = 1
-    if (eta>-3.5 && eta<-0.03) || (eta>0.03 && eta<40)
-        r=1
-        q=la
-        while r>1.0e-8
-            la = q*(s+log(q))/(q-1.0)
-            r = abs(q/la-1)
-            q=la
+    if (eta > -3.5 && eta < -0.03) || (eta > 0.03 && eta < 40)
+        r = 1
+        q = la
+        while r > 1.0e-8
+            la = q*(s + log(q))/(q - 1.0)
+            r = abs(q/la - 1)
+            q = la
         end
     end
     return la
 end
+
 """
 Computing the first coefficient for the expansion :
 ```math
@@ -229,7 +226,7 @@ function coeff1(eta::Float64)
         coeff1 = @horner(eta, -3.333333333438e-1, -2.070740359969e-1, -5.041806657154e-2, -4.923635739372e-3, -4.293658292782e-5) / @horner(eta, 1.000000000000e+0, 7.045554412463e-1, 2.118190062224e-1, 3.048648397436e-2, 1.605037988091e-3)
     else
         la = lambdaeta(eta)
-        coeff1 = log(eta/(la-1.0))/eta
+        coeff1 = log(eta/(la - 1.0))/eta
     end
     return coeff1
 end
@@ -326,7 +323,7 @@ function gamma_inc_cf(a::Float64, x::Float64, ind::Integer)
            break
        end
     end
-    q = rgammax(a,x)*a2n
+    q = rgammax(a, x)*a2n
     return (1.0 - q, q)
 end
 """
@@ -349,10 +346,10 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     apn = a + 1.0
     t = x/apn
     wk[1] = t
-    loop=2
+    loop = 2
     for indx = 2:20
-       apn = apn + 1.0
-       t = t*(x/apn)
+       apn += 1.0
+       t *= x/apn
        if t <= 1.0e-3
            loop = indx
            flag = true
@@ -366,9 +363,9 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     sm = t
     tol = 0.5*acc #tolerance
     while true
-       apn = apn+1.0
-       t = t*(x/apn)
-       sm = sm + t
+       apn += 1.0
+       t *= x/apn
+       sm += t
        if t <= tol
            break
        end
@@ -376,8 +373,8 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    p = (rgammax(a,x)/a)*(1.0 + sm)
-    return (p, 1.0-p)
+    p = (rgammax(a, x)/a)*(1.0 + sm)
+    return (p, 1.0 - p)
 end
 """
     gamma_inc_asym(a, x, ind)
@@ -396,19 +393,19 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     wk = zeros(30)
     flag = false
     acc = acc0[ind + 1]
-    amn = a-1.0
-    t=amn/x
-    wk[1]=t
-    loop=2
-    for indx = 2 : 20
-       amn = amn-1.0
-       t=t*(amn/x)
+    amn = a - 1.0
+    t = amn/x
+    wk[1] = t
+    loop = 2
+    for indx = 2:20
+       amn = amn - 1.0
+       t *= amn/x
        if abs(t) <= 1.0e-3
            loop = indx
            flag = true
            break
        end
-       wk[indx]=t
+       wk[indx] = t
     end
     if !flag
         loop = 20
@@ -418,14 +415,14 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
        if abs(t) < acc
            break
        end
-       amn=amn-1.0
-       t=t*(amn/x)
-       sm=sm+t
+       amn -= 1.0
+       t *= amn/x
+       sm += t
     end
     for j = loop-1:-1:1
        sm += wk[j]
     end
-    q = (rgammax(a,x)/x)*(1.0 + sm)
+    q = (rgammax(a, x)/x)*(1.0 + sm)
     return (1.0 - q, q)
 end
 """
@@ -446,15 +443,15 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
-    l=3.0
-    c=x
-    sm= x/(a + 3.0)
+    l = 3.0
+    c = x
+    sm = x/(a + 3.0)
     tol = 3.0*acc/(a + 1.0)
     while true
-       l=l+1.0
-       c=-c*(x/l)
-       t=c/(a+l)
-       sm=sm+t
+       l += 1.0
+       c *= -x/l
+       t = c/(a + l)
+       sm += t
        if abs(t) <= tol
            break
        end
@@ -465,7 +462,7 @@ function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
     g = 1.0 + h
     if (x < 0.25 && z > -.13394) || a < x/2.59
        l = expm1(z)
-       w = 1.0+l
+       w = 1.0 + l
        q = max((w*temp - l)*g - h, 0.0)
        return (1.0 - q, q)
     else
@@ -474,6 +471,7 @@ function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
        return (p, 1.0 - p)
     end
 end
+
 """
     gamma_inc_minimax(a,x,z)
 
@@ -500,43 +498,44 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
     w = 0.5*erfcx(sqrt(y))
 
     if abs(s) <= 1.0e-3
-        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
-        c2 = @horner(z , d20 , d2[1] , d2[2])
-        c3 = @horner(z , d30 , d3[1] , d3[2])
-        c4 = @horner(z , d40 , d4[1])
-        c5 = @horner(z , d50 , d5[1])
-        c6 = @horner(z , d60 , d6[1])
+        c0 = @horner(z, d00, d0[1], d0[2], d0[3])
+        c1 = @horner(z, d10, d1[1], d1[2], d1[3])
+        c2 = @horner(z, d20, d2[1], d2[2])
+        c3 = @horner(z, d30, d3[1], d3[2])
+        c4 = @horner(z, d40, d4[1])
+        c5 = @horner(z, d50, d5[1])
+        c6 = @horner(z, d60, d6[1])
 
-        t = @horner(z , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
+        t = @horner(z, c0, c1, c2, c3, c4, c5, c6, d70, d80)
         if l < 1.0
             p = c*(w - rt2pin*t/sqrt(a))
-            return (p , 1.0 - p)
+            return (p, 1.0 - p)
         else
             q = c*(w + rt2pin*t/sqrt(a))
-            return (1.0 - q , q)
+            return (1.0 - q, q)
         end
     end
     #---USING THE MINIMAX APPROXIMATIONS---
-    c0 = @horner(z , -.333333333333333E+00 , -.159840143443990E+00 , -.335378520024220E-01 , -.231272501940775E-02)/(@horner(z , 1.0 , .729520430331981E+00 , .238549219145773E+00, .376245718289389E-01 , .239521354917408E-02 , -.939001940478355E-05 , .633763414209504E-06) )
-    c1 = @horner(z , -.185185185184291E-02 , -.491687131726920E-02 , -.587926036018402E-03 , -.398783924370770E-05)/(@horner(z , 1.0 , .780110511677243E+00 , .283344278023803E+00 , .506042559238939E-01 , .386325038602125E-02))
-    c2 = @horner(z , .413359788442192E-02 , .669564126155663E-03)/(@horner(z , 1.0 , .810647620703045E+00 , .339173452092224E+00 , .682034997401259E-01 , .650837693041777E-02 , -.421924263980656E-03))
-    c3 = @horner(z , .649434157619770E-03 , .810586158563431E-03)/(@horner(z , 1.0 , .894800593794972E+00, .406288930253881E+00 , .906610359762969E-01 , .905375887385478E-02 , -.632276587352120E-03))
-    c4 = @horner(z , -.861888301199388E-03 , -.105014537920131E-03)/(@horner(z , 1.0 , .103151890792185E+01 , .591353097931237E+00 , .178295773562970E+00 , .322609381345173E-01))
-    c5 = @horner(z , -.336806989710598E-03, -.435211415445014E-03)/(@horner(z , 1.0 , .108515217314415E+01 , .600380376956324E+00 , .178716720452422E+00))
-    c6 = @horner(z , .531279816209452E-03 , -.182503596367782E-03)/(@horner(z , 1.0 , .770341682526774E+00 , .345608222411837E+00))
-    c7 = @horner(z , .344430064306926E-03, .443219646726422E-03)/(@horner(z , 1.0 , .115029088777769E+01 , .821824741357866E+00))
-    c8 = @horner(z , -.686013280418038E-03 , .878371203603888E-03)
+    c0 = @horner(z, -.333333333333333E+00, -.159840143443990E+00, -.335378520024220E-01, -.231272501940775E-02)/(@horner(z, 1.0, .729520430331981E+00, .238549219145773E+00,  .376245718289389E-01, .239521354917408E-02, -.939001940478355E-05, .633763414209504E-06))
+    c1 = @horner(z, -.185185185184291E-02, -.491687131726920E-02, -.587926036018402E-03, -.398783924370770E-05)/(@horner(z, 1.0, .780110511677243E+00, .283344278023803E+00,  .506042559238939E-01, .386325038602125E-02))
+    c2 = @horner(z,  .413359788442192E-02,  .669564126155663E-03)/(@horner(z, 1.0, .810647620703045E+00, .339173452092224E+00, .682034997401259E-01, .650837693041777E-02, -.421924263980656E-03))
+    c3 = @horner(z,  .649434157619770E-03,  .810586158563431E-03)/(@horner(z, 1.0, .894800593794972E+00, .406288930253881E+00, .906610359762969E-01, .905375887385478E-02, -.632276587352120E-03))
+    c4 = @horner(z, -.861888301199388E-03, -.105014537920131E-03)/(@horner(z, 1.0, .103151890792185E+01, .591353097931237E+00, .178295773562970E+00, .322609381345173E-01))
+    c5 = @horner(z, -.336806989710598E-03, -.435211415445014E-03)/(@horner(z, 1.0, .108515217314415E+01, .600380376956324E+00, .178716720452422E+00))
+    c6 = @horner(z,  .531279816209452E-03, -.182503596367782E-03)/(@horner(z, 1.0, .770341682526774E+00, .345608222411837E+00))
+    c7 = @horner(z,  .344430064306926E-03,  .443219646726422E-03)/(@horner(z, 1.0, .115029088777769E+01, .821824741357866E+00))
+    c8 = @horner(z, -.686013280418038E-03,  .878371203603888E-03)
 
-    t = @horner(1.0/a , c0 , c1 , c2 , c3 , c4 , c5 , c6 , c7 , c8)
+    t = @horner(1.0/a, c0, c1, c2, c3, c4, c5, c6, c7, c8)
     if l < 1.0
         p = c*(w - rt2pin*t/sqrt(a))
-        return (p , 1.0 - p)
+        return (p, 1.0 - p)
     else
         q = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q , q)
+        return (1.0 - q, q)
     end
 end
+
 """
     gamma_inc_temme(a, x, z)
 
@@ -558,18 +557,19 @@ function gamma_inc_temme(a::Float64, x::Float64, z::Float64)
     y = -a*LogExpFunctions.logmxp1(x/a)
     c = exp(-y)
     w = 0.5*erfcx(sqrt(y))
-    c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3] , d0[4] , d0[5] , d0[6])
-    c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3] , d1[4])
-    c2 = @horner(z , d20 , d2[1])
-    t = @horner(1.0/a , c0 , c1 , c2)
+    c0 = @horner(z, d00, d0[1], d0[2], d0[3], d0[4], d0[5], d0[6])
+    c1 = @horner(z, d10, d1[1], d1[2], d1[3], d1[4])
+    c2 = @horner(z, d20, d2[1])
+    t  = @horner(1.0/a, c0, c1, c2)
     if l < 1.0
         p = c*(w - rt2pin*t/sqrt(a))
-        return (p , 1.0 - p)
+        return (p, 1.0 - p)
     else
         q = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q , q)
+        return (1.0 - q, q)
     end
 end
+
 """
     gamma_inc_temme_1(a, x, z, ind)
 
@@ -590,39 +590,40 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     l = x/a
     y = -a * LogExpFunctions.logmxp1(l)
     if a*eps()*eps() > 3.28e-3
-        throw(DomainError((a,x,ind,"P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+        throw(DomainError((a, x, ind_), "P(a,x) or Q(a,x) is computationally indeterminant in this case."))
     end
     c = exp(-y)
     w = 0.5*erfcx(sqrt(y))
     u = 1.0/a
     if iop == 1
-        c0 = @horner(z , d00 , d0[1] , d0[2] , d0[3])
-        c1 = @horner(z , d10 , d1[1] , d1[2] , d1[3])
-        c2 = @horner(z , d20 , d2[1] , d2[2])
-        c3 = @horner(z , d30 , d3[1] , d3[2])
-        c4 = @horner(z , d40 , d4[1])
-        c5 = @horner(z , d50 , d5[1])
-        c6 = @horner(z , d60 , d6[1])
+        c0 = @horner(z, d00, d0[1], d0[2], d0[3])
+        c1 = @horner(z, d10, d1[1], d1[2], d1[3])
+        c2 = @horner(z, d20, d2[1], d2[2])
+        c3 = @horner(z, d30, d3[1], d3[2])
+        c4 = @horner(z, d40, d4[1])
+        c5 = @horner(z, d50, d5[1])
+        c6 = @horner(z, d60, d6[1])
 
-        t = @horner(u , c0 , c1 , c2 , c3 , c4 , c5 , c6 , d70 , d80)
+        t = @horner(u, c0, c1, c2, c3, c4, c5, c6, d70, d80)
 
     elseif iop == 2
-        c0 = @horner(d00 , d0[1] , d0[2])
-        c1 = @horner(d10 , d1[1])
-        t = @horner(u , c0 , c1 , d20)
+        c0 = @horner(d00, d0[1], d0[2])
+        c1 = @horner(d10, d1[1])
+        t = @horner(u, c0, c1, d20)
 
     else
-        t = @horner(z , d00 , d0[1])
+        t = @horner(z, d00, d0[1])
 
     end
     if l < 1.0
         p = c*(w - rt2pin*t/sqrt(a))
-        return (p , 1.0 - p)
+        return (p, 1.0 - p)
     else
         q = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q , q)
+        return (1.0 - q, q)
     end
 end
+
 """
     gamma_inc_fsum(a,x)
 
@@ -637,17 +638,17 @@ function gamma_inc_fsum(a::Float64, x::Float64)
         sm = exp(-x)
         t = sm
         N = 1
-        c=0.0
-        i = trunc(Int,a )
+        c = 0.0
+        i = trunc(Int, a)
     else
         rtx = sqrt(x)
         sm = erfc(rtx)
         t = exp(-x)/(rtpi*rtx)
-        N=0
-        c=-0.5
-        i = trunc(Int,a )
+        N = 0
+        c = -0.5
+        i = trunc(Int, a)
     end
-    for lp = N : i-1
+    for lp = N:(i - 1)
         if i == 0
             break
         end
@@ -659,6 +660,7 @@ function gamma_inc_fsum(a::Float64, x::Float64)
     return (1.0 - q, q)
 
 end
+
 """
     gamma_inc_inv_psmall(a,p)
 
@@ -672,21 +674,22 @@ Inverting this relation we obtain ``x = r + \\sum_{k=2}^{\\infty}c_{k}r^{k}``.
 """
 function gamma_inc_inv_psmall(a::Float64, p::Float64)
     logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
-    r = exp(logr)
-    ap1 = a + 1.0
-    ap1² = (ap1)*ap1
-    ap1³ = (ap1)*ap1²
+    r    = exp(logr)
+    ap1  = a + 1.0
+    ap1² = ap1*ap1
+    ap1³ = ap1*ap1²
     ap1⁴ = ap1²*ap1²
-    ap2 = a+2.0
+    ap2  = a + 2.0
     ap2² = ap2*ap2
-    ck1 = 1.0
-    ck2 = 1.0/(1.0+a)
-    ck3 = 0.5*(3*a+5)/(ap1²*(a+2))
-    ck4 = (1.0/3.0)*(@horner(a,31,33,8))/(ap1³*ap2*(a+3))
-    ck5 = (1.0/24.0)*(@horner(a, 2888, 5661, 3971, 1179, 125))/(ap1⁴*ap2²*(a+3)*(a+4))
-    x0 = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
+    ck1  = 1.0
+    ck2  = 1.0/(1.0 + a)
+    ck3  = 0.5*(3*a + 5)/(ap1²*(a + 2))
+    ck4  = (1.0/3.0)*(@horner(a, 31, 33, 8))/(ap1³*ap2*(a + 3))
+    ck5  = (1.0/24.0)*(@horner(a, 2888, 5661, 3971, 1179, 125))/(ap1⁴*ap2²*(a + 3)*(a + 4))
+    x0   = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
     return x0
 end
+
 """
     gamma_inc_inv_qsmall(a,q)
 
@@ -698,8 +701,8 @@ x \\sim x_{0} - L + b \\sum_{k=1}^{\\infty} d_{k}/x_{0}^{k}
 where ``b = 1-a``, ``L = \\ln{x_0}``.
 """
 function gamma_inc_inv_qsmall(a::Float64, q::Float64)
-    b=1.0-a
-    eta=sqrt(-2/a*log(q*gammax(a)*sqrt(2*pi)/sqrt(a)))
+    b = 1.0 - a
+    eta = sqrt(-2/a*log(q*gammax(a)*sqrt(2*pi)/sqrt(a)))
     x0 = a*lambdaeta(eta)
     l = log(x0)
 
@@ -709,15 +712,16 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
         ck2 = (@horner(l, @horner(b, 2, 3), @horner(b, -2, -2), 1))/2.0
         ck3 = (@horner(l, @horner(b, -12, -24, -11), @horner(b, 12, 24, 6), @horner(b, -6, -9), 2))/6.0
         ck4 = (@horner(l, @horner(b, 72, 162, 120, 25), @horner(b, -72, -168, -114, -12), @horner(b, 36, 84, 36), @horner(b, -12, -22), 3))/12.0
-        x0 = x0 - l + b * r * @horner(r, ck1, ck2, ck3, ck4)
+        x0 = x0 - l + b*r*@horner(r, ck1, ck2, ck3, ck4)
     else
         r = 1.0/x0
         l² = l*l
         ck1 = l - 1.0
-        x0 = x0 - l + b * r * ck1
+        x0 = x0 - l + b*r*ck1
     end
     return x0
 end
+
 """
     gamma_inc_inv_asmall(a,p,q,pcase)
 
@@ -729,6 +733,7 @@ function gamma_inc_inv_asmall(a::Float64, p::Float64, q::Float64, pcase::Bool)
     logp = (pcase) ? log(p) : log1p(-q)
     return exp((1.0/a)*(logp +loggamma1p(a)))
 end
+
 """
     gamma_inc_inv_alarge(a,porq,s)
 
@@ -751,9 +756,9 @@ function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
     eta += (coeff1(eta) + (coeff2(eta) + coeff3(eta)/a)/a)/a
     x0 = a*lambdaeta(eta)
     fp = -sqrt(a/(2*pi))*exp(-0.5*a*eta*eta)/gammax(a)
-    return (x0,fp)
+    return (x0, fp)
 end
-# Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato , Alfred H Morris.
+# Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato, Alfred H Morris.
 # Published in Journal: ACM Transactions on Mathematical Software (TOMS)
 # Volume 12 Issue 4, Dec. 1986 Pages 377-393
 # doi>10.1145/22721.23109
@@ -785,15 +790,15 @@ gamma_inc(a::Real,x::Real,ind::Integer=0) = _gamma_inc(promote(float(a),float(x)
 function _gamma_inc(a::Float64, x::Float64, ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
-    if a<0.0 || x<0.0
-        throw(DomainError((a,x,ind,"`a` and `x` must be greater than 0 ---- Domain : (0,inf)")))
-    elseif a==0.0 && x==0.0
-        throw(DomainError((a,x,ind,"`a` and `x` must be greater than 0 ---- Domain : (0,inf)")))
-    elseif a*x==0.0
-        if x<=a
-            return (0.0,1.0)
+    if a < 0.0 || x < 0.0
+        throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
+    elseif a == 0.0 && x == 0.0
+        throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
+    elseif a*x == 0.0
+        if x <= a
+            return (0.0, 1.0)
         else
-            return (1.0,0.0)
+            return (1.0, 0.0)
         end
     end
 
@@ -805,9 +810,10 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
             end
             s = 1.0 - l
             z = -LogExpFunctions.logmxp1(l)
+            700.0/a
             if z >= 700.0/a
                 if abs(s) <= 2*eps(Float64)
-                    throw(DomainError((a, x, ind, "P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+                    throw(DomainError((a, x, ind), "P(a,x) or Q(a,x) is computationally indeterminant in this case."))
                 end
                 if x <= a
                     return (0.0, 1.0)
@@ -815,26 +821,27 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
                     return (1.0, 0.0)
                 end
             end
+
             y = a*z
             rta = sqrt(a)
             if abs(s) <= e0[iop]/rta
                 z = sqrt(z + z)
                 if l < 1.0
-                    z=-z
+                    z = -z
                 end
                 return gamma_inc_temme_1(a, x, z, ind)
             end
 
             if abs(s) <= 0.4
                 if abs(s) <= 2.0*eps() && a*eps()*eps() > 3.28e-3
-                    throw(DomainError((a, x, ind, "P(a,x) or Q(a,x) is computationally indeterminant in this case.")))
+                    throw(DomainError((a, x, ind), "P(a,x) or Q(a,x) is computationally indeterminant in this case."))
                 end
                 c = exp(-y)
                 w = 0.5*erfcx(sqrt(y))
                 u = 1.0/a
                 z = sqrt(z + z)
                 if l < 1.0
-                    z=-z
+                    z = -z
                 end
                 if iop == 1
                     return gamma_inc_minimax(a, x, z)
@@ -855,10 +862,10 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
     elseif a == 0.5
         if x >= 0.25
             q = erfc(sqrt(x))
-            return ( 1.0 - q , q )
+            return (1.0 - q, q)
         end
         p = erf(sqrt(x))
-        return ( p , 1.0 - p )
+        return (p, 1.0 - p)
     elseif x < 1.1
         return gamma_inc_taylor_x(a, x, ind)
     end
@@ -872,7 +879,7 @@ end
 
 function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
+    ccall((:mpfr_gamma_inc, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, a, x, ROUNDING_MODE[])
     q = z/gamma(a)
     return (1.0 - q, q)
 end
@@ -924,20 +931,20 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     end
     haseta = false
 
-    logr = (1.0/a)*( log(p) + logabsgamma(a + 1.0)[1] )
-    if logr < log(0.2*(1+a)) #small value of p
-        x0 = gamma_inc_inv_psmall(a,p)
+    logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
+    if logr < log(0.2*(1 + a)) #small value of p
+        x0 = gamma_inc_inv_psmall(a, p)
     elseif ((q < min(0.02, exp(-1.5*a)/gamma(a))) && (a < 10)) #small q
         x0 = gamma_inc_inv_qsmall(a, q)
     elseif abs(porq - 0.5) < 1.0e-05
-        x0 = a - 1.0/3.0 + (8.0/405.0 + 184.0/25515.0/a) / a
-    elseif abs(a-1.0) < 1.0e-4
+        x0 = a - 1.0/3.0 + (8.0/405.0 + 184.0/25515.0/a)/a
+    elseif abs(a - 1.0) < 1.0e-4
         x0 = pcase ? -log1p(-p) : -log(q)
     elseif a < 1.0 # small value of a
         x0 = gamma_inc_inv_asmall(a, p, q, pcase)
     else    #large a
         haseta = true
-        (x0,fp) = gamma_inc_inv_alarge(a,porq,s)
+        (x0,fp) = gamma_inc_inv_alarge(a, porq, s)
     end
 
     t = 1
@@ -949,9 +956,9 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         x = x0
         x² = x*x
         if !haseta
-            dlnr = (1.0-a)*log(x) + x + logabsgam
+            dlnr = (1.0 - a)*log(x) + x + logabsgam
             if dlnr > log(floatmax(Float64)/1000.0)
-                n=20
+                n = 20
             else
                 r = exp(dlnr)
             end
@@ -959,9 +966,9 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
             r = -(1/fp)*x
         end
 
-        (px,qx) = gamma_inc(a,x,0)
-        ck1 = (pcase) ? -r*(px-p) : r*(qx-q)
-        ck2 = (x-a+1.0)/(2.0*x)
+        (px, qx) = gamma_inc(a, x, 0)
+        ck1 = pcase ? -r*(px-p) : r*(qx-q)
+        ck2 = (x - a + 1.0)/(2.0*x)
         ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
         r = ck1
         if a > 0.1
@@ -974,10 +981,9 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
             end
         end
 
-        t=abs(x/x0 - 1.0)
-        n+=1
-        x=x0
-
+        t = abs(x/x0 - 1.0)
+        n += 1
+        x = x0
     end
     return x
 end
@@ -986,17 +992,17 @@ _gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32(_gamma_inc_inv(Floa
 _gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
 
 # like promote(x,y), but don't complexify real values
-promotereal(x::Real,y::Real) = promote(x,y)
-promotereal(x::Real,y::Number) = let (u,v) = promote(x,y); real(u),v; end
-promotereal(x::Number,y::Real) = let (u,v) = promote(x,y); u,real(v); end
-promotereal(x,y) = promote(x,y)
+promotereal(x::Real, y::Real) = promote(x, y)
+promotereal(x::Real, y::Number) = let (u, v) = promote(x, y); real(u), v; end
+promotereal(x::Number, y::Real) = let (u, v) = promote(x, y); u, real(v); end
+promotereal(x, y) = promote(x,y)
 
 """
     gamma(a,x)
 
 Returns the upper incomplete gamma function
 ```math
-\\Gamma(a,x) = \\int_x^\\infty t^{a-1} e^{-t} dt \\, ,
+\\Gamma(a,x) = \\int_x^\\infty t^{a-1} e^{-t} dt \\,
 ```
 supporting arbitrary real or complex `a` and `x`.
 
@@ -1006,10 +1012,10 @@ See also the [`gamma_inc`](@ref) function to compute both the upper and lower
 
 External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 """
-gamma(a::Number,x::Number) = _gamma(promotereal(float(a),float(x))...)
+gamma(a::Number,x::Number) = _gamma(promotereal(float(a), float(x))...)
 gamma(a::Integer,x::Number) = _gamma(a, float(x))
 
-function _gamma(a::Number,x::Number)
+function _gamma(a::Number, x::Number)
     if a isa Real && x isa Real && !isfinite(a*x)
         if isinf(x) && isfinite(a)
             if x > 0 # == +Inf
@@ -1022,14 +1028,14 @@ function _gamma(a::Number,x::Number)
                 if x ≥ 0
                     return a*one(x) # +Inf
                 else
-                    throw(DomainError((a,x), "gamma will only return a complex result if called with a complex argument"))
+                    throw(DomainError((a, x), "gamma will only return a complex result if called with a complex argument"))
                 end
             elseif a < 0
                 return zero(a)*one(x)
             end
         end
     end
-    return iszero(x) ? gamma(one(x)*a) : x^a * expint(1-a, x)
+    return iszero(x) ? gamma(one(x)*a) : x^a * expint(1 - a, x)
 end
 
 _gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
@@ -1042,11 +1048,11 @@ function _gamma_big(a::Real,x::Real)
         if isinteger(a) && a > 0
             return invoke(_gamma, Tuple{Number,Number}, a, BigFloat(x))
         else
-            throw(DomainError((a,x), "gamma will only return a complex result if called with a complex argument"))
+            throw(DomainError((a, x), "gamma will only return a complex result if called with a complex argument"))
         end
     end
     z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr), Int32 , (Ref{BigFloat} , Ref{BigFloat} , Ref{BigFloat} , Int32) , z , a , x , ROUNDING_MODE[])
+    ccall((:mpfr_gamma_inc, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, a, x, ROUNDING_MODE[])
     return z
 end
 
@@ -1055,7 +1061,7 @@ end
 
 Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
 ```math
-\\log \\Gamma(a,x) = \\log \\int_x^\\infty t^{a-1} e^{-t} dt \\, ,
+\\log \\Gamma(a,x) = \\log \\int_x^\\infty t^{a-1} e^{-t} dt \\,
 ```
 supporting arbitrary real or complex `a` and `x`.
 
@@ -1065,15 +1071,15 @@ but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of 
 
 See also [`loggamma(x)`](@ref).
 """
-loggamma(a::Number,x::Number) = _loggamma(promotereal(float(a),float(x))...)
-loggamma(a::Integer,x::Number) = _loggamma(a, float(x))
-function _loggamma(a::Number,x::Number)
+loggamma(a::Number, x::Number) = _loggamma(promotereal(float(a), float(x))...)
+loggamma(a::Integer, x::Number) = _loggamma(a, float(x))
+function _loggamma(a::Number, x::Number)
     if a isa Real && x isa Real && !isfinite(a*x)
         if isinf(x) && isfinite(a)
             if x > 0 # == +Inf
                 return -one(a)*x
             elseif x < 0
-                throw(DomainError((a,x), "loggamma will only return a complex result if called with a complex argument"))
+                throw(DomainError((a, x), "loggamma will only return a complex result if called with a complex argument"))
             end
         elseif isinf(a) && isfinite(x)
             if a > 0 && x ≥ 0
@@ -1089,5 +1095,5 @@ function _loggamma(a::Number,x::Number)
         # minus signs in expintx and x^a may cancel
         return a*log(-x) + log(-expintx(1-a, x)) - x
     end
-    return a*log(x) + log(expintx(1-a, x)) - x
+    return a*log(x) + log(expintx(1 - a, x)) - x
 end

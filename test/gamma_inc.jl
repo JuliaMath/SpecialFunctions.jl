@@ -38,9 +38,18 @@
     @test gamma_inc(1e7, 1e7 + 1)[2] ≈ 0.4998317911745633
     @test gamma_inc(29.0, 0.3)[1] ≈ 5.80834761514062e-47
     @test gamma_inc(29.0, 1000.0)[2] == 0.0
+    @test gamma_inc(1e300, 1e-100)[1] == 0.0
+    @test gamma_inc(7.098843361278083e33, 7.098843361278083e33*2)[2] == 0.0
+    @test gamma_inc(7.098843361278083e33, 7.098843361278083e33/2)[1] == 0.0
+    @test gamma_inc(1.1, 1e3)[2] == 0.0
+    @test gamma_inc(24.0, 1e-323)[1] == 0.0
+    @test gamma_inc(6311.0, 6311.0*0.59999)[1] < 1e-300
     @test_throws DomainError gamma_inc(-1, 2, 2)
     @test_throws DomainError gamma_inc(0, 0, 1)
+    @test_throws DomainError gamma_inc(7.098843361278083e33, 7.09884336127808e33)
+    @test_throws DomainError gamma_inc(6.693195169205051e28, 6.693195169205049e28)
 end
+
 @testset "inverse of incomplete gamma ratios" begin
 #Compared with Scipy.special.gammaincinv
     @test gamma_inc_inv(1.0,0.5,0.5) ≈ 0.69314718055994529
@@ -62,7 +71,7 @@ end
         @test SpecialFunctions.loggamma1p(x) ≈ loggamma(1.0+x)
     end
     for x = .5:5.0:100.0
-        @test SpecialFunctions.stirling(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
+        @test SpecialFunctions.stirling_error(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
     end
 end
 
