@@ -398,7 +398,7 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     wk[1] = t
     loop = 2
     for indx = 2:20
-       amn = amn - 1.0
+       amn -= 1.0
        t *= amn/x
        if abs(t) <= 1.0e-3
            loop = indx
