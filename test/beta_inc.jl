@@ -18,8 +18,8 @@
     @testset "a=80.9, b=0.8, x=$x" for (x, val) in zip(0.01:0.01:0.99, ans4)
         @test beta_inc(80.9, 0.8, x, 1.0 - x)[1] ≈ val # scipy.special.betainc(80.9,0.8,x)
     end
-    @testset "a=1.7, b=10.5, x=$x" for (ctr, x) in enumerate(0.01:0.01:0.99)
-        @test beta_inc(1.7, 10.5, x, 1.0 - x)[1] ≈ ans5[ctr]#scipy.special.betainc(1.7,10.5,x)
+    @testset "a=1.7, b=10.5, x=$x" for (x, val) in zip(0.01:0.01:0.99, ans5)
+        @test beta_inc(1.7, 10.5, x, 1.0 - x)[1] ≈ val # scipy.special.betainc(1.7,10.5,x)
     end
     @testset "a=100.5, b=100.5, x=$x" for (ctr, x) in enumerate(0.01:0.01:0.99)
         @test beta_inc(100.5, 100.5, x, 1.0 - x)[1] ≈ ans6[ctr]#scipy.special.betainc(100.5,100.5,x)
