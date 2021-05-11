@@ -919,6 +919,17 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 gamma_inc_inv(a::Real, p::Real, q::Real) = _gamma_inc_inv(promote(float(a), float(p), float(q))...)
 
 function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
+
+    if p + q != 1
+        throw(ArgumentError("p + q must equal one but is $(p + q)"))
+    end
+
+    if iszero(p)
+        return 0.0
+    elseif iszero(q)
+        return Inf
+    end
+
     if p < 0.5
         pcase = true
         porq = p
@@ -943,21 +954,21 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         x0 = gamma_inc_inv_asmall(a, p, q, pcase)
     else    #large a
         haseta = true
-        (x0,fp) = gamma_inc_inv_alarge(a, porq, s)
+        x0, fp = gamma_inc_inv_alarge(a, porq, s)
     end
 
     t = 1
     x = x0
     n = 1
     logabsgam = logabsgamma(a)[1]
-    #Newton-like higher order iteration with upper limit as 15.
+    # Newton-like higher order iteration with upper limit as 15.
     while t > 1.0e-15 && n < 15
         x = x0
         x² = x*x
         if !haseta
             dlnr = (1.0 - a)*log(x) + x + logabsgam
             if dlnr > log(floatmax(Float64)/1000.0)
-                n = 20
+                break
             else
                 r = exp(dlnr)
             end
@@ -965,11 +976,18 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
             r = -(1/fp)*x
         end
 
-        (px, qx) = gamma_inc(a, x, 0)
-        ck1 = pcase ? -r*(px-p) : r*(qx-q)
+        px, qx = gamma_inc(a, x, 0)
+        ck1 = pcase ? -r*(px - p) : r*(qx - q)
         ck2 = (x - a + 1.0)/(2.0*x)
         ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
         r = ck1
+
+        # This check is not in the invincgam subroutine from IncgamFI but it probably
+        # should be since the routine fails to compute a finite value for very small p
+        if !isfinite(ck3)
+            break
+        end
+
         if a > 0.1
             x0 = @horner(r, x, 1.0, ck2, ck3)
         else
