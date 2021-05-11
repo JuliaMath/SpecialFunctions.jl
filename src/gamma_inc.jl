@@ -810,7 +810,6 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
             end
             s = 1.0 - l
             z = -LogExpFunctions.logmxp1(l)
-            700.0/a
             if z >= 700.0/a
                 if abs(s) <= 2*eps(Float64)
                     throw(DomainError((a, x, ind), "P(a,x) or Q(a,x) is computationally indeterminant in this case."))
