@@ -977,25 +977,31 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
         end
 
         px, qx = gamma_inc(a, x, 0)
-        ck1 = pcase ? -r*(px - p) : r*(qx - q)
-        ck2 = (x - a + 1.0)/(2.0*x)
-        ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
-        r = ck1
 
-        # This check is not in the invincgam subroutine from IncgamFI but it probably
-        # should be since the routine fails to compute a finite value for very small p
-        if !isfinite(ck3)
-            break
-        end
+        ck1 = pcase ? -r*(px - p) : r*(qx - q)        
+        if a > 0.05
+            ck2 = (x - a + 1.0)/(2.0*x)
 
-        if a > 0.1
-            x0 = @horner(r, x, 1.0, ck2, ck3)
-        else
-            if a > 0.05
-                x0 = @horner(r, x, 1.0, ck2)
-            else
-                x0 = x + r
+            # This check is not in the invincgam subroutine from IncgamFI but it probably
+            # should be since the routine fails to compute a finite value for very small p
+            if !isfinite(ck2)
+                break
             end
+
+            if a > 0.1
+                ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
+
+                # This check is not in the invincgam subroutine from IncgamFI but it probably
+                # should be since the routine fails to compute a finite value for very small p
+                if !isfinite(ck3)
+                    break
+                end
+                x0 = @horner(ck1, x, 1.0, ck2, ck3)
+            else
+                x0 = @horner(ck1, x, 1.0, ck2)
+            end
+        else
+            x0 = x + ck1
         end
 
         t = abs(x/x0 - 1.0)
