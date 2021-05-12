@@ -1,44 +1,55 @@
 @testset "incomplete gamma ratios" begin
 #Computed using Wolframalpha gamma(a,x)/gamma(a) ~ gamma_q(a,x,0) function.
-    @test gamma_inc(10,10)[2] ≈ 0.45792971447185221
-    @test gamma_inc(1,1)[2] ≈ 0.3678794411714423216
-    @test gamma_inc(0.5,0.5)[2] ≈ 0.31731050786291410
-    @test gamma_inc(BigFloat(30.5),BigFloat(30.5))[2] ≈ parse(BigFloat,"0.47591691193354987004") rtol=eps()
-    @test gamma_inc(5.5,0.5)[2] ≈ 0.9999496100513121669
-    @test gamma_inc(0.5,7.4)[2] ≈ 0.0001195355018130302
-    @test gamma_inc(0.5,0.22)[2] ≈ 0.507122455359825146
-    @test gamma_inc(0.5,0.8)[2] ≈ 0.20590321073206830887
-    @test gamma_inc(11.5,0.5)[2] ≈ 0.999999999998406112
-    @test gamma_inc(0.19,0.99)[2] ≈ 0.050147247342905857
-    @test gamma_inc(0.9999,0.9999)[2] ≈ 0.3678730556923103
-    @test gamma_inc(24,23.9999999999)[2] ≈ 0.472849720555859138
-    @test gamma_inc(0.5,0.55)[2] ≈ 0.29426610430496289
-    @test gamma_inc(Float32(0.5),Float32(0.55))[2] ≈ Float32(gamma_inc(0.5,0.55)[2])
-    @test gamma_inc(Float16(0.5),Float16(0.55))[2] ≈ Float16(gamma_inc(0.5,0.55)[2])
-    @test gamma_inc(30,29.99999)[2] ≈ 0.475717712451705704
-    @test gamma_inc(30,29.9)[2] ≈ 0.482992166284958565
-    @test gamma_inc(10,0.0001)[2] ≈ 1.0000
-    @test gamma_inc(0.0001,0.0001)[2] ≈ 0.000862958131006599
-    @test gamma_inc(0.0001,10.5)[1] ≈ 0.999999999758896146
-    @test gamma_inc(1,1)[1] ≈ 0.63212055882855768
-    @test gamma_inc(13,15.1)[2] ≈ 0.25940814264863701
-    @test gamma_inc(0.6,1.3)[2] ≈ 0.136458554006505355
-    @test gamma_inc((100),(80))[2] ≈ 0.9828916869648668
-    @test gamma_inc((100),(80),1)[2] ≈ 0.9828916869
-    @test Float16(gamma_inc((100),(80),2)[2]) ≈ Float16(.983)
-    @test gamma_inc(13.5,15.1)[2] ≈ 0.305242642543419087
-    @test gamma_inc(11,9)[1] ≈ 0.2940116796594881834
-    @test gamma_inc(8,32)[1] ≈ 0.99999989060651042057
-    @test gamma_inc(15,16)[2] ≈ 0.3675273597655649298
-    @test gamma_inc(15.5,16)[2] ≈ 0.4167440299455427811
-    @test gamma_inc(0.9,0.8)[1] ≈ 0.59832030278768172
-    @test gamma_inc(1.7,2.5)[1] ≈ 0.78446115627678957
-    @test gamma_inc(11.1,0.001)[2] ≈ 1.0000
-    @test gamma_inc(1e7, (1e7)+1)[1] ≈ 0.5001682088254367
-    @test gamma_inc(1e7, (1e7)+1)[2] ≈ 0.4998317911745633
-    @test_throws DomainError gamma_inc(-1,2,2)
-    @test_throws DomainError gamma_inc(0,0,1)
+    @test gamma_inc(10, 10)[2] ≈ 0.45792971447185221
+    @test gamma_inc(1, 1)[2] ≈ 0.3678794411714423216
+    @test gamma_inc(0.5, 0.5)[2] ≈ 0.31731050786291410
+    @test gamma_inc(BigFloat(30.5), BigFloat(30.5))[2] ≈ parse(BigFloat,"0.47591691193354987004") rtol=eps()
+    @test gamma_inc(5.5, 0.5)[2] ≈ 0.9999496100513121669
+    @test gamma_inc(0.5, 7.4)[2] ≈ 0.0001195355018130302
+    @test gamma_inc(0.5, 0.22)[2] ≈ 0.507122455359825146
+    @test gamma_inc(0.5, 0.8)[2] ≈ 0.20590321073206830887
+    @test gamma_inc(11.5, 0.5)[2] ≈ 0.999999999998406112
+    @test gamma_inc(0.19, 0.99)[2] ≈ 0.050147247342905857
+    @test gamma_inc(0.9999, 0.9999)[2] ≈ 0.3678730556923103
+    @test gamma_inc(24, 23.9999999999)[2] ≈ 0.472849720555859138
+    @test gamma_inc(0.5, 0.55)[2] ≈ 0.29426610430496289
+    @test gamma_inc(Float32(0.5), Float32(0.55))[2] ≈ Float32(gamma_inc(0.5,0.55)[2])
+    @test gamma_inc(Float16(0.5), Float16(0.55))[2] ≈ Float16(gamma_inc(0.5,0.55)[2])
+    @test gamma_inc(30, 29.99999)[2] ≈ 0.475717712451705704
+    @test gamma_inc(30, 29.9)[2] ≈ 0.482992166284958565
+    @test gamma_inc(10, 0.0001)[2] ≈ 1.0000
+    @test gamma_inc(0.0001, 0.0001)[2] ≈ 0.000862958131006599
+    @test gamma_inc(0.0001, 10.5)[1] ≈ 0.999999999758896146
+    @test gamma_inc(1, 1)[1] ≈ 0.63212055882855768
+    @test gamma_inc(13, 15.1)[2] ≈ 0.25940814264863701
+    @test gamma_inc(0.6, 1.3)[2] ≈ 0.136458554006505355
+    @test gamma_inc(100, 80)[2] ≈ 0.9828916869648668
+    @test gamma_inc(100, 80, 1)[2] ≈ 0.9828916869
+    @test Float16(gamma_inc(100, 80, 2)[2]) ≈ Float16(.983)
+    @test gamma_inc(13.5, 15.1)[2] ≈ 0.305242642543419087
+    @test gamma_inc(11, 9)[1] ≈ 0.2940116796594881834
+    @test gamma_inc(8, 32)[1] ≈ 0.99999989060651042057
+    @test gamma_inc(15, 16)[2] ≈ 0.3675273597655649298
+    @test gamma_inc(15.5, 16)[2] ≈ 0.4167440299455427811
+    @test gamma_inc(0.9, 0.8)[1] ≈ 0.59832030278768172
+    @test gamma_inc(1.7, 2.5)[1] ≈ 0.78446115627678957
+    @test gamma_inc(11.1, 0.001)[2] ≈ 1.0000
+    @test gamma_inc(1e7, 1e7 + 1)[1] ≈ 0.5001682088254367
+    @test gamma_inc(1e7, 1e7 + 1)[2] ≈ 0.4998317911745633
+    @test gamma_inc(29.0, 0.3)[1] ≈ 5.80834761514062e-47
+    @test gamma_inc(29.0, 1000.0)[2] == 0.0
+    @test gamma_inc(1e300, 1e-100)[1] == 0.0
+    @test gamma_inc(7.098843361278083e33, 7.098843361278083e33*2)[2] == 0.0
+    @test gamma_inc(7.098843361278083e33, 7.098843361278083e33/2)[1] == 0.0
+    @test gamma_inc(1.1, 1e3)[2] == 0.0
+    @test gamma_inc(24.0, 1e-323)[1] == 0.0
+    @test gamma_inc(6311.0, 6311.0*0.59999)[1] < 1e-300
+    @test_throws DomainError gamma_inc(-1, 2, 2)
+    @test_throws DomainError gamma_inc(0, 0, 1)
+    @test_throws DomainError gamma_inc(7.098843361278083e33, 7.09884336127808e33)
+    @test_throws DomainError gamma_inc(6.693195169205051e28, 6.693195169205049e28)
 end
+
 @testset "inverse of incomplete gamma ratios" begin
 #Compared with Scipy.special.gammaincinv
     @test gamma_inc_inv(1.0,0.5,0.5) ≈ 0.69314718055994529
@@ -60,7 +71,7 @@ end
         @test SpecialFunctions.loggamma1p(x) ≈ loggamma(1.0+x)
     end
     for x = .5:5.0:100.0
-        @test SpecialFunctions.stirling(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
+        @test SpecialFunctions.stirling_error(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
     end
 end
 
