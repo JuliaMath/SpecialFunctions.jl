@@ -978,7 +978,7 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
 
         px, qx = gamma_inc(a, x, 0)
 
-        ck1 = pcase ? -r*(px - p) : r*(qx - q)        
+        ck1 = pcase ? -r*(px - p) : r*(qx - q)
         if a > 0.05
             ck2 = (x - a + 1.0)/(2.0*x)
 
