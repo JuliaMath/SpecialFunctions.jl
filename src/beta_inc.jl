@@ -109,9 +109,9 @@ function beta_integrand(a::Float64,b::Float64,x::Float64,y::Float64,mu::Float64=
              lambda = a - (a+b)*x
         end
         e = -lambda/a
-        u = abs(e) > 0.6 ? u = e - log(x/x0) : - log1pmx(e)
+        u = abs(e) > 0.6 ? e - log(x/x0) : - LogExpFunctions.log1pmx(e)
         e = lambda/b
-        v = abs(e) > 0.6 ? e - log(y/y0) : - log1pmx(e)
+        v = abs(e) > 0.6 ? e - log(y/y0) : - LogExpFunctions.log1pmx(e)
         z = esum(mu, -(a*u + b*v))
         return (1.0/sqrt(2*pi))*sqrt(b*x0)*z*exp(-stirling_corr(a,b))
     elseif x > 0.375
@@ -271,7 +271,7 @@ function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, 
         r1 = (b-a)/b
         w0 = 1.0/sqrt(a*(1.0+h))
     end
-    f = -a*log1pmx(-(lambda/a)) - b*log1pmx((lambda/b))
+    f = -a*LogExpFunctions.log1pmx(-(lambda/a)) - b*LogExpFunctions.log1pmx(lambda/b)
     t = exp(-f)
     if t == 0.0
         return ans

@@ -1,3 +1,8 @@
+const BESSEL_ORDER_INFO = """
+derivatives of Bessel functions with respect to the order are not implemented currently:
+https://github.com/JuliaMath/SpecialFunctions.jl/issues/160
+"""
+
 ChainRulesCore.@scalar_rule(airyai(x), airyaiprime(x))
 ChainRulesCore.@scalar_rule(airyaiprime(x), x * airyai(x))
 ChainRulesCore.@scalar_rule(airybi(x), airybiprime(x))
@@ -52,49 +57,49 @@ ChainRulesCore.@scalar_rule(trigamma(x), polygamma(2, x))
 ChainRulesCore.@scalar_rule(
     besselj(ν, x),
     (
-        ChainRulesCore.@thunk(error("not implemented")),
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
         (besselj(ν - 1, x) - besselj(ν + 1, x)) / 2
     ),
 )
 ChainRulesCore.@scalar_rule(
     besseli(ν, x),
     (
-        ChainRulesCore.@thunk(error("not implemented")),
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
         (besseli(ν - 1, x) + besseli(ν + 1, x)) / 2,
     ),
 )
 ChainRulesCore.@scalar_rule(
     bessely(ν, x),
     (
-        ChainRulesCore.@thunk(error("not implemented")),
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
         (bessely(ν - 1, x) - bessely(ν + 1, x)) / 2,
     ),
 )
 ChainRulesCore.@scalar_rule(
     besselk(ν, x),
     (
-        ChainRulesCore.@thunk(error("not implemented")),
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
         -(besselk(ν - 1, x) + besselk(ν + 1, x)) / 2,
     ),
 )
 ChainRulesCore.@scalar_rule(
     hankelh1(ν, x),
     (
-        ChainRulesCore.@thunk(error("not implemented")),
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
         (hankelh1(ν - 1, x) - hankelh1(ν + 1, x)) / 2,
     ),
 )
 ChainRulesCore.@scalar_rule(
     hankelh2(ν, x),
     (
-        ChainRulesCore.@thunk(error("not implemented")),
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
         (hankelh2(ν - 1, x) - hankelh2(ν + 1, x)) / 2,
     ),
 )
 ChainRulesCore.@scalar_rule(
     polygamma(m, x),
     (
-        ChainRulesCore.@thunk(error("not implemented")),
+        ChainRulesCore.DoesNotExist(),
         polygamma(m + 1, x),
     ),
 )
