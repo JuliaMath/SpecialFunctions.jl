@@ -8,8 +8,8 @@ LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
 OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
 
 [compat]
-ChainRulesCore = "0.9"
-ChainRulesTestUtils = "0.6.3"
+ChainRulesCore = "0.9.40"
+ChainRulesTestUtils = "0.6.8"
 LogExpFunctions = "0.2"
 OpenSpecFun_jll = "0.5"
 julia = "1.3"
