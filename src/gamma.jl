@@ -772,38 +772,9 @@ Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)
 """
 function beta end
 
-function beta(a::Real, b::Real)
-    #Special case for negative integer argument
-    if a <= 0.0
-        if isinteger(a) && 1-a-b > 0
-            sgn = isinteger(b/2) ? 1 : -1
-            return sgn* beta(1-a-b,b)
-        end
-    end
-    if b <= 0.0
-        if isinteger(b) && 1-a-b > 0
-            sgn = isinteger(a/2) ? 1 : -1
-            return sgn* beta(1-a-b,a)
-        end
-    end
-    if a < b
-        a,b = b,a
-    end
-    #asymptotic expansion for log(B(a,b)) for |a| >> |b|
-    if abs(a) > 1e5*abs(b) && abs(a) > 1e5
-        return exp(loggammadiv(b,a) + loggamma(b))
-    end
-    ya, sa = logabsgamma(a)
-    yb, sb = logabsgamma(b)
-    yab, sab = logabsgamma(a+b)
-    return exp(ya + yb - yab) * (sa*sb*sab)
-end
-
 function beta(a::Number, b::Number)
-    ya = loggamma(a)
-    yb = loggamma(b)
-    yab = loggamma(a+b)
-    return exp(ya + yb - yab)
+    lab, sign = logabsbeta(a, b)
+    return sign*exp(lab)
 end
 
 """
@@ -813,7 +784,13 @@ Natural logarithm of the [`beta`](@ref) function ``\\log(|\\operatorname{B}(x,y)
 
 See also [`logabsbeta`](@ref).
 """
-logbeta(a::Number, b::Number) = loggamma(a)+loggamma(b)-loggamma(a+b)
+function logbeta(a::Number, b::Number)
+    lab, sign = logabsbeta(a, b)
+    if sign < 0
+        throw(DomainError((a, b), "`beta(a, b)` must be non-negative"))
+    end
+    return lab
+end
 
 """
     logabsbeta(x, y)
@@ -822,31 +799,38 @@ Compute the natural logarithm of the absolute value of the [`beta`](@ref) functi
 
 See also [`logbeta`](@ref).
 """
-function logabsbeta(a::Real, b::Real)
-    if a <= 0.0
-        if isinteger(a) && 1-a-b > 0
+function logabsbeta(a::T, b::T) where T<:Real
+    # ensure that a <= b
+    if a > b
+        return logabsbeta(b, a)
+    end
+
+    if a <= 0.0 && isinteger(a)
+        if a + b <= 0
+            r = logbeta(1 - a - b, b)
             sgn = isinteger(b/2) ? 1 : -1
-            return logabsbeta(1-a-b,b)
+            return r, sgn
+        else
+            return -log(zero(first(promote(a, b)))), 1
         end
     end
-    if b <= 0.0
-        if isinteger(b) && 1-a-b > 0
-            sgn = isinteger(a/2) ? 1 : -1
-            return logabsbeta(1-a-b,a)
-        end
+
+    # asymptotic expansion for large `b` and positive arguments
+    # FIXME! We probably lose precision for negative arguments. However, `loggammadiv`
+    # is based on the NSWC code which doesn't bother with negative arguments
+    if a > 0 && b > 8
+        return (loggammadiv(a, b) + loggamma(a)), 1
     end
-    if a < b
-        a,b = b,a
-    end
-    #asymptotic expansion for log(B(a,b)) for |a| >> |b|
-    if abs(a) > 1e5*abs(b) && abs(a) > 1e5
-        return (loggammadiv(b,a) + loggamma(b)), 1
-    end
+
     ya, sa = logabsgamma(a)
     yb, sb = logabsgamma(b)
-    yab, sab = logabsgamma(a+b)
+    yab, sab = logabsgamma(a + b)
     (ya + yb - yab), (sa*sb*sab)
 end
+logabsbeta(a::Real, b::Real) = logabsbeta(promote(a, b)...)
+
+logabsbeta(a::Number, b::Number) = loggamma(a) + loggamma(b) - loggamma(a + b), 1
+
 ## from base/mpfr.jl
 
 # log of absolute value of gamma function

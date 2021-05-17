@@ -248,22 +248,35 @@ end
     @test first.(logabsbinomial.(200, 0:200)) ≈ log.(binomial.(BigInt(200), (0:200)))
 end
 
-@testset "beta, lbeta" begin
-    @test beta(3/2,7/2) ≈ 5π/128
-    @test beta(3,5) ≈ 1/105
-    @test logbeta(5,4) ≈ log(beta(5,4))
-    @test beta(5,4) ≈ beta(4,5)
-    @test beta(-2.0,2.0) ≈ 0.5
-    @test logabsbeta(-2.0,2.0)[1] ≈ -0.69314718055994529
-    @test beta(1e8,0.5) ≈ 0.00017724538531210809
-    @test logabsbeta(1e8,0.5)[1] ≈ -8.637975427801484
-    @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈ -16/3
-    @test logabsbeta(-1/2, 3)[1] ≈ log(16/3)
-    @test beta(Float32(5),Float32(4)) == beta(Float32(4),Float32(5))
-    @test beta(3,5) ≈ beta(3+0im,5+0im)
-    @test(beta(3.2+0.1im,5.3+0.3im) ≈ exp(logbeta(3.2+0.1im,5.3+0.3im)) ≈
+@testset "beta, logbeta, and logabsbeta" begin
+    @test beta(3/2, 7/2) ≈ 5π/128
+    @test beta(3, 5)     ≈ 1/105
+    @test logbeta(5, 4)  ≈ log(beta(5,4))
+    @test beta(5, 4)     ≈ beta(4,5)
+
+    @testset "negative integer argument" begin
+        @test beta(-2.0, 2.0)          ≈ 1/2     rtol=1e-14
+        @test beta(-5.0, 2.0)          ≈ 1/20    rtol=1e-14
+        @test logabsbeta(-2.0, 2.0)[1] ≈ -log(2) rtol=1e-14
+        @test beta(-2.0, -2.0)         == Inf
+        @test logbeta(-2.0, -2.0)      == Inf
+        @test beta(-2.0, 2.1)          == Inf
+        @test logbeta(-2.0, 2.1)       == Inf
+    end
+
+    @testset "large difference in magnitude" begin
+        @test beta(1e4, 1.5)          ≈     8.86193693673874630607029e-7  rtol=1e-14
+        @test logabsbeta(1e4, 1.5)[1] ≈ log(8.86193693673874630607029e-7) rtol=1e-14
+        @test beta(1e8, 0.5)          ≈     0.00017724538531210809        rtol=1e-14
+        @test logabsbeta(1e8, 0.5)[1] ≈ log(0.00017724538531210809)       rtol=1e-14
+    end
+
+    @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈    -16/3
+    @test logabsbeta(-1/2, 3)[1]                    ≈ log(16/3)
+    @test beta(Float32(5), Float32(4))             == beta(Float32(4), Float32(5))
+    @test beta(3, 5)                                ≈ beta(3 + 0im, 5 + 0im)
+    @test(beta(3.2 + 0.1im, 5.3 + 0.3im)            ≈ exp(logbeta(3.2 + 0.1im, 5.3 + 0.3im)) ≈
           0.00634645247782269506319336871208405439180447035257028310080 -
           0.00169495384841964531409376316336552555952269360134349446910im)
-
-    @test beta(big(1.0),big(1.2)) ≈ beta(1.0,1.2) rtol=4*eps()
+    @test beta(big(1.0), big(1.2))                  ≈ beta(1.0, 1.2) rtol=4*eps()
 end

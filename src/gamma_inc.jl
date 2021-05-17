@@ -37,6 +37,7 @@ const d80 = -.652623918595309E-03
    Uses the relation `gamma(a+1) = a*gamma(a)`.
 """
 function rgamma1pm1(a::Float64)
+    @assert -0.5 <= a <= 1.5
     t = a
     rangereduce = a > 0.5
     t = rangereduce ? a-1 : a #-0.5<= t <= 0.5
@@ -86,6 +87,7 @@ end
 Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, `-1 <= x <= 1`.
 """
 function auxgam(x::Float64)
+    @assert -1 <= x <= 1
     if x < 0
         return -(1.0 + (1.0 + x)*(1.0 + x)*auxgam(1.0 + x))/(1.0 - x)
     else
@@ -95,11 +97,12 @@ function auxgam(x::Float64)
 end
 
 """
-    loggamma1p(a)
+    loggamma1p(x)
 
-Compute ``log(\\Gamma(1+a))`` for `-1 < a <= 1`.
+Compute ``log(\\Gamma(1+x))`` for `-1 < x <= 1`.
 """
 function loggamma1p(x::Float64)
+    @assert -1 < x <= 1
     return -log1p(x*(x - 1.0)*auxgam(x))
 end
 
