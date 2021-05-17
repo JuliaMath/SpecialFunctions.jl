@@ -81,7 +81,8 @@
 
     @testset "log gamma and co" begin
         # It is important that we have negative numbers with both odd and even integer parts
-        for x in (1.5, 2.5, 10.5, -0.6, -2.6, -3.3, 1.6 + 1.6im, 1.6 - 1.6im, -4.6 + 1.6im)
+        test_points = (1.5, 2.5, 10.5, -0.6, -2.6, -3.3, 1.6 + 1.6im, 1.6 - 1.6im, -4.6 + 1.6im)
+        for x in test_points
             for m in (0, 1, 2, 3)
                 test_frule(polygamma, m, x)
                 test_rrule(polygamma, m, x)
@@ -89,10 +90,24 @@
 
             isreal(x) && x < 0 && continue
             test_scalar(loggamma, x)
+            for a in test_points
+                # ensure all complex if any complex for FiniteDifferences
+                _a, _x = promote(a, x)
+                test_frule(gamma, _a, _x; rtol=1e-8)
+                test_rrule(gamma, _a, _x; rtol=1e-8)
+
+                test_frule(loggamma, _a, _x)
+                test_rrule(loggamma, _a, _x)
+            end
 
             isreal(x) || continue
             test_frule(logabsgamma, x)
             test_rrule(logabsgamma, x; output_tangent=(randn(), randn()))
+            for a in test_points
+                isreal(a) && a > 0 || continue
+                test_frule(gamma_inc, a, x, 0)
+                test_rrule(gamma_inc, a, x, 0; output_tangent=(randn(), randn()))
+            end
         end
     end
 end
