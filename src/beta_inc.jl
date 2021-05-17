@@ -432,7 +432,7 @@ See also: [`beta_inc`](@ref)
 `FPSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float64)
-    @assert b < eps(Float64)*min(1.0, a)
+    @assert b < epps*min(1.0, a)
     @assert x <= 0.5
     ans = 1.0
     if a > 1.0e-3 * epps
