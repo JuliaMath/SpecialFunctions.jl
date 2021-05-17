@@ -476,7 +476,7 @@ See also: [`beta_inc`](@ref)
 `APSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)
-    @assert a   <= eps(Float64)*min(1.0, b)
+    @assert a   <= epps*min(1.0, b)
     @assert b*x <= 1
     @assert x   <= 0.5
     g = Base.MathConstants.eulergamma
