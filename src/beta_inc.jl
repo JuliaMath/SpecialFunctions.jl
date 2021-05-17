@@ -105,10 +105,10 @@ function beta_integrand(a::Float64, b::Float64, x::Float64, y::Float64, mu::Floa
             y0 = h/(1.0 + h)
             lambda = (a+b)*y - b
         else
-             h = a/b
-             x0 = h/(1.0 + h)
-             y0 = 1.0/(1.0 + h)
-             lambda = a - (a+b)*x
+            h = a/b
+            x0 = h/(1.0 + h)
+            y0 = 1.0/(1.0 + h)
+            lambda = a - (a+b)*x
         end
         e = -lambda/a
         u = abs(e) > 0.6 ? e - log(x/x0) : - LogExpFunctions.log1pmx(e)
@@ -155,23 +155,25 @@ function beta_integrand(a::Float64, b::Float64, x::Float64, y::Float64, mu::Floa
                 t = 1.0 + rgamma1pm1(apb)
             end
             return a0*(esum(mu,z))*(1.0 + rgamma1pm1(b0))/t
+        else
+            ans = esum(mu, z)
+            if ans == 0.0
+                return 0.0
+            end
+            apb = a + b
+            if apb > 1.0
+                z = (1.0 + rgamma1pm1(apb - 1.0))/apb
+            else
+                z = 1.0 + rgamma1pm1(apb)
+            end
+            c = (1.0 + rgamma1pm1(a))*(1.0 + rgamma1pm1(b))/z
+            return ans*(a0*c)/(1.0 + a0/b0)
         end
     else
-        z -= logbeta(a,b)
-        ans = esum(mu,z)
+        z -= logbeta(a, b)
+        ans = esum(mu, z)
         return ans
     end
-    if ans == 0.0
-        return 0.0
-    end
-    apb = a + b
-    if apb > 1.0
-        z = (1.0 + rgamma1pm1(apb - 1.0))/apb
-    else
-        z = 1.0 + rgamma1pm1(apb)
-    end
-    c = (1.0 + rgamma1pm1(a))*(1.0 + rgamma1pm1(b))/z
-    return ans*(a0*c)/(1.0 + a0/b0)
 end
 
 """
