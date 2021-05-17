@@ -50,10 +50,9 @@ Compute stirling(a0) + stirling(b0) - stirling(a0 + b0)
 for a0, b0 >= 8
 """
 function stirling_corr(a0::Float64, b0::Float64)
-    @assert a0 >= 0
-    @assert b0 >= 0
     a = min(a0, b0)
     b = max(a0, b0)
+    @assert a >= 8
 
     h = a/b
     c = h/(1.0 + h)
