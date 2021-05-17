@@ -255,11 +255,14 @@ end
     @test beta(5, 4)     ≈ beta(4,5)
 
     @testset "negative integer argument" begin
-        @test beta(-2.0, 2.0)          ≈ 1/2     rtol=1e-14
-        @test beta(-5.0, 2.0)          ≈ 1/20    rtol=1e-14
+        @test beta(-2.0, 1.0)          ≈ -1/2    rtol=1e-14
+        @test beta(-2.0, 2.0)          ≈  1/2    rtol=1e-14
+        @test beta(-5.0, 2.0)          ≈  1/20   rtol=1e-14
         @test logabsbeta(-2.0, 2.0)[1] ≈ -log(2) rtol=1e-14
         @test beta(-2.0, -2.0)         == Inf
         @test logbeta(-2.0, -2.0)      == Inf
+        @test beta(-2.0, 1.9)          == Inf
+        @test logbeta(-2.0, 1.9)       == Inf
         @test beta(-2.0, 2.1)          == Inf
         @test logbeta(-2.0, 2.1)       == Inf
     end

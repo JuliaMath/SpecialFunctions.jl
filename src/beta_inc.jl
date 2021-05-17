@@ -630,7 +630,7 @@ function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Intege
         d = exp(-t)
     end
 
-    ans = beta_integrand(a,b,x,y,mu)/a
+    ans = beta_integrand(a, b, x, y, mu)/a
     if n == 1 || ans == 0.0
         return ans
     end
@@ -820,53 +820,53 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     end
 
     if b0 < min(epps, epps*a0)
-        p = beta_inc_power_series2(a0,b0,x0,epps)
+        p = beta_inc_power_series2(a0, b0, x0, epps)
         q = 1.0 - p
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
-        q = beta_inc_power_series1(a0,b0,x0,epps)
+        q = beta_inc_power_series1(a0, b0, x0, epps)
         p = 1.0 - q
     elseif max(a0,b0) > 1.0
         if b0 <= 1.0
-            p = beta_inc_power_series(a0,b0,x0,epps)
+            p = beta_inc_power_series(a0, b0, x0, epps)
             q = 1.0 - p
         elseif x0 >= 0.3
-            q = beta_inc_power_series(b0,a0,y0,epps)
+            q = beta_inc_power_series(b0, a0, y0, epps)
             p = 1.0 - q
         elseif x0 >= 0.1
             if b0 > 15.0
-                q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
+                q = beta_inc_asymptotic_asymmetric(b0, a0, y0, x0, q, 15.0*eps())
                 p = 1.0 - q
             else
                 n = 20
-                q = beta_inc_diff(b0,a0,y0,x0,n,epps)
+                q = beta_inc_diff(b0, a0, y0, x0, n, epps)
                 b0 += n
-                q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
+                q = beta_inc_asymptotic_asymmetric(b0, a0, y0, x0, q, 15.0*eps())
                 p = 1.0 - q
             end
         elseif (x0*b0)^(a0) <= 0.7
-            p = beta_inc_power_series(a0,b0,x0,epps)
+            p = beta_inc_power_series(a0, b0, x0, epps)
             q = 1.0 - p
         else
             n = 20
-            q = beta_inc_diff(b0,a0,y0,x0,n,epps)
+            q = beta_inc_diff(b0, a0, y0, x0, n, epps)
             b0 += n
-            q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
+            q = beta_inc_asymptotic_asymmetric(b0, a0, y0, x0, q, 15.0*eps())
             p = 1.0 - q
         end
     elseif a0 >= min(0.2, b0)
-        p = beta_inc_power_series(a0,b0,x0,epps)
+        p = beta_inc_power_series(a0, b0, x0, epps)
         q = 1.0 - p
     elseif x0^a0 <= 0.9
-        p = beta_inc_power_series(a0,b0,x0,epps)
+        p = beta_inc_power_series(a0, b0, x0, epps)
         q = 1.0 - p
     elseif x0 >= 0.3
-        q = beta_inc_power_series(b0,a0,y0,epps)
+        q = beta_inc_power_series(b0, a0, y0, epps)
         p = 1.0 - q
     else
         n = 20
-        q = beta_inc_diff(b0,a0,y0,x0,n,epps)
+        q = beta_inc_diff(b0, a0, y0, x0, n, epps)
         b0 += n
-        q = beta_inc_asymptotic_asymmetric(b0,a0,y0,x0,q,15.0*eps())
+        q = beta_inc_asymptotic_asymmetric(b0, a0, y0, x0, q, 15.0*eps())
         p = 1.0 - q
     end
 

@@ -806,12 +806,12 @@ function logabsbeta(a::T, b::T) where T<:Real
     end
 
     if a <= 0 && isinteger(a)
-        if a + b <= 0
+        if a + b <= 0 && isinteger(b)
             r = logbeta(1 - a - b, b)
-            sgn = isinteger(b/2) ? 1 : -1
+            sgn = iseven(Int(b)) ? 1 : -1
             return r, sgn
         else
-            return -log(zero(first(promote(a, b)))), 1
+            return -log(zero(a)), 1
         end
     end
 
