@@ -805,7 +805,7 @@ function logabsbeta(a::T, b::T) where T<:Real
         return logabsbeta(b, a)
     end
 
-    if a <= 0.0 && isinteger(a)
+    if a <= 0 && isinteger(a)
         if a + b <= 0
             r = logbeta(1 - a - b, b)
             sgn = isinteger(b/2) ? 1 : -1
