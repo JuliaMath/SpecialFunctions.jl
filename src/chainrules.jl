@@ -3,6 +3,12 @@ derivatives of Bessel functions with respect to the order are not implemented cu
 https://github.com/JuliaMath/SpecialFunctions.jl/issues/160
 """
 
+const INCOMPLETE_GAMMA_INFO = """
+derivatives of the incomplete Gamma functions with respect to parameter `a` are not
+implemented currently:
+https://github.com/JuliaMath/SpecialFunctions.jl/issues/317
+"""
+
 ChainRulesCore.@scalar_rule(airyai(x), airyaiprime(x))
 ChainRulesCore.@scalar_rule(airyaiprime(x), x * airyai(x))
 ChainRulesCore.@scalar_rule(airybi(x), airybiprime(x))
@@ -26,6 +32,27 @@ ChainRulesCore.@scalar_rule(erfcx(x), (2 * x * Ω) - (2 / sqrt(π)))
 ChainRulesCore.@scalar_rule(erfi(x), (2 / sqrt(π)) * exp(x * x))
 ChainRulesCore.@scalar_rule(erfinv(x), (sqrt(π) / 2) * exp(Ω^2))
 ChainRulesCore.@scalar_rule(gamma(x), Ω * digamma(x))
+ChainRulesCore.@scalar_rule(
+    gamma(a, x),
+    (
+        ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
+        - exp(-x) * x^(a - 1),
+    ),
+)
+ChainRulesCore.@scalar_rule(
+    gamma_inc(a, x, IND),
+    @setup(z = exp(-x) * x^(a - 1) / gamma(a)),
+    (
+        ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
+        z,
+        ChainRulesCore.DoesNotExist(),
+    ),
+    (
+        ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
+        -z,
+        ChainRulesCore.DoesNotExist(),
+    ),
+)
 ChainRulesCore.@scalar_rule(
     invdigamma(x),
     inv(trigamma(invdigamma(x))),
@@ -98,3 +125,10 @@ ChainRulesCore.@scalar_rule(
 ChainRulesCore.@scalar_rule(logabsgamma(x), digamma(x), ChainRulesCore.Zero())
 
 ChainRulesCore.@scalar_rule(loggamma(x), digamma(x))
+ChainRulesCore.@scalar_rule(
+    loggamma(a, x),
+    (
+        ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
+        -exp(- (x + Ω)) * x^(a - 1),
+    )
+)
