@@ -979,7 +979,6 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
             adj = g*pp_approx
             sq = adj^2
             tx = x - adj
-            prev
             if (prev > sq && tx >= 0.0 && tx <= 1.0)
                 break
             end
