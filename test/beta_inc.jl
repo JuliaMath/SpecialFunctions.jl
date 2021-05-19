@@ -210,6 +210,19 @@
     @test beta_inc(1.5, 200.5,  0.07,0.93)[1] ≈ 0.99999790408564
     @test beta_inc(1e-20, 0.000001, 0.2)[2] ≈ 1.0000013862929421e-14
 
+    # test promotions and return types
+    for T in (Float64, Float32)
+        a, b = randexp(T, 2)
+        x = rand(T)
+        @test beta_inc(a, b, x) isa Tuple{T,T}
+        @test beta_inc(a, b, x, 1 - x) isa Tuple{T,T}
+        @test beta_inc(a, b, x) == beta_inc(a, b, x, 1 - x)
+    end
+    a, b = randexp(2)
+    x = rand()
+    @test beta_inc(a, Float32(b), x) == beta_inc(a, b, x)
+    @test beta_inc(a, Float32(b), Float32(x), 1-x) == beta_inc(a, b, x, 1-x)
+
     @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
     @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling_error(11.99) + SpecialFunctions.stirling_error(100.1) - SpecialFunctions.stirling_error(11.99 + 100.1)
 end
