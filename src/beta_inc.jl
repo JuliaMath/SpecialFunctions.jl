@@ -52,7 +52,7 @@ for a0, b0 >= 8
 function stirling_corr(a0::Float64, b0::Float64)
     a = min(a0, b0)
     b = max(a0, b0)
-    @assert a >= 8
+    @assert a >= 8.0
 
     h = a/b
     c = h/(1.0 + h)
@@ -190,8 +190,8 @@ See also: [`beta_inc`](@ref)
 `BFRAC(A,B,X,Y,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
-    @assert a > 1
-    @assert b > 1
+    @assert a > 1.0
+    @assert b > 1.0
     ans = beta_integrand(a,b,x,y)
     if ans == 0.0
         return 0.0
@@ -258,8 +258,8 @@ See also: [`beta_inc`](@ref)
 `BASYM(A,B,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)
-    @assert a >= 15
-    @assert b >= 15
+    @assert a >= 15.0
+    @assert b >= 15.0
     a0 =zeros(22)
     b0 = zeros(22)
     c = zeros(22)
@@ -356,8 +356,8 @@ External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wi
 See also: [`beta_inc`](@ref)
 """
 function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::Float64, w::Float64, epps::Float64)
-    @assert a >= 15
-    @assert b <= 1
+    @assert a >= 15.0
+    @assert b <= 1.0
     c = zeros(31)
     d = zeros(31)
     bm1 = b - 1.0
@@ -521,7 +521,7 @@ See also: [`beta_inc`](@ref)
 `BPSER(A,B,X,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64)
-    @assert b <= 1 || b*x <= 0.7
+    @assert b <= 1.0 || b*x <= 0.7
     ans = 0.0
     if x == 0.0
         return 0.0
@@ -691,7 +691,7 @@ function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Intege
     end
 
     kp1 = k + 1
-    for i = kp1:nm1
+    for i in kp1:nm1
         l = i - 1
         d *= ((apb + l)/(ap1 + l))*x
         w += d
