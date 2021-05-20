@@ -876,7 +876,7 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     return ind ? (q, p) : (p, q)
 end
 
-beta_inc(a::Float64, b::Float64, x::Float64) = beta_inc(a, b, x, 1.0 - x)
+beta_inc(a::Real, b::Real, x::Real) = beta_inc(a, b, x, 1 - x)
 function beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
     T.(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y)))
 end
