@@ -84,8 +84,8 @@
         test_points = (1.5, 2.5, 10.5, -0.6, -2.6, -3.3, 1.6 + 1.6im, 1.6 - 1.6im, -4.6 + 1.6im)
         for x in test_points
             for m in (0, 1, 2, 3)
-                test_frule(polygamma, m, x)
-                test_rrule(polygamma, m, x)
+                test_frule(polygamma, m, x; rtol=1e-8)
+                test_rrule(polygamma, m, x; rtol=1e-8)
             end
 
             isreal(x) && x < 0 && continue
