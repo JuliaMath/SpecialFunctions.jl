@@ -3,7 +3,6 @@ os:
   - freebsd
 julia:
   - 1.6
-  - 1
   - nightly
 matrix:
   allow_failures:
