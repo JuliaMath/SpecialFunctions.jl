@@ -10,8 +10,8 @@ CI (Linux, macOS, FreeBSD, Windows):
 [![codecov](https://codecov.io/gh/JuliaMath/SpecialFunctions.jl/branch/master/graph/badge.svg?token=qIKzX2I5ZK)](https://codecov.io/gh/JuliaMath/SpecialFunctions.jl)
 
 Documentation:
-[![Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaMath.github.io/SpecialFunctions.jl/stable)
-[![Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaMath.github.io/SpecialFunctions.jl/dev)
+[![Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://specialfunctions.JuliaMath.org/stable)
+[![Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://specialfunctions.JuliaMath.org/dev)
 
 Test status (most recent release):
 [![PkgEval](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/S/SpecialFunctions.svg)](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/report.html)
