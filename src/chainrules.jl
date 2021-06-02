@@ -45,12 +45,12 @@ ChainRulesCore.@scalar_rule(
     (
         ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
         z,
-        ChainRulesCore.DoesNotExist(),
+        ChainRulesCore.NoTangent(),
     ),
     (
         ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
         -z,
-        ChainRulesCore.DoesNotExist(),
+        ChainRulesCore.NoTangent(),
     ),
 )
 ChainRulesCore.@scalar_rule(
