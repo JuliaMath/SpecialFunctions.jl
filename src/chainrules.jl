@@ -105,7 +105,7 @@ ChainRulesCore.@scalar_rule(
 ChainRulesCore.@scalar_rule(
     polygamma(m, x),
     (
-        ChainRulesCore.DoesNotExist(),
+        ChainRulesCore.NoTangent(),
         polygamma(m + 1, x),
     ),
 )
@@ -122,7 +122,11 @@ ChainRulesCore.@scalar_rule(
 )
 
 # actually is the absolute value of the logorithm of gamma paired with sign gamma
-ChainRulesCore.@scalar_rule(logabsgamma(x), digamma(x), ChainRulesCore.Zero())
+ChainRulesCore.@scalar_rule(
+    logabsgamma(x),
+    digamma(x),
+    ChainRulesCore.ZeroTangent()
+)
 
 ChainRulesCore.@scalar_rule(loggamma(x), digamma(x))
 ChainRulesCore.@scalar_rule(
