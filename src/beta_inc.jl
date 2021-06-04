@@ -9,8 +9,10 @@ const exparg_p =  log(prevfloat(floatmax(Float64)))
 
 Computes ``log(\\Gamma(b)/\\Gamma(a+b))`` when b >= 8
 """
-loggammadiv(a::Number, b::Number) = _loggammadiv(float(a), float(b))
+loggammadiv(a::Number, b::Number) = _loggammadiv(promote(float(a), float(b))...)
 
+# TODO: Add a proper implementation
+_loggammadiv(a::Number, b::Number) = loggamma(b) - loggamma(a + b) # handle e.g. BigFloat (used by `logabsbeta`)
 _loggammadiv(a::T, b::T) where {T<:Base.IEEEFloat} = T(_loggammadiv(Float64(a), Float64(b))) # handle Float16, Float32
 function _loggammadiv(a::Float64, b::Float64)
     @assert b >= 8

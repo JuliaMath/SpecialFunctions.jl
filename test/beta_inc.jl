@@ -227,6 +227,7 @@
     @test beta_inc(a, b, x, 1 - x) == beta_inc(a, Float64(b), Float64(x), 1 - x)
 
     @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
+    @test SpecialFunctions.loggammadiv(big(13.89), big(21.0001)) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
     @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling_error(11.99) + SpecialFunctions.stirling_error(100.1) - SpecialFunctions.stirling_error(11.99 + 100.1)
 end
 

@@ -274,6 +274,24 @@ end
         @test logabsbeta(1e8, 0.5)[1] ≈ log(0.00017724538531210809)       rtol=1e-14
     end
 
+    @testset "BigFloat" begin
+        @test beta(big(3), big(5)) ≈ inv(big(105))
+        @test beta(big(3//2), big(7//2)) ≈ 5 * big(π) / 128
+        @test beta(big(1e4), big(3//2)) ≈ 8.86193693673874630607029e-7 rtol=1e-14
+        @test beta(big(1e8), big(1//2)) ≈ 0.00017724538531210809 rtol=1e-14
+
+        @test logbeta(big(5), big(4)) ≈ log(beta(big(5), big(4)))
+        @test logbeta(big(5.0), big(4)) ≈ log(beta(big(5), big(4)))
+        @test logbeta(big(1e4), big(3//2)) ≈ log(8.86193693673874630607029e-7) rtol=1e-14
+        @test logbeta(big(1e8), big(1//2)) ≈ log(0.00017724538531210809) rtol=1e-14
+
+        @test logabsbeta(-big(2), big(2))[1] ≈ -log(big(2))
+        @test logabsbeta(-big(2.0), big(2))[1] ≈ -log(big(2))
+        @test logabsbeta(-big(2), big(2//1))[1] ≈ -log(big(2))
+        @test logabsbeta(big(1e4), big(3//2))[1] ≈ log(8.86193693673874630607029e-7) rtol=1e-14
+        @test logabsbeta(big(1e8), big(1//2))[1] ≈ log(0.00017724538531210809) rtol=1e-14
+    end
+
     @test beta(-1/2, 3) ≈ beta(-1/2 + 0im, 3 + 0im) ≈    -16/3
     @test logabsbeta(-1/2, 3)[1]                    ≈ log(16/3)
     @test beta(Float32(5), Float32(4))             == beta(Float32(4), Float32(5))
