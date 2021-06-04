@@ -110,4 +110,27 @@
             end
         end
     end
+
+    @testset "exponential integrals" begin
+        for x in (1.5, 2.5, 10.5, 1.6 + 1.6im, 1.6 - 1.6im, -4.6 + 1.6im)
+            test_scalar(expint, x)
+            test_scalar(expintx, x)
+
+            for nu in (-1.5, 2.2, 4.0)
+                # ensure all complex if any complex for FiniteDifferences
+                _x, _nu = promote(x, nu)
+
+                test_frule(expint, _nu, _x)
+                test_rrule(expint, _nu, _x)
+
+                test_frule(expintx, _nu, _x)
+                test_rrule(expintx, _nu, _x)
+            end
+
+            isreal(x) || continue
+            test_scalar(expinti, x)
+            test_scalar(sinint, x)
+            test_scalar(cosint, x)
+        end
+    end
 end
