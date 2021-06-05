@@ -9,6 +9,12 @@ implemented currently:
 https://github.com/JuliaMath/SpecialFunctions.jl/issues/317
 """
 
+const INCOMPLETE_EXPINT_INFO = """
+derivatives of the exponential integral with respect to parameter `ν` are not implemented
+currently:
+https://github.com/JuliaMath/SpecialFunctions.jl/issues/321
+"""
+
 ChainRulesCore.@scalar_rule(airyai(x), airyaiprime(x))
 ChainRulesCore.@scalar_rule(airyaiprime(x), x * airyai(x))
 ChainRulesCore.@scalar_rule(airybi(x), airybiprime(x))
@@ -136,3 +142,24 @@ ChainRulesCore.@scalar_rule(
         -exp(- (x + Ω)) * x^(a - 1),
     )
 )
+
+# exponential integrals
+ChainRulesCore.@scalar_rule(expint(z), - exp(-z) / z)
+ChainRulesCore.@scalar_rule(
+    expint(ν, z),
+    (
+        ChainRulesCore.@not_implemented(INCOMPLETE_EXPINT_INFO),
+        - expint(ν - 1, z),
+    )
+)
+ChainRulesCore.@scalar_rule(expintx(z), Ω - inv(z))
+ChainRulesCore.@scalar_rule(
+    expintx(ν, z),
+    (
+        ChainRulesCore.@not_implemented(INCOMPLETE_EXPINT_INFO),
+        Ω - expintx(ν - 1, z),
+    )
+)
+ChainRulesCore.@scalar_rule(expinti(x), exp(x) / x)
+ChainRulesCore.@scalar_rule(sinint(x), sinc(x / π))
+ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
