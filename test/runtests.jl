@@ -37,6 +37,7 @@ tests = [
 
 const testdir = dirname(@__FILE__)
 
+push!(ChainRulesTestUtils.TRANSFORMS_TO_ALT_TANGENTS, x -> @thunk(x))
 
 for t in tests
     tp = joinpath(testdir, "$(t).jl")
