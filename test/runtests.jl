@@ -37,6 +37,11 @@ tests = [
 
 const testdir = dirname(@__FILE__)
 
+# TRANSFORMS_TO_ALT_TANGENTS is a list (presently empty) of transformations
+# which take a tangent to an alternative tangent. The rules are tested to
+# that they also support receiving alternative tangents. See
+# https://github.com/JuliaMath/SpecialFunctions.jl/pull/329#discussion_r658178389
+# for more details.
 push!(ChainRulesTestUtils.TRANSFORMS_TO_ALT_TANGENTS, x -> @thunk(x))
 
 for t in tests
