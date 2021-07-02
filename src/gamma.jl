@@ -808,7 +808,8 @@ function logabsbeta(a::T, b::T) where T<:Real
     if a <= 0 && isinteger(a)
         if a + b <= 0 && isinteger(b)
             r = logbeta(1 - a - b, b)
-            sgn = iseven(Int(b)) ? 1 : -1
+            # in julia ≥ 1.7, iseven doesn't require Int (julia#38976)
+            sgn = iseven(@static VERSION ≥ v"1.7" ? b : Int(b)) ? 1 : -1
             return r, sgn
         else
             return -log(zero(a)), 1
@@ -825,7 +826,7 @@ function logabsbeta(a::T, b::T) where T<:Real
     ya, sa = logabsgamma(a)
     yb, sb = logabsgamma(b)
     yab, sab = logabsgamma(a + b)
-    (ya + yb - yab), (sa*sb*sab)
+    (ya + yb - yab), Int(sa*sb*sab)
 end
 logabsbeta(a::Real, b::Real) = logabsbeta(promote(a, b)...)
 
