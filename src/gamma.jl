@@ -620,12 +620,12 @@ gamma(x::Number) = gamma(float(x))
 function logabsgamma(x::Float64)
     signp = Ref{Int32}()
     y = ccall((:lgamma_r,libm),  Float64, (Float64, Ptr{Int32}), x, signp)
-    return y, signp[]
+    return y, Int(signp[])
 end
 function logabsgamma(x::Float32)
     signp = Ref{Int32}()
     y = ccall((:lgammaf_r,libm),  Float32, (Float32, Ptr{Int32}), x, signp)
-    return y, signp[]
+    return y, Int(signp[])
 end
 logabsgamma(x::Real) = logabsgamma(float(x))
 logabsgamma(x::Float16) = Float16.(logabsgamma(Float32(x)))
@@ -668,7 +668,7 @@ loggamma(x::Number) = loggamma(float(x))
 
 function loggamma(x::Real)
     (y, s) = logabsgamma(x)
-    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
 
@@ -839,12 +839,12 @@ function logabsgamma(x::BigFloat)
     z = BigFloat()
     lgamma_signp = Ref{Cint}()
     ccall((:mpfr_lgamma,:libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
-    return z, lgamma_signp[]
+    return z, Int(lgamma_signp[])
 end
 
 function loggamma(x::BigFloat)
     (y, s) = logabsgamma(x)
-    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
 if Base.MPFR.version() >= v"4.0.0"
