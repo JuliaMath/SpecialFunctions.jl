@@ -620,12 +620,12 @@ gamma(x::Number) = gamma(float(x))
 function logabsgamma(x::Float64)
     signp = Ref{Int32}()
     y = ccall((:lgamma_r,libm),  Float64, (Float64, Ptr{Int32}), x, signp)
-    return y, signp[]
+    return y, Int(signp[])
 end
 function logabsgamma(x::Float32)
     signp = Ref{Int32}()
     y = ccall((:lgammaf_r,libm),  Float32, (Float32, Ptr{Int32}), x, signp)
-    return y, signp[]
+    return y, Int(signp[])
 end
 logabsgamma(x::Real) = logabsgamma(float(x))
 logabsgamma(x::Float16) = Float16.(logabsgamma(Float32(x)))
@@ -668,7 +668,7 @@ loggamma(x::Number) = loggamma(float(x))
 
 function loggamma(x::Real)
     (y, s) = logabsgamma(x)
-    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
 
@@ -808,7 +808,8 @@ function logabsbeta(a::T, b::T) where T<:Real
     if a <= 0 && isinteger(a)
         if a + b <= 0 && isinteger(b)
             r = logbeta(1 - a - b, b)
-            sgn = iseven(Int(b)) ? 1 : -1
+            # in julia ≥ 1.7, iseven doesn't require Int (julia#38976)
+            sgn = iseven(@static VERSION ≥ v"1.7" ? b : Int(b)) ? 1 : -1
             return r, sgn
         else
             return -log(zero(a)), 1
@@ -825,7 +826,7 @@ function logabsbeta(a::T, b::T) where T<:Real
     ya, sa = logabsgamma(a)
     yb, sb = logabsgamma(b)
     yab, sab = logabsgamma(a + b)
-    (ya + yb - yab), (sa*sb*sab)
+    (ya + yb - yab), Int(sa*sb*sab)
 end
 logabsbeta(a::Real, b::Real) = logabsbeta(promote(a, b)...)
 
@@ -838,12 +839,12 @@ function logabsgamma(x::BigFloat)
     z = BigFloat()
     lgamma_signp = Ref{Cint}()
     ccall((:mpfr_lgamma,:libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
-    return z, lgamma_signp[]
+    return z, Int(lgamma_signp[])
 end
 
 function loggamma(x::BigFloat)
     (y, s) = logabsgamma(x)
-    s < 0.0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
 if Base.MPFR.version() >= v"4.0.0"
