@@ -10,7 +10,7 @@ OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
 [compat]
 ChainRulesCore = "0.9.44, 0.10"
 ChainRulesTestUtils = "0.6.8, 0.7"
-LogExpFunctions = "0.2"
+LogExpFunctions = "0.2, 0.3"
 OpenSpecFun_jll = "0.5"
 julia = "1.3"
 
