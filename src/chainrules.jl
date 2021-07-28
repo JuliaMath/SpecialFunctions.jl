@@ -163,3 +163,5 @@ ChainRulesCore.@scalar_rule(
 ChainRulesCore.@scalar_rule(expinti(x), exp(x) / x)
 ChainRulesCore.@scalar_rule(sinint(x), sinc(x / π))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
+
+ChainRulesCore.@scalar_rule(beta_inc(a,b,x), beta_inc_grad(a,b,x)[2:end])
