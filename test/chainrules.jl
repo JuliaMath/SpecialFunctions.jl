@@ -66,6 +66,14 @@
         end
     end
 
+    @testset "incomplete beta" begin
+        test_points = (1e-20, 0.5, 0.8, 0.9, 0.99, 1.5, 1.7, 10.5, 100.5)
+        for a in test_points, b in test_points, x in 0.0:0.01:1.0
+            test_frule(beta_inc, a, b, x)
+            test_rrule(beta_inc, a, b, x)
+        end
+    end
+
     @testset "beta and logbeta" begin
         test_points = (1.5, 2.5, 10.5, 1.6 + 1.6im, 1.6 - 1.6im, 4.6 + 1.6im)
         for _x in test_points, _y in test_points
