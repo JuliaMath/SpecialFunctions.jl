@@ -165,6 +165,6 @@ ChainRulesCore.@scalar_rule(sinint(x), sinc(x / π))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
 
 ChainRulesCore.@scalar_rule(beta_inc(a,b,x),
-    @setup(z, pa, pb, px = beta_inc_grad(a,b,x)),
-    (pa,pb,px,), (-pa,-pb,-px,)
+    @setup((z, pa, pb, px) = beta_inc_grad(a,b,x)),
+    (pa,pb,px,), (-pa,-pb,-px,),
 )
