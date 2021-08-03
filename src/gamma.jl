@@ -715,7 +715,7 @@ function loggamma(z::Complex{Float64})
                        * floor(0.5*x+0.25)) -
                log(sinpi(z)) - loggamma(1-z)
     elseif abs(x - 1) + yabs < 0.1
-        # taylor series around zero at z=1
+        # taylor series at z=1
         # ... coefficients are [-eulergamma; [(-1)^k * zeta(k)/k for k in 2:15]]
         w = Complex(x - 1, y)
         return w * @evalpoly(w, -5.7721566490153286060651188e-01,8.2246703342411321823620794e-01,
@@ -727,7 +727,7 @@ function loggamma(z::Complex{Float64})
                                 -7.6932516411352191472827157e-02,7.1432946295361336059232779e-02,
                                 -6.6668705882420468032903454e-02)
     elseif abs(x - 2) + yabs < 0.1
-        # taylor series around zero at z=2
+        # taylor series at z=2
         # ... coefficients are [1-eulergamma; [(-1)^k * (zeta(k)-1)/k for k in 2:12]]
         w = Complex(x - 2, y)
         return w * @evalpoly(w, 4.2278433509846713939348812e-01,3.2246703342411321823620794e-01,
