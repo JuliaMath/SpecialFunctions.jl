@@ -1,6 +1,6 @@
 # Special Functions
 
-[`SpecialFunctions.jl`](https://github.com/JuliaMath/SpecialFunctions.jl/edit/master/docs/src/index.md) provides a comprehensive collection of special functions based on the
+[`SpecialFunctions.jl`](https://github.com/JuliaMath/SpecialFunctions.jl/) provides a comprehensive collection of special functions based on the
 [OpenSpecFun](https://github.com/JuliaLang/openspecfun) and [OpenLibm](https://github.com/JuliaLang/openlibm)
 libraries.
 
