@@ -184,7 +184,7 @@ end
 
 # besselj0, besselj1, bessely0, bessely1
 for jy in ("j","y"), nu in (0,1)
-    jynu = Expr(:quote, Symbol(jy,nu))
+    jynu  = Expr(:quote, Symbol(jy,nu))
     jynuf = Expr(:quote, Symbol(jy,nu,"f"))
     bjynu = Symbol("bessel",jy,nu)
     if jy == "y"
@@ -201,8 +201,10 @@ for jy in ("j","y"), nu in (0,1)
         end
     end
     @eval begin
-        $bjynu(x::Real) = $bjynu(float(x))
-        $bjynu(x::Complex) = $(Symbol("bessel",jy))($nu,x)
+        $bjynu(x::Real            ) = $bjynu(float(x))
+        $bjynu(x::Complex{Float64}) = $(Symbol("bessel",jy))($nu,x)
+        $bjynu(x::Complex{Float32}) = Complex{Float32}($bjynu(Complex{Float64}(x)))
+        $bjynu(x::Complex{Float16}) = Complex{Float16}($bjynu(Complex{Float64}(x)))
     end
 end
 
@@ -389,8 +391,9 @@ function besselj(nu::Float64, z::Complex{Float64})
     end
 end
 
-besselj(nu::Cint, x::Float64) = ccall((:jn, libm), Float64, (Cint, Float64), nu, x)
-besselj(nu::Cint, x::Float32) = ccall((:jnf, libm), Float32, (Cint, Float32), nu, x)
+besselj(nu::Cint, x::Float64)          = ccall((:jn,  libm), Float64, (Cint, Float64), nu, x)
+besselj(nu::Cint, x::Float32)          = ccall((:jnf, libm), Float32, (Cint, Float32), nu, x)
+besselj(nu::Cint, x::Float16)::Float16 = besselj(nu, Float32(x))
 
 
 function besseljx(nu::Float64, z::Complex{Float64})
@@ -421,20 +424,13 @@ function bessely(nu::Cint, x::Float32)
     end
     ccall((:ynf, libm), Float32, (Cint, Float32), nu, x)
 end
+bessely(nu::Cint, x::Float16) = Float16(bessely(nu, Float32(x)))
 
 function bessely(nu::Float64, z::Complex{Float64})
     if nu < 0
         return _bessely(-nu,z,Int32(1))*cospi(nu) - _besselj(-nu,z,Int32(1))*sinpi(nu)
     else
         return _bessely(nu,z,Int32(1))
-    end
-end
-
-function besselyx(nu::Float64, z::Complex{Float64})
-    if nu < 0
-        return _bessely(-nu,z,Int32(2))*cospi(nu) - _besselj(-nu,z,Int32(2))*sinpi(nu)
-    else
-        return _bessely(nu,z,Int32(2))
     end
 end
 
@@ -574,13 +570,21 @@ function besselyx(nu::Real, x::AbstractFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    real(besselyx(float(nu), complex(x)))
+    convert(typeof(x), besselyx(float(nu), complex(x)))
+end
+
+function besselyx(nu::Float64, z::Complex{Float64})
+    if nu < 0
+        return _bessely(-nu,z,Int32(2))*cospi(nu) - _besselj(-nu,z,Int32(2))*sinpi(nu)
+    else
+        return _bessely(nu,z,Int32(2))
+    end
 end
 
 for f in ("i", "ix", "j", "jx", "k", "kx", "y", "yx")
     bfn = Symbol("bessel", f)
     @eval begin
-        $bfn(nu::Real, x::Real) = $bfn(nu, float(x))
+        $bfn(nu::Real, x::Real) = typeof(float(x))($bfn(float(nu), float(x)))
         function $bfn(nu::Real, z::Complex)
             Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
             $bfn(Tf(nu), Complex{Tf}(z))
