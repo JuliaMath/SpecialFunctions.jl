@@ -428,12 +428,15 @@ function zeta(s::ComplexOrReal{Float64})
         if absim > 12 # amplitude of sinpi(s/2) ≈ exp(imag(s)*π/2)
             # avoid overflow/underflow (issue #128)
             lg = loggamma(1 - s)
-            ln2pi = 1.83787706640934548356 # log(2pi) to double precision
             rehalf = real(s)*0.5
-            return zeta(1 - s) * exp(lg + absim*(pi/2) + s*ln2pi) * (0.5/π) *
-                Complex(sinpi(rehalf), copysign(cospi(rehalf), imag(s)))
+            return zeta(1 - s) * exp(
+                lg + absim*IrrationalConstants.halfπ + s*IrrationalConstants.log2π
+            ) * IrrationalConstants.inv2π * Complex(
+                sinpi(rehalf), copysign(cospi(rehalf), imag(s))
+            )
         else
-            return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * (2π)^s / π
+            return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * IrrationalConstants.twoπ^s *
+                IrrationalConstants.invπ
         end
     end
 
@@ -707,13 +710,13 @@ function loggamma(z::Complex{Float64})
         return loggamma_asymptotic(z)
     elseif x < 0.1 # use reflection formula to transform to x > 0
         if x == 0 && y == 0 # return Inf with the correct imaginary part for z == 0
-            return Complex(Inf, signbit(x) ? copysign(oftype(x, pi), -y) : -y)
+            return Complex(Inf, signbit(x) ? copysign(Float64(π), -y) : -y)
         end
         # the 2pi * floor(...) stuff is to choose the correct branch cut for log(sinpi(z))
-        return Complex(1.1447298858494001741434262, # log(pi)
-                       copysign(6.2831853071795864769252842, y) # 2pi
-                       * floor(0.5*x+0.25)) -
-               log(sinpi(z)) - loggamma(1-z)
+        return Complex(
+            Float64(IrrationalConstants.logπ),
+            copysign(Float64(IrrationalConstants.twoπ), y) * floor(0.5*x+0.25),
+        ) - log(sinpi(z)) - loggamma(1-z)
     elseif abs(x - 1) + yabs < 0.1
         # taylor series at z=1
         # ... coefficients are [-eulergamma; [(-1)^k * zeta(k)/k for k in 2:15]]

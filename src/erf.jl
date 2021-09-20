@@ -417,16 +417,15 @@ end
 
 function erfinv(y::BigFloat)
     xfloat = erfinv(Float64(y))
-    sqrtπ = sqrt(big(pi))
     if isfinite(xfloat)
         x = BigFloat(xfloat)
     else
         # Float64 overflowed, use asymptotic estimate instead
         # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
-        x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
+        x = copysign(sqrt(-log((1-abs(y))*IrrationalConstants.sqrtπ)), y)
         isfinite(x) || return x
     end
-    sqrtπhalf = sqrtπ * 0.5
+    sqrtπhalf = IrrationalConstants.sqrtπ * big(0.5)
     tol = 2eps(abs(x))
     while true # Newton iterations
         Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
@@ -439,21 +438,20 @@ end
 function erfcinv(y::BigFloat)
     yfloat = Float64(y)
     xfloat = erfcinv(yfloat)
-    sqrtπ = sqrt(big(pi))
     if isfinite(xfloat)
         x = BigFloat(xfloat)
     else
         # Float64 overflowed, use asymptotic estimate instead
         # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
         if yfloat < 1
-            x = sqrt(-log(y*sqrtπ))
+            x = sqrt(-log(y*IrrationalConstants.sqrtπ))
         else # y must be close to 2
-            x = -sqrt(-log((2-y)*sqrtπ))
+            x = -sqrt(-log((2-y)*IrrationalConstants.sqrtπ))
         end
         # TODO: Newton convergence is slow near y=0 singularity; accelerate?
         isfinite(x) || return x
     end
-    sqrtπhalf = sqrtπ * 0.5
+    sqrtπhalf = IrrationalConstants.sqrtπ * big(0.5)
     tol = 2eps(abs(x))
     while true # Newton iterations
         Δx = sqrtπhalf * (erfc(x) - y) * exp(x^2)
@@ -489,7 +487,7 @@ function erfcx(x::BigFloat)
             w *= -k*v
             s += w
         end
-        return (1+s)/(x*sqrt(oftype(x,pi)))
+        return (1+s)/(x*IrrationalConstants.sqrtπ)
     end
 end
 
@@ -568,7 +566,7 @@ External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 See also: [`erf(x,y)`](@ref erf).
 """
 function logerf(a::Real, b::Real)
-    if abs(a) ≤ 1/√2 && abs(b) ≤ 1/√2
+    if abs(a) ≤ IrrationalConstants.invsqrt2 && abs(b) ≤ IrrationalConstants.invsqrt2
         return log(erf(a, b))
     elseif b > a > 0
         return logerfc(a) + log1mexp(logerfc(b) - logerfc(a))

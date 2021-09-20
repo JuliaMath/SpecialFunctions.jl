@@ -50,7 +50,7 @@ function ellipk(m::Float64)
     end
 
     if x == 0.0
-        return pi/2
+        return Float64(IrrationalConstants.halfπ)
 
     elseif x == 1.0
         return Inf
@@ -165,7 +165,7 @@ function ellipk(m::Float64)
             0.179481482914906162 , 0.144556057087555150 , 0.123200993312427711 ,
             0.108938811574293531 , 0.098853409871592910 , 0.091439629201749751 ,
             0.085842591595413900 , 0.081541118718303215)
-        km  = -Base.log(qd) * (kdm/pi)
+        km  = -Base.log(qd) * (kdm * IrrationalConstants.invπ)
         t   = km
     end
 
@@ -225,7 +225,7 @@ function ellipe(m::Float64)
     end
 
     if x == 0.0
-        return pi/2
+        return Float64(IrrationalConstants.halfπ)
     elseif x == 1.0
         return 1.0
 
@@ -336,7 +336,7 @@ function ellipe(m::Float64)
         hdm = kdm - edm
         km  = ellipk(Float64(x))
         #em =  km + (pi/2 - km*edm)/kdm
-        em  = (pi/2 + km*hdm) / kdm   #to avoid precision loss near 1
+        em  = (IrrationalConstants.halfπ + km*hdm) / kdm   #to avoid precision loss near 1
         t   = em
     end
     if flag_is_m_neg

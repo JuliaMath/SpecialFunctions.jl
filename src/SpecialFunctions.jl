@@ -1,6 +1,7 @@
 module SpecialFunctions
 
 import ChainRulesCore
+import IrrationalConstants
 import LogExpFunctions
 
 using OpenSpecFun_jll
