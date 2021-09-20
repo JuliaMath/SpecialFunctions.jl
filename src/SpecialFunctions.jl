@@ -3,6 +3,7 @@ module SpecialFunctions
 import ChainRulesCore
 import LogExpFunctions
 
+using OpenLibm_jll
 using OpenSpecFun_jll
 
 export
