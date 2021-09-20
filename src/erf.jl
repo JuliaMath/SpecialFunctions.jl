@@ -569,12 +569,10 @@ function logerf(a::Real, b::Real)
     if abs(a) ≤ IrrationalConstants.invsqrt2 && abs(b) ≤ IrrationalConstants.invsqrt2
         return log(erf(a, b))
     elseif b > a > 0
-        return logerfc(a) + log1mexp(logerfc(b) - logerfc(a))
+        return logerfc(a) + LogExpFunctions.log1mexp(logerfc(b) - logerfc(a))
     elseif a < b < 0
-        return logerfc(-b) + log1mexp(logerfc(-a) - logerfc(-b))
+        return logerfc(-b) + LogExpFunctions.log1mexp(logerfc(-a) - logerfc(-b))
     else
         return log(erf(a, b))
     end
 end
-
-log1mexp(x::Real) = x < -log(oftype(x, 2)) ? log1p(-exp(x)) : log(-expm1(x))
