@@ -248,7 +248,7 @@ function erfinv(x::Float64)
                               -0.10014_37634_97830_70835e2,
                                0.1e1)
     else # Table 57 in Blair et al.
-        t = 1.0 / sqrt(-log(1.0 - a))
+        t = inv(sqrt(-log1p(-a)))
         return @horner(t, 0.10501_31152_37334_38116e-3,
                           0.10532_61131_42333_38164_25e-1,
                           0.26987_80273_62432_83544_516,
@@ -301,7 +301,7 @@ function erfinv(x::Float32)
                               -0.21757_03119_6f1,
                                0.1f1)
     else # Table 50 in Blair et al.
-        t = 1.0f0 / sqrt(-log(1.0f0 - a))
+        t = inv(sqrt(-log1p(-a)))
         return @horner(t, 0.15504_70003_116f0,
                           0.13827_19649_631f1,
                           0.69096_93488_87f0,
