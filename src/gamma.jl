@@ -695,8 +695,7 @@ end
 # SciPy loggamma function.  The key identities are also described
 # at http://functions.wolfram.com/GammaBetaErf/LogGamma/
 function loggamma(z::Complex{Float64})
-    x = real(z)
-    y = imag(z)
+    x, y = reim(z)
     yabs = abs(y)
     if !isfinite(x) || !isfinite(y) # Inf or NaN
         if isinf(x) && isfinite(y)
