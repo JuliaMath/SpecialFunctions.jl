@@ -429,14 +429,11 @@ function zeta(s::ComplexOrReal{Float64})
             # avoid overflow/underflow (issue #128)
             lg = loggamma(1 - s)
             rehalf = real(s)*0.5
-            return zeta(1 - s) * exp(
-                lg + absim*IrrationalConstants.halfπ + s*IrrationalConstants.log2π
-            ) * IrrationalConstants.inv2π * Complex(
+            return zeta(1 - s) * exp(lg + absim*halfπ + s*log2π) * inv2π * Complex(
                 sinpi(rehalf), copysign(cospi(rehalf), imag(s))
             )
         else
-            return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * IrrationalConstants.twoπ^s *
-                IrrationalConstants.invπ
+            return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * twoπ^s * invπ
         end
     end
 
@@ -712,10 +709,8 @@ function loggamma(z::Complex{Float64})
             return Complex(Inf, signbit(x) ? copysign(Float64(π), -y) : -y)
         end
         # the 2pi * floor(...) stuff is to choose the correct branch cut for log(sinpi(z))
-        return Complex(
-            Float64(IrrationalConstants.logπ),
-            copysign(Float64(IrrationalConstants.twoπ), y) * floor(0.5*x+0.25),
-        ) - log(sinpi(z)) - loggamma(1-z)
+        return Complex(Float64(logπ), copysign(Float64(twoπ), y) * floor(0.5*x+0.25)) -
+            log(sinpi(z)) - loggamma(1-z)
     elseif abs(x - 1) + yabs < 0.1
         # taylor series at z=1
         # ... coefficients are [-eulergamma; [(-1)^k * zeta(k)/k for k in 2:15]]

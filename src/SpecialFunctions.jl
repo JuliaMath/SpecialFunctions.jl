@@ -1,7 +1,18 @@
 module SpecialFunctions
 
+using IrrationalConstants:
+    twoπ,
+    halfπ,
+    sqrtπ,
+    sqrt2π,
+    invπ,
+    inv2π,
+    invsqrt2,
+    invsqrt2π,
+    logπ,
+    log2π
+
 import ChainRulesCore
-import IrrationalConstants
 import LogExpFunctions
 
 using OpenLibm_jll

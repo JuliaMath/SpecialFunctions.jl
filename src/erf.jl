@@ -422,10 +422,10 @@ function erfinv(y::BigFloat)
     else
         # Float64 overflowed, use asymptotic estimate instead
         # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
-        x = copysign(sqrt(-log((1-abs(y))*IrrationalConstants.sqrtπ)), y)
+        x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
         isfinite(x) || return x
     end
-    sqrtπhalf = IrrationalConstants.sqrtπ * big(0.5)
+    sqrtπhalf = sqrtπ * big(0.5)
     tol = 2eps(abs(x))
     while true # Newton iterations
         Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
@@ -444,14 +444,14 @@ function erfcinv(y::BigFloat)
         # Float64 overflowed, use asymptotic estimate instead
         # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
         if yfloat < 1
-            x = sqrt(-log(y*IrrationalConstants.sqrtπ))
+            x = sqrt(-log(y*sqrtπ))
         else # y must be close to 2
-            x = -sqrt(-log((2-y)*IrrationalConstants.sqrtπ))
+            x = -sqrt(-log((2-y)*sqrtπ))
         end
         # TODO: Newton convergence is slow near y=0 singularity; accelerate?
         isfinite(x) || return x
     end
-    sqrtπhalf = IrrationalConstants.sqrtπ * big(0.5)
+    sqrtπhalf = sqrtπ * big(0.5)
     tol = 2eps(abs(x))
     while true # Newton iterations
         Δx = sqrtπhalf * (erfc(x) - y) * exp(x^2)
@@ -487,7 +487,7 @@ function erfcx(x::BigFloat)
             w *= -k*v
             s += w
         end
-        return (1+s)/(x*IrrationalConstants.sqrtπ)
+        return (1+s)/(x*sqrtπ)
     end
 end
 
@@ -566,7 +566,7 @@ External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 See also: [`erf(x,y)`](@ref erf).
 """
 function logerf(a::Real, b::Real)
-    if abs(a) ≤ IrrationalConstants.invsqrt2 && abs(b) ≤ IrrationalConstants.invsqrt2
+    if abs(a) ≤ invsqrt2 && abs(b) ≤ invsqrt2
         return log(erf(a, b))
     elseif b > a > 0
         return logerfc(a) + LogExpFunctions.log1mexp(logerfc(b) - logerfc(a))
