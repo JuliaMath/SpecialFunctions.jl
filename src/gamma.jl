@@ -573,8 +573,8 @@ export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, lo
 
 ## from base/special/gamma.jl
 
-gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libm), Float64, (Float64,), x), x)
-gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libm), Float32, (Float32,), x), x)
+gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
+gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
 gamma(x::Float16)       = Float16(gamma(Float32(x)))
 gamma(x::AbstractFloat) = throw(MethodError(gamma, x))
 
@@ -622,12 +622,12 @@ gamma(x::Number) = gamma(float(x))
 
 function logabsgamma(x::Float64)
     signp = Ref{Int32}()
-    y = ccall((:lgamma_r,libm),  Float64, (Float64, Ptr{Int32}), x, signp)
+    y = ccall((:lgamma_r,libopenlibm),  Float64, (Float64, Ptr{Int32}), x, signp)
     return y, Int(signp[])
 end
 function logabsgamma(x::Float32)
     signp = Ref{Int32}()
-    y = ccall((:lgammaf_r,libm),  Float32, (Float32, Ptr{Int32}), x, signp)
+    y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
     return y, Int(signp[])
 end
 logabsgamma(x::Real) = logabsgamma(float(x))

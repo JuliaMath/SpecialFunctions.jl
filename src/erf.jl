@@ -1,12 +1,12 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using Base.Math: @horner, libm
+using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
 
 for f in (:erf, :erfc)
     @eval begin
-        ($f)(x::Float64) = ccall(($(string(f)),libm), Float64, (Float64,), x)
-        ($f)(x::Float32) = ccall(($(string(f,"f")),libm), Float32, (Float32,), x)
+        ($f)(x::Float64) = ccall(($(string(f)),libopenlibm), Float64, (Float64,), x)
+        ($f)(x::Float32) = ccall(($(string(f,"f")),libopenlibm), Float32, (Float32,), x)
         ($f)(x::Real) = ($f)(float(x))
         ($f)(a::Float16) = Float16($f(Float32(a)))
         ($f)(a::Complex{Float16}) = Complex{Float16}($f(Complex{Float32}(a)))

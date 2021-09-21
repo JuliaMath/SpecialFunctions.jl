@@ -4,6 +4,7 @@ import ChainRulesCore
 import IrrationalConstants
 import LogExpFunctions
 
+using OpenLibm_jll
 using OpenSpecFun_jll
 
 export
