@@ -266,7 +266,7 @@ function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, 
     b0 = zeros(22)
     c = zeros(22)
     d = zeros(22)
-    e0 = 2/Float64(IrrationalConstants.sqrtπ)
+    e0 = 2/IrrationalConstants.sqrtπ
     e1 = 2^(-1.5)
     sm = 0.0
     ans = 0.0
