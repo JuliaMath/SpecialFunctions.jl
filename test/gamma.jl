@@ -59,11 +59,7 @@
         @test eta(Complex{Float32}(2)) ≈ eta(2)
     end
     @testset "gamma, loggamma, logabsgamma (complex argument)" begin
-        if Base.Math.libm == "libopenlibm"
-            @test gamma.(Float64[1:25;]) == gamma.(1:25)
-        else
-            @test gamma.(Float64[1:25;]) ≈ gamma.(1:25)
-        end
+        @test gamma.(Float64[1:25;]) ≈ gamma.(1:25)
         for elty in (Float32, Float64)
             @test gamma(convert(elty,1/2)) ≈ convert(elty,sqrt(π))
             @test gamma(convert(elty,-1/2)) ≈ convert(elty,-2sqrt(π))

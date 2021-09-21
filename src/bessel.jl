@@ -189,14 +189,14 @@ for jy in ("j","y"), nu in (0,1)
     bjynu = Symbol("bessel",jy,nu)
     if jy == "y"
         @eval begin
-            $bjynu(x::Float64) = nan_dom_err(ccall(($jynu,libm),  Float64, (Float64,), x), x)
-            $bjynu(x::Float32) = nan_dom_err(ccall(($jynuf,libm), Float32, (Float32,), x), x)
+            $bjynu(x::Float64) = nan_dom_err(ccall(($jynu,libopenlibm),  Float64, (Float64,), x), x)
+            $bjynu(x::Float32) = nan_dom_err(ccall(($jynuf,libopenlibm), Float32, (Float32,), x), x)
             $bjynu(x::Float16) = Float16($bjynu(Float32(x)))
         end
     else
         @eval begin
-            $bjynu(x::Float64) = ccall(($jynu,libm),  Float64, (Float64,), x)
-            $bjynu(x::Float32) = ccall(($jynuf,libm), Float32, (Float32,), x)
+            $bjynu(x::Float64) = ccall(($jynu,libopenlibm),  Float64, (Float64,), x)
+            $bjynu(x::Float32) = ccall(($jynuf,libopenlibm), Float32, (Float32,), x)
             $bjynu(x::Float16) = Float16($bjynu(Float32(x)))
         end
     end
@@ -389,8 +389,8 @@ function besselj(nu::Float64, z::Complex{Float64})
     end
 end
 
-besselj(nu::Cint, x::Float64) = ccall((:jn, libm), Float64, (Cint, Float64), nu, x)
-besselj(nu::Cint, x::Float32) = ccall((:jnf, libm), Float32, (Cint, Float32), nu, x)
+besselj(nu::Cint, x::Float64) = ccall((:jn, libopenlibm), Float64, (Cint, Float64), nu, x)
+besselj(nu::Cint, x::Float32) = ccall((:jnf, libopenlibm), Float32, (Cint, Float32), nu, x)
 
 
 function besseljx(nu::Float64, z::Complex{Float64})
@@ -413,13 +413,13 @@ function bessely(nu::Cint, x::Float64)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    ccall((:yn, libm), Float64, (Cint, Float64), nu, x)
+    ccall((:yn, libopenlibm), Float64, (Cint, Float64), nu, x)
 end
 function bessely(nu::Cint, x::Float32)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    ccall((:ynf, libm), Float32, (Cint, Float32), nu, x)
+    ccall((:ynf, libopenlibm), Float32, (Cint, Float32), nu, x)
 end
 
 function bessely(nu::Float64, z::Complex{Float64})
