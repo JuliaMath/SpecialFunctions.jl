@@ -650,7 +650,10 @@ function logabsgamma(x::Float32)
     y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
     return y, Int(signp[])
 end
-logabsgamma(x::Float16) = Float16.(logabsgamma(Float32(x)))
+function logabsgamma(x::Float16)
+    y, s = logabsgamma(Float32(x))
+    return Float16(y), s
+end    
 
 
 """
