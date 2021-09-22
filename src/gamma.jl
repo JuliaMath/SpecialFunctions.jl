@@ -653,7 +653,7 @@ end
 function logabsgamma(x::Float16)
     y, s = logabsgamma(Float32(x))
     return Float16(y), s
-end    
+end
 
 
 """
