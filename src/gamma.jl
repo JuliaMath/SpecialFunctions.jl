@@ -573,7 +573,6 @@ export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, lo
 gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
 gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
 gamma(x::Float16)       = Float16(gamma(Float32(x)))
-gamma(x::AbstractFloat) = throw(MethodError(gamma, x))
 
 function gamma(x::BigFloat)
     isnan(x) && return x
@@ -615,7 +614,31 @@ the upper incomplete gamma function ``\Gamma(a,z)``.
 - `Complex`: by `exp(loggamma(z))`.
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
-gamma(x::Number) = gamma(float(x))
+function gamma(x::Number)
+    z = float(x)
+    if typeof(z) === typeof(x)
+        # There is nothing to fallback to
+        throw(MethodError(gamma, x))
+    end
+    return gamma(z)
+end
+
+"""
+    logabsgamma(x)
+
+Compute the logarithm of absolute value of [`gamma`](@ref) for
+[`Real`](@ref) `x`and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
+
+See also [`loggamma`](@ref).
+"""
+function logabsgamma(x::Real)
+    z = float(x)
+    if typeof(z) === typeof(x)
+        # There is nothing to fallback to
+        throw(MethodError(logabsgamma, x))
+    end
+    return logabsgamma(z)
+end
 
 function logabsgamma(x::Float64)
     signp = Ref{Int32}()
@@ -627,10 +650,7 @@ function logabsgamma(x::Float32)
     y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
     return y, Int(signp[])
 end
-logabsgamma(x::Real) = logabsgamma(float(x))
 logabsgamma(x::Float16) = Float16.(logabsgamma(Float32(x)))
-logabsgamma(x::Integer) = logabsgamma(float(x))
-logabsgamma(x::AbstractFloat) = throw(MethodError(logabsgamma, x))
 
 
 """
@@ -641,16 +661,6 @@ Equivalent to [`loggamma`](@ref) of `x + 1`, but `loggamma` extends this functio
 to non-integer `x`.
 """
 logfactorial(x::Integer) = x < 0 ? throw(DomainError(x, "`x` must be non-negative.")) : loggamma(x + oneunit(x))
-
-"""
-    logabsgamma(x)
-
-Compute the logarithm of absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x`and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
-
-See also [`loggamma`](@ref).
-"""
-function logabsgamma end
 
 """
     loggamma(x)
@@ -664,7 +674,14 @@ but `loggamma(x)` may differ from `log(gamma(x))` by an integer multiple of ``2\
 
 See also [`logabsgamma`](@ref) for real `x`.
 """
-loggamma(x::Number) = loggamma(float(x))
+function loggamma(x::Number)
+    z = float(x)
+    if typeof(z) === typeof(x)
+        # There is nothing to fallback to
+        throw(MethodError(loggamma, x))
+    end
+    return loggamma(z)
+end
 
 function loggamma(x::Real)
     (y, s) = logabsgamma(x)
