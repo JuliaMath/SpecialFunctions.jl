@@ -6,8 +6,8 @@ const big1 = [25.0, 14.0, 10.0]
 const e0 = [0.25e-3, 0.25e-1, 0.14]
 const x0 = [31.0, 17.0, 9.7]
 const alog10 = log(10)
-const rt2pin = 1.0/sqrt(2*pi)
-const rtpi = sqrt(pi)
+const rt2pin = Float64(invsqrt2π)
+const rtpi = Float64(sqrtπ)
 const stirling_coef = [1.996379051590076518221, -0.17971032528832887213e-2, 0.131292857963846713e-4, -0.2340875228178749e-6, 0.72291210671127e-8, -0.3280997607821e-9, 0.198750709010e-10, -0.15092141830e-11, 0.1375340084e-12, -0.145728923e-13, 0.17532367e-14, -0.2351465e-15, 0.346551e-16, -0.55471e-17, 0.9548e-18, -0.1748e-18, 0.332e-19, -0.58e-20]
 const auxgam_coef = [-1.013609258009865776949, 0.784903531024782283535e-1, 0.67588668743258315530e-2, -0.12790434869623468120e-2, 0.462939838642739585e-4, 0.43381681744740352e-5, -0.5326872422618006e-6, 0.172233457410539e-7, 0.8300542107118e-9, -0.10553994239968e-9, 0.39415842851e-11, 0.362068537e-13, -0.107440229e-13, 0.5000413e-15, -0.62452e-17, -0.5185e-18, 0.347e-19, -0.9e-21]
 
@@ -139,11 +139,11 @@ function stirling_error(x::Float64)
     if x < floatmin(Float64)*1000.0
         return floatmax(Float64)/1000.0
     elseif x < 1
-        return loggamma1p(x) - (x + 0.5)*log(x) + x - log((2*pi))/2.0
+        return loggamma1p(x) - (x + 0.5)*log(x) + x - log2π/2.0
     elseif x < 2
-        return loggamma1p(x - 1) - (x - 0.5)*log(x) + x - log((2*pi))/2.0
+        return loggamma1p(x - 1) - (x - 0.5)*log(x) + x - log2π/2.0
     elseif x < 3
-        return loggamma1p(x - 2) - (x - 0.5)*log(x) + x  - log((2*pi))/2.0 + log(x - 1)
+        return loggamma1p(x - 2) - (x - 0.5)*log(x) + x  - log2π/2.0 + log(x - 1)
     elseif x < 12
         z=18.0/(x*x)-1.0
         return chepolsum(z, stirling_coef)/(12.0*x)
@@ -170,7 +170,7 @@ function gammax(x::Float64)
     if x >= 3
         return exp(stirling_error(x))
     elseif x > 0
-        return gamma(x)/(exp(-x + (x - 0.5)*log(x))*sqrt(2*pi))
+        return gamma(x)/(exp(-x + (x - 0.5)*log(x))*sqrt2π)
     else
         return floatmax(Float64)/1000.0
     end
@@ -705,7 +705,7 @@ where ``b = 1-a``, ``L = \\ln{x_0}``.
 """
 function gamma_inc_inv_qsmall(a::Float64, q::Float64)
     b = 1.0 - a
-    eta = sqrt(-2/a*log(q*gammax(a)*sqrt(2*pi)/sqrt(a)))
+    eta = sqrt(-2/a*log(q*gammax(a)*sqrt(twoπ/a)))
     x0 = a*lambdaeta(eta)
     l = log(x0)
 
@@ -758,7 +758,7 @@ function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
     eta = s*r/sqrt(a*0.5)
     eta += (coeff1(eta) + (coeff2(eta) + coeff3(eta)/a)/a)/a
     x0 = a*lambdaeta(eta)
-    fp = -sqrt(a/(2*pi))*exp(-0.5*a*eta*eta)/gammax(a)
+    fp = -sqrt(inv2π*a)*exp(-0.5*a*eta*eta)/gammax(a)
     return (x0, fp)
 end
 # Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato, Alfred H Morris.
