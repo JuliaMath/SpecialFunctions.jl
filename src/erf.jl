@@ -248,7 +248,7 @@ function erfinv(x::Float64)
                               -0.10014_37634_97830_70835e2,
                                0.1e1)
     else # Table 57 in Blair et al.
-        t = 1.0 / sqrt(-log(1.0 - a))
+        t = inv(sqrt(-log1p(-a)))
         return @horner(t, 0.10501_31152_37334_38116e-3,
                           0.10532_61131_42333_38164_25e-1,
                           0.26987_80273_62432_83544_516,
@@ -301,7 +301,7 @@ function erfinv(x::Float32)
                               -0.21757_03119_6f1,
                                0.1f1)
     else # Table 50 in Blair et al.
-        t = 1.0f0 / sqrt(-log(1.0f0 - a))
+        t = inv(sqrt(-log1p(-a)))
         return @horner(t, 0.15504_70003_116f0,
                           0.13827_19649_631f1,
                           0.69096_93488_87f0,
@@ -417,7 +417,6 @@ end
 
 function erfinv(y::BigFloat)
     xfloat = erfinv(Float64(y))
-    sqrtπ = sqrt(big(pi))
     if isfinite(xfloat)
         x = BigFloat(xfloat)
     else
@@ -426,7 +425,7 @@ function erfinv(y::BigFloat)
         x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
         isfinite(x) || return x
     end
-    sqrtπhalf = sqrtπ * 0.5
+    sqrtπhalf = sqrtπ * big(0.5)
     tol = 2eps(abs(x))
     while true # Newton iterations
         Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
@@ -439,7 +438,6 @@ end
 function erfcinv(y::BigFloat)
     yfloat = Float64(y)
     xfloat = erfcinv(yfloat)
-    sqrtπ = sqrt(big(pi))
     if isfinite(xfloat)
         x = BigFloat(xfloat)
     else
@@ -453,7 +451,7 @@ function erfcinv(y::BigFloat)
         # TODO: Newton convergence is slow near y=0 singularity; accelerate?
         isfinite(x) || return x
     end
-    sqrtπhalf = sqrtπ * 0.5
+    sqrtπhalf = sqrtπ * big(0.5)
     tol = 2eps(abs(x))
     while true # Newton iterations
         Δx = sqrtπhalf * (erfc(x) - y) * exp(x^2)
@@ -489,7 +487,7 @@ function erfcx(x::BigFloat)
             w *= -k*v
             s += w
         end
-        return (1+s)/(x*sqrt(oftype(x,pi)))
+        return (1+s)/(x*sqrtπ)
     end
 end
 
@@ -568,15 +566,13 @@ External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 See also: [`erf(x,y)`](@ref erf).
 """
 function logerf(a::Real, b::Real)
-    if abs(a) ≤ 1/√2 && abs(b) ≤ 1/√2
+    if abs(a) ≤ invsqrt2 && abs(b) ≤ invsqrt2
         return log(erf(a, b))
     elseif b > a > 0
-        return logerfc(a) + log1mexp(logerfc(b) - logerfc(a))
+        return logerfc(a) + LogExpFunctions.log1mexp(logerfc(b) - logerfc(a))
     elseif a < b < 0
-        return logerfc(-b) + log1mexp(logerfc(-a) - logerfc(-b))
+        return logerfc(-b) + LogExpFunctions.log1mexp(logerfc(-a) - logerfc(-b))
     else
         return log(erf(a, b))
     end
 end
-
-log1mexp(x::Real) = x < -log(oftype(x, 2)) ? log1p(-exp(x)) : log(-expm1(x))
