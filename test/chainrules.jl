@@ -143,4 +143,31 @@
             test_scalar(cosint, x)
         end
     end
+
+    # https://github.com/JuliaMath/SpecialFunctions.jl/issues/307
+    @testset "promotions" begin
+        # one argument
+        for f in (erf, erfc, logerfc, erfcinv, logerfcx, erfi, erfinv, sinint)
+            _, ẏ = frule((NoTangent(), 1f0), f, 1f0)
+            @test ẏ isa Float32
+            _, back = rrule(f, 1f0)
+            _, x̄ = back(1f0)
+            @test x̄ isa Float32
+        end
+
+        # two arguments
+        _, ẏ = frule((NoTangent(), 1f0, 1f0), erf, 1f0, 1f0)
+        @test ẏ isa Float32
+        _, back = rrule(erf, 1f0, 1f0)
+        _, x̄ = back(1f0)
+        @test x̄ isa Float32
+
+        # currently broken, can be fixed if `invsqrtπ` is available:
+        # https://github.com/JuliaMath/IrrationalConstants.jl/pull/8#issuecomment-925828753
+        _, ẏ = frule((NoTangent(), 1f0), erfcx, 1f0)
+        @test_broken ẏ isa Float32
+        _, back = rrule(erfcx, 1f0)
+        _, x̄ = back(1f0)
+        @test x̄ isa Float32
+    end
 end
