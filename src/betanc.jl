@@ -104,7 +104,7 @@ function ncbeta_poisson(a::Float64, b::Float64, lambda::Float64, x::Float64)
     end
 
     t0 = logabsgamma(a+b)[1] - logabsgamma(a+1.0)[1] - logabsgamma(b)[1]
-    s0 = a*log(x) + b*log(1.0-x)
+    s0 = a*log(x) + b*log1p(-x)
 
     s = 0.0
     for j = 0:iter1-1
