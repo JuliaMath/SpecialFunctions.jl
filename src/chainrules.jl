@@ -16,7 +16,9 @@ https://github.com/JuliaMath/SpecialFunctions.jl/issues/321
 """
 
 ChainRulesCore.@scalar_rule(airyai(x), airyaiprime(x))
+ChainRulesCore.@scalar_rule(airyaix(x), airyaiprimex(x) + sqrt(x) * Ω)
 ChainRulesCore.@scalar_rule(airyaiprime(x), x * airyai(x))
+ChainRulesCore.@scalar_rule(airyaiprimex(x), x * airyaix(x) + sqrt(x) * Ω)
 ChainRulesCore.@scalar_rule(airybi(x), airybiprime(x))
 ChainRulesCore.@scalar_rule(airybiprime(x), x * airybi(x))
 ChainRulesCore.@scalar_rule(besselj0(x), -besselj1(x))
@@ -31,12 +33,18 @@ ChainRulesCore.@scalar_rule(
 )
 ChainRulesCore.@scalar_rule(dawson(x), 1 - (2 * x * Ω))
 ChainRulesCore.@scalar_rule(digamma(x), trigamma(x))
-ChainRulesCore.@scalar_rule(erf(x), (2 / sqrt(π)) * exp(-x * x))
-ChainRulesCore.@scalar_rule(erfc(x), -(2 / sqrt(π)) * exp(-x * x))
-ChainRulesCore.@scalar_rule(erfcinv(x), -(sqrt(π) / 2) * exp(Ω^2))
-ChainRulesCore.@scalar_rule(erfcx(x), (2 * x * Ω) - (2 / sqrt(π)))
-ChainRulesCore.@scalar_rule(erfi(x), (2 / sqrt(π)) * exp(x * x))
-ChainRulesCore.@scalar_rule(erfinv(x), (sqrt(π) / 2) * exp(Ω^2))
+
+# TODO: use `invsqrtπ` if it is added to IrrationalConstants
+ChainRulesCore.@scalar_rule(erf(x), (2 * exp(-x^2)) / sqrtπ)
+ChainRulesCore.@scalar_rule(erf(x, y), (- (2 * exp(-x^2)) / sqrtπ, (2 * exp(-y^2)) / sqrtπ))
+ChainRulesCore.@scalar_rule(erfc(x), - (2 * exp(-x^2)) / sqrtπ)
+ChainRulesCore.@scalar_rule(logerfc(x), - (2 * exp(-x^2 - Ω)) / sqrtπ)
+ChainRulesCore.@scalar_rule(erfcinv(x), - (sqrtπ * (exp(Ω^2) / 2)))
+ChainRulesCore.@scalar_rule(erfcx(x), 2 * (x * Ω - inv(oftype(Ω, sqrtπ))))
+ChainRulesCore.@scalar_rule(logerfcx(x), 2 * (x - exp(-Ω) / sqrtπ))
+ChainRulesCore.@scalar_rule(erfi(x), (2 * exp(x^2)) / sqrtπ)
+ChainRulesCore.@scalar_rule(erfinv(x), sqrtπ * (exp(Ω^2) / 2))
+
 ChainRulesCore.@scalar_rule(gamma(x), Ω * digamma(x))
 ChainRulesCore.@scalar_rule(
     gamma(a, x),
@@ -65,7 +73,7 @@ ChainRulesCore.@scalar_rule(
 )
 ChainRulesCore.@scalar_rule(trigamma(x), polygamma(2, x))
 
-# binary
+# Bessel functions
 ChainRulesCore.@scalar_rule(
     besselj(ν, x),
     (
@@ -95,10 +103,24 @@ ChainRulesCore.@scalar_rule(
     ),
 )
 ChainRulesCore.@scalar_rule(
+    besselkx(ν, x),
+    (
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
+        -(besselkx(ν - 1, x) + besselkx(ν + 1, x)) / 2 + Ω,
+    ),
+)
+ChainRulesCore.@scalar_rule(
     hankelh1(ν, x),
     (
         ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
         (hankelh1(ν - 1, x) - hankelh1(ν + 1, x)) / 2,
+    ),
+)
+ChainRulesCore.@scalar_rule(
+    hankelh1x(ν, x),
+    (
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
+        (hankelh1x(ν - 1, x) - hankelh1x(ν + 1, x)) / 2 - im * Ω,
     ),
 )
 ChainRulesCore.@scalar_rule(
@@ -108,6 +130,14 @@ ChainRulesCore.@scalar_rule(
         (hankelh2(ν - 1, x) - hankelh2(ν + 1, x)) / 2,
     ),
 )
+ChainRulesCore.@scalar_rule(
+    hankelh2x(ν, x),
+    (
+        ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO),
+        (hankelh2x(ν - 1, x) - hankelh2x(ν + 1, x)) / 2 + im * Ω,
+    ),
+)
+
 ChainRulesCore.@scalar_rule(
     polygamma(m, x),
     (
@@ -161,5 +191,5 @@ ChainRulesCore.@scalar_rule(
     )
 )
 ChainRulesCore.@scalar_rule(expinti(x), exp(x) / x)
-ChainRulesCore.@scalar_rule(sinint(x), sinc(x / π))
+ChainRulesCore.@scalar_rule(sinint(x), sinc(invπ * x))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
