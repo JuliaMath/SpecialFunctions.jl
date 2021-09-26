@@ -1,6 +1,8 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using Base.MPFR: ROUNDING_MODE, big_ln2
+using Base.MPFR: ROUNDING_MODE
+
+export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
 
 const ComplexOrReal{T} = Union{T,Complex{T}}
 
@@ -17,7 +19,9 @@ const ComplexOrReal{T} = Union{T,Complex{T}}
 
 Compute the digamma function of `x` (the logarithmic derivative of `gamma(x)`).
 """
-function digamma(z::ComplexOrReal{Float64})
+digamma(x::Number) = _digamma(float(x))
+
+function _digamma(z::ComplexOrReal{Float64})
     # Based on eq. (12), without looking at the accompanying source
     # code, of: K. S. Kölbig, "Programs for computing the logarithm of
     # the gamma function, and the digamma function, for complex
@@ -46,7 +50,7 @@ function digamma(z::ComplexOrReal{Float64})
     ψ -= t * @evalpoly(t,0.08333333333333333,-0.008333333333333333,0.003968253968253968,-0.004166666666666667,0.007575757575757576,-0.021092796092796094,0.08333333333333333,-0.4432598039215686)
 end
 
-function digamma(x::BigFloat)
+function _digamma(x::BigFloat)
     z = BigFloat()
     ccall((:mpfr_digamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
@@ -57,7 +61,9 @@ end
 
 Compute the trigamma function of `x` (the logarithmic second derivative of `gamma(x)`).
 """
-function trigamma(z::ComplexOrReal{Float64})
+trigamma(x::Number) = _trigamma(float(x))
+
+function _trigamma(z::ComplexOrReal{Float64})
     # via the derivative of the Kölbig digamma formulation
     x = real(z)
     if x <= 0 # reflection formula
@@ -222,11 +228,11 @@ The Riemann zeta function is recovered as ``\\zeta(s)=\\zeta(s,1)``.
 
 External links: [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function), [Hurwitz zeta function](https://en.wikipedia.org/wiki/Hurwitz_zeta_function)
 """
-function zeta(s::ComplexOrReal{Float64}, z::ComplexOrReal{Float64})
-    ζ = zero(promote_type(typeof(s), typeof(z)))
+zeta(s::Number, z::Number) = _zeta(map(float, promote(s, z))...)
 
-    (z == 1 || z == 0) && return oftype(ζ, zeta(s))
-    s == 2 && return oftype(ζ, trigamma(z))
+function _zeta(s::T, z::T) where {T<:ComplexOrReal{Float64}}
+    (z == 1 || z == 0) && return zeta(s)
+    s == 2 && return trigamma(z)
 
     x = real(z)
 
@@ -234,23 +240,24 @@ function zeta(s::ComplexOrReal{Float64}, z::ComplexOrReal{Float64})
     if !isfinite(s)
         (isnan(s) || isnan(z)) && return (s*z)^2 # type-stable NaN+Nan*im
         if real(s) == Inf
-            z == 1 && return one(ζ)
+            z == 1 && return one(T)
             if x > 1 || (x >= 0.5 ? abs(z) > 1 : abs(z - round(x)) > 1)
-                return zero(ζ) # distance to poles is > 1
+                return zero(T) # distance to poles is > 1
             end
-            x > 0 && imag(z) == 0 && imag(s) == 0 && return oftype(ζ, Inf)
+            x > 0 && imag(z) == 0 && imag(s) == 0 && return T(Inf)
         end
         throw(DomainError(s, "`s` must be finite."))  # nothing clever to return
     end
     if isnan(x)
         if imag(z) == 0 && imag(s) == 0
-            return oftype(ζ, x)
+            return x
         else
-            return oftype(ζ, Complex(x,x))
+            return T(Complex(x,x))
         end
     end
 
     m = s - 1
+    ζ = zero(T)
 
     # Algorithm is just the m-th derivative of digamma formula above,
     # with a modified cutoff of the final asymptotic expansion.
@@ -332,7 +339,9 @@ External links: [Wikipedia](https://en.wikipedia.org/wiki/Polygamma_function)
 
 See also: [`gamma(z)`](@ref SpecialFunctions.gamma)
 """
-function polygamma(m::Integer, z::ComplexOrReal{Float64})
+polygamma(m::Integer, x::Number) = _polygamma(m, float(x))
+
+function _polygamma(m::Integer, z::ComplexOrReal{Float64})
     m == 0 && return digamma(z)
     m == 1 && return trigamma(z)
 
@@ -365,7 +374,9 @@ end
 
 Compute the inverse [`digamma`](@ref) function of `x`.
 """
-function invdigamma(y::Float64)
+invdigamma(x::Number) = _invdigamma(float(x))
+
+function _invdigamma(y::Float64)
     # Implementation of fixed point algorithm described in
     # "Estimating a Dirichlet distribution" by Thomas P. Minka, 2000
 
@@ -402,7 +413,9 @@ Riemann zeta function
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Riemann_zeta_function)
 """
-function zeta(s::ComplexOrReal{Float64})
+zeta(s::Number) = _zeta(float(s))
+
+function _zeta(s::ComplexOrReal{Float64})
     # Riemann zeta function; algorithm is based on specializing the Hurwitz
     # zeta function above for z==1.
 
@@ -461,18 +474,20 @@ function zeta(s::ComplexOrReal{Float64})
     return ζ
 end
 
-function zeta(x::BigFloat)
+function _zeta(x::BigFloat)
     z = BigFloat()
     ccall((:mpfr_zeta, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
 """
-    eta(x)
+    eta(s)
 
 Dirichlet eta function ``\\eta(s) = \\sum^\\infty_{n=1}(-1)^{n-1}/n^{s}``.
 """
-function eta(z::ComplexOrReal{Float64})
+eta(s::Number) = _eta(float(s))
+
+function _eta(z::ComplexOrReal{Float64})
     δz = 1 - z
     if fastabs(δz) < 7e-3 # Taylor expand around z==1
         return 0.6931471805599453094172321214581765 *
@@ -487,99 +502,38 @@ function eta(z::ComplexOrReal{Float64})
     end
 end
 
-function eta(x::BigFloat)
-    x == 1 && return big_ln2()
-    return -zeta(x) * expm1(big_ln2()*(1-x))
+function _eta(x::BigFloat)
+    x == 1 && return BigFloat(logtwo)
+    return -zeta(x) * expm1(BigFloat(logtwo)*(1-x))
 end
 
 # Converting types that we can convert, and not ones we can not
 # Float16, and Float32 and their Complex equivalents can be converted to Float64
 # and results converted back.
-# Otherwise, we need to make things use their own `float` converting methods
-# and in those cases, we do not convert back either as we assume
-# they also implement their own versions of the functions, with the correct return types.
-# This is the case for BitIntegers (which become `Float64` when `float`ed).
-# Otherwise, if they do not implement their version of the functions we
-# manually throw a `MethodError`.
-# This case occurs, when calling `float` on a type does not change its type,
-# as it is already a `float`, and would have hit own method, if one had existed.
-
-
 # If we really cared about single precision, we could make a faster
 # Float32 version by truncating the Stirling series at a smaller cutoff.
 # and if we really cared about half precision, we could make a faster
 # Float16 version, by using a precomputed table look-up.
 
-
-for T in (Float16, Float32, Float64)
+for T in (Float16, Float32)
     @eval f64(x::Complex{$T}) = Complex{Float64}(x)
     @eval f64(x::$T) = Float64(x)
-end
 
+    for f in (:_digamma, :_trigamma, :_zeta, :_eta, :_invdigamma)
+        @eval $f(z::ComplexOrReal{$T}) = oftype(z, $f(f64(z)))
+    end
 
-for f in (:digamma, :trigamma, :zeta, :eta, :invdigamma)
+    @eval _loggamma(z::Complex{$T}) = oftype(z, _loggamma(f64(z)))
+
     @eval begin
-        function $f(z::Union{ComplexOrReal{Float16}, ComplexOrReal{Float32}})
-            oftype(z, $f(f64(z)))
+        function _zeta(s::U, z::U) where {U<:ComplexOrReal{$T}}
+            U(_zeta(f64(s), f64(z)))
         end
 
-        function $f(z::Number)
-            x = float(z)
-            typeof(x) === typeof(z) && throw(MethodError($f, (z,)))
-            # There is nothing to fallback to, as this didn't change the argument types
-            $f(x)
+        function _polygamma(m::Integer, z::ComplexOrReal{$T})
+            oftype(z, _polygamma(m, f64(z)))
         end
     end
-end
-
-
-for T1 in (Float16, Float32, Float64), T2 in (Float16, Float32, Float64)
-    (T1 == T2 == Float64) && continue # Avoid redefining base definition
-
-    @eval function zeta(s::ComplexOrReal{$T1}, z::ComplexOrReal{$T2})
-        ζ = zeta(f64(s), f64(z))
-        convert(promote_type(typeof(s), typeof(z)),  ζ)
-    end
-end
-
-
-function zeta(s::Number, z::Number)
-    t = float(s)
-    x = float(z)
-    if typeof(t) === typeof(s) && typeof(x) === typeof(z)
-        # There is nothing to fallback to, since this didn't work
-        throw(MethodError(zeta,(s,z)))
-    end
-    zeta(t, x)
-end
-
-
-function polygamma(m::Integer, z::Union{ComplexOrReal{Float16}, ComplexOrReal{Float32}})
-    oftype(z, polygamma(m, f64(z)))
-end
-
-
-function polygamma(m::Integer, z::Number)
-    x = float(z)
-    typeof(x) === typeof(z) && throw(MethodError(polygamma, (m,z)))
-    # There is nothing to fallback to, since this didn't work
-    polygamma(m, x)
-end
-
-export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
-
-## from base/special/gamma.jl
-
-gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
-gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
-gamma(x::Float16)       = Float16(gamma(Float32(x)))
-
-function gamma(x::BigFloat)
-    isnan(x) && return x
-    z = BigFloat()
-    ccall((:mpfr_gamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
-    isnan(z) && throw(DomainError(x, "NaN result for non-NaN input."))
-    return z
 end
 
 @doc raw"""
@@ -614,14 +568,29 @@ the upper incomplete gamma function ``\Gamma(a,z)``.
 - `Complex`: by `exp(loggamma(z))`.
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
-function gamma(x::Number)
-    z = float(x)
-    if typeof(z) === typeof(x)
-        # There is nothing to fallback to
-        throw(MethodError(gamma, x))
-    end
-    return gamma(z)
+gamma(x::Number) = _gamma(float(x))
+
+function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64})
+    n < 0 && throw(DomainError(n, "`n` must not be negative."))
+    n == 0 && return Inf
+    n <= 2 && return 1.0
+    n > 20 && return _gamma(Float64(n))
+    @inbounds return Float64(Base._fact_table64[n-1])
 end
+
+_gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
+_gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
+_gamma(x::Float16)       = Float16(_gamma(Float32(x)))
+
+function _gamma(x::BigFloat)
+    isnan(x) && return x
+    z = BigFloat()
+    ccall((:mpfr_gamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    isnan(z) && throw(DomainError(x, "NaN result for non-NaN input."))
+    return z
+end
+
+_gamma(z::Complex) = exp(loggamma(z))
 
 """
     logabsgamma(x)
@@ -631,30 +600,29 @@ Compute the logarithm of absolute value of [`gamma`](@ref) for
 
 See also [`loggamma`](@ref).
 """
-function logabsgamma(x::Real)
-    z = float(x)
-    if typeof(z) === typeof(x)
-        # There is nothing to fallback to
-        throw(MethodError(logabsgamma, x))
-    end
-    return logabsgamma(z)
-end
+logabsgamma(x::Real) = _logabsgamma(float(x))
 
-function logabsgamma(x::Float64)
+function _logabsgamma(x::Float64)
     signp = Ref{Int32}()
     y = ccall((:lgamma_r,libopenlibm),  Float64, (Float64, Ptr{Int32}), x, signp)
     return y, Int(signp[])
 end
-function logabsgamma(x::Float32)
+function _logabsgamma(x::Float32)
     signp = Ref{Int32}()
     y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
     return y, Int(signp[])
 end
-function logabsgamma(x::Float16)
-    y, s = logabsgamma(Float32(x))
+function _logabsgamma(x::Float16)
+    y, s = _logabsgamma(Float32(x))
     return Float16(y), s
 end
 
+function _logabsgamma(x::BigFloat)
+    z = BigFloat()
+    lgamma_signp = Ref{Cint}()
+    ccall((:mpfr_lgamma,:libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
+    return z, Int(lgamma_signp[])
+end
 
 """
     logfactorial(x)
@@ -677,31 +645,12 @@ but `loggamma(x)` may differ from `log(gamma(x))` by an integer multiple of ``2\
 
 See also [`logabsgamma`](@ref) for real `x`.
 """
-function loggamma(x::Number)
-    z = float(x)
-    if typeof(z) === typeof(x)
-        # There is nothing to fallback to
-        throw(MethodError(loggamma, x))
-    end
-    return loggamma(z)
-end
+loggamma(x::Number) = _loggamma(float(x))
 
-function loggamma(x::Real)
+function _loggamma(x::Union{Real,BigFloat})
     (y, s) = logabsgamma(x)
     s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
-end
-
-# asymptotic series for log(gamma(z)), valid for sufficiently large real(z) or |imag(z)|
-function loggamma_asymptotic(z::Complex{Float64})
-    zinv = inv(z)
-    t = zinv*zinv
-    # coefficients are bernoulli[2:n+1] .// (2*(1:n).*(2*(1:n) - 1))
-    return (z-0.5)*log(z) - z + 9.1893853320467274178032927e-01 + # <-- log(2pi)/2
-       zinv*@evalpoly(t, 8.3333333333333333333333368e-02,-2.7777777777777777777777776e-03,
-                         7.9365079365079365079365075e-04,-5.9523809523809523809523806e-04,
-                         8.4175084175084175084175104e-04,-1.9175269175269175269175262e-03,
-                         6.4102564102564102564102561e-03,-2.9550653594771241830065352e-02)
 end
 
 # Compute the logΓ(z) function using a combination of the asymptotic series,
@@ -711,7 +660,7 @@ end
 # and similar techniques are used (in a somewhat different way) by the
 # SciPy loggamma function.  The key identities are also described
 # at http://functions.wolfram.com/GammaBetaErf/LogGamma/
-function loggamma(z::Complex{Float64})
+function _loggamma(z::Complex{Float64})
     x, y = reim(z)
     yabs = abs(y)
     if !isfinite(x) || !isfinite(y) # Inf or NaN
@@ -777,21 +726,35 @@ function loggamma(z::Complex{Float64})
     end
     return loggamma_asymptotic(Complex(x,y)) - shift
 end
-loggamma(z::Complex{T}) where {T<:Union{Integer,Rational}} = loggamma(float(z))
-loggamma(z::Complex{T}) where {T<:Union{Float32,Float16}} = Complex{T}(loggamma(Complex{Float64}(z)))
 
-gamma(z::Complex) = exp(loggamma(z))
+# asymptotic series for log(gamma(z)), valid for sufficiently large real(z) or |imag(z)|
+function loggamma_asymptotic(z::Complex{Float64})
+    zinv = inv(z)
+    t = zinv*zinv
+    # coefficients are bernoulli[2:n+1] .// (2*(1:n).*(2*(1:n) - 1))
+    return (z-0.5)*log(z) - z + 9.1893853320467274178032927e-01 + # <-- log(2pi)/2
+       zinv*@evalpoly(t, 8.3333333333333333333333368e-02,-2.7777777777777777777777776e-03,
+                         7.9365079365079365079365075e-04,-5.9523809523809523809523806e-04,
+                         8.4175084175084175084175104e-04,-1.9175269175269175269175262e-03,
+                         6.4102564102564102564102561e-03,-2.9550653594771241830065352e-02)
+end
 
 """
     beta(x, y)
 
 Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)/\\Gamma(x+y)``.
 """
-function beta end
-
 function beta(a::Number, b::Number)
     lab, sign = logabsbeta(a, b)
     return sign*exp(lab)
+end
+
+if Base.MPFR.version() >= v"4.0.0"
+    function beta(y::BigFloat, x::BigFloat)
+        z = BigFloat()
+        ccall((:mpfr_beta, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, y, x, ROUNDING_MODE[])
+        return z
+    end
 end
 
 """
@@ -848,41 +811,6 @@ end
 logabsbeta(a::Real, b::Real) = logabsbeta(promote(a, b)...)
 
 logabsbeta(a::Number, b::Number) = loggamma(a) + loggamma(b) - loggamma(a + b), 1
-
-## from base/mpfr.jl
-
-# log of absolute value of gamma function
-function logabsgamma(x::BigFloat)
-    z = BigFloat()
-    lgamma_signp = Ref{Cint}()
-    ccall((:mpfr_lgamma,:libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
-    return z, Int(lgamma_signp[])
-end
-
-function loggamma(x::BigFloat)
-    (y, s) = logabsgamma(x)
-    s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
-    return y
-end
-if Base.MPFR.version() >= v"4.0.0"
-    function beta(y::BigFloat, x::BigFloat)
-        z = BigFloat()
-        ccall((:mpfr_beta, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, y, x, ROUNDING_MODE[])
-        return z
-    end
-end
-
-## from base/combinatorics.jl'
-
-function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64})
-    n < 0 && throw(DomainError(n, "`n` must not be negative."))
-    n == 0 && return Inf
-    n <= 2 && return 1.0
-    n > 20 && return gamma(Float64(n))
-    @inbounds return Float64(Base._fact_table64[n-1])
-end
-
-## from base/math.jl
 
 ## from base/numbers.jl
 
