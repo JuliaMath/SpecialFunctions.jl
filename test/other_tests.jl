@@ -63,13 +63,13 @@ end
     @test_throws MethodError zeta(big"1.0",2.0)
     @test_throws MethodError zeta(big"1",2.0)
 
-    @test typeof(polygamma(3, 0x2)) == Float64
-    @test typeof(polygamma(big"3", 2f0)) == Float32
-    @test typeof(zeta(1, 2.0)) == Float64
-    @test typeof(zeta(1, 2f0)) == Float64 # BitIntegers result in Float64 returns
-    @test typeof(zeta(2f0, complex(2f0,0f0))) == Complex{Float32}
-    @test typeof(zeta(complex(1,1), 2f0)) == Complex{Float64}
-    @test typeof(zeta(complex(1), 2.0)) == Complex{Float64}
+    @test polygamma(3, 0x2) isa Float64
+    @test polygamma(big"3", 2f0) isa Float32
+    @test zeta(1, 2.0) isa Float64
+    @test zeta(1, 2f0) isa Float32
+    @test zeta(2f0, complex(2f0,0f0)) isa Complex{Float32}
+    @test zeta(complex(1,1), 2f0) isa Complex{Float32}
+    @test zeta(complex(1), 2.0) isa Complex{Float64}
 end
 
 @test sprint(showerror, AmosException(1)) == "AmosException with id 1: input error."
