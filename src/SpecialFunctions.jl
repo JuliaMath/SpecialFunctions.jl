@@ -9,6 +9,7 @@ using IrrationalConstants:
     inv2π,
     invsqrt2,
     invsqrt2π,
+    logtwo,
     logπ,
     log2π
 

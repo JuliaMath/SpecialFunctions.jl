@@ -130,6 +130,11 @@
         @test_throws MethodError gamma(NotAFloat())
         @test_throws MethodError logabsgamma(NotAFloat())
         @test_throws MethodError loggamma(NotAFloat())
+
+        # https://github.com/JuliaMath/SpecialFunctions.jl/issues/339
+        # https://github.com/JuliaMath/SpecialFunctions.jl/issues/233
+        @test_throws MethodError gamma(complex(big(1.0)))
+        @test_throws MethodError loggamma(complex(big(1.0)))
     end
 end
 
