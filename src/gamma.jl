@@ -234,26 +234,22 @@ function _zeta(s::T, z::T) where {T<:ComplexOrReal{Float64}}
     (z == 1 || z == 0) && return zeta(s)
     s == 2 && return trigamma(z)
 
+    # handle NaN cases
+    if isnan(s) || isnan(z)
+        return T <: Real ? NaN : NaN + NaN*im
+    end
+
     x = real(z)
 
-    # annoying s = Inf or NaN cases:
+    # annoying s = Inf case:
     if !isfinite(s)
-        (isnan(s) || isnan(z)) && return (s*z)^2 # type-stable NaN+Nan*im
         if real(s) == Inf
-            z == 1 && return one(T)
             if x > 1 || (x >= 0.5 ? abs(z) > 1 : abs(z - round(x)) > 1)
                 return zero(T) # distance to poles is > 1
             end
-            x > 0 && imag(z) == 0 && imag(s) == 0 && return T(Inf)
+            x > 0 && isreal(z) && isreal(s) && return T(Inf)
         end
         throw(DomainError(s, "`s` must be finite."))  # nothing clever to return
-    end
-    if isnan(x)
-        if imag(z) == 0 && imag(s) == 0
-            return x
-        else
-            return T(Complex(x,x))
-        end
     end
 
     m = s - 1
