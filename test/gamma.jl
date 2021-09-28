@@ -80,6 +80,17 @@
         @test_throws MethodError logfactorial(1.0)
     end
 
+    @testset "BigFloat" begin
+        loggamma_mpfr(x::BigFloat) = invoke(SpecialFunctions._loggamma, Tuple{BigFloat}, x)
+        logabsgamma_mpfr(x::BigFloat) = invoke(SpecialFunctions._logabsgamma, Tuple{BigFloat}, x)
+        @test loggamma(big(3124)) == loggamma_mpfr(big(3124.0))
+        @test loggamma(big(3124)) ≈ loggamma(3124)
+        @test loggamma(big(1e6)) == loggamma_mpfr(big(1e6))
+        @test logabsgamma(big(1e7)) == logabsgamma_mpfr(big(1e7))
+        @test logabsgamma(big(1e8)) == (loggamma(big(1e8)), 1)
+        @test logabsgamma(big(1e8))[1] ≈ logabsgamma(1e8)[1]
+    end
+
     # loggamma & logabsgamma test cases (from Wolfram Alpha)
     @test loggamma(-300im) ≅ -473.17185074259241355733179182866544204963885920016823743 - 1410.3490664555822107569308046418321236643870840962522425im
     @test loggamma(3.099) ≅ loggamma(3.099+0im) ≅ 0.786413746900558058720665860178923603134125854451168869796

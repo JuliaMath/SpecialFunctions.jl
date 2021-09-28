@@ -1,6 +1,6 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using Base.MPFR: ROUNDING_MODE
+using Base.MPFR: MPFRRoundingMode, ROUNDING_MODE
 
 export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
 
@@ -643,10 +643,16 @@ See also [`logabsgamma`](@ref) for real `x`.
 """
 loggamma(x::Number) = _loggamma(float(x))
 
-function _loggamma(x::Union{Real,BigFloat})
+function _loggamma(x::Real)
     (y, s) = logabsgamma(x)
     s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
+end
+
+function _loggamma(x::BigFloat)
+    z = BigFloat()
+    ccall((:mpfr_lngamma, :libmpfr), Cint, (Ref{BigFloat}, Ref{BigFloat}, MPFRRoundingMode), z, x, ROUNDING_MODE[])
+    return z
 end
 
 # Compute the logΓ(z) function using a combination of the asymptotic series,
