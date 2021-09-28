@@ -193,3 +193,66 @@ ChainRulesCore.@scalar_rule(
 ChainRulesCore.@scalar_rule(expinti(x), exp(x) / x)
 ChainRulesCore.@scalar_rule(sinint(x), sinc(invπ * x))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
+
+# non-holomorphic functions
+function ChainRulesCore.frule((_, _, _), ::typeof(besselix), ν::Number, x::Number)
+    Ω = besselix(ν, x)
+    ΔΩ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    return Ω, ΔΩ
+end
+function ChainRulesCore.rrule(::typeof(besselix), ν::Number, x::Number)
+    Ω = besselix(ν, x)
+    project_x = ChainRulesCore.ProjectTo(x)
+    function besselix_pullback(ΔΩ)
+        ν̄ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+        a = (besselix(ν - 1, x) + besselix(ν + 1, x)) / 2
+        b = - sign(real(x)) * Ω
+        x̄ = project_x(conj(a) * ΔΩ + real(conj(b) * ΔΩ))
+        return ChainRulesCore.NoTangent(), ν̄, x̄
+    end
+    return Ω, besselix_pullback
+end
+
+function ChainRulesCore.frule((_, _, _), ::typeof(besseljx), ν::Number, x::Number)
+    Ω = besseljx(ν, x)
+    ΔΩ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    return Ω, ΔΩ
+end
+function ChainRulesCore.rrule(::typeof(besseljx), ν::Number, x::Number)
+    Ω = besseljx(ν, x)
+    project_x = ChainRulesCore.ProjectTo(x)
+    function besseljx_pullback(ΔΩ)
+        ν̄ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+        a = (besseljx(ν - 1, x) - besseljx(ν + 1, x)) / 2
+        x̄ = if x isa Real
+            project_x(conj(a) * ΔΩ)
+        else
+            b = -sign(imag(x)) * Ω
+            project_x(conj(a) * ΔΩ + real(conj(b) * ΔΩ) * im)
+        end
+        return ChainRulesCore.NoTangent(), ν̄, x̄
+    end
+    return Ω, besseljx_pullback
+end
+
+function ChainRulesCore.frule((_, _, _), ::typeof(besselyx), ν::Number, x::Number)
+    Ω = besselyx(ν, x)
+    ΔΩ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    return Ω, ΔΩ
+end
+function ChainRulesCore.rrule(::typeof(besselyx), ν::Number, x::Number)
+    Ω = besselyx(ν, x)
+    project_x = ChainRulesCore.ProjectTo(x)
+    function besselyx_pullback(ΔΩ)
+        ν̄ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+        a = (besselyx(ν - 1, x) - besselyx(ν + 1, x)) / 2
+        x̄ = if x isa Real
+            project_x(conj(a) * ΔΩ)
+        else
+            b = -sign(imag(x)) * Ω
+            project_x(conj(a) * ΔΩ + real(conj(b) * ΔΩ) * im)
+        end
+        return ChainRulesCore.NoTangent(), ν̄, x̄
+    end
+    return Ω, besselyx_pullback
+end
