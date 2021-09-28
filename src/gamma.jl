@@ -650,9 +650,9 @@ function _loggamma(x::Real)
 end
 
 function _loggamma(x::BigFloat)
-    z = BigFloat()
-    ccall((:mpfr_lngamma, :libmpfr), Cint, (Ref{BigFloat}, Ref{BigFloat}, MPFRRoundingMode), z, x, ROUNDING_MODE[])
-    return z
+    y = BigFloat()
+    ccall((:mpfr_lngamma, :libmpfr), Cint, (Ref{BigFloat}, Ref{BigFloat}, MPFRRoundingMode), y, x, ROUNDING_MODE[])
+    return y
 end
 
 # Compute the logΓ(z) function using a combination of the asymptotic series,
