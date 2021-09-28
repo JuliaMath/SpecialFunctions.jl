@@ -268,6 +268,32 @@ end
         @test logbeta(-2.0, 2.1)       == Inf
     end
 
+    @testset "one of arguments is 1" begin
+        x = rand()
+        y = 100 + rand()
+        for (a, b) in (
+            (1.0, 1.0),
+            (3.0, 1.0),
+            (1.0, 4.0),
+            (1.0, x),
+            (x, 1.0),
+            (1.0, y),
+            (y, 1.0),
+            (1.0, -x),
+            (-x, 1.0),
+            (1.0, -y),
+            (-y, 1.0),
+        )
+            z = a == 1 ? b : a
+            @test beta(a, b) == inv(z)
+            @test logabsbeta(a, b) == (-log(abs(z)), z > 0 ? 1 : -1)
+
+            if z > 0
+                @test logbeta(a, b) == -log(z)
+            end
+        end
+    end
+
     @testset "large difference in magnitude" begin
         @test beta(1e4, 1.5)          ≈     8.86193693673874630607029e-7  rtol=1e-14
         @test logabsbeta(1e4, 1.5)[1] ≈ log(8.86193693673874630607029e-7) rtol=1e-14
@@ -280,6 +306,17 @@ end
         @test beta(big(3//2), big(7//2)) ≈ 5 * big(π) / 128
         @test beta(big(1e4), big(3//2)) ≈ 8.86193693673874630607029e-7 rtol=1e-14
         @test beta(big(1e8), big(1//2)) ≈ 0.00017724538531210809 rtol=1e-14
+
+        # check that results match the ones we get with MPFR
+        if Base.MPFR.version() >= v"4.0.0"
+            function beta_mpfr(x::BigFloat, y::BigFloat)
+                return invoke(SpecialFunctions._beta, Tuple{BigFloat,BigFloat}, x, y)
+            end
+            @test beta(big(3), big(5)) == beta_mpfr(big(3.0), big(5.0))
+            @test beta(big(3//2), big(7//2)) == beta_mpfr(big(1.5), big(3.5))
+            @test beta(big(1e4), big(3//2)) == beta_mpfr(big(1e4), big(1.5))
+            @test beta(big(1e8), big(1//2)) == beta_mpfr(big(1e8), big(0.5))
+        end
 
         @test logbeta(big(5), big(4)) ≈ log(beta(big(5), big(4)))
         @test logbeta(big(5.0), big(4)) ≈ log(beta(big(5), big(4)))
