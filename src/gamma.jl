@@ -650,8 +650,10 @@ function _loggamma(x::Real)
 end
 
 function _loggamma(x::BigFloat)
+    isnan(x) && return x
     y = BigFloat()
     ccall((:mpfr_lngamma, :libmpfr), Cint, (Ref{BigFloat}, Ref{BigFloat}, MPFRRoundingMode), y, x, ROUNDING_MODE[])
+    isnan(y) && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
 
