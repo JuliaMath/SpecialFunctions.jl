@@ -80,7 +80,7 @@
         @test_throws MethodError logfactorial(1.0)
     end
 
-        # values taken from Wolfram Alpha
+    # values taken from Wolfram Alpha
     @testset "loggamma & logabsgamma test cases" begin
         @test loggamma(-300im) ≅ -473.17185074259241355733179182866544204963885920016823743 - 1410.3490664555822107569308046418321236643870840962522425im
         @test loggamma(3.099) ≅ loggamma(3.099+0im) ≅ 0.786413746900558058720665860178923603134125854451168869796
