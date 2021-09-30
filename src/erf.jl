@@ -46,6 +46,33 @@ for f in (:erfcx, :erfi, :dawson)
     end
 end
 
+# MPFR has an open TODO item for this function
+# until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
+function _erfcx(x::BigFloat)
+    if x <= (Clong == Int32 ? 0x1p15 : 0x1p30)
+        # any larger gives internal overflow
+        return exp(x^2)*erfc(x)
+    elseif !isfinite(x)
+        return 1/x
+    else
+        # asymptotic series
+        # starts to diverge at iteration i = 2^30 or 2^60
+        # final term will be < Γ(2*i+1)/(2^i * Γ(i+1)) / (2^(i+1))
+        # so good to (lgamma(2*i+1) - lgamma(i+1))/log(2) - 2*i - 1
+        #            ≈ 3.07e10 or 6.75e19 bits
+        # which is larger than the memory of the respective machines
+        ϵ = eps(BigFloat)/4
+        v = 1/(2*x*x)
+        k = 1
+        s = w = -k*v
+        while abs(w) > ϵ
+            k += 2
+            w *= -k*v
+            s += w
+        end
+        return (1+s)/(x*sqrtπ)
+    end
+end
 
 @doc raw"""
     erf(x)
@@ -323,6 +350,25 @@ function _erfinv(x::Float32)
     end
 end
 
+function _erfinv(y::BigFloat)
+    xfloat = erfinv(Float64(y))
+    if isfinite(xfloat)
+        x = BigFloat(xfloat)
+    else
+        # Float64 overflowed, use asymptotic estimate instead
+        # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
+        x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
+        isfinite(x) || return x
+    end
+    sqrtπhalf = sqrtπ * big(0.5)
+    tol = 2eps(abs(x))
+    while true # Newton iterations
+        Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
+        x -= Δx
+        abs(Δx) < tol && break
+    end
+    return x
+end
 
 @doc raw"""
     erfcinv(x)
@@ -424,26 +470,6 @@ function _erfcinv(y::Float32)
     end
 end
 
-function _erfinv(y::BigFloat)
-    xfloat = erfinv(Float64(y))
-    if isfinite(xfloat)
-        x = BigFloat(xfloat)
-    else
-        # Float64 overflowed, use asymptotic estimate instead
-        # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
-        x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
-        isfinite(x) || return x
-    end
-    sqrtπhalf = sqrtπ * big(0.5)
-    tol = 2eps(abs(x))
-    while true # Newton iterations
-        Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
-        x -= Δx
-        abs(Δx) < tol && break
-    end
-    return x
-end
-
 function _erfcinv(y::BigFloat)
     yfloat = Float64(y)
     xfloat = erfcinv(yfloat)
@@ -468,35 +494,6 @@ function _erfcinv(y::BigFloat)
         abs(Δx) < tol && break
     end
     return x
-end
-
-
-# MPFR has an open TODO item for this function
-# until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
-function erfcx(x::BigFloat)
-    if x <= (Clong == Int32 ? 0x1p15 : 0x1p30)
-        # any larger gives internal overflow
-        return exp(x^2)*erfc(x)
-    elseif !isfinite(x)
-        return 1/x
-    else
-        # asymptotic series
-        # starts to diverge at iteration i = 2^30 or 2^60
-        # final term will be < Γ(2*i+1)/(2^i * Γ(i+1)) / (2^(i+1))
-        # so good to (lgamma(2*i+1) - lgamma(i+1))/log(2) - 2*i - 1
-        #            ≈ 3.07e10 or 6.75e19 bits
-        # which is larger than the memory of the respective machines
-        ϵ = eps(BigFloat)/4
-        v = 1/(2*x*x)
-        k = 1
-        s = w = -k*v
-        while abs(w) > ϵ
-            k += 2
-            w *= -k*v
-            s += w
-        end
-        return (1+s)/(x*sqrtπ)
-    end
 end
 
 @doc raw"""
