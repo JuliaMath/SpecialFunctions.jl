@@ -4,42 +4,48 @@ using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
 
 for f in (:erf, :erfc)
+    internalf = Symbol(:_, f)
+    libopenlibmf = QuoteNode(f)
+    libopenlibmf0 = QuoteNode(Symbol(f, :f))
+    openspecfunf = QuoteNode(Symbol(:Faddeeva_, f))
+    mpfrf = QuoteNode(Symbol(:mpfr_, f))
     @eval begin
-        ($f)(x::Float64) = ccall(($(string(f)),libopenlibm), Float64, (Float64,), x)
-        ($f)(x::Float32) = ccall(($(string(f,"f")),libopenlibm), Float32, (Float32,), x)
-        ($f)(x::Real) = ($f)(float(x))
-        ($f)(a::Float16) = Float16($f(Float32(a)))
-        ($f)(a::Complex{Float16}) = Complex{Float16}($f(Complex{Float32}(a)))
-        function ($f)(x::BigFloat)
+        $f(x::Number) = $internalf(float(x))
+
+        $internalf(x::Float64) = ccall(($libopenlibmf, libopenlibm), Float64, (Float64,), x)
+        $internalf(x::Float32) = ccall(($libopenlibmf0, libopenlibm), Float32, (Float32,), x)
+        $internalf(x::Float16) = Float16($internalf(Float32(x)))
+
+        $internalf(z::Complex{Float64}) = Complex{Float64}(ccall(($openspecfunf, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
+        $internalf(z::Complex{Float32}) = Complex{Float32}(ccall(($openspecfunf, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        $internalf(z::Complex{Float16}) = Complex{Float16}($internalf(Complex{Float32}(z)))
+
+        function $internalf(x::BigFloat)
             z = BigFloat()
-            ccall(($(string(:mpfr_,f)), :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+            ccall(($mpfrf, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
             return z
         end
-        ($f)(x::AbstractFloat) = error("not implemented for ", typeof(x))
     end
 end
 
-for f in (:erf, :erfc, :erfcx, :erfi, :Dawson)
-    fname = (f === :Dawson) ? :dawson : f
+for f in (:erfcx, :erfi, :dawson)
+    internalf = Symbol(:_, f)
+    openspecfunfsym = Symbol(:Faddeeva_, f === :dawson ? :Dawson : f)
+    openspecfunfF64 = QuoteNode(Symbol(openspecfunfsym, :_re))
+    openspecfunfCF64 = QuoteNode(openspecfunfsym)
     @eval begin
-        ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
-        ($fname)(z::Complex{Float32}) = Complex{Float32}(ccall(($(string("Faddeeva_",f)),libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        $f(x::Number) = $internalf(float(x))
 
-        ($fname)(z::Complex) = ($fname)(float(z))
-        ($fname)(z::Complex{<:AbstractFloat}) = throw(MethodError($fname,(z,)))
+        $internalf(x::Float64) = ccall(($openspecfunfF64, libopenspecfun), Float64, (Float64,), x)
+        $internalf(x::Float32) = Float32($internalf(Float64(x)))
+        $internalf(x::Float16) = Float16($internalf(Float64(x)))
+
+        $internalf(z::Complex{Float64}) = Complex{Float64}(ccall(($openspecfunfCF64, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
+        $internalf(z::Complex{Float32}) = Complex{Float32}(ccall(($openspecfunfCF64, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        $internalf(z::Complex{Float16}) = Complex{Float16}($internalf(Complex{Float32}(z)))
     end
 end
 
-for f in (:erfcx, :erfi, :Dawson)
-    fname = (f === :Dawson) ? :dawson : f
-    @eval begin
-        ($fname)(x::Float64) = ccall(($(string("Faddeeva_",f,"_re")),libopenspecfun), Float64, (Float64,), x)
-        ($fname)(x::Float32) = Float32(ccall(($(string("Faddeeva_",f,"_re")),libopenspecfun), Float64, (Float64,), Float64(x)))
-
-        ($fname)(x::Real) = ($fname)(float(x))
-        ($fname)(x::AbstractFloat) = throw(MethodError($fname,(x,)))
-    end
-end
 
 @doc raw"""
     erf(x)
@@ -204,7 +210,9 @@ Using the rational approximants tabulated in:
 > <http://www.jstor.org/stable/2005402>
 combined with Newton iterations for `BigFloat`.
 """
-function erfinv(x::Float64)
+erfinv(x::Real) = _erfinv(float(x))
+
+function _erfinv(x::Float64)
     a = abs(x)
     if a >= 1.0
         if x == 1.0
@@ -272,7 +280,7 @@ function erfinv(x::Float64)
     end
 end
 
-function erfinv(x::Float32)
+function _erfinv(x::Float32)
     a = abs(x)
     if a >= 1.0f0
         if x == 1.0f0
@@ -315,7 +323,6 @@ function erfinv(x::Float32)
     end
 end
 
-erfinv(x::Union{Integer,Rational}) = erfinv(float(x))
 
 @doc raw"""
     erfcinv(x)
@@ -341,7 +348,9 @@ Using the rational approximants tabulated in:
 > <http://www.jstor.org/stable/2005402>
 combined with Newton iterations for `BigFloat`.
 """
-function erfcinv(y::Float64)
+erfcinv(x::Real) = _erfcinv(float(x))
+
+function _erfcinv(y::Float64)
     if y > 0.0625
         return erfinv(1.0 - y)
     elseif y <= 0.0
@@ -393,7 +402,7 @@ function erfcinv(y::Float64)
     end
 end
 
-function erfcinv(y::Float32)
+function _erfcinv(y::Float32)
     if y > 0.0625f0
         return erfinv(1.0f0 - y)
     elseif y <= 0.0f0
@@ -415,7 +424,7 @@ function erfcinv(y::Float32)
     end
 end
 
-function erfinv(y::BigFloat)
+function _erfinv(y::BigFloat)
     xfloat = erfinv(Float64(y))
     if isfinite(xfloat)
         x = BigFloat(xfloat)
@@ -435,7 +444,7 @@ function erfinv(y::BigFloat)
     return x
 end
 
-function erfcinv(y::BigFloat)
+function _erfcinv(y::BigFloat)
     yfloat = Float64(y)
     xfloat = erfcinv(yfloat)
     if isfinite(xfloat)
@@ -461,7 +470,6 @@ function erfcinv(y::BigFloat)
     return x
 end
 
-erfcinv(x::Union{Integer,Rational}) = erfcinv(float(x))
 
 # MPFR has an open TODO item for this function
 # until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
@@ -511,7 +519,9 @@ See also: [`erfcx(x)`](@ref erfcx).
 Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
 Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
-function logerfc(x::Union{Float32, Float64, BigFloat})
+logerfc(x::Real) = _logerfc(float(x))
+
+function _logerfc(x::Union{Float32, Float64, BigFloat})
     # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
     if x > 0.0
         return log(erfcx(x)) - x^2
@@ -519,9 +529,6 @@ function logerfc(x::Union{Float32, Float64, BigFloat})
         return log(erfc(x))
     end
 end
-
-logerfc(x::Real) = logerfc(float(x))
-logerfc(x::AbstractFloat) = throw(MethodError(logerfc, x))
 
 @doc raw"""
     logerfcx(x)
@@ -543,7 +550,9 @@ See also: [`erfcx(x)`](@ref erfcx).
 Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
 Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
-function logerfcx(x::Union{Float32, Float64, BigFloat})
+logerfcx(x::Real) = _logerfcx(float(x))
+
+function _logerfcx(x::Union{Float32, Float64, BigFloat})
     # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
     if x < 0.0
         return log(erfc(x)) + x^2
@@ -551,9 +560,6 @@ function logerfcx(x::Union{Float32, Float64, BigFloat})
         return log(erfcx(x))
     end
 end
-
-logerfcx(x::Real) = logerfcx(float(x))
-logerfcx(x::AbstractFloat) = throw(MethodError(logerfcx, x))
 
 @doc raw"""
     logerf(x, y)
