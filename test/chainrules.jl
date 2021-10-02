@@ -53,12 +53,14 @@
             for nu in (-1.5, 2.2, 4.0)
                 test_frule(besseli, nu, x)
                 test_rrule(besseli, nu, x)
-                test_frule(besselix, nu, x)
+                test_frule(besselix, nu, x) # derivative is `NotImplemented`
+                test_frule(besselix, nu ⊢ NoTangent(), x) # derivative is a number
                 test_rrule(besselix, nu, x)
 
                 test_frule(besselj, nu, x)
                 test_rrule(besselj, nu, x)
-                test_frule(besseljx, nu, x)
+                test_frule(besseljx, nu, x) # derivative is `NotImplemented`
+                test_frule(besseljx, nu ⊢ NoTangent(), x) # derivative is a number
                 test_rrule(besseljx, nu, x)
 
                 test_frule(besselk, nu, x)
@@ -68,7 +70,8 @@
 
                 test_frule(bessely, nu, x)
                 test_rrule(bessely, nu, x)
-                test_frule(besselyx, nu, x)
+                test_frule(besselyx, nu, x) # derivative is `NotImplemented`
+                test_frule(besselyx, nu ⊢ NoTangent(), x) # derivative is a number
                 test_rrule(besselyx, nu, x)
 
                 test_frule(hankelh1, nu, x)

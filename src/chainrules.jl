@@ -195,9 +195,24 @@ ChainRulesCore.@scalar_rule(sinint(x), sinc(invπ * x))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
 
 # non-holomorphic functions
-function ChainRulesCore.frule((_, _, _), ::typeof(besselix), ν::Number, x::Number)
+function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselix), ν::Number, x::Number)
+    # primal
     Ω = besselix(ν, x)
-    ΔΩ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+
+    # derivative
+    ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    ∂Ω_∂ν_Δν = ∂Ω_∂ν * Δν
+    ΔΩ = if ∂Ω_∂ν_Δν isa ChainRulesCore.NotImplemented
+        ∂Ω_∂ν_Δν
+    else
+        a = (besselix(ν - 1, x) + besselix(ν + 1, x)) / 2
+        if Δx isa Real
+            muladd(muladd(-sign(real(x)), Ω, a), Δx, ∂Ω_∂ν_Δν)
+        else
+            muladd(a, Δx, muladd(-sign(real(x)) * Ω, real(Δx), ∂Ω_∂ν_Δν))
+        end
+    end
+
     return Ω, ΔΩ
 end
 function ChainRulesCore.rrule(::typeof(besselix), ν::Number, x::Number)
@@ -212,9 +227,24 @@ function ChainRulesCore.rrule(::typeof(besselix), ν::Number, x::Number)
     return Ω, besselix_pullback
 end
 
-function ChainRulesCore.frule((_, _, _), ::typeof(besseljx), ν::Number, x::Number)
+function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besseljx), ν::Number, x::Number)
+    # primal
     Ω = besseljx(ν, x)
-    ΔΩ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+
+    # derivative
+    ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    ∂Ω_∂ν_Δν = ∂Ω_∂ν * Δν
+    ΔΩ = if ∂Ω_∂ν_Δν isa ChainRulesCore.NotImplemented
+        ∂Ω_∂ν_Δν
+    else
+        a = (besseljx(ν - 1, x) - besseljx(ν + 1, x)) / 2
+        if Δx isa Real
+            a * Δx
+        else
+            muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν_Δν))
+        end
+    end
+
     return Ω, ΔΩ
 end
 function ChainRulesCore.rrule(::typeof(besseljx), ν::Number, x::Number)
@@ -233,9 +263,24 @@ function ChainRulesCore.rrule(::typeof(besseljx), ν::Number, x::Number)
     return Ω, besseljx_pullback
 end
 
-function ChainRulesCore.frule((_, _, _), ::typeof(besselyx), ν::Number, x::Number)
+function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselyx), ν::Number, x::Number)
+    # primal
     Ω = besselyx(ν, x)
-    ΔΩ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+
+    # derivative
+    ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    ∂Ω_∂ν_Δν = ∂Ω_∂ν * Δν
+    ΔΩ = if ∂Ω_∂ν_Δν isa ChainRulesCore.NotImplemented
+        ∂Ω_∂ν_Δν
+    else
+        a = (besselyx(ν - 1, x) - besselyx(ν + 1, x)) / 2
+        if Δx isa Real
+            a * Δx
+        else
+            muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν_Δν))
+        end
+    end
+
     return Ω, ΔΩ
 end
 function ChainRulesCore.rrule(::typeof(besselyx), ν::Number, x::Number)
