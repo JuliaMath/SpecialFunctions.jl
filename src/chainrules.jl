@@ -201,16 +201,11 @@ function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselix), ν::Number, x:
 
     # derivative
     ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
-    ∂Ω_∂ν_Δν = ∂Ω_∂ν * Δν
-    ΔΩ = if ∂Ω_∂ν_Δν isa ChainRulesCore.NotImplemented
-        ∂Ω_∂ν_Δν
+    a = (besselix(ν - 1, x) + besselix(ν + 1, x)) / 2
+    ΔΩ = if Δx isa Real
+        muladd(muladd(-sign(real(x)), Ω, a), Δx, ∂Ω_∂ν * Δν)
     else
-        a = (besselix(ν - 1, x) + besselix(ν + 1, x)) / 2
-        if Δx isa Real
-            muladd(muladd(-sign(real(x)), Ω, a), Δx, ∂Ω_∂ν_Δν)
-        else
-            muladd(a, Δx, muladd(-sign(real(x)) * Ω, real(Δx), ∂Ω_∂ν_Δν))
-        end
+        muladd(a, Δx, muladd(-sign(real(x)) * Ω, real(Δx), ∂Ω_∂ν * Δν))
     end
 
     return Ω, ΔΩ
@@ -233,16 +228,11 @@ function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besseljx), ν::Number, x:
 
     # derivative
     ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
-    ∂Ω_∂ν_Δν = ∂Ω_∂ν * Δν
-    ΔΩ = if ∂Ω_∂ν_Δν isa ChainRulesCore.NotImplemented
-        ∂Ω_∂ν_Δν
+    a = (besseljx(ν - 1, x) - besseljx(ν + 1, x)) / 2
+    ΔΩ = if Δx isa Real
+        muladd(a, Δx, ∂Ω_∂ν * Δν)
     else
-        a = (besseljx(ν - 1, x) - besseljx(ν + 1, x)) / 2
-        if Δx isa Real
-            a * Δx
-        else
-            muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν_Δν))
-        end
+        muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν * Δν))
     end
 
     return Ω, ΔΩ
@@ -269,16 +259,11 @@ function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselyx), ν::Number, x:
 
     # derivative
     ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
-    ∂Ω_∂ν_Δν = ∂Ω_∂ν * Δν
-    ΔΩ = if ∂Ω_∂ν_Δν isa ChainRulesCore.NotImplemented
-        ∂Ω_∂ν_Δν
+    a = (besselyx(ν - 1, x) - besselyx(ν + 1, x)) / 2
+    ΔΩ = if Δx isa Real
+        muladd(a, Δx, ∂Ω_∂ν * Δν)
     else
-        a = (besselyx(ν - 1, x) - besselyx(ν + 1, x)) / 2
-        if Δx isa Real
-            a * Δx
-        else
-            muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν_Δν))
-        end
+        muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν * Δν))
     end
 
     return Ω, ΔΩ
