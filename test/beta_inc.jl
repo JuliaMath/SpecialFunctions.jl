@@ -211,12 +211,12 @@
     @test beta_inc(1e-20, 0.000001, 0.2)[2] ≈ 1.0000013862929421e-14
 
     # test promotions and return types
-    for T in (Float64, Float32)
-        a, b = randexp(T, 2)
+    for T in (Float16, Float32, Float64)
         x = rand(T)
-        @test beta_inc(a, b, x) isa Tuple{T,T}
-        @test beta_inc(a, b, x, 1 - x) isa Tuple{T,T}
-        @test beta_inc(a, b, x) == beta_inc(a, b, x, 1 - x)
+        for a in (1, randexp(T)), b in (1, randexp(T))
+            @test beta_inc(a, b, x) isa Tuple{T,T}
+            @test beta_inc(a, b, x, 1 - x) === beta_inc(a, b, x)
+        end
     end
     a = randexp()
     b = randexp(Float32)
@@ -279,4 +279,12 @@ end
     @test f(1.30625000, 11.75620000, 0.21053116418502513) ≈ 0.033557
     @test f(1.30625000, 11.75620000, 0.18241165418408148) ≈ 0.029522
     @test f(1000.0, 2.0, 9.0797754e-317) ≈ 0.48 # This one is a bit slow (but also hard)
+
+    for T in (Float16, Float32, Float64)
+        p = rand(T)
+        for a in (1, randexp(T)), b in (1, randexp(T))
+            @test beta_inc_inv(a, b, p) isa Tuple{T,T}
+            @test beta_inc_inv(a, b, p, 1 - p) === beta_inc_inv(a, b, p)
+        end
+    end
 end
