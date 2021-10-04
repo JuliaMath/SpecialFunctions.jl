@@ -205,7 +205,7 @@ function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselix), ν::Number, x:
     ΔΩ = if Δx isa Real
         muladd(muladd(-sign(real(x)), Ω, a), Δx, ∂Ω_∂ν * Δν)
     else
-        muladd(a, Δx, muladd(-sign(real(x)) * Ω, real(Δx), ∂Ω_∂ν * Δν))
+        muladd(a, Δx, muladd(-sign(real(x)) * real(Δx), Ω, ∂Ω_∂ν * Δν))
     end
 
     return Ω, ΔΩ
@@ -232,7 +232,7 @@ function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besseljx), ν::Number, x:
     ΔΩ = if Δx isa Real
         muladd(a, Δx, ∂Ω_∂ν * Δν)
     else
-        muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν * Δν))
+        muladd(a, Δx, muladd(-sign(imag(x)) * imag(Δx), Ω, ∂Ω_∂ν * Δν))
     end
 
     return Ω, ΔΩ
@@ -263,7 +263,7 @@ function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselyx), ν::Number, x:
     ΔΩ = if Δx isa Real
         muladd(a, Δx, ∂Ω_∂ν * Δν)
     else
-        muladd(a, Δx, muladd(-sign(imag(x)) * Ω, imag(Δx), ∂Ω_∂ν * Δν))
+        muladd(a, Δx, muladd(-sign(imag(x)) * imag(Δx), Ω, ∂Ω_∂ν * Δν))
     end
 
     return Ω, ΔΩ
