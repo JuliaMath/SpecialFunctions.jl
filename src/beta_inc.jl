@@ -712,9 +712,10 @@ end
 #Wikipedia : https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function
 
 """
-    beta_inc(a, b, x[, y])
+    beta_inc(a, b, x, y=1-x)
 
-Returns a tuple ``(I_{x}(a,b),1.0-I_{x}(a,b))`` where the Regularized Incomplete Beta Function is given by:
+Return a tuple ``(I_{x}(a,b), 1-I_{x}(a,b))`` where ``I_{x}(a,b)`` is the regularized
+incomplete beta function given by
 ```math
 I_{x}(a,b) = \\frac{1}{B(a,b)} \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
 ```
@@ -722,9 +723,13 @@ where ``B(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)``.
 
 External links: [DLMF](https://dlmf.nist.gov/8.17.1), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
-See also: [`beta_inc_inv(a, b, p, q)`](@ref SpecialFunctions.beta_inc_inv)
+See also: [`beta_inc_inv`](@ref)
 """
-function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
+function beta_inc(a::Real, b::Real, x::Real, y::Real=1-x)
+    return _beta_inc(map(float, promote(a, b, x, y))...)
+end
+
+function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     p = 0.0
     q = 0.0
    # lambda = a - (a+b)*x
@@ -878,69 +883,63 @@ function beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     return ind ? (q, p) : (p, q)
 end
 
-beta_inc(a::Real, b::Real, x::Real) = beta_inc(a, b, x, 1 - x)
-function beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
-    T.(beta_inc(Float64(a), Float64(b), Float64(x), Float64(y)))
+function _beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
+    p, q = _beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))
+    T(p), T(q)
 end
-beta_inc(a::Real, b::Real, x::Real, y::Real) = beta_inc(promote(float(a), float(b), float(x), float(y))...)
-beta_inc(a::T, b::T, x::T, y::T) where {T<:AbstractFloat} = throw(MethodError(beta_inc,(a, b, x, y,"")))
+
 
 #GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms AS 63: The Incomplete Beta Integral and AS 64: Inverse of the Incomplete Beta Integeral,
 #Applied Statistics,
 #Volume 26, Number 1, 1977, pages 111-114.
 
 """
-    beta_inc_inv(a, b, p, q, lb=logbeta(a,b)[1])
+    beta_inc_inv(a, b, p, q=1-p)
 
-Computes inverse of incomplete beta function. Given `a`,`b` and ``I_{x}(a,b) = p`` find `x` and return tuple `(x,y)`.
+Return a tuple `(x, 1-x)` where `x` satisfies ``I_{x}(a, b) = p``, i.e., `x` is the inverse
+of the regularized incomplete beta function ``I_{x}(a, b)``.
 
-See also: [`beta_inc(a,b,x)`](@ref SpecialFunctions.beta_inc)
+See also: [`beta_inc`](@ref)
 """
-function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbeta(a,b)[1])
-    fpu = 1e-30
-    x = p
-    if p == 0.0
-        return (0.0, 1.0)
-    elseif p == 1.0
-        return (1.0, 0.0)
+function beta_inc_inv(a::Real, b::Real, p::Real, q::Real=1-p)
+    return _beta_inc_inv(map(float, promote(a, b, p, q))...)
+end
+
+function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64)
+    #change tail if necessary
+    if p > 0.5
+        y, x = _beta_inc_inv(b, a, q, p)
+        return x, y
     end
 
-    #change tail if necessary
-
-    if p > 0.5
-        pp = q
-        aa = b
-        bb = a
-        indx = true
-    else
-        pp = p
-        aa = a
-        bb = b
-        indx = false
+    if p == 0.0
+        return (0.0, 1.0)
     end
 
     #Initial approx
-
-    r = sqrt(-2*log(pp))
-    pp_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
+    x = p
+    r = sqrt(-2*log(p))
+    p_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
+    fpu = 1e-30
+    lb = logbeta(a, b)
 
     if a > 1.0 && b > 1.0
-        r = (pp_approx^2 - 3.0)/6.0
-        s = 1.0/(2*aa - 1.0)
-        t = 1.0/(2*bb - 1.0)
+        r = (p_approx^2 - 3.0)/6.0
+        s = 1.0/(2*a - 1.0)
+        t = 1.0/(2*b - 1.0)
         h = 2.0/(s + t)
-        w = pp_approx*sqrt(h + r)/h - (t - s)*(r + 5.0/6.0 - 2.0/(3.0*h))
-        x = aa/(aa + bb*exp(w + w))
+        w = p_approx*sqrt(h + r)/h - (t - s)*(r + 5.0/6.0 - 2.0/(3.0*h))
+        x = a/(a + b*exp(w + w))
     else
-        r = 2.0*bb
-        t = 1.0/(9.0*bb)
-        t = r*(1.0 - t + pp_approx*sqrt(t))^3
+        r = 2.0*b
+        t = 1.0/(9.0*b)
+        t = r*(1.0 - t + p_approx*sqrt(t))^3
         if t <= 0.0
-            x = -expm1((log((1.0 - pp)*bb) + lb)/bb)
+            x = -expm1((log((1.0 - p)*b) + lb)/b)
         else
-            t = (4.0*aa + r - 2.0)/t
+            t = (4.0*a + r - 2.0)/t
             if t <= 1.0
-                x = exp((log(pp*aa) + lb)/aa)
+                x = exp((log(p*a) + lb)/a)
             else
                 x = 1.0 - 2.0/(t + 1.0)
             end
@@ -949,9 +948,9 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
 
     #solve x using modified newton-raphson iteration
 
-    r = 1.0 - aa
-    t = 1.0 - bb
-    pp_approx_prev = 0.0
+    r = 1.0 - a
+    t = 1.0 - b
+    p_approx_prev = 0.0
     sq = 1.0
     prev = 1.0
 
@@ -962,23 +961,23 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
         x = .9999
     end
 
-    iex = max(-5.0/aa^2 - 1.0/pp^0.2 - 13.0, -30.0)
+    iex = max(-5.0/a^2 - 1.0/p^0.2 - 13.0, -30.0)
     acu = 10.0^iex
 
     #iterate
     while true
-        pp_approx = beta_inc(aa, bb, x)[1]
+        p_approx = beta_inc(a, b, x)[1]
         xin = x
-        pp_approx = (pp_approx - pp)*min(floatmax(), exp(lb + r*log(xin) + t*log1p(-xin)))
+        p_approx = (p_approx - p)*min(floatmax(), exp(lb + r*log(xin) + t*log1p(-xin)))
 
-        if pp_approx * pp_approx_prev <= 0.0
+        if p_approx * p_approx_prev <= 0.0
             prev = max(sq, fpu)
         end
         g = 1.0
 
-        tx = x - g*pp_approx
+        tx = x - g*p_approx
         while true
-            adj = g*pp_approx
+            adj = g*p_approx
             sq = adj^2
             tx = x - adj
             if (prev > sq && tx >= 0.0 && tx <= 1.0)
@@ -989,18 +988,22 @@ function beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64; lb = logbe
 
         #check if current estimate is acceptable
 
-        if prev <= acu || pp_approx^2 <= acu
+        if prev <= acu || p_approx^2 <= acu
             x = tx
-            return indx ? (1.0 - x, x) : (x, 1.0 - x)
+            return (x, 1.0 - x)
         end
 
         if tx == x
-            return indx ? (1.0 - x, x) : (x, 1.0 - x)
+            return (x, 1.0 - x)
         end
 
         x = tx
-        pp_approx_prev = pp_approx
+        p_approx_prev = p_approx
     end
 end
 
-beta_inc_inv(a::Float64, b::Float64, p::Float64) = beta_inc_inv(a, b, p, 1.0-p)
+function _beta_inc_inv(a::T, b::T, p::T, q::T) where {T<:Union{Float16, Float32}}
+    x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p), Float64(q))
+    T(x), T(y)
+end
+
