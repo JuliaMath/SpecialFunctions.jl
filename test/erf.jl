@@ -8,7 +8,7 @@
         @test erfc(Float32(1))  ≈ 0.15729920705028513066 rtol=2*eps(Float32)
         @test erfc(Float64(1))  ≈ 0.15729920705028513066 rtol=2*eps(Float64)
 
-        @test_throws MethodError erfcx(Float16(1))
+        @test erfcx(Float16(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float16)
         @test erfcx(Float32(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float32)
         @test erfcx(Float64(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float64)
 
@@ -38,7 +38,7 @@
         @test logerfcx(Float32(1000)) ≈ -7.48012072190621214066734919080 rtol=2eps(Float32)
         @test logerfcx(Float64(1000)) ≈ -7.48012072190621214066734919080 rtol=2eps(Float64)
 
-        @test_throws MethodError erfi(Float16(1))
+        @test erfi(Float16(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float16)
         @test erfi(Float32(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float32)
         @test erfi(Float64(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float64)
 
@@ -52,7 +52,7 @@
         @test erfcinv(Float32(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float32)
         @test erfcinv(Float64(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float64)
 
-        @test_throws MethodError dawson(Float16(1))
+        @test dawson(Float16(1)) ≈ 0.53807950691276841914 rtol=2*eps(Float16)
         @test dawson(Float32(1)) ≈ 0.53807950691276841914 rtol=2*eps(Float32)
         @test dawson(Float64(1)) ≈ 0.53807950691276841914 rtol=2*eps(Float64)
     end
@@ -66,11 +66,11 @@
         @test erfc(ComplexF32(1+2im)) ≈ 1.5366435657785650340+5.0491437034470346695im
         @test erfc(ComplexF64(1+2im)) ≈ 1.5366435657785650340+5.0491437034470346695im
 
-        @test_throws MethodError erfcx(ComplexF16(1))
+        @test erfcx(ComplexF16(1+2im)) ≈ 0.14023958136627794370-0.22221344017989910261im
         @test erfcx(ComplexF32(1+2im)) ≈ 0.14023958136627794370-0.22221344017989910261im
         @test erfcx(ComplexF64(1+2im)) ≈ 0.14023958136627794370-0.22221344017989910261im
 
-        @test_throws MethodError erfi(ComplexF16(1))
+        @test erfi(ComplexF16(1+2im)) ≈ -0.011259006028815025076+1.0036063427256517509im
         @test erfi(ComplexF32(1+2im)) ≈ -0.011259006028815025076+1.0036063427256517509im
         @test erfi(ComplexF64(1+2im)) ≈ -0.011259006028815025076+1.0036063427256517509im
 
@@ -78,7 +78,7 @@
 
         @test_throws MethodError erfcinv(Complex(1))
 
-        @test_throws MethodError dawson(ComplexF16(1))
+        @test dawson(ComplexF16(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
         @test dawson(ComplexF32(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
         @test dawson(ComplexF64(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
     end
@@ -114,6 +114,18 @@
             @test_throws DomainError erfinv(x)
             @test_throws DomainError erfcinv(1-x)
         end
+    end
+
+    @testset "Other float types" begin
+        struct NotAFloat <: AbstractFloat end
+
+        @test_throws MethodError erf(NotAFloat())
+        @test_throws MethodError erfc(NotAFloat())
+        @test_throws MethodError erfcx(NotAFloat())
+        @test_throws MethodError erfi(NotAFloat())
+        @test_throws MethodError erfinv(NotAFloat())
+        @test_throws MethodError erfcinv(NotAFloat())
+        @test_throws MethodError dawson(NotAFloat())
     end
 
     @testset "inverse" begin
