@@ -750,8 +750,9 @@ Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)
 """
 beta(a::Number, b::Number) = _beta(map(float, promote(a, b))...)
 
-# here `T` is a floating point type but we don't want to restrict the implementation
-# to `AbstractFloat` or `Float64`
+# here `T` is a floating point type (e.g., `Float64` or `ComplexF64`) since
+# it is called by `beta` above with arguments converted with `float`
+# we don't want to restrict the implementation to `AbstractFloat` or `Float64` though
 function _beta(a::T, b::T) where {T<:Number}
     # two special cases
     a == 1 && return inv(b)
