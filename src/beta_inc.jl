@@ -725,11 +725,14 @@ External links: [DLMF](https://dlmf.nist.gov/8.17.1), [Wikipedia](https://en.wik
 
 See also: [`beta_inc_inv`](@ref)
 """
-function beta_inc(a::Real, b::Real, x::Real, y::Real=1-x)
+function beta_inc(a::Real, b::Real, x::Real)
+    return _beta_inc(map(float, promote(a, b, x))...)
+end
+function beta_inc(a::Real, b::Real, x::Real, y::Real)
     return _beta_inc(map(float, promote(a, b, x, y))...)
 end
 
-function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
+function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64=1-x)
     p = 0.0
     q = 0.0
    # lambda = a - (a+b)*x
@@ -883,6 +886,10 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     return ind ? (q, p) : (p, q)
 end
 
+function _beta_inc(a::T, b::T, x::T) where {T<:Union{Float16, Float32}}
+    p, q = _beta_inc(Float64(a), Float64(b), Float64(x))
+    T(p), T(q)
+end
 function _beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
     p, q = _beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))
     T(p), T(q)
@@ -901,11 +908,14 @@ of the regularized incomplete beta function ``I_{x}(a, b)``.
 
 See also: [`beta_inc`](@ref)
 """
-function beta_inc_inv(a::Real, b::Real, p::Real, q::Real=1-p)
+function beta_inc_inv(a::Real, b::Real, p::Real)
+    return _beta_inc_inv(map(float, promote(a, b, p))...)
+end
+function beta_inc_inv(a::Real, b::Real, p::Real, q::Real)
     return _beta_inc_inv(map(float, promote(a, b, p, q))...)
 end
 
-function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64)
+function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     #change tail if necessary
     if p > 0.5
         y, x = _beta_inc_inv(b, a, q, p)
@@ -1002,6 +1012,10 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64)
     end
 end
 
+function _beta_inc_inv(a::T, b::T, p::T) where {T<:Union{Float16, Float32}}
+    x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p))
+    T(x), T(y)
+end
 function _beta_inc_inv(a::T, b::T, p::T, q::T) where {T<:Union{Float16, Float32}}
     x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p), Float64(q))
     T(x), T(y)

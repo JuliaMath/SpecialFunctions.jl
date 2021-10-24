@@ -212,10 +212,11 @@
 
     # test promotions and return types
     for T in (Float16, Float32, Float64)
-        x = rand(T)
-        for a in (1, randexp(T)), b in (1, randexp(T))
-            @test beta_inc(a, b, x) isa Tuple{T,T}
-            @test beta_inc(a, b, x, 1 - x) === beta_inc(a, b, x)
+        for x in (T(0.1), rand(T))
+            for a in (1, randexp(T)), b in (1, randexp(T))
+                @test beta_inc(a, b, x) isa Tuple{T,T}
+                @test T.(beta_inc(a, b, x, 1 - Float64(x))) === beta_inc(a, b, x)
+            end
         end
     end
     a = randexp()
