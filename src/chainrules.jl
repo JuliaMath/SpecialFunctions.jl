@@ -216,7 +216,7 @@ function ChainRulesCore.rrule(::typeof(besselix), ν::Number, x::Number)
     function besselix_pullback(ΔΩ)
         ν̄ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
         a = (besselix(ν - 1, x) + besselix(ν + 1, x)) / 2
-        x̄ = project_x(muladd(conj(a), ΔΩ, - sign(real(x)) * real(conj(Ω) * ΔΩ)))
+        x̄ = project_x(muladd(conj(a), ΔΩ, - sign(real(x)) * RealDot.realdot(Ω, ΔΩ)))
         return ChainRulesCore.NoTangent(), ν̄, x̄
     end
     return Ω, besselix_pullback
@@ -246,7 +246,7 @@ function ChainRulesCore.rrule(::typeof(besseljx), ν::Number, x::Number)
         x̄ = if x isa Real
             project_x(a * ΔΩ)
         else
-            project_x(muladd(conj(a), ΔΩ, - sign(imag(x)) * real(conj(Ω) * ΔΩ) * im))
+            project_x(muladd(conj(a), ΔΩ, - sign(imag(x)) * RealDot.realdot(Ω, ΔΩ) * im))
         end
         return ChainRulesCore.NoTangent(), ν̄, x̄
     end
@@ -277,7 +277,7 @@ function ChainRulesCore.rrule(::typeof(besselyx), ν::Number, x::Number)
         x̄ = if x isa Real
             project_x(a * ΔΩ)
         else
-            project_x(muladd(conj(a), ΔΩ, - sign(imag(x)) * real(conj(Ω) * ΔΩ) * im))
+            project_x(muladd(conj(a), ΔΩ, - sign(imag(x)) * RealDot.realdot(Ω, ΔΩ) * im))
         end
         return ChainRulesCore.NoTangent(), ν̄, x̄
     end
