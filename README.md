@@ -5,7 +5,6 @@ eta, zeta, digamma, inverse digamma, trigamma, and polygamma functions.
 Most of these functions were formerly part of Base in early versions of Julia.
 
 CI (Linux, macOS, FreeBSD, Windows):
-[![Travis](https://travis-ci.org/JuliaMath/SpecialFunctions.jl.svg?branch=master)](https://travis-ci.org/JuliaMath/SpecialFunctions.jl)
 [![CI](https://github.com/JuliaMath/SpecialFunctions.jl/workflows/CI/badge.svg)](https://github.com/JuliaMath/SpecialFunctions.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/JuliaMath/SpecialFunctions.jl/branch/master/graph/badge.svg?token=qIKzX2I5ZK)](https://codecov.io/gh/JuliaMath/SpecialFunctions.jl)
 
