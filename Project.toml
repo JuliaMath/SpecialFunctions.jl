@@ -1,6 +1,6 @@
 name = "SpecialFunctions"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "1.8.0"
+version = "1.9.0"
 
 [deps]
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
@@ -8,6 +8,7 @@ IrrationalConstants = "92d709cd-6900-40b7-9082-c6be49f344b6"
 LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
 OpenLibm_jll = "05823500-19ac-5b8b-9628-191a04bc5112"
 OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
+RealDot = "c1ae055f-0cd5-4b69-90a6-9a35b1a98df9"
 
 [compat]
 ChainRulesCore = "0.9.44, 0.10, 1"
@@ -16,6 +17,7 @@ IrrationalConstants = "0.1"
 LogExpFunctions = "0.3"
 OpenLibm_jll = "0.7, 0.8"
 OpenSpecFun_jll = "0.5"
+RealDot = "0.1"
 julia = "1.3"
 
 [extras]

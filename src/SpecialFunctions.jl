@@ -15,6 +15,7 @@ using IrrationalConstants:
 
 import ChainRulesCore
 import LogExpFunctions
+import RealDot
 
 using OpenLibm_jll
 using OpenSpecFun_jll
