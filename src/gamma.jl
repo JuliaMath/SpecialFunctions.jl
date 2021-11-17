@@ -818,13 +818,6 @@ logabsbeta(a::Number, b::Number) = loggamma(a) + loggamma(b) - loggamma(a + b), 
 
 ## from base/numbers.jl
 
-# this trickery is needed while the deprecated method in Base exists
-@static if !hasmethod(Base.factorial, Tuple{Number})
-    import Base: factorial
-end
-factorial(x) = Base.factorial(x) # to make SpecialFunctions.factorial work unconditionally
-factorial(x::Number) = gamma(x + 1) # fallback for x not Integer
-
 """
     logabsbinomial(n, k)
 
