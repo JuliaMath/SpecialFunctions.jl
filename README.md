@@ -14,3 +14,22 @@ Documentation:
 
 Test status (most recent release):
 [![PkgEval](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/S/SpecialFunctions.svg)](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/report.html)
+
+## Upgrading from SpecialFunctions 1
+
+SpecialFunctions 2 has only a [single breaking change](https://github.com/JuliaMath/SpecialFunctions.jl/pull/297):
+The removal of the type piracy `Base.factorial(x::Number) = gamma(x + 1)`.
+For most users this change will not break anything but for users of `factorial` it might.
+If you want to upgrade from SpecialFunctions 1 to SpecialFunctions 2 we recommend:
+
+- If your code does not use `factorial` then update the compat entry for SpecialFunctions to e.g. `"1.8.1, 2"`.
+- If your code does use `factorial` then check for all occurrences of `factorial`:
+
+  - If `factorial` is called on an `Integer`, keep `factorial`,
+  - Otherwise replace `factorial(x)` with a call to `gamma(x + 1)`.
+
+  Afterwards update the compat entry for SpecialFunctions and check that your package works with SpecialFunctions 2.
+
+**Be warned**:
+As the previous overload of `factorial` was type piratical ([added 4 years ago when code was moved out of Base](https://github.com/fredrikekre/SpecialFunctions.jl/blame/148574086f3da1d9f7e05d4eb538f91a73775d96/src/gamma.jl#L757-L758)), it is possible that you used it without a direct dependency on SpecialFunctions as long as SpecialFunctions was loaded.
+As such random things might break because of its removal.
