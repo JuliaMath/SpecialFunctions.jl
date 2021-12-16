@@ -194,6 +194,10 @@ ChainRulesCore.@scalar_rule(expinti(x), exp(x) / x)
 ChainRulesCore.@scalar_rule(sinint(x), sinc(invπ * x))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
 
+# elliptic integrals
+ChainRulesCore.@scalar_rule(ellipk(m), (ellipe(m) / (1 - m) - Ω) / (2 * m))
+ChainRulesCore.@scalar_rule(ellipe(m), (Ω - ellipk(m)) / (2 * m))
+
 # non-holomorphic functions
 function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselix), ν::Number, x::Number)
     # primal

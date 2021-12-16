@@ -37,6 +37,12 @@
                     test_scalar(airyaiprimex, x)
                 end
             end
+
+            # finite differencing fails for x = 0
+            if x isa Real && x < 1 && !iszero(x)
+                test_scalar(ellipk, x)
+                test_scalar(ellipe, x)
+            end
         end
     end
 
