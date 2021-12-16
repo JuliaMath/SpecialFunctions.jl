@@ -38,8 +38,7 @@
                 end
             end
 
-            # finite differencing fails for x = 0
-            if x isa Real && x < 1 && !iszero(x)
+            if x isa Real && x < 1
                 test_scalar(ellipk, x)
                 test_scalar(ellipe, x)
             end
