@@ -30,6 +30,5 @@ If you want to upgrade from SpecialFunctions 1 to SpecialFunctions 2 we recommen
 
   Afterwards update the compat entry for SpecialFunctions and check that your package works with SpecialFunctions 2.
 
-**Be warned**:
 As the previous overload of `factorial` was type piratical ([added 4 years ago when code was moved out of Base](https://github.com/fredrikekre/SpecialFunctions.jl/blame/148574086f3da1d9f7e05d4eb538f91a73775d96/src/gamma.jl#L757-L758)), it is possible that you used it without a direct dependency on SpecialFunctions as long as SpecialFunctions was loaded.
-As such random things might break because of its removal.
+The package ecosystem was analyzed and this only impacted a couple of packages. However, it is possible that private packages that depend on this may need updating, or stay with the older release of SpecialFunctions.jl.
