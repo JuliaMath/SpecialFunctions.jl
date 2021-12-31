@@ -25,8 +25,8 @@
 
 ## convert irrationals to float
 
-@test isapprox(@inferred(lambertw(pi)), 1.0736581947961492)
-@test isapprox(@inferred(lambertw(pi, 0)), 1.0736581947961492)
+@test @inferred(lambertw(pi)) ≈ 1.0736581947961492
+@test @inferred(lambertw(pi, 0)) ≈ 1.0736581947961492
 
 ### infinite args or return values
 
@@ -53,41 +53,36 @@
 for (z, k, res) in [(0, 0 , 0), (complex(0, 0), 0 , 0),
                     (complex(0.0, 0), 0 , 0), (complex(1.0, 0), 0, 0.567143290409783873)]
     if Int != Int32
-        @test isapprox(lambertw(z, k), res)
-        @test isapprox(lambertw(z), res)
+        @test lambertw(z, k) ≈ res
+        @test lambertw(z) ≈ res
     else
-        @test isapprox(lambertw(z, k), res; rtol = 1e-14)
-        @test isapprox(lambertw(z), res; rtol = 1e-14)
+        @test lambertw(z, k) ≈ res rtol=1e-14
+        @test lambertw(z) ≈ res rtol=1e-14
     end
 end
 
-for (z, k) in ((complex(1, 1), 2), (complex(1, 1), 0), (complex(.6, .6), 0),
-              (complex(.6, -.6), 0))
-    let w
-        @test (w = lambertw(z, k) ; true)
-        @test abs(w*exp(w) - z) < 1e-15
-    end
+@testset "complex z=$z, k=$k" for (z, k) in
+            ((complex(1, 1), 2), (complex(1, 1), 0), (complex(.6, .6), 0),
+             (complex(.6, -.6), 0))
+    w = lambertw(z, k)
+    @test w*exp(w) ≈ z atol=1e-15
 end
 
-@test abs(lambertw(complex(-3.0, -4.0), 0) - Complex(1.075073066569255, -1.3251023817343588)) < 1e-14
-@test abs(lambertw(complex(-3.0, -4.0), 1) - Complex(0.5887666813694675, 2.7118802109452247)) < 1e-14
-@test (lambertw(complex(.3, .3), 0); true)
+@test lambertw(complex(-3.0, -4.0), 0) ≈ Complex(1.075073066569255, -1.3251023817343588) atol=1e-14
+@test lambertw(complex(-3.0, -4.0), 1) ≈ Complex(0.5887666813694675, 2.7118802109452247) atol=1e-14
+@test lambertw(complex(.3, .3)) ≈ Complex(0.26763519642648767, 0.1837481231767825)
 
 # bug fix
 # The routine will start at -1/e + eps * im, rather than -1/e + 0im,
 # otherwise root finding will fail
-if Int != Int32
-    @test abs(lambertw(-inv(MathConstants.e) + 0im, -1)) == 1
-else
-    @test abs(lambertw(-inv(MathConstants.e) + 0im, -1) + 1) < 1e-7
-end
+@test lambertw(-inv(MathConstants.e) + 0im, -1) ≈ -1 atol=1e-7
+
 # lambertw for BigFloat is more precise than Float64. Note
 # that 70 digits in test is about 35 digits in W
-let W
-    for z in [BigFloat(1), BigFloat(2), complex(BigFloat(1), BigFloat(1))]
-        @test (W = lambertw(z); true)
-        @test abs(z - W * exp(W)) < BigFloat(1)^(-70)
-    end
+@testset "lambertw() for BigFloat z=$z" for z in
+            [BigFloat(1), BigFloat(2), complex(BigFloat(1), BigFloat(1))]
+    W = lambertw(z)
+    @test z ≈ W*exp(W) atol=BigFloat(10)^(-70)
 end
 
 ###  ω constant
@@ -117,36 +112,24 @@ end
 
 if Int != Int32
 
-# Test double-precision expansion near branch point using BigFloats
-let sp = precision(BigFloat), z = BigFloat(1)/10^12, wo, xdiff
-    setprecision(2048)
-    for i in 1:300
-        innerarg = z - inv(big(MathConstants.e))
+@testset "double-precision expansion near branch point using BigFloats" begin
+    setprecision(2048) do
+        z = BigFloat(10)^(-12)
+        for _ in 1:300
+            innerarg = z - inv(big(MathConstants.e))
 
-        # branch k = 0
-        @test (wo = lambertwbp(Float64(z)); xdiff = abs(-1 + wo - lambertw(innerarg)); true)
-        if xdiff > 5e-16
-            println(Float64(z), " ", Float64(xdiff))
+            @test lambertwbp(Float64(z)) ≈ 1 + lambertw(innerarg) atol=5e-16
+            @test lambertwbp(Float64(z), -1) ≈ 1 + lambertw(innerarg, -1) atol=5e-16
+            z *= 1.1
+            if z > 0.23 break end
+
         end
-        @test xdiff < 5e-16
-
-        #  branch k = -1
-        @test (wo = lambertwbp(Float64(z), -1); xdiff = abs(-1 + wo - lambertw(innerarg, -1)); true)
-        if xdiff > 5e-16
-            println(Float64(z), " ", Float64(xdiff))
-        end
-        @test xdiff < 5e-16
-        z  *= 1.1
-        if z > 0.23 break end
-
     end
-    setprecision(sp)
 end
 
 # test the expansion about branch point for k=-1,
 # by comparing to exact BigFloat calculation.
-@test @inferred(lambertwbp(1e-20, -1)) - 1 - lambertw(-inv(big(MathConstants.e)) + BigFloat(10)^BigFloat(-20), -1) < 1e-16
-
-@test abs(@inferred(lambertwbp(Complex(.01, .01), -1)) - Complex(-0.2755038208041206, -0.1277888928494641)) < 1e-14
+@test @inferred(lambertwbp(1e-20, -1)) ≈ 1 + lambertw(-inv(big(MathConstants.e)) + BigFloat(10)^(-20), -1) atol=1e-16
+@test @inferred(lambertwbp(Complex(.01, .01), -1)) ≈ Complex(-0.2755038208041206, -0.1277888928494641) atol=1e-14
 
 end  # if Int != Int32
