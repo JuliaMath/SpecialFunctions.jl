@@ -1,4 +1,5 @@
 ### domain errors
+using IrrationalConstants
 
 @test_throws DomainError lambertw(-2.0, 0)
 @test_throws DomainError lambertw(-2.0, -1)
@@ -21,8 +22,8 @@
 @test @inferred(lambertw(MathConstants.e, 0)) == 1
 
 ## value at branch point where real branches meet
-@test lambertw(-inv(MathConstants.e), 0) == lambertw(-inv(MathConstants.e), -1) == -1
-@test typeof(lambertw(-inv(MathConstants.e), 0)) == typeof(lambertw(-inv(MathConstants.e), -1)) <: AbstractFloat
+@test lambertw(-inve, 0) == lambertw(-inve, -1) == -1
+@test typeof(lambertw(-inve, 0)) == typeof(lambertw(-inve, -1)) <: AbstractFloat
 
 ## convert irrationals to float
 
@@ -76,7 +77,7 @@ end
 # bug fix
 # The routine will start at -1/e + eps * im, rather than -1/e + 0im,
 # otherwise root finding will fail
-@test lambertw(-inv(MathConstants.e) + 0im, -1) ≈ -1 atol=1e-7
+@test lambertw(-inve + 0im, -1) ≈ -1 atol=1e-7
 
 # lambertw for BigFloat is more precise than Float64. Note
 # that 70 digits in test is about 35 digits in W
@@ -104,9 +105,9 @@ end
 @testset "lambertwbp()" begin
     # not a domain error, but not implemented
     @test_throws ArgumentError lambertwbp(1, 1)
-    @test_throws ArgumentError lambertwbp(inv(MathConstants.e) + 1e-5, 2)
-    @test_throws DomainError lambertwbp(inv(MathConstants.e) + 1e-5, 0)
-    @test_throws DomainError lambertwbp(inv(MathConstants.e) + 1e-5, -1)
+    @test_throws ArgumentError lambertwbp(inve + 1e-5, 2)
+    @test_throws DomainError lambertwbp(inve + 1e-5, 0)
+    @test_throws DomainError lambertwbp(inve + 1e-5, -1)
 
     # Expansions about branch point converges almost to machine precision
     # except near the radius of convergence.
@@ -116,8 +117,8 @@ end
         setprecision(2048) do
             z = BigFloat(10)^(-12)
             for _ in 1:300
-                @test lambertwbp(Float64(z)) ≈ 1 + lambertw(z - inv(big(MathConstants.e))) atol=5e-16
-                @test lambertwbp(Float64(z), -1) ≈ 1 + lambertw(z - inv(big(MathConstants.e)), -1) atol=5e-16
+                @test lambertwbp(Float64(z)) ≈ 1 + lambertw(z - big(inve)) atol=5e-16
+                @test lambertwbp(Float64(z), -1) ≈ 1 + lambertw(z - big(inve), -1) atol=5e-15
 
                 z *= 1.1
                 if z > 0.23 break end
@@ -127,6 +128,6 @@ end
 
     # test the expansion about branch point for k=-1,
     # by comparing to exact BigFloat calculation.
-    @test @inferred(lambertwbp(1e-20, -1)) ≈ 1 + lambertw(-inv(big(MathConstants.e)) + BigFloat(10)^(-20), -1) atol=1e-16
+    @test @inferred(lambertwbp(1e-20, -1)) ≈ 1 + lambertw(-big(inve) + BigFloat(10)^(-20), -1) atol=1e-16
     @test @inferred(lambertwbp(Complex(.01, .01), -1)) ≈ Complex(-0.2755038208041206, -0.1277888928494641) atol=1e-14
 end
