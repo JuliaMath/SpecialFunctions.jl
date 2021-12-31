@@ -201,45 +201,33 @@ Base.BigFloat(::Irrational{:ω}) = omega_const(BigFloat)
 # (4.23) and (4.24) for all μ are also given. This code implements the
 # recursion relations.
 
-# (4.23) and (4.24) give zero based coefficients.
-cset(a, i, v) = a[i+1] = v
-cget(a, i) = a[i+1]
-
-# (4.24)
-function compute_a_coeffs(k, m, a)
-    sum0 = zero(eltype(m))
-    for j in 2:(k - 1)
-        sum0 += cget(m, j) * cget(m, k + 1 - j)
-    end
-    cset(a, k, sum0)
-    return sum0
-end
-
-# (4.23)
-function compute_m_coefficients(k, m, a)
-    kt = convert(eltype(m), k)
-    mk = (kt - 1) / (kt + 1) *(cget(m, k - 2) / 2 + cget(a, k - 2) / 4) -
-        cget(a, k) / 2 - cget(m, k - 1) / (kt + 1)
-    cset(m, k, mk)
-    return mk
-end
-
 # We plug the known value μ₂ == -1//3 for (4.22) into (4.23) and
 # solve for α₂. We get α₂ = 0.
 # Compute array of coefficients μ in (4.22).
 # m[1] is μ₀
 function compute_branch_point_coeffs(T::DataType, n::Int)
-    a =  Array{T}(undef, n)
-    m =  Array{T}(undef, n)
-    cset(a, 0, 2)  # α₀ literal in paper
-    cset(a, 1, -1) # α₁ literal in paper
-    cset(a, 2, 0)  # α₂ get this by solving (4.23) for alpha_2 with values printed in paper
-    cset(m, 0, -1) # μ₀ literal in paper
-    cset(m, 1, 1)  # μ₁ literal in paper
-    cset(m, 2, -1//3) # μ₂ literal in paper, but only in (4.22)
-    for i in 3:(n - 1)  # coeffs are zero indexed
-        compute_a_coeffs(i, m, a)
-        compute_m_coefficients(i, m, a)
+    a = Vector{T}(undef, n)
+    m = Vector{T}(undef, n)
+
+    a[1] = 2  # α₀ literal in paper
+    a[2] = -1 # α₁ literal in paper
+    a[3] = 0  # α₂ get this by solving (4.23) for alpha_2 with values printed in paper
+    m[1] = -1 # μ₀ literal in paper
+    m[2] = 1  # μ₁ literal in paper
+    m[3] = -1//3 # μ₂ literal in paper, but only in (4.22)
+
+    for i in 4:n
+        # (4.24)
+        msum = zero(T)
+        @inbounds for j in 2:(i - 2)
+            msum += m[j + 1] * m[i + 1 - j]
+        end
+        a[i] = msum
+
+        # (4.23)
+        it = convert(T, i)
+        m[i] = (it - 2) / it *(m[i - 2] / 2 + a[i - 2] / 4) -
+               a[i] / 2 - m[i - 1] / it
     end
     return m
 end
