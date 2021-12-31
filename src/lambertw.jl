@@ -52,16 +52,14 @@ function _lambertw(x::Real, k, maxits)
 end
 
 # Real x, k = 0
-# This appears to be inferrable with T=Float64 and T=BigFloat, including if x=Inf.
 # There is a magic number here. It could be noted, or possibly removed.
 # In particular, the fancy initial condition selection does not seem to help speed.
-function lambertw_branch_zero(x::T, maxits)::T where T<:Real
-    isnan(x) && return(NaN)
-    x == Inf && return Inf # appears to return convert(BigFloat, Inf) for x == BigFloat(Inf)
+function lambertw_branch_zero(x::T, maxits) where T<:Real
+    isfinite(x) || return x
     one_t = one(T)
     oneoe = -one_t / convert(T, MathConstants.e)  # The branch point
     x == oneoe && return -one_t
-    oneoe <= x || throw(DomainError(x))
+    oneoe < x || throw(DomainError(x))
     itwo_t = 1 / convert(T, 2)
     if x > one_t
         lx = log(x)
@@ -77,7 +75,7 @@ end
 function lambertw_branch_one(x::T, maxits) where T<:Real
     oneoe = -one(T) / convert(T, MathConstants.e)
     x == oneoe && return -one(T) # W approaches -1 as x -> -1/e from above
-    oneoe <= x || throw(DomainError(x))  # branch domain exludes x < -1/e
+    oneoe < x || throw(DomainError(x))  # branch domain exludes x < -1/e
     x == zero(T) && return -convert(T, Inf) # W decreases w/o bound as x -> 0 from below
     x < zero(T) || throw(DomainError(x))
     return lambertw_root_finding(x, log(-x), maxits)
