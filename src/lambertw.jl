@@ -1,8 +1,7 @@
 #### Lambert W function ####
 
 """
-    lambertw(z::Complex{T}, k::V=0, maxits=1000) where {T<:Real, V<:Integer}
-    lambertw(z::T, k::V=0, maxits=1000) where {T<:Real, V<:Integer}
+    lambertw(z::Number, k::Integer=0, maxits=1000)
 
 Compute the `k`th branch of the Lambert W function of `z`. If `z` is real, `k` must be
 either `0` or `-1`. For `Real` `z`, the domain of the branch `k = -1` is `[-1/e, 0]` and the
@@ -26,16 +25,16 @@ julia> lambertw(Complex(-10.0, 3.0), 4)
 -0.9274337508660128 + 26.37693445371142im
 ```
 """
-lambertw(z, k::Integer=0, maxits::Integer=1000) = _lambertw(float(z), k, maxits)
+lambertw(z::Number, k::Integer=0, maxits::Integer=1000) = _lambertw(float(z), k, maxits)
 
 # lambertw(e + 0im, k) is ok for all k
 # Maybe this should return a float. But, this should cause no type instability in any case
-function _lambertw(::typeof(MathConstants.e), k, maxits)
+function _lambertw(::typeof(MathConstants.e), k::Integer, maxits::Integer)
     k == 0 && return 1
     throw(DomainError(k))
 end
-_lambertw(x::Irrational, k, maxits) = _lambertw(float(x), k, maxits)
-function _lambertw(x::Union{Integer, Rational}, k, maxits)
+_lambertw(x::Irrational, k::Integer, maxits::Integer) = _lambertw(float(x), k, maxits)
+function _lambertw(x::Union{Integer, Rational}, k::Integer, maxits::Integer)
     if k == 0
         x == 0 && return float(zero(x))
         x == 1 && return convert(typeof(float(x)), omega) # must be a more efficient way
@@ -45,7 +44,7 @@ end
 
 ### Real x
 
-function _lambertw(x::Real, k, maxits)
+function _lambertw(x::Real, k::Integer, maxits::Integer)
     k == 0 && return lambertw_branch_zero(x, maxits)
     k == -1 && return lambertw_branch_one(x, maxits)
     throw(DomainError(k, "lambertw: real x must have branch k == 0 or k == -1"))
@@ -54,7 +53,7 @@ end
 # Real x, k = 0
 # There is a magic number here. It could be noted, or possibly removed.
 # In particular, the fancy initial condition selection does not seem to help speed.
-function lambertw_branch_zero(x::T, maxits) where T<:Real
+function lambertw_branch_zero(x::T, maxits::Integer) where T<:Real
     isfinite(x) || return x
     one_t = one(T)
     oneoe = -inv(convert(T, MathConstants.e))  # The branch point
@@ -72,7 +71,7 @@ function lambertw_branch_zero(x::T, maxits) where T<:Real
 end
 
 # Real x, k = -1
-function lambertw_branch_one(x::T, maxits) where T<:Real
+function lambertw_branch_one(x::T, maxits::Integer) where T<:Real
     oneoe = -inv(convert(T, MathConstants.e))
     x == oneoe && return -one(T) # W approaches -1 as x -> -1/e from above
     oneoe < x || throw(DomainError(x))  # branch domain exludes x < -1/e
@@ -83,10 +82,9 @@ end
 
 ### Complex z
 
-_lambertw(z::Complex{<:Integer}, k, maxits) = _lambertw(float(z), k, maxits)
+_lambertw(z::Complex{<:Integer}, k::Integer, maxits::Integer) = _lambertw(float(z), k, maxits)
 # choose initial value inside correct branch for root finding
-function _lambertw(z::Complex{T}, k, maxits) where T<:Real
-    one_t = one(T)
+function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
     local w::Complex{T}
     pointseven = 7//10
     if abs(z) <= inv(convert(T, MathConstants.e))
@@ -120,7 +118,7 @@ end
 
 # Use Halley's root-finding method to find
 # x = lambertw(z) with initial point x0.
-function lambertw_root_finding(z::T, x0::T, maxits) where T <: Number
+function lambertw_root_finding(z::T, x0::T, maxits::Integer) where T <: Number
     two_t = convert(T, 2)
     x = x0
     lastx = x
@@ -203,7 +201,7 @@ Base.BigFloat(::Irrational{:ω}) = omega_const(BigFloat)
 # solve for α₂. We get α₂ = 0.
 # Compute array of coefficients μ in (4.22).
 # m[1] is μ₀
-function compute_branch_point_coeffs(T::DataType, n::Int)
+function compute_branch_point_coeffs(T::Type{<:Number}, n::Integer)
     a = Vector{T}(undef, n)
     m = Vector{T}(undef, n)
 
@@ -259,7 +257,7 @@ end
 # Why is wser5 omitted ?
 # p is the argument to the series which is computed
 # from x before calling `branch_point_series`.
-function branch_point_series(p, x)
+function branch_point_series(p::Real, x::Real)
     x < 4e-11 && return wser3(p)
     x < 1e-5 && return wser7(p)
     x < 1e-3 && return wser12(p)
@@ -273,7 +271,7 @@ function branch_point_series(p, x)
 end
 
 # These may need tuning.
-function branch_point_series(p::Complex{T}, z) where T<:Real
+function branch_point_series(p::Complex{T}, z::Complex{T}) where T<:Real
     x = abs(z)
     x < 4e-11 && return wser3(p)
     x < 1e-5 && return wser7(p)
@@ -287,13 +285,13 @@ function branch_point_series(p::Complex{T}, z) where T<:Real
     return wser290(p)
 end
 
-function _lambertw0(x) # 1 + W(-1/e + x)  , k = 0
+function _lambertw0(x::Number) # 1 + W(-1/e + x)  , k = 0
     ps = 2 * MathConstants.e * x
     series_arg = sqrt(ps)
     branch_point_series(series_arg, x)
 end
 
-function _lambertwm1(x) # 1 + W(-1/e + x)  , k = -1
+function _lambertwm1(x::Number) # 1 + W(-1/e + x)  , k = -1
     ps = 2 * MathConstants.e * x
     series_arg = -sqrt(ps)
     branch_point_series(series_arg, x)
