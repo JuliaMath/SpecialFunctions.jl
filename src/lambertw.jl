@@ -200,7 +200,7 @@ Base.BigFloat(::Irrational{:ω}) = omega_const(BigFloat)
 # solve for α₂. We get α₂ = 0.
 # Compute array of coefficients μ in (4.22).
 # m[1] is μ₀
-function compute_branch_point_coeffs(T::Type{<:Number}, n::Integer)
+function lambertw_coeffs(T::Type{<:Number}, n::Integer)
     a = Vector{T}(undef, n)
     m = Vector{T}(undef, n)
 
@@ -227,68 +227,43 @@ function compute_branch_point_coeffs(T::Type{<:Number}, n::Integer)
     return m
 end
 
-const BRANCH_POINT_COEFFS_FLOAT64 = compute_branch_point_coeffs(Float64, 500)
+const LAMBERTW_COEFFS_FLOAT64 = lambertw_coeffs(Float64, 500)
 
-# Base.Math.@horner requires literal coefficients
-# It cannot be used here because we have an array of computed coefficients
-function horner(x, coeffs::AbstractArray, n)
-    n += 1
-    ex = coeffs[n]
-    for i = (n - 1):-1:2
-        ex = :(muladd(t, $ex, $(coeffs[i])))
-    end
-    ex = :( t * $ex)
-    return Expr(:block, :(t = $x), ex)
-end
+(lambertwbp_evalpoly(x::T, ::Val{N})::T) where {T<:Number, N} =
+    # assume that Julia compiler is smart to decide for which N to unroll at compile time
+    # note that we skip μ₀=-1
+    evalpoly(x, ntuple(i -> LAMBERTW_COEFFS_FLOAT64[i+1], N-1))*x
 
-# write functions that evaluate the branch point series
-# with `num_terms` number of terms.
-for (func_name, num_terms) in (
-    (:wser3, 3), (:wser5, 5), (:wser7, 7), (:wser12, 12),
-    (:wser19, 19), (:wser26, 26), (:wser32, 32),
-    (:wser50, 50), (:wser100, 100), (:wser290, 290))
-    iex = horner(:x, BRANCH_POINT_COEFFS_FLOAT64, num_terms)
-    @eval function ($func_name)(x) $iex end
-end
-
-# Converges to Float64 precision
+# how many coefficients of the series to use
+# to converge to Float64 precision for given x
 # We could get finer tuning by separating k=0, -1 branches.
-# Why is wser5 omitted ?
-# p is the argument to the series which is computed
-# from x before calling `branch_point_series`.
-function branch_point_series(p::Real, x::Real)
-    x < 4e-11 && return wser3(p)
-    x < 1e-5 && return wser7(p)
-    x < 1e-3 && return wser12(p)
-    x < 1e-2 && return wser19(p)
-    x < 3e-2 && return wser26(p)
-    x < 5e-2 && return wser32(p)
-    x < 1e-1 && return wser50(p)
-    x < 1.9e-1 && return wser100(p)
-    x > 1 / MathConstants.e && throw(DomainError(x))  # radius of convergence
-    return wser290(p)  # good for x approx .32
+function lambertwbp_series_length(x::Real)
+    x < 4e-11 && return 3
+    # Why N = 5 is omitted?
+    x < 1e-5 && return 7
+    x < 1e-3 && return 12
+    x < 1e-2 && return 19
+    x < 3e-2 && return 26
+    x < 5e-2 && return 32
+    x < 1e-1 && return 50
+    x < 1.9e-1 && return 100
+    x > inv(MathConstants.e) && throw(DomainError(x))  # radius of convergence
+    return 290 # good for x approx .32
 end
 
 # These may need tuning.
-function branch_point_series(p::Complex{T}, z::Complex{T}) where T<:Real
-    x = abs(z)
-    x < 4e-11 && return wser3(p)
-    x < 1e-5 && return wser7(p)
-    x < 1e-3 && return wser12(p)
-    x < 1e-2 && return wser19(p)
-    x < 3e-2 && return wser26(p)
-    x < 5e-2 && return wser32(p)
-    x < 1e-1 && return wser50(p)
-    x < 1.9e-1 && return wser100(p)
-    x > 1 / MathConstants.e && throw(DomainError(x))  # radius of convergence
-    return wser290(p)
-end
+lambertwbp_series_length(z::Complex) = lambertwbp_series_length(abs(z))
+
+# p is the argument to the series which is computed from x,
+# see `_lambertwbp()`.
+lambertwbp_series(p::Number, x::Number) =
+    lambertwbp_evalpoly(p, Val{lambertwbp_series_length(x)}())
 
 _lambertwbp(x::Number, ::Val{0}) =
-    branch_point_series(sqrt(2 * MathConstants.e * x), x)
+    lambertwbp_series(sqrt(2 * MathConstants.e * x), x)
 
 _lambertwbp(x::Number, ::Val{-1}) =
-    branch_point_series(-sqrt(2 * MathConstants.e * x), x)
+    lambertwbp_series(-sqrt(2 * MathConstants.e * x), x)
 
 _lambertwbp(_::Number, k::Val) =
     throw(ArgumentError("lambertw() expansion about branch point for k=$k not implemented (only implemented for 0 and -1)."))
