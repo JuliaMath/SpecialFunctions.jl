@@ -57,7 +57,7 @@ end
 function lambertw_branch_zero(x::T, maxits) where T<:Real
     isfinite(x) || return x
     one_t = one(T)
-    oneoe = -one_t / convert(T, MathConstants.e)  # The branch point
+    oneoe = -inv(convert(T, MathConstants.e))  # The branch point
     x == oneoe && return -one_t
     oneoe < x || throw(DomainError(x))
     itwo_t = 1 / convert(T, 2)
@@ -73,7 +73,7 @@ end
 
 # Real x, k = -1
 function lambertw_branch_one(x::T, maxits) where T<:Real
-    oneoe = -one(T) / convert(T, MathConstants.e)
+    oneoe = -inv(convert(T, MathConstants.e))
     x == oneoe && return -one(T) # W approaches -1 as x -> -1/e from above
     oneoe < x || throw(DomainError(x))  # branch domain exludes x < -1/e
     x == zero(T) && return -convert(T, Inf) # W decreases w/o bound as x -> 0 from below
@@ -89,7 +89,7 @@ function _lambertw(z::Complex{T}, k, maxits) where T<:Real
     one_t = one(T)
     local w::Complex{T}
     pointseven = 7//10
-    if abs(z) <= one_t/convert(T, MathConstants.e)
+    if abs(z) <= inv(convert(T, MathConstants.e))
         if z == 0
             k == 0 && return z
             return complex(-convert(T, Inf), zero(T))
