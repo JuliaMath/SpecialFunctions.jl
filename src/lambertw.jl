@@ -100,7 +100,9 @@ function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
             k != 0 ? w += complex(0, k * 2 * pi) : nothing
         end
     elseif k == 0 && imag(z) <= pointseven && abs(z) <= pointseven
-        w = abs(z+ 1//2) < 1//10 ? imag(z) > 0 ? complex(pointseven, pointseven) : complex(pointseven, -pointseven) : z
+        w = abs(z+ 1//2) < 1//10 ? imag(z) > 0 ?
+                complex(pointseven, pointseven) :
+                complex(pointseven, -pointseven) : z
     else
         if real(z) == convert(T, Inf)
             k == 0 && return z
@@ -118,16 +120,15 @@ end
 # Use Halley's root-finding method to find
 # x = lambertw(z) with initial point x0.
 function lambertw_root_finding(z::T, x0::T, maxits::Integer) where T <: Number
-    two_t = convert(T, 2)
     x = x0
     lastx = x
     lastdiff = zero(real(T))
     converged = false
-    for i in 1:maxits
+    for _ in 1:maxits
         ex = exp(x)
         xexz = x * ex - z
         x1 = x + 1
-        x -= xexz / (ex * x1 - (x + two_t) * xexz / (two_t * x1 ))
+        x -= xexz / (ex * x1 - (x + 2) * xexz / (2 * x1))
         xdiff = abs(lastx - x)
         if xdiff <= 3 * eps(lastdiff) || lastdiff == xdiff  # second condition catches two-value cycle
             converged = true
@@ -136,7 +137,7 @@ function lambertw_root_finding(z::T, x0::T, maxits::Integer) where T <: Number
         lastx = x
         lastdiff = xdiff
     end
-    converged || @warn("lambertw with z=", z, " did not converge in ", maxits, " iterations.")
+    converged || @warn("lambertw(", z, ") did not converge in ", maxits, " iterations.")
     return x
 end
 
