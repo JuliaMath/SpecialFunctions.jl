@@ -44,16 +44,12 @@ end
 
 ### Real x
 
-function _lambertw(x::Real, k::Integer, maxits::Integer)
-    k == 0 && return lambertw_branch_zero(x, maxits)
-    k == -1 && return lambertw_branch_one(x, maxits)
-    throw(DomainError(k, "lambertw: real x must have branch k == 0 or k == -1"))
-end
+_lambertw(x::Real, k::Integer, maxits::Integer) = _lambertw(x, Val(Int(k)), maxits)
 
 # Real x, k = 0
 # There is a magic number here. It could be noted, or possibly removed.
 # In particular, the fancy initial condition selection does not seem to help speed.
-function lambertw_branch_zero(x::T, maxits::Integer) where T<:Real
+function _lambertw(x::T, ::Val{0}, maxits::Integer) where T<:Real
     isfinite(x) || return x
     one_t = one(T)
     oneoe = -inv(convert(T, MathConstants.e))  # The branch point
@@ -71,7 +67,7 @@ function lambertw_branch_zero(x::T, maxits::Integer) where T<:Real
 end
 
 # Real x, k = -1
-function lambertw_branch_one(x::T, maxits::Integer) where T<:Real
+function _lambertw(x::T, ::Val{-1}, maxits::Integer) where T<:Real
     oneoe = -inv(convert(T, MathConstants.e))
     x == oneoe && return -one(T) # W approaches -1 as x -> -1/e from above
     oneoe < x || throw(DomainError(x))  # branch domain exludes x < -1/e
@@ -79,6 +75,9 @@ function lambertw_branch_one(x::T, maxits::Integer) where T<:Real
     x < zero(T) || throw(DomainError(x))
     return lambertw_root_finding(x, log(-x), maxits)
 end
+
+_lambertw(x::Real, k::Val, maxits::Integer) =
+    throw(DomainError(x, "lambertw: for branch k=$k not defined, real x must have branch k == 0 or k == -1"))
 
 ### Complex z
 
@@ -285,17 +284,14 @@ function branch_point_series(p::Complex{T}, z::Complex{T}) where T<:Real
     return wser290(p)
 end
 
-function _lambertw0(x::Number) # 1 + W(-1/e + x)  , k = 0
-    ps = 2 * MathConstants.e * x
-    series_arg = sqrt(ps)
-    branch_point_series(series_arg, x)
-end
+_lambertwbp(x::Number, ::Val{0}) =
+    branch_point_series(sqrt(2 * MathConstants.e * x), x)
 
-function _lambertwm1(x::Number) # 1 + W(-1/e + x)  , k = -1
-    ps = 2 * MathConstants.e * x
-    series_arg = -sqrt(ps)
-    branch_point_series(series_arg, x)
-end
+_lambertwbp(x::Number, ::Val{-1}) =
+    branch_point_series(-sqrt(2 * MathConstants.e * x), x)
+
+_lambertwbp(_::Number, k::Val) =
+    throw(ArgumentError("lambertw() expansion about branch point for k=$k not implemented (only implemented for 0 and -1)."))
 
 """
     lambertwbp(z, k=0)
@@ -323,10 +319,4 @@ julia> convert(Float64, (lambertw(-BigFloat(1)/e + BigFloat(10)^(-18), -1) + 1))
     The loss of precision in `lambertw` is analogous to the loss of precision
     in computing the `sqrt(1-x)` for `x` close to `1`.
 """
-function lambertwbp(x::Number, k::Integer)
-    k == 0 && return _lambertw0(x)
-    k == -1 && return _lambertwm1(x)
-    throw(ArgumentError("expansion about branch point only implemented for k = 0 and -1."))
-end
-
-lambertwbp(x::Number) = _lambertw0(x)
+lambertwbp(x::Number, k::Integer=0) = _lambertwbp(x, Val(Int(k)))
