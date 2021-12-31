@@ -126,15 +126,15 @@ function lambertw_root_finding(z::T, x0::T, maxits) where T <: Number
     two_t = convert(T, 2)
     x = x0
     lastx = x
-    lastdiff = zero(T)
-    converged::Bool = false
+    lastdiff = zero(real(T))
+    converged = false
     for i in 1:maxits
         ex = exp(x)
         xexz = x * ex - z
         x1 = x + 1
         x -= xexz / (ex * x1 - (x + two_t) * xexz / (two_t * x1 ))
         xdiff = abs(lastx - x)
-        if xdiff <= 3 * eps(abs(lastx)) || lastdiff == xdiff  # second condition catches two-value cycle
+        if xdiff <= 3 * eps(lastdiff) || lastdiff == xdiff  # second condition catches two-value cycle
             converged = true
             break
         end
