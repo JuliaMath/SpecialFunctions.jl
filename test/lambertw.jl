@@ -3,21 +3,21 @@
 @test_throws DomainError lambertw(-2.0, 0)
 @test_throws DomainError lambertw(-2.0, -1)
 @test_throws DomainError lambertw(-2.0, 1)
-@test isnan(lambertw(NaN))
+@test isnan(@inferred(lambertw(NaN)))
 
 ## math constant e
 @test_throws DomainError lambertw(MathConstants.e, 1)
 @test_throws DomainError lambertw(MathConstants.e, -1)
 
 ## integer arguments return floating point types
-@test lambertw(0) isa AbstractFloat
-@test lambertw(0) == 0
+@test @inferred(lambertw(0)) isa AbstractFloat
+@test @inferred(lambertw(0)) == 0
 
 ### math constant, MathConstants.e e
 
 # could return math const e, but this would break type stability
-@test lambertw(1) isa AbstractFloat
-@test lambertw(MathConstants.e, 0) == 1
+@test @inferred(lambertw(1)) isa AbstractFloat
+@test @inferred(lambertw(MathConstants.e, 0)) == 1
 
 ## value at branch point where real branches meet
 @test lambertw(-inv(MathConstants.e), 0) == lambertw(-inv(MathConstants.e), -1) == -1
@@ -25,24 +25,24 @@
 
 ## convert irrationals to float
 
-@test isapprox(lambertw(pi), 1.0736581947961492)
-@test isapprox(lambertw(pi, 0), 1.0736581947961492)
+@test isapprox(@inferred(lambertw(pi)), 1.0736581947961492)
+@test isapprox(@inferred(lambertw(pi, 0)), 1.0736581947961492)
 
 ### infinite args or return values
 
 @test lambertw(0, -1) == lambertw(0.0, -1) == -Inf
 @test lambertw(Inf, 0) == Inf
-@test lambertw(complex(Inf, 1), 0) == complex(Inf, 1)
+@test @inferred(lambertw(complex(Inf, 1), 0)) == complex(Inf, 1)
 @test lambertw(complex(Inf, 0), 1) == complex(Inf, 2pi)
 @test lambertw(complex(-Inf, 0), 1) == complex(Inf, 3pi)
-@test lambertw(complex(0.0, 0.0), -1) == complex(-Inf, 0.0)
+@test @inferred(lambertw(complex(0.0, 0.0), -1)) == complex(-Inf, 0.0)
 
 ## default branch is  k = 0
 @test lambertw(1.0) == lambertw(1.0, 0)
 
 ## BigInt args return BigFloats
-@test typeof(lambertw(BigInt(0))) == BigFloat
-@test typeof(lambertw(BigInt(3))) == BigFloat
+@test @inferred(lambertw(BigInt(0))) isa BigFloat
+@test @inferred(lambertw(BigInt(3))) isa BigFloat
 
 ## Any Integer type allowed for second argument
 @test lambertw(-0.2, -1) == lambertw(-0.2, BigInt(-1))
@@ -145,8 +145,8 @@ end
 
 # test the expansion about branch point for k=-1,
 # by comparing to exact BigFloat calculation.
-@test lambertwbp(1e-20, -1) - 1 - lambertw(-inv(big(MathConstants.e)) + BigFloat(10)^BigFloat(-20), -1) < 1e-16
+@test @inferred(lambertwbp(1e-20, -1)) - 1 - lambertw(-inv(big(MathConstants.e)) + BigFloat(10)^BigFloat(-20), -1) < 1e-16
 
-@test abs(lambertwbp(Complex(.01, .01), -1) - Complex(-0.2755038208041206, -0.1277888928494641)) < 1e-14
+@test abs(@inferred(lambertwbp(Complex(.01, .01), -1)) - Complex(-0.2755038208041206, -0.1277888928494641)) < 1e-14
 
 end  # if Int != Int32
