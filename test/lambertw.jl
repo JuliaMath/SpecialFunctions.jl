@@ -8,6 +8,7 @@
 ## math constant e
 @test_throws DomainError lambertw(MathConstants.e, 1)
 @test_throws DomainError lambertw(MathConstants.e, -1)
+@test_throws DomainError lambertw(.3, 2)
 
 ## integer arguments return floating point types
 @test @inferred(lambertw(0)) isa AbstractFloat
@@ -100,36 +101,32 @@ end
 @test lambertw(BigInt(1)) == big(SpecialFunctions.omega)
 
 ###  expansion about branch point
+@testset "lambertwbp()" begin
+    # not a domain error, but not implemented
+    @test_throws ArgumentError lambertwbp(1, 1)
+    @test_throws ArgumentError lambertwbp(inv(MathConstants.e) + 1e-5, 2)
+    @test_throws DomainError lambertwbp(inv(MathConstants.e) + 1e-5, 0)
+    @test_throws DomainError lambertwbp(inv(MathConstants.e) + 1e-5, -1)
 
-# not a domain error, but not implemented
-@test_throws ArgumentError lambertwbp(1, 1)
+    # Expansions about branch point converges almost to machine precision
+    # except near the radius of convergence.
+    # Complex args are not tested here.
 
-@test_throws DomainError lambertw(.3, 2)
+    @testset "double-precision expansion near branch point using BigFloats" begin
+        setprecision(2048) do
+            z = BigFloat(10)^(-12)
+            for _ in 1:300
+                @test lambertwbp(Float64(z)) ≈ 1 + lambertw(z - inv(big(MathConstants.e))) atol=5e-16
+                @test lambertwbp(Float64(z), -1) ≈ 1 + lambertw(z - inv(big(MathConstants.e)), -1) atol=5e-16
 
-# Expansions about branch point converges almost to machine precision
-# except near the radius of convergence.
-# Complex args are not tested here.
-
-if Int != Int32
-
-@testset "double-precision expansion near branch point using BigFloats" begin
-    setprecision(2048) do
-        z = BigFloat(10)^(-12)
-        for _ in 1:300
-            innerarg = z - inv(big(MathConstants.e))
-
-            @test lambertwbp(Float64(z)) ≈ 1 + lambertw(innerarg) atol=5e-16
-            @test lambertwbp(Float64(z), -1) ≈ 1 + lambertw(innerarg, -1) atol=5e-16
-            z *= 1.1
-            if z > 0.23 break end
-
+                z *= 1.1
+                if z > 0.23 break end
+            end
         end
     end
+
+    # test the expansion about branch point for k=-1,
+    # by comparing to exact BigFloat calculation.
+    @test @inferred(lambertwbp(1e-20, -1)) ≈ 1 + lambertw(-inv(big(MathConstants.e)) + BigFloat(10)^(-20), -1) atol=1e-16
+    @test @inferred(lambertwbp(Complex(.01, .01), -1)) ≈ Complex(-0.2755038208041206, -0.1277888928494641) atol=1e-14
 end
-
-# test the expansion about branch point for k=-1,
-# by comparing to exact BigFloat calculation.
-@test @inferred(lambertwbp(1e-20, -1)) ≈ 1 + lambertw(-inv(big(MathConstants.e)) + BigFloat(10)^(-20), -1) atol=1e-16
-@test @inferred(lambertwbp(Complex(.01, .01), -1)) ≈ Complex(-0.2755038208041206, -0.1277888928494641) atol=1e-14
-
-end  # if Int != Int32
