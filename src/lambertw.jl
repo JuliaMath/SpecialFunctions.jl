@@ -1,9 +1,9 @@
 #### Lambert W function ####
 
 """
-    lambertw(z::Number, k::Integer=0, maxits=1000)
+    lambertw(z::Number, k::Integer=0; [maxiter=1000])
 
-Compute the `k`th branch of the Lambert W function of `z`. If `z` is real, `k` must be
+Compute the `k`th branch of the [Lambert W function](https://en.wikipedia.org/wiki/Lambert_W_function) of `z`. If `z` is real, `k` must be
 either `0` or `-1`. For `Real` `z`, the domain of the branch `k = -1` is `[-1/e, 0]` and the
 domain of the branch `k = 0` is `[-1/e, Inf]`. For `Complex` `z`, and all `k`, the domain is
 the complex plane.
@@ -25,7 +25,7 @@ julia> lambertw(Complex(-10.0, 3.0), 4)
 -0.9274337508660128 + 26.37693445371142im
 ```
 """
-lambertw(z::Number, k::Integer=0, maxits::Integer=1000) = _lambertw(float(z), k, maxits)
+lambertw(z::Number, k::Integer=0; maxiter::Integer=1000) = _lambertw(z, k, maxiter)
 
 # lambertw(e + 0im, k) is ok for all k
 # Maybe this should return a float. But, this should cause no type instability in any case
