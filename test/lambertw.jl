@@ -131,7 +131,7 @@ end
             z = BigFloat(10)^(-12)
             for _ in 1:300
                 @test lambertwbp(Float64(z)) ≈ 1 + lambertw(z - big(inve)) atol=5e-16
-                @test lambertwbp(Float64(z), -1) ≈ 1 + lambertw(z - big(inve), -1) atol=5e-15
+                @test lambertwbp(Float64(z), -1) ≈ 1 + lambertw(z - big(inve), -1) atol=1e-15
 
                 z *= 1.1
                 if z > 0.23 break end
@@ -142,5 +142,5 @@ end
     # test the expansion about branch point for k=-1,
     # by comparing to exact BigFloat calculation.
     @test @inferred(lambertwbp(1e-20, -1)) ≈ 1 + lambertw(-big(inve) + BigFloat(10)^(-20), -1) atol=1e-16
-    @test @inferred(lambertwbp(Complex(.01, .01), -1)) ≈ Complex(-0.2755038208041206, -0.1277888928494641) atol=1e-14
+    @test @inferred(lambertwbp(Complex(.01, .01), -1)) ≈ Complex(-0.27550382080412062443536, -0.12778889284946406573511) atol=1e-16
 end
