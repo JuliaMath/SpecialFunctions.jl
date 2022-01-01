@@ -34,15 +34,15 @@ using IrrationalConstants
 
 ### infinite args or return values
 
-@test lambertw(0, -1) == lambertw(0.0, -1) == -Inf
-@test lambertw(Inf, 0) == Inf
+@test @inferred(lambertw(0, -1)) == @inferred(lambertw(0.0, -1)) == -Inf
+@test @inferred(lambertw(Inf, 0)) == Inf
 @test @inferred(lambertw(complex(Inf, 1), 0)) == complex(Inf, 1)
-@test lambertw(complex(Inf, 0), 1) == complex(Inf, 2pi)
-@test lambertw(complex(-Inf, 0), 1) == complex(Inf, 3pi)
+@test @inferred(lambertw(complex(Inf, 0), 1)) == complex(Inf, 2pi)
+@test @inferred(lambertw(complex(-Inf, 0), 1)) == complex(Inf, 3pi)
 @test @inferred(lambertw(complex(0.0, 0.0), -1)) == complex(-Inf, 0.0)
 
-## default branch is  k = 0
-@test lambertw(1.0) == lambertw(1.0, 0)
+## default branch is k = 0
+@test @inferred(lambertw(1.0)) == @inferred(lambertw(1.0, 0))
 
 ## BigInt args return BigFloats
 @test @inferred(lambertw(BigInt(0))) isa BigFloat
