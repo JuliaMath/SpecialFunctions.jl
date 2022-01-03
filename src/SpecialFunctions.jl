@@ -13,8 +13,10 @@ using IrrationalConstants:
     invsqrt2π,
     logtwo,
     logπ,
-    log2π,
-    inve
+    log2π
+
+# FIXME temporary until the fate of inve is decided
+Base.@irrational inve 0.367879441171442321595 inv(big(ℯ))
 
 import LogExpFunctions
 

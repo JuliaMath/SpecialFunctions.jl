@@ -1,5 +1,6 @@
 ### domain errors
-using IrrationalConstants
+using SpecialFunctions: inve # FIXME temporary until the fate of inve is decided
+#using IrrationalConstants
 
 @test_throws DomainError lambertw(-2.0, 0)
 @test_throws DomainError lambertw(-2.0, -1)
