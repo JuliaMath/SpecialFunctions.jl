@@ -52,7 +52,7 @@ _lambertw(x::Real, k::Integer, maxits::Integer) = _lambertw(x, Val(Int(k)), maxi
 function _lambertw(x::T, ::Val{0}, maxits::Integer) where T<:Real
     isfinite(x) || return x
     one_t = one(T)
-    oneoe = -inv(convert(T, MathConstants.e))  # The branch point
+    oneoe = -T(inve)  # The branch point
     x == oneoe && return -one_t
     oneoe < x || throw(DomainError(x))
     itwo_t = 1 / convert(T, 2)
@@ -68,7 +68,7 @@ end
 
 # Real x, k = -1
 function _lambertw(x::T, ::Val{-1}, maxits::Integer) where T<:Real
-    oneoe = -inv(convert(T, MathConstants.e))
+    oneoe = -T(inve)
     x == oneoe && return -one(T) # W approaches -1 as x -> -1/e from above
     oneoe < x || throw(DomainError(x))  # branch domain exludes x < -1/e
     x == zero(T) && return -convert(T, Inf) # W decreases w/o bound as x -> 0 from below
@@ -86,7 +86,7 @@ _lambertw(z::Complex{<:Integer}, k::Integer, maxits::Integer) = _lambertw(float(
 function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
     local w::Complex{T}
     pointseven = 7//10
-    if abs(z) <= inv(convert(T, MathConstants.e))
+    if abs(z) <= T(inve)
         if z == 0
             k == 0 && return z
             return complex(-convert(T, Inf), zero(T))
@@ -238,7 +238,7 @@ function lambertwbp_series_length(x::Real)
     x < 5e-2 && return 32
     x < 1e-1 && return 50
     x < 1.9e-1 && return 100
-    x > inv(MathConstants.e) && throw(DomainError(x))  # radius of convergence
+    x > typeof(x)(inve) && throw(DomainError(x))  # radius of convergence
     return 290 # good for x approx .32
 end
 

@@ -11,7 +11,8 @@ using IrrationalConstants:
     invsqrt2π,
     logtwo,
     logπ,
-    log2π
+    log2π,
+    inve
 
 import LogExpFunctions
 
