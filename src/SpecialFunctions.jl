@@ -77,7 +77,9 @@ export
     expintx,
     sinint,
     cosint,
-    lbinomial
+    lbinomial,
+    lambertw,
+    lambertwbp
 
 include("bessel.jl")
 include("erf.jl")
@@ -90,6 +92,7 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
+include("lambertw.jl")
 if !isdefined(Base, :get_extension)
     include("../ext/SpecialFunctionsChainRulesCoreExt.jl")
 end

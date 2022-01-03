@@ -32,6 +32,7 @@ tests = [
     "gamma",
     "logabsgamma",
     "sincosint",
+    "lambertw",
     "other_tests",
     "chainrules"
 ]
