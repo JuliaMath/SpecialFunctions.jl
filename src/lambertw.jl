@@ -8,11 +8,11 @@ either `0` or `-1`. For `Real` `z`, the domain of the branch `k = -1` is `[-1/e,
 domain of the branch `k = 0` is `[-1/e, Inf]`. For `Complex` `z`, and all `k`, the domain is
 the complex plane.
 
-```jldoctest
-julia> lambertw(-1/e, -1)
+```jldoctest; setup=:(using SpecialFunctions)
+julia> lambertw(-1/ℯ, -1)
 -1.0
 
-julia> lambertw(-1/e, 0)
+julia> lambertw(-1/ℯ, 0)
 -1.0
 
 julia> lambertw(0, 0)
@@ -268,20 +268,19 @@ The result is accurate to Float64 precision for abs(z) < 0.32.
 If `k=-1` and `imag(z) < 0`, the value on the branch `k=1` is returned.
 
 # Example
-```jldoctest
-julia> lambertw(-1/e + 1e-18, -1)
+```jldoctest; setup=:(using SpecialFunctions)
+julia> lambertw(-1/ℯ + 1e-18, -1)
 -1.0
 
 julia> lambertwbp(1e-18, -1)
 -2.331643983409312e-9
 
-# Same result, but 1000 times slower
-julia> convert(Float64, (lambertw(-BigFloat(1)/e + BigFloat(10)^(-18), -1) + 1))
+julia> convert(Float64, (lambertw(-big(1)/ℯ + big(10)^(-18), -1) + 1)) # Same result, but 1000 times slower
 -2.331643983409312e-9
 ```
 
 !!! note
-    `lambertwbp` uses a series expansion about the branch point `z=-1/e` to avoid loss of precision.
+    `lambertwbp` uses a series expansion about the branch point `z=-1/ℯ` to avoid loss of precision.
     The loss of precision in `lambertw` is analogous to the loss of precision
     in computing the `sqrt(1-x)` for `x` close to `1`.
 """
