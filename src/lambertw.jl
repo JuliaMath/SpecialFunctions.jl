@@ -137,7 +137,7 @@ function lambertw_root_finding(z::T, x0::T, maxits::Integer) where T <: Number
         lastx = x
         lastdiff = xdiff
     end
-    converged || @warn("lambertw(", z, ") did not converge in ", maxits, " iterations.")
+    converged || @warn "lambertw($z) did not converge in $maxits iterations."
     return x
 end
 

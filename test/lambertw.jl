@@ -77,6 +77,12 @@ end
 @test lambertw(complex(-3.0, -4.0), 1) ≈ Complex(0.5887666813694675, 2.7118802109452247) atol=1e-14
 @test lambertw(complex(.3, .3)) ≈ Complex(0.26763519642648767, 0.1837481231767825)
 
+# test maxiter keyword and convergence warning
+@test_logs (:warn, "lambertw(-0.2) did not converge in 3 iterations.") @inferred(lambertw(-0.2, -1, maxiter=3))
+@test lambertw(-0.2, -1, maxiter=5) == lambertw(-0.2, -1)
+@test_logs (:warn, "lambertw(0.3 + 0.3im) did not converge in 3 iterations.") @inferred(lambertw(complex(.3, .3), maxiter=3))
+@test lambertw(complex(.3, .3), maxiter=5) == lambertw(complex(.3, .3))
+
 # bug fix
 # The routine will start at -1/e + eps * im, rather than -1/e + 0im,
 # otherwise root finding will fail
