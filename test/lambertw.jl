@@ -19,6 +19,8 @@ using IrrationalConstants
 
 # could return math const e, but this would break type stability
 @test @inferred(lambertw(1)) isa AbstractFloat
+@test @inferred(lambertw(1)) == float(LambertW.Omega)
+@test @inferred(lambertw(big(1))) == big(LambertW.Omega)
 @test @inferred(lambertw(MathConstants.e, 0)) == 1
 
 ## value at branch point where real branches meet
@@ -87,19 +89,30 @@ end
     @test z ≈ W*exp(W) atol=BigFloat(10)^(-70)
 end
 
-###  ω constant
+@testset "LambertW.Omega" begin
+    @test isapprox(LambertW.Ω * exp(LambertW.Ω), 1)
+    @test LambertW.Omega === LambertW.Ω
 
-## get ω from recursion and compare to value from lambertw
-let sp = precision(BigFloat)
-    setprecision(512)
-    @test lambertw(big(1)) == big(SpecialFunctions.omega)
-    setprecision(sp)
+    # lower than default precision
+    setprecision(BigFloat, 196) do
+        o = big(LambertW.Ω)
+        @test precision(o) == 196
+        @test isapprox(o * exp(o), 1, atol=eps(BigFloat))
+
+        oalias = big(LambertW.Omega)
+        @test o == oalias
+    end
+
+    # higher than default precision
+    setprecision(BigFloat, 2048) do
+        o = big(LambertW.Ω)
+        @test precision(o) == 2048
+        @test isapprox(o * exp(o), 1, atol=eps(BigFloat))
+
+        oalias = big(LambertW.Omega)
+        @test o == oalias
+    end
 end
-
-@test lambertw(1) == float(SpecialFunctions.omega)
-@test convert(Float16, SpecialFunctions.omega) == convert(Float16, 0.5674)
-@test convert(Float32, SpecialFunctions.omega) == 0.56714326f0
-@test lambertw(BigInt(1)) == big(SpecialFunctions.omega)
 
 ###  expansion about branch point
 @testset "lambertwbp()" begin

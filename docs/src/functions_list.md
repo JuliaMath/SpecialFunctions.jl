@@ -71,5 +71,5 @@ SpecialFunctions.logabsbeta
 SpecialFunctions.logabsbinomial
 SpecialFunctions.lambertw
 SpecialFunctions.lambertwbp
-SpecialFunctions.omega
+SpecialFunctions.LambertW.Ω
 ```

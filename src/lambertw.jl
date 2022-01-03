@@ -37,7 +37,7 @@ _lambertw(x::Irrational, k::Integer, maxits::Integer) = _lambertw(float(x), k, m
 function _lambertw(x::Union{Integer, Rational}, k::Integer, maxits::Integer)
     if k == 0
         x == 0 && return float(zero(x))
-        x == 1 && return convert(typeof(float(x)), omega) # must be a more efficient way
+        x == 1 && return convert(typeof(float(x)), LambertW.Omega) # must be a more efficient way
     end
     return _lambertw(float(x), k, maxits)
 end
@@ -141,54 +141,44 @@ function lambertw_root_finding(z::T, x0::T, maxits::Integer) where T <: Number
     return x
 end
 
-### omega constant
+### Lambert's Omega constant
 
-const _omega_const = 0.567143290409783872999968662210355
-
-# The BigFloat `omega_const_bf_` is set via a literal in the function __init__ to prevent a segfault
-
-# compute omega constant via root finding
-# We could compute higher precision. This converges very quickly.
-function omega_const(::Type{BigFloat})
-    precision(BigFloat) <= 256 && return omega_const_bf_[]
+# compute BigFloat Omega constant at arbitrary precision
+function compute_lambertw_Omega()
+    oc = BigFloat("0.5671432904097838729999686622103555497538157871865125081351310792230457930866845666932194")
+    precision(oc) <= 256 && return oc
+    # iteratively improve the precision
+    # see https://en.wikipedia.org/wiki/Omega_constant#Computation
     myeps = eps(BigFloat)
-    oc = omega_const_bf_[]
-    for i in 1:100
+    for _ in 1:1000
         nextoc = (1 + oc) / (1 + exp(oc))
-        abs(oc - nextoc) <= myeps && break
+        abs(oc - nextoc) <= myeps && return oc
         oc = nextoc
     end
+    @warn "Omega precision is less than current BigFloat precision ($(precision(BigFloat)))"
     return oc
 end
 
+# "private" declaration of Omega constant
+Base.@irrational lambertw_Omega 0.567143290409783872999968662210355 compute_lambertw_Omega()
+
+module LambertW
+
 """
-    omega
-    ω
+Lambert's Omega (*Ω*) constant.
 
-The constant defined by `ω exp(ω) = 1`.
+Lambert's *Ω* is the solution to *W(Ω) = 1* equation,
+where *W(t) = t exp(t)* is the
+[Lambert's *W* function](https://en.wikipedia.org/wiki/Lambert_W_function).
 
-# Example
-```jldoctest
-julia> ω
-ω = 0.5671432904097...
-
-julia> omega
-ω = 0.5671432904097...
-
-julia> ω * exp(ω)
-1.0
-
-julia> big(omega)
-5.67143290409783872999968662210355549753815787186512508135131079223045793086683e-01
-```
+# See also
+  * https://en.wikipedia.org/wiki/Omega_constant
+  * [`lambertw()`][@ref SpecialFunctions.lambertw]
 """
-const ω = Irrational{:ω}()
-@doc (@doc ω) omega = ω
+const Ω = Irrational{:lambertw_Omega}()
+const Omega = Ω # ASCII alias
 
-Base.Float64(::Irrational{:ω}) = _omega_const
-Base.Float32(::Irrational{:ω}) = Float32(_omega_const)
-Base.Float16(::Irrational{:ω}) = Float16(_omega_const)
-Base.BigFloat(::Irrational{:ω}) = omega_const(BigFloat)
+end
 
 ### Expansion about branch point x = -1/e
 
