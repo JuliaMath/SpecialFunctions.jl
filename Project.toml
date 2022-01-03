@@ -4,6 +4,7 @@ version = "2.2.0"
 
 [deps]
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+Compat = "34da2185-b29b-5c13-b0c7-acf172513d20"
 IrrationalConstants = "92d709cd-6900-40b7-9082-c6be49f344b6"
 LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
 OpenLibm_jll = "05823500-19ac-5b8b-9628-191a04bc5112"
@@ -18,6 +19,7 @@ SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
 [compat]
 ChainRulesCore = "0.9.44, 0.10, 1"
 ChainRulesTestUtils = "0.6.8, 0.7, 1"
+Compat = "3.7, 4"
 IrrationalConstants = "0.1, 0.2"
 LogExpFunctions = "0.3.2"
 OpenLibm_jll = "0.7, 0.8"

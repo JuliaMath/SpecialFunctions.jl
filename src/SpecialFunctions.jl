@@ -1,5 +1,7 @@
 module SpecialFunctions
 
+using Compat
+
 using IrrationalConstants:
     twoπ,
     halfπ,
