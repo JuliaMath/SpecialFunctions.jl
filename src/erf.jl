@@ -573,13 +573,9 @@ See also: [`erfcx(x)`](@ref erfcx).
 
 # Implementation
 Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
-Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
-logerfc(x::Real) = _logerfc(float(x))
-
-function _logerfc(x::Union{Float32, Float64, BigFloat})
-    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
-    if x > 0.0
+function logerfc(x::Real)
+    if x > zero(x)
         return log(erfcx(x)) - x^2
     else
         return log(erfc(x))
@@ -604,13 +600,9 @@ See also: [`erfcx(x)`](@ref erfcx).
 
 # Implementation
 Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
-Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
-logerfcx(x::Real) = _logerfcx(float(x))
-
-function _logerfcx(x::Union{Float32, Float64, BigFloat})
-    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
-    if x < 0.0
+function logerfcx(x::Real)
+    if x < zero(x)
         return log(erfc(x)) + x^2
     else
         return log(erfcx(x))
