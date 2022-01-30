@@ -164,7 +164,15 @@ end
     for x = .5:5.0:100.0
         @test SpecialFunctions.stirling_error(x) ≈ log(gamma(x)) - (x-.5)*log(x)+x- log(2*pi)/2.0
     end
+
     @test_throws ArgumentError("p + q must equal one but is 0.5") gamma_inc_inv(0.4, 0.2, 0.3)
+
+    @testset "Low precision with Float64(p) + Float64(q) != 1" for T in (Float16, Float32)
+        @test gamma_inc(T(1.0), gamma_inc_inv(T(1.0), T(0.1), T(0.9)))[1]::T ≈ T(0.1)
+        @test gamma_inc(T(1.0), gamma_inc_inv(T(1.0), T(0.9), T(0.1)))[2]::T ≈ T(0.1)
+        @test_throws ArgumentError("p + q must equal one but was 1.02") gamma_inc_inv(T(1.0), T(0.1), T(0.92))
+        @test_throws ArgumentError("p + q must equal one but was 1.02") gamma_inc_inv(T(1.0), T(0.92), T(0.1))
+    end
 end
 
 double(x::Real) = Float64(x)
