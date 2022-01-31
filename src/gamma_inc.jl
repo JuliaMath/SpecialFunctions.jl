@@ -1015,18 +1015,13 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
 end
 
 function _gamma_inc_inv(a::T, p::T, q::T) where {T <: Union{Float16, Float32}}
+    if p + q != one(T)
+        throw(ArgumentError("p + q must equal one but was $(p + q)"))
+    end
     p64, q64 = if p < q
-        _q = 1 - Float64(p)
-        if q != T(_q)
-            throw(ArgumentError("p + q must equal one but was $(p + q)"))
-        end
-        Float64(p), _q
+        (Float64(p), 1 - Float64(p))
     else
-        _p = 1 - Float64(q)
-        if p != T(_p)
-            throw(ArgumentError("p + q must equal one but was $(p + q)"))
-        end
-        _p, Float64(q)
+        (1 - Float64(q), Float64(q))
     end
     return T(_gamma_inc_inv(Float64(a), p64, q64))
 end
