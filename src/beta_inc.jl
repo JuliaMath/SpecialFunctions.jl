@@ -930,7 +930,8 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     x = p
     r = sqrt(-2*log(p))
     p_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
-    fpu = 1e-30
+    fpu = floatmin(Float64)
+    sae = log10(fpu)
     lb = logbeta(a, b)
 
     if a > 1.0 && b > 1.0
@@ -971,8 +972,30 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
         x = .9999
     end
 
-    iex = max(-5.0/a^2 - 1.0/p^0.2 - 13.0, -30.0)
-    acu = 10.0^iex
+    # This first argument was proposed in
+    #
+    # K. J. Berry, P. W. Mielke, Jr and G. W. Cran (1990).
+    # Algorithm AS R83: A Remark on Algorithm AS 109: Inverse of the
+    #   Incomplete Beta Function Ratio.
+    # Journal of the Royal Statistical Society.
+    # Series C (Applied Statistics), 39(2), 309–310. doi:10.2307/2347779
+    #
+    # but the last term has been changed from 13 to 34 since the
+    # the original article
+    #
+    # Majumder, K. L., & Bhattacharjee, G. P. (1973).
+    # Algorithm as 64: Inverse of the incomplete beta function ratio.
+    # Journal of the Royal Statistical Society.
+    # Series C (Applied Statistics), 22(3), 411-414.
+    #
+    # argues that the iex value should be set to -2r - 2 where r is the
+    # required number of accurate digits.
+    #
+    # The idea with the -5.0/a^2 - 1.0/p^0.2 - 34.0 correction is to
+    # use -2r - 2 (for 16 digits) for large values of a and p but use
+    # a much smaller tolerance for small values of a and p.
+    iex = max(-5.0/a^2 - 1.0/p^0.2 - 34.0, sae)
+    acu = exp10(iex)
 
     #iterate
     while true
