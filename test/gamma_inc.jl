@@ -170,8 +170,8 @@ end
     @testset "Low precision with Float64(p) + Float64(q) != 1" for T in (Float16, Float32)
         @test gamma_inc(T(1.0), gamma_inc_inv(T(1.0), T(0.1), T(0.9)))[1]::T ≈ T(0.1)
         @test gamma_inc(T(1.0), gamma_inc_inv(T(1.0), T(0.9), T(0.1)))[2]::T ≈ T(0.1)
-        @test_throws ArgumentError("p + q must equal one but was 1.02") gamma_inc_inv(T(1.0), T(0.1), T(0.92))
-        @test_throws ArgumentError("p + q must equal one but was 1.02") gamma_inc_inv(T(1.0), T(0.92), T(0.1))
+        @test_throws ArgumentError("p + q must equal one but is 1.02") gamma_inc_inv(T(1.0), T(0.1), T(0.92))
+        @test_throws ArgumentError("p + q must equal one but is 1.02") gamma_inc_inv(T(1.0), T(0.92), T(0.1))
     end
 end
 
