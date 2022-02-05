@@ -725,14 +725,13 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
 end
 
 """
-    gamma_inc_inv_asmall(a, minpq, pcase)
+    gamma_inc_inv_asmall(a, logp)
 
 Compute `x0` - initial approximation when `a` is small.
-Here the solution `x` of ``P(a,x)=p`` satisfies ``x_{l} < x < x_{u}``
+Here the solution `x` of ``P(a,x)=p=\\exp(logp)`` satisfies ``x_{l} < x < x_{u}``
 where ``x_{l} = (p\\Gamma(a+1))^{1/a}`` and ``x_{u} = -\\log{(1 - p\\Gamma(a+1))}``, and is used as starting value for Newton iteration.
 """
-function gamma_inc_inv_asmall(a::Float64, minpq::Float64, pcase::Bool)
-    logp = pcase ? log(minpq) : log1p(-minpq)
+function gamma_inc_inv_asmall(a::Float64, logp::Float64)
     return exp((logp + loggamma1p(a)) / a)
 end
 
@@ -956,7 +955,7 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     elseif abs(a - 1.0) < 1.0e-4
         x0 = pcase ? -log1p(-minpq) : -log(minpq)
     elseif a < 1.0 # small value of a
-        x0 = gamma_inc_inv_asmall(a, minpq, pcase)
+        x0 = gamma_inc_inv_asmall(a, logp)
     else    #large a
         haseta = true
         x0, fp = gamma_inc_inv_alarge(a, minpq, pcase)
