@@ -911,8 +911,12 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
-gamma_inc_inv(a::Real, p::Real, q::Real) = _gamma_inc_inv(promote(float(a), float(p), float(q))...)
+function gamma_inc_inv(a::Real, p::Real, q::Real)
+    return _gamma_inc_inv(map(float, promote(a, p, q))...)
+end
 
+# `gamma inc_inv` ensures that arguments of `_gamma_inc_inv` are
+# floating point numbers of the same type
 function _gamma_inc_inv(a::T, p::T, q::T) where {T<:Real}
     if p + q != 1
         throw(ArgumentError("p + q must equal one but is $(p + q)"))
@@ -926,7 +930,6 @@ function _gamma_inc_inv(a::T, p::T, q::T) where {T<:Real}
 
     pcase = p < 0.5
     minpq = pcase ? p : q
-
     return __gamma_inc_inv(a, minpq, pcase)
 end
 
