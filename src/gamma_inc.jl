@@ -725,17 +725,6 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
 end
 
 """
-    gamma_inc_inv_asmall(a, logp)
-
-Compute `x0` - initial approximation when `a` is small.
-Here the solution `x` of ``P(a,x)=p=\\exp(logp)`` satisfies ``x_{l} < x < x_{u}``
-where ``x_{l} = (p\\Gamma(a+1))^{1/a}`` and ``x_{u} = -\\log{(1 - p\\Gamma(a+1))}``, and is used as starting value for Newton iteration.
-"""
-function gamma_inc_inv_asmall(a::Float64, logp::Float64)
-    return exp((logp + loggamma1p(a)) / a)
-end
-
-"""
     gamma_inc_inv_alarge(a, minpq, pcase)
 
 Compute `x0` - initial approximation when `a` is large.
@@ -945,7 +934,8 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     haseta = false
 
     logp = pcase ? log(minpq) : log1p(-minpq)
-    logr = (1.0/a)*(logp + logabsgamma(a + 1.0)[1])
+    loggamma1pa = a <= 1.0 ? loggamma1p(a) : loggamma(a + 1.0)
+    logr = (logp + loggamma1pa) / a
     if logr < log(0.2*(1 + a)) #small value of p
         x0 = gamma_inc_inv_psmall(a, logr)
     elseif !pcase && minpq < min(0.02, exp(-1.5*a)/gamma(a)) && a < 10 #small q
@@ -955,7 +945,7 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     elseif abs(a - 1.0) < 1.0e-4
         x0 = pcase ? -log1p(-minpq) : -log(minpq)
     elseif a < 1.0 # small value of a
-        x0 = gamma_inc_inv_asmall(a, logp)
+        x0 = exp(logr)
     else    #large a
         haseta = true
         x0, fp = gamma_inc_inv_alarge(a, minpq, pcase)
