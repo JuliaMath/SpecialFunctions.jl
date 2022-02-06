@@ -44,10 +44,17 @@
     @test gamma_inc(1.1, 1e3)[2] == 0.0
     @test gamma_inc(24.0, 1e-323)[1] == 0.0
     @test gamma_inc(6311.0, 6311.0*0.59999)[1] < 1e-300
+    @test gamma_inc(0.5, Inf) == (1.0, 0.0)
+    @test all(isnan, gamma_inc(NaN, 1.0))
+    @test all(isnan, gamma_inc(1.0, NaN))
+    @test all(isnan, gamma_inc(NaN, Inf))
     @test_throws DomainError gamma_inc(-1, 2, 2)
     @test_throws DomainError gamma_inc(0, 0, 1)
     @test_throws DomainError gamma_inc(7.098843361278083e33, 7.09884336127808e33)
     @test_throws DomainError gamma_inc(6.693195169205051e28, 6.693195169205049e28)
+    @test_throws DomainError gamma_inc(NaN, -1.0)
+    @test_throws DomainError gamma_inc(-1.0, NaN)
+    @test_throws DomainError gamma_inc(1.0, -Inf)
 end
 
 @testset "inverse of incomplete gamma ratios" begin
