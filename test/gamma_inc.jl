@@ -173,6 +173,11 @@ end
         @test_throws ArgumentError("p + q must equal one but is 1.02") gamma_inc_inv(T(1.0), T(0.1), T(0.92))
         @test_throws ArgumentError("p + q must equal one but is 1.02") gamma_inc_inv(T(1.0), T(0.92), T(0.1))
     end
+
+    @testset "Promotion of arguments" begin
+        @test @inferred(gamma_inc_inv(1//2, 0.3f0, 0.7f0)) isa Float32
+        @test @inferred(gamma_inc_inv(1, 0.2f0, 0.8f0)) isa Float32
+    end
 end
 
 double(x::Real) = Float64(x)
