@@ -791,6 +791,10 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
         else
             return (1.0, 0.0)
         end
+    elseif isnan(a) || isnan(x)
+        return (a*x, a*x)
+    elseif isinf(x)
+        return (1.0, 0.0)
     end
 
     if a >= 1.0
