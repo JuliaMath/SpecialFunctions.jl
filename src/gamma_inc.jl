@@ -665,7 +665,7 @@ function gamma_inc_fsum(a::Float64, x::Float64)
 end
 
 """
-    gamma_inc_inv_psmall(a,p)
+    gamma_inc_inv_psmall(a, logr)
 
 Compute `x0` - initial approximation when `p` is small.
 Here we invert the series in Eqn (2.20) in the paper and write the inversion problem as:
@@ -675,8 +675,7 @@ x = r\\left[1 + a\\sum_{k=1}^{\\infty}\\frac{(-x)^{n}}{(a+n)n!}\\right]^{-1/a},
 where ``r = (p\\Gamma(1+a))^{1/a}``
 Inverting this relation we obtain ``x = r + \\sum_{k=2}^{\\infty}c_{k}r^{k}``.
 """
-function gamma_inc_inv_psmall(a::Float64, p::Float64)
-    logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
+function gamma_inc_inv_psmall(a::Float64, logr::Float64)
     r    = exp(logr)
     ap1  = a + 1.0
     ap1² = ap1*ap1
@@ -726,19 +725,7 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
 end
 
 """
-    gamma_inc_inv_asmall(a,p,q,pcase)
-
-    Compute `x0` - initial approximation when `a` is small.
-    Here the solution `x` of ``P(a,x)=p`` satisfies ``x_{l} < x < x_{u}``
-    where ``x_{l} = (p\\Gamma(a+1))^{1/a}`` and ``x_{u} = -\\log{(1 - p\\Gamma(a+1))}``, and is used as starting value for Newton iteration.
-    """
-function gamma_inc_inv_asmall(a::Float64, p::Float64, q::Float64, pcase::Bool)
-    logp = (pcase) ? log(p) : log1p(-q)
-    return exp((1.0/a)*(logp +loggamma1p(a)))
-end
-
-"""
-    gamma_inc_inv_alarge(a,porq,s)
+    gamma_inc_inv_alarge(a, minpq, pcase)
 
 Compute `x0` - initial approximation when `a` is large.
 The inversion problem is rewritten as :
@@ -753,9 +740,10 @@ and it is possible to expand:
 which is calculated by coeff1, coeff2 and coeff3 functions below.
 This returns a tuple `(x0,fp)`, where `fp` is computed since it's an approximation for the coefficient after inverting the original power series.
 """
-function gamma_inc_inv_alarge(a::Float64, porq::Float64, s::Integer)
-    r = erfcinv(2*porq)
-    eta = s*r/sqrt(a*0.5)
+function gamma_inc_inv_alarge(a::Float64, minpq::Float64, pcase::Bool)
+    r = erfcinv(2*minpq)
+    s = r/sqrt(a*0.5)
+    eta = pcase ? -s : s
     eta += (coeff1(eta) + (coeff2(eta) + coeff3(eta)/a)/a)/a
     x0 = a*lambdaeta(eta)
     fp = -sqrt(inv2π*a)*exp(-0.5*a*eta*eta)/gammax(a)
@@ -803,6 +791,10 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
         else
             return (1.0, 0.0)
         end
+    elseif isnan(a) || isnan(x)
+        return (a*x, a*x)
+    elseif isinf(x)
+        return (1.0, 0.0)
     end
 
     if a >= 1.0
@@ -919,45 +911,47 @@ External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wiki
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
-gamma_inc_inv(a::Real, p::Real, q::Real) = _gamma_inc_inv(promote(float(a), float(p), float(q))...)
+function gamma_inc_inv(a::Real, p::Real, q::Real)
+    return _gamma_inc_inv(map(float, promote(a, p, q))...)
+end
 
-function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
-
+# `gamma inc_inv` ensures that arguments of `_gamma_inc_inv` are
+# floating point numbers of the same type
+function _gamma_inc_inv(a::T, p::T, q::T) where {T<:Real}
     if p + q != 1
         throw(ArgumentError("p + q must equal one but is $(p + q)"))
     end
 
     if iszero(p)
-        return 0.0
+        return zero(T)
     elseif iszero(q)
-        return Inf
+        return T(Inf)
     end
 
-    if p < 0.5
-        pcase = true
-        porq = p
-        s = -1
-    else
-        pcase = false
-        porq = q
-        s = 1
-    end
+    pcase = p < 0.5
+    minpq = pcase ? p : q
+    return __gamma_inc_inv(a, minpq, pcase)
+end
+
+function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     haseta = false
 
-    logr = (1.0/a)*(log(p) + logabsgamma(a + 1.0)[1])
+    logp = pcase ? log(minpq) : log1p(-minpq)
+    loggamma1pa = a <= 1.0 ? loggamma1p(a) : loggamma(a + 1.0)
+    logr = (logp + loggamma1pa) / a
     if logr < log(0.2*(1 + a)) #small value of p
-        x0 = gamma_inc_inv_psmall(a, p)
-    elseif ((q < min(0.02, exp(-1.5*a)/gamma(a))) && (a < 10)) #small q
-        x0 = gamma_inc_inv_qsmall(a, q)
-    elseif abs(porq - 0.5) < 1.0e-05
+        x0 = gamma_inc_inv_psmall(a, logr)
+    elseif !pcase && minpq < min(0.02, exp(-1.5*a)/gamma(a)) && a < 10 #small q
+        x0 = gamma_inc_inv_qsmall(a, minpq)
+    elseif abs(minpq - 0.5) < 1.0e-05
         x0 = a - 1.0/3.0 + (8.0/405.0 + 184.0/25515.0/a)/a
     elseif abs(a - 1.0) < 1.0e-4
-        x0 = pcase ? -log1p(-p) : -log(q)
+        x0 = pcase ? -log1p(-minpq) : -log(minpq)
     elseif a < 1.0 # small value of a
-        x0 = gamma_inc_inv_asmall(a, p, q, pcase)
+        x0 = exp(logr)
     else    #large a
         haseta = true
-        x0, fp = gamma_inc_inv_alarge(a, porq, s)
+        x0, fp = gamma_inc_inv_alarge(a, minpq, pcase)
     end
 
     t = 1
@@ -981,7 +975,7 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
 
         px, qx = gamma_inc(a, x, 0)
 
-        ck1 = pcase ? -r*(px - p) : r*(qx - q)
+        ck1 = pcase ? -r*(px - minpq) : r*(qx - minpq)
         if a > 0.05
             ck2 = (x - a + 1.0)/(2.0*x)
 
@@ -1014,8 +1008,9 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     return x
 end
 
-_gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
-_gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
+function __gamma_inc_inv(a::T, minpq::T, pcase::Bool) where {T<:Union{Float16,Float32}}
+    return T(__gamma_inc_inv(Float64(a), Float64(minpq), pcase))
+end
 
 # like promote(x,y), but don't complexify real values
 promotereal(x::Real, y::Real) = promote(x, y)

@@ -39,7 +39,9 @@ For ``m<0``, followed by
 > <https://www.researchgate.net/publication/267330394>
 As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 """
-function ellipk(m::Float64)
+ellipk(m::Real) = _ellipk(float(m))
+
+function _ellipk(m::Float64)
     flag_is_m_neg = false
     if m < 0.0
         x               = m / (m-1)         #dealing with negative args
@@ -214,7 +216,9 @@ For ``m<0``, followed by
 > <https://www.researchgate.net/publication/267330394>
 As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 """
-function ellipe(m::Float64)
+ellipe(m::Real) = _ellipe(float(m))
+
+function _ellipe(m::Float64)
     flag_is_m_neg = false
     if m < 0.0
         x               = m / (m-1)         #dealing with negative args
@@ -346,11 +350,7 @@ function ellipe(m::Float64)
     end
 end
 
-for f in (:ellipk,:ellipe)
-    @eval begin
-        ($f)(x::Float16)        = Float16(($f)(Float64(x)))
-	    ($f)(x::Float32)        = Float32(($f)(Float64(x)))
-        ($f)(x::Real)           = ($f)(float(x))
-	    ($f)(x::AbstractFloat)  = throw(MethodError($f, (x, "")))
-    end
+# Support for Float32 and Float16
+for internalf in (:_ellipk, :_ellipe), T in (:Float16, :Float32)
+    @eval $internalf(x::$T) = $T($internalf(Float64(x)))
 end

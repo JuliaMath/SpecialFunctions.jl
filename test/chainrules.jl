@@ -37,6 +37,11 @@
                     test_scalar(airyaiprimex, x)
                 end
             end
+
+            if x isa Real && x < 1
+                test_scalar(ellipk, x)
+                test_scalar(ellipe, x)
+            end
         end
     end
 
