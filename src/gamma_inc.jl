@@ -803,6 +803,10 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
         else
             return (1.0, 0.0)
         end
+    elseif isnan(a) || isnan(x)
+        return (a*x, a*x)
+    elseif isinf(x)
+        return (1.0, 0.0)
     end
 
     if a >= 1.0
@@ -1014,8 +1018,17 @@ function _gamma_inc_inv(a::Float64, p::Float64, q::Float64)
     return x
 end
 
-_gamma_inc_inv(a::Float32, p::Float32, q::Float32) = Float32(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
-_gamma_inc_inv(a::Float16, p::Float16, q::Float16) = Float16(_gamma_inc_inv(Float64(a), Float64(p), Float64(q)))
+function _gamma_inc_inv(a::T, p::T, q::T) where {T <: Union{Float16, Float32}}
+    if p + q != one(T)
+        throw(ArgumentError("p + q must equal one but was $(p + q)"))
+    end
+    p64, q64 = if p < q
+        (Float64(p), 1 - Float64(p))
+    else
+        (1 - Float64(q), Float64(q))
+    end
+    return T(_gamma_inc_inv(Float64(a), p64, q64))
+end
 
 # like promote(x,y), but don't complexify real values
 promotereal(x::Real, y::Real) = promote(x, y)
