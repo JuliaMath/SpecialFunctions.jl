@@ -693,7 +693,7 @@ function gamma_inc_inv_psmall(a::Float64, logr::Float64)
 end
 
 """
-    gamma_inc_inv_qsmall(a,q)
+    gamma_inc_inv_qsmall(a, q, qgammaxa)
 
 Compute `x0` - initial approximation when `q` is small from ``e^{-x_{0}} x_{0}^{a} = q \\Gamma(a)``.
 Asymptotic expansions Eqn (2.29) in the paper is used here and higher approximations are obtained using
@@ -702,9 +702,9 @@ x \\sim x_{0} - L + b \\sum_{k=1}^{\\infty} d_{k}/x_{0}^{k}
 ```
 where ``b = 1-a``, ``L = \\ln{x_0}``.
 """
-function gamma_inc_inv_qsmall(a::Float64, q::Float64)
+function gamma_inc_inv_qsmall(a::Float64, q::Float64, qgammaxa::Float64)
     b = 1.0 - a
-    eta = sqrt(-2/a*log(q*gammax(a)*sqrt(twoπ/a)))
+    eta = sqrt(-2/a*log(qgammaxa))
     x0 = a*lambdaeta(eta)
     l = log(x0)
 
@@ -941,8 +941,11 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     logr = (logp + loggamma1pa) / a
     if logr < log(0.2*(1 + a)) #small value of p
         x0 = gamma_inc_inv_psmall(a, logr)
-    elseif !pcase && minpq < min(0.02, exp(-1.5*a)/gamma(a)) && a < 10 #small q
-        x0 = gamma_inc_inv_qsmall(a, minpq)
+    elseif !pcase && a < 10 && minpq < 0.02 && (qgammaxa = minpq*gammax(a)*sqrt(twoπ/a)) < 1 #small q
+        # This deviates from the original version. The tmp variable
+        # here ensures that the argument of sqrt in gamma_inc_inv_qsmall
+        # is positive
+        x0 = gamma_inc_inv_qsmall(a, minpq, qgammaxa)
     elseif abs(minpq - 0.5) < 1.0e-05
         x0 = a - 1.0/3.0 + (8.0/405.0 + 184.0/25515.0/a)/a
     elseif abs(a - 1.0) < 1.0e-4
