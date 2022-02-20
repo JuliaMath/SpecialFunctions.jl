@@ -185,6 +185,12 @@ end
         @test @inferred(gamma_inc_inv(1//2, 0.3f0, 0.7f0)) isa Float32
         @test @inferred(gamma_inc_inv(1, 0.2f0, 0.8f0)) isa Float32
     end
+
+    @testset "Issue 385" begin
+        a = 0.010316813105574363
+        q = 0.010101010101010102
+        @test last(gamma_inc(a, gamma_inc_inv(a, 1 - q, q))) ≈ q
+    end
 end
 
 double(x::Real) = Float64(x)
