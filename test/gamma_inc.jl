@@ -191,6 +191,16 @@ end
         q = 0.010101010101010102
         @test last(gamma_inc(a, gamma_inc_inv(a, 1 - q, q))) ≈ q
     end
+
+    @testset "Issue 387" begin
+        n = 1000
+        @testset "a=$a" for a in exp10.(range(-20, stop=20, length=n))
+            @testset "x=$x" for x = exp10.(range(-20, stop=2, length=n))
+                p, q = gamma_inc(a, x)
+                @test p < floatmin() || q < floatmin() || gamma_inc_inv(a, p, q) ≈ x
+            end
+        end
+    end
 end
 
 double(x::Real) = Float64(x)

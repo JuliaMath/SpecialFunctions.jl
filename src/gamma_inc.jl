@@ -179,7 +179,7 @@ end
 """
     lambdaeta(eta)
 
-Compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-\\ln{\\lambda}``.
+Compute the value of ``\\lambda`` satisfying ``\\eta^{2}/2 = \\lambda-1-\\log{\\lambda}``.
 """
 function lambdaeta(eta::Float64)
     s = eta*eta*0.5
@@ -715,7 +715,9 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64, qgammaxa::Float64)
         ck3 = (@horner(l, @horner(b, -12, -24, -11), @horner(b, 12, 24, 6), @horner(b, -6, -9), 2))/6.0
         ck4 = (@horner(l, @horner(b, 72, 162, 120, 25), @horner(b, -72, -168, -114, -12), @horner(b, 36, 84, 36), @horner(b, -12, -22), 3))/12.0
         x0 = x0 - l + b*r*@horner(r, ck1, ck2, ck3, ck4)
-    else
+    elseif x0 > 1
+        # The x0 > 1 condition isn't in the original version but without it
+        # the update in the branch can cause negative initial x0
         r = 1.0/x0
         l² = l*l
         ck1 = l - 1.0
@@ -942,7 +944,7 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     if logr < log(0.2*(1 + a)) #small value of p
         x0 = gamma_inc_inv_psmall(a, logr)
     elseif !pcase && a < 10 && minpq < 0.02 && (qgammaxa = minpq*gammax(a)*sqrt(twoπ/a)) < 1 #small q
-        # This deviates from the original version. The tmp variable
+        # This deviates from the original version. The qgammaxa variable
         # here ensures that the argument of sqrt in gamma_inc_inv_qsmall
         # is positive
         x0 = gamma_inc_inv_qsmall(a, minpq, qgammaxa)
