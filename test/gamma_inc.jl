@@ -177,8 +177,29 @@ end
     @testset "Low precision with Float64(p) + Float64(q) != 1" for T in (Float16, Float32)
         @test gamma_inc(T(1.0), gamma_inc_inv(T(1.0), T(0.1), T(0.9)))[1]::T ≈ T(0.1)
         @test gamma_inc(T(1.0), gamma_inc_inv(T(1.0), T(0.9), T(0.1)))[2]::T ≈ T(0.1)
-        @test_throws ArgumentError("p + q must equal one but was 1.02") gamma_inc_inv(T(1.0), T(0.1), T(0.92))
-        @test_throws ArgumentError("p + q must equal one but was 1.02") gamma_inc_inv(T(1.0), T(0.92), T(0.1))
+        @test_throws ArgumentError("p + q must equal one but is 1.02") gamma_inc_inv(T(1.0), T(0.1), T(0.92))
+        @test_throws ArgumentError("p + q must equal one but is 1.02") gamma_inc_inv(T(1.0), T(0.92), T(0.1))
+    end
+
+    @testset "Promotion of arguments" begin
+        @test @inferred(gamma_inc_inv(1//2, 0.3f0, 0.7f0)) isa Float32
+        @test @inferred(gamma_inc_inv(1, 0.2f0, 0.8f0)) isa Float32
+    end
+
+    @testset "Issue 385" begin
+        a = 0.010316813105574363
+        q = 0.010101010101010102
+        @test last(gamma_inc(a, gamma_inc_inv(a, 1 - q, q))) ≈ q
+    end
+
+    @testset "Issue 387" begin
+        n = 1000
+        @testset "a=$a" for a in exp10.(range(-20, stop=20, length=n))
+            @testset "x=$x" for x = exp10.(range(-20, stop=2, length=n))
+                p, q = gamma_inc(a, x)
+                @test p < floatmin() || q < floatmin() || gamma_inc_inv(a, p, q) ≈ x
+            end
+        end
     end
 end
 
