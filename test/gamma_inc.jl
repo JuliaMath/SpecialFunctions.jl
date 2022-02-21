@@ -201,6 +201,12 @@ end
             end
         end
     end
+
+    @testset "Issue 390 part 1" begin
+        a = 1.0309015068677239
+        q = 0.020202020202020204
+        @test last(gamma_inc(a, gamma_inc_inv(a, 1 - q, q))) ≈ q
+    end
 end
 
 double(x::Real) = Float64(x)
