@@ -300,7 +300,7 @@ function coeff3(eta::Float64)
     if eta < -8.0
         x=eta*eta
         y = log(-eta)/eta
-        coeff3=(-30.0 + eta*y*(6.0*x*y*y - 12.0+x))/(12.0*eta*x*x)
+        coeff3=(-30.0 + eta*y*(6.0*x*y*y - 12.0 + x))/(12.0*eta*x*x)
     elseif eta < -4.0
         coeff3 = (
             @horner(
