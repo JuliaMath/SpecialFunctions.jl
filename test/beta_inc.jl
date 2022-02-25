@@ -230,6 +230,11 @@
     @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
     @test SpecialFunctions.loggammadiv(big(13.89), big(21.0001)) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
     @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling_error(11.99) + SpecialFunctions.stirling_error(100.1) - SpecialFunctions.stirling_error(11.99 + 100.1)
+
+    @testset "Issue 334. Underflow without erroring" begin
+        @test beta_inc(0.1, 4000, 0.2) == (1.0, 0.0)
+        @test beta_inc(4000, 0.1, 0.2) == (0.0, 1.0)
+    end
 end
 
 @testset "inverse of incomplete beta" begin
@@ -288,5 +293,10 @@ end
             @test beta_inc_inv(a, b, p) isa Tuple{T,T}
             @test beta_inc_inv(a, b, p, 1 - p) === beta_inc_inv(a, b, p)
         end
+    end
+
+    @testset "Avoid NaN when p=q=1" begin
+        @test first(beta_inc_inv(1.0, 1.0, 1e-21)) ≈ 1e-21
+        @test beta_inc_inv(1.0e30, 1.0, 0.49) == (1.0, 0.0)
     end
 end
