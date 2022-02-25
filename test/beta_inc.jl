@@ -230,6 +230,11 @@
     @test SpecialFunctions.loggammadiv(13.89, 21.0001) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
     @test SpecialFunctions.loggammadiv(big(13.89), big(21.0001)) ≈ log(gamma(big(21.0001))/gamma(big(21.0001)+big(13.89)))
     @test SpecialFunctions.stirling_corr(11.99, 100.1) ≈ SpecialFunctions.stirling_error(11.99) + SpecialFunctions.stirling_error(100.1) - SpecialFunctions.stirling_error(11.99 + 100.1)
+
+    @testset "Issue 334. Underflow without erroring" begin
+        @test beta_inc(0.1, 4000, 0.2) == (1.0, 0.0)
+        @test beta_inc(4000, 0.1, 0.2) == (0.0, 1.0)
+    end
 end
 
 @testset "inverse of incomplete beta" begin
