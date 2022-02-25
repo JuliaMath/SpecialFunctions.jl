@@ -1004,7 +1004,10 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     while true
         p_approx = beta_inc(a, b, x)[1]
         xin = x
-        p_approx = (p_approx - p)*min(floatmax(), exp(lb + r*log(xin) + t*log1p(-xin)))
+        p_approx = (p_approx - p)*min(
+            floatmax(),
+            exp(lb + LogExpFunctions.xlogy(r, xin) + LogExpFunctions.xlog1py(t, -xin))
+        )
 
         if p_approx * p_approx_prev <= 0.0
             prev = max(sq, fpu)

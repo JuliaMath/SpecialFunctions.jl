@@ -294,4 +294,9 @@ end
             @test beta_inc_inv(a, b, p, 1 - p) === beta_inc_inv(a, b, p)
         end
     end
+
+    @testset "Avoid NaN when p=q=1" begin
+        @test first(beta_inc_inv(1.0, 1.0, 1e-21)) ≈ 1e-21
+        @test beta_inc_inv(1.0e30, 1.0, 0.49) == (1.0, 0.0)
+    end
 end
