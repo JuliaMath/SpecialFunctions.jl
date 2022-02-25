@@ -371,19 +371,21 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
     end
     z = -nu*lnx
     if b*z == 0.0
-        return error("expansion can't be computed")
+        @debug("underflow: expansion can't be computed")
+        return w
     end
 
     # COMPUTATION OF THE EXPANSION
     #SET R = EXP(-Z)*Z**B/GAMMA(B)
     r = b*(1.0 + rgamma1pm1(b))*exp(b*log(z))
     r *= exp(a*lnx)*exp(0.5*bm1*lnx)
-    u = loggammadiv(b,a) + b*log(nu)
+    u = loggammadiv(b, a) + b*log(nu)
     u = r*exp(-u)
     if u == 0.0
-        return error("expansion can't be computed")
+        @debug("underflow: expansion can't be computed")
+        return w
     end
-    (p, q) = gamma_inc(b,z,0)
+    p, q = gamma_inc(b, z, 0)
     v = inv(nu)^2/4
     t2 = lnx^2/4
     l = w/u
@@ -412,7 +414,8 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
         dj = d[n] * j
         sm += dj
         if sm <= 0.0
-            return error("expansion can't be computed")
+            @debug("underflow: expansion can't be computed")
+            return w
         end
         if abs(dj) <= epps*(sm+l)
             break
@@ -837,7 +840,7 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64=1-x)
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
         q = beta_inc_power_series1(a0, b0, x0, epps)
         p = 1.0 - q
-    elseif max(a0,b0) > 1.0
+    elseif max(a0, b0) > 1.0
         if b0 <= 1.0
             p = beta_inc_power_series(a0, b0, x0, epps)
             q = 1.0 - p
