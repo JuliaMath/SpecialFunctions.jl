@@ -919,6 +919,9 @@ function beta_inc_inv(a::Real, b::Real, p::Real, q::Real)
 end
 
 function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
+
+    maxiter = 30
+
     #change tail if necessary
     if p > 0.5
         y, x = _beta_inc_inv(b, a, q, p)
@@ -968,8 +971,8 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     sq = 1.0
     prev = 1.0
 
-    if x < 0.0001
-        x = 0.0001
+    if x < 1e-200
+        x = 1e-200
     end
     if x > .9999
         x = .9999
@@ -1001,7 +1004,7 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     acu = exp10(iex)
 
     #iterate
-    while true
+    for i in 1:maxiter
         p_approx = beta_inc(a, b, x)[1]
         xin = x
         p_approx = (p_approx - p)*min(
@@ -1026,7 +1029,7 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
         end
 
         #check if current estimate is acceptable
-
+        prev, acu, p_approx, x, tx
         if prev <= acu || p_approx^2 <= acu
             x = tx
             return (x, 1.0 - x)
@@ -1039,6 +1042,9 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
         x = tx
         p_approx_prev = p_approx
     end
+
+    @debug "Newton iterations didn't converge in $maxiter iterations. The result might have reduced precision."
+    return (x, 1.0 - x)
 end
 
 function _beta_inc_inv(a::T, b::T, p::T) where {T<:Union{Float16, Float32}}
