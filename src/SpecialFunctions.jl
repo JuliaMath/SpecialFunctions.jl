@@ -78,6 +78,7 @@ export
     expintx,
     sinint,
     cosint,
+    cosint2,
     lbinomial
 
 include("bessel.jl")
