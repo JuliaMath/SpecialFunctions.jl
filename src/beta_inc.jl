@@ -919,9 +919,6 @@ function beta_inc_inv(a::Real, b::Real, p::Real, q::Real)
 end
 
 function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
-
-    maxiter = 30
-
     #change tail if necessary
     if p > 0.5
         y, x = _beta_inc_inv(b, a, q, p)
@@ -937,7 +934,6 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     r = sqrt(-2*log(p))
     p_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
     fpu = floatmin(Float64)
-    sae = log10(fpu)
     lb = logbeta(a, b)
 
     if a > 1.0 && b > 1.0
@@ -971,12 +967,7 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     sq = 1.0
     prev = 1.0
 
-    if x < 1e-200
-        x = 1e-200
-    end
-    if x > .9999
-        x = .9999
-    end
+    x = clamp(x, fpu, prevfloat(1.0))
 
     # This first argument was proposed in
     #
@@ -1000,11 +991,11 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     # The idea with the -5.0/a^2 - 1.0/p^0.2 - 34.0 correction is to
     # use -2r - 2 (for 16 digits) for large values of a and p but use
     # a much smaller tolerance for small values of a and p.
-    iex = max(-5.0/a^2 - 1.0/p^0.2 - 34.0, sae)
-    acu = exp10(iex)
+    iex = -5.0/a^2 - 1.0/p^0.2 - 34.0
+    acu = max(exp10(iex), 10 * fpu) # 10 * fpu instead of fpu avoids hangs for small values
 
     #iterate
-    for i in 1:maxiter
+    while true
         p_approx = beta_inc(a, b, x)[1]
         xin = x
         p_approx = (p_approx - p)*min(
@@ -1015,21 +1006,15 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
         if p_approx * p_approx_prev <= 0.0
             prev = max(sq, fpu)
         end
-        g = 1.0
 
-        tx = x - g*p_approx
-        while true
-            adj = g*p_approx
-            sq = adj^2
+	adj = p_approx
+	tx = x - adj
+	while prev <= (sq = adj^2) || tx < 0.0 || tx > 1.0
+            adj /= 3.0
             tx = x - adj
-            if (prev > sq && tx >= 0.0 && tx <= 1.0)
-                break
-            end
-            g /= 3.0
         end
 
         #check if current estimate is acceptable
-        prev, acu, p_approx, x, tx
         if prev <= acu || p_approx^2 <= acu
             x = tx
             return (x, 1.0 - x)
@@ -1042,9 +1027,6 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
         x = tx
         p_approx_prev = p_approx
     end
-
-    @debug "Newton iterations didn't converge in $maxiter iterations. The result might have reduced precision."
-    return (x, 1.0 - x)
 end
 
 function _beta_inc_inv(a::T, b::T, p::T) where {T<:Union{Float16, Float32}}
