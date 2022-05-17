@@ -299,4 +299,10 @@ end
         @test first(beta_inc_inv(1.0, 1.0, 1e-21)) ≈ 1e-21
         @test beta_inc_inv(1.0e30, 1.0, 0.49) == (1.0, 0.0)
     end
+
+    @testset "Avoid infinite loops" begin
+        # See https://github.com/JuliaStats/StatsFuns.jl/issues/133#issuecomment-1069602721
+        y = 2.0e-280
+        @test beta_inc(2.0, 1.0, beta_inc_inv(2.0, 1.0, y, 1.0)[1])[1] ≈ y
+    end
 end
