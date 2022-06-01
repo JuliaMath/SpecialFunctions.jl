@@ -305,4 +305,10 @@ end
         y = 2.0e-280
         @test beta_inc(2.0, 1.0, beta_inc_inv(2.0, 1.0, y, 1.0)[1])[1] ≈ y
     end
+
+    @testset "StatsFuns#145" begin
+        y = 0.92
+        @test beta_inc_inv(0.01, 0.1, y)[1] ≈ 0.7803014210919872
+        @test beta_inc(0.01, 0.1, beta_inc_inv(0.01, 0.1, y)[1])[1] ≈ y
+    end
 end
