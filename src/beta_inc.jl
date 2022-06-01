@@ -967,7 +967,7 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     sq = 1.0
     prev = 1.0
 
-    x = clamp(x, fpu, prevfloat(1.0))
+    x = clamp(x, 0.0001, 0.9999)
 
     # This first argument was proposed in
     #
