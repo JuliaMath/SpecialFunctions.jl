@@ -202,10 +202,22 @@ end
         end
     end
 
-    @testset "Issue 390 part 1" begin
+    @testset "Issue 390 + 403" begin
         a = 1.0309015068677239
         q = 0.020202020202020204
         @test last(gamma_inc(a, gamma_inc_inv(a, 1 - q, q))) ≈ q
+
+        a = 0.0016546512046778552
+        q = 0.7070707070707071
+        # Mathematica: InverseGammaRegularized[0.0016546512046778552, 0, 1-0.7070707070707071] = 3.04992226601142476643093`9.786272979013901*^-323
+        @test gamma_inc_inv(a, 1 - q, q) ≈ 3e-323
+    end
+
+    @testset "Distributions.jl: Issue 1567" begin
+        a = 0.0030345129757232197
+        p = 0.106
+        # Mathematica: InverseGammaRegularized[0.0030345129757232197, 0, 0.106] = 3.5283979699566549210055643`10.308610719322063*^-322
+        @test gamma_inc_inv(a, p, 1 - p) ≈ 3.5e-322
     end
 end
 
