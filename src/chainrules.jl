@@ -193,6 +193,7 @@ ChainRulesCore.@scalar_rule(
 ChainRulesCore.@scalar_rule(expinti(x), exp(x) / x)
 ChainRulesCore.@scalar_rule(sinint(x), sinc(invπ * x))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
+ChainRulesCore.@scalar_rule(cosint2(x),  iszero(x) ? zero(x) : (one(x)-cos(x))/x )
 
 # elliptic integrals
 ChainRulesCore.@scalar_rule(

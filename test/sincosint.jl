@@ -23,16 +23,22 @@
 
     @test sinint(Float16(1)) == Float16(sinint(1))
     @test cosint(Float16(1)) == Float16(cosint(1))
+    @test cosint2(Float16(1)) == Float16(cosint2(1))
     @test sinint(Float32(1)) == Float32(sinint(1))
     @test cosint(Float32(1)) == Float32(cosint(1))
+    @test cosint2(Float32(1)) == Float32(cosint2(1))
 
     @test sinint(1//2) == sinint(0.5)
     @test cosint(1//2) == cosint(0.5)
+    @test cosint2(1//2) == cosint2(0.5)
 
     @test sinint(1e300)     ≅ π/2
     @test cosint(1e300)     ≅ -8.17881912115908554103E-301
     @test sinint(1e-300)    ≅ 1.0E-300
     @test cosint(1e-300)    ≅ -690.1983122333121
+    
+    @test cosint2(0.0) == 0.0
+    @test cosint2(0.05) ≅ 0.0006249348994501105 # Computed with Mathematica: SetPrecision[EulerGamma + Log[1/20] - CosIntegral[1/20], 20]
 
     @test sinint(Inf) == π/2
     @test cosint(Inf) == 0.0
@@ -41,10 +47,12 @@
 
     @test_throws ErrorException sinint(big(1.0))
     @test_throws ErrorException cosint(big(1.0))
+    @test_throws ErrorException cosint2(big(1.0))
     @test_throws DomainError cosint(-1.0)
     @test_throws DomainError cosint(Float32(-1.0))
     @test_throws DomainError cosint(Float16(-1.0))
     @test_throws DomainError cosint(-1//2)
     @test_throws MethodError sinint(Complex(1))
     @test_throws MethodError cosint(Complex(1))
+    @test_throws MethodError cosint2(Complex(1))
 end

@@ -216,7 +216,18 @@ function cosint(x::Float64)
     end
 end
 
-for f in (:sinint, :cosint)
+function cosint2(x::Float64)
+    y = abs(x)
+    if y < 0.5
+        z = y*y
+        return z * @horner(z, 1/4, -1/96, 1/4320, -1/322560, 1/36288000, 1/5748019200)
+    else
+        return MathConstants.eulergamma + log(y) - cosint(y)
+    end
+end
+
+
+for f in (:sinint, :cosint, :cosint2)
     @eval begin
         ($f)(x::Float32)        = Float32(($f)(Float64(x)))
         ($f)(x::Float16)        = Float16(($f)(Float64(x)))
