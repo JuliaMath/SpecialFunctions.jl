@@ -864,16 +864,13 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
         throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
     elseif a == 0.0 && x == 0.0
         throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
-    elseif a*x == 0.0
-        if x <= a
-            return (0.0, 1.0)
-        else
-            return (1.0, 0.0)
-        end
     elseif isnan(a) || isnan(x)
-        return (a*x, a*x)
-    elseif isinf(x)
+        ax = a*x
+        return (ax, ax)
+    elseif a == 0.0 || isinf(x)
         return (1.0, 0.0)
+    elseif x == 0.0
+        return (0.0, 1.0)
     end
 
     if a >= 1.0
@@ -1042,8 +1039,6 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     logabsgam = logabsgamma(a)[1]
     # Newton-like higher order iteration with upper limit as 15.
     while t > 1.0e-15 && n < 15
-        x = x0
-        x² = x*x
         if !haseta
             dlnr = (1.0 - a)*log(x) + x + logabsgam
             if dlnr > log(floatmax(Float64)/1000.0)
@@ -1068,22 +1063,23 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
             end
 
             if a > 0.1
-                ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
+                ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x^2)
 
                 # This check is not in the invincgam subroutine from IncgamFI but it probably
                 # should be since the routine fails to compute a finite value for very small p
                 if !isfinite(ck3)
                     break
                 end
-                x0 = @horner(ck1, x, 1.0, ck2, ck3)
+                Δx = ck1 * @horner(ck1, 1.0, ck2, ck3)
             else
-                x0 = @horner(ck1, x, 1.0, ck2)
+                Δx = ck1 * @horner(ck1, 1.0, ck2)
             end
         else
-            x0 = x + ck1
+            Δx = ck1
         end
 
-        t = abs(x/x0 - 1.0)
+        x0 = x + Δx
+        t = abs(Δx/x0)
         n += 1
         x = x0
     end
