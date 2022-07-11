@@ -78,10 +78,14 @@ export
     expintx,
     sinint,
     cosint,
-    lbinomial
+    lbinomial,
+    fresnelc,
+    fresnels,
+    fresnel 
 
 include("bessel.jl")
 include("erf.jl")
+include("fresnel.jl")
 include("ellip.jl")
 include("expint.jl")
 include("sincosint.jl")
