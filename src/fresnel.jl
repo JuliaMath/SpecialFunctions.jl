@@ -4,8 +4,11 @@
 """
     fresnelc(z::Number)
 
-Calculates the Fresnel cosine integral for the number z for
-    ``C(z) = \\int_{0}^{z} \\cos{\\left(\\frac{\\pi t^2}{2}\\right)}dt``
+Calculate the normalized Fresnel cosine integral
+```math
+C(z) = \\int_{0}^{z} \\cos{\\left(\\frac{\\pi t^2}{2}\\right)} \, \mathrm{d}t
+```
+for the number ``z``.
 """
 function fresnelc(z::Number)
     x = (z * sqrtπ) / 2
