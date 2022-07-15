@@ -63,5 +63,27 @@ Calculate the normalized sine and cosine fresnel integrals.
 
 See also [`fresnels`](@ref), [`fresnelc`](@ref).
 """
-fresnel(z::Number) = (fresnelc(z),fresnels(z))
+function fresnel(z::Number)
+    x = (z * sqrtπ) / 2
+    re_x, im_x = reim(x)
+    a = (re_x - im_x) + (re_x - im_x) * im
+    b = (re_x + im_x) + (im_x - re_x) * im
+    re_erf_a, im_erf_a = reim(erf(a))
+    re_erf_b, im_erf_b = reim(erf(b))
+    re_y_sin = (re_erf_a - im_erf_a + re_erf_b + im_erf_b) / 4
+    im_y_sin = (re_erf_a + im_erf_a - re_erf_b + im_erf_b) / 4
+    re_y_cos = (re_erf_a + im_erf_a + re_erf_b - im_erf_b) / 4
+    im_y_cos = (im_erf_a - re_erf_a + re_erf_b + im_erf_b) / 4
+    y_sin = re_y_sin + im_y_sin * im
+    y_cos = re_y_cos + im_y_cos * im
+    return (y_sin, y_cos)
+end
+function fresnel(z::Real)
+    x = (z * sqrtπ) / 2
+    a = x + x * im
+    re_erf_a, im_erf_a = reim(erf(a))
+    y_sin = (re_erf_a - im_erf_a) / 2
+    y_cos = (re_erf_a + im_erf_a) / 2
+    return (y_sin, y_cos)
+end
 
