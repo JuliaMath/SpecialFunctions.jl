@@ -57,8 +57,11 @@ function fresnels(z::Real)
 end
 
 """
-        fresnel(z)
-Calculates the cosine and sine fresnel integrals
+    fresnel(z::Number)
+
+Calculate the normalized sine and cosine fresnel integrals.
+
+See also [`fresnels`](@ref), [`fresnelc`](@ref).
 """
 fresnel(z::Number) = (fresnelc(z),fresnels(z))
 
