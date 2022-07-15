@@ -4,7 +4,8 @@
 
 
 """
-        fresnelc(z)
+    fresnelc(z::Number)
+
 Calculates the Fresnel cosine integral for the number z for
     ``C(z) = \\int_{0}^{z} \\cos{\\left(\\frac{\\pi t^2}{2}\\right)}dt``
 """
