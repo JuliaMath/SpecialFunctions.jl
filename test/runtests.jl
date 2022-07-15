@@ -22,6 +22,7 @@ checktol(err::Float64) = err ≤ 1e-13
 
 
 tests = [
+    "fresnel",
     "bessel",
     "beta_inc",
     "betanc",
@@ -32,8 +33,7 @@ tests = [
     "gamma",
     "sincosint",
     "other_tests",
-    "chainrules",
-    "fresnel"
+    "chainrules"
 ]
 
 const testdir = dirname(@__FILE__)
