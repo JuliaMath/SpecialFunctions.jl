@@ -79,13 +79,13 @@ export
     sinint,
     cosint,
     lbinomial,
-    fresnelc,
-    fresnels,
-    fresnel 
-
+    fresnelcos,
+    fresnelsin,
+    fresnelsincos 
+    
+include("fresnel.jl")
 include("bessel.jl")
 include("erf.jl")
-include("fresnel.jl")
 include("ellip.jl")
 include("expint.jl")
 include("sincosint.jl")

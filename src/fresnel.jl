@@ -2,15 +2,15 @@
 
 
 """
-    fresnelc(z::Number)
+    fresnelcos(z::Number)
 
 Calculate the normalized Fresnel cosine integral
 ```math
-C(z) = \\int_{0}^{z} \\cos{\\left(\\frac{\\pi t^2}{2}\\right)} \, \mathrm{d}t
+C(z) = \\int_{0}^{z} \\cos{\\left(\\frac{\\pi t^2}{2}\\right)} \\, \\mathrm{d}t
 ```
 for the number ``z``.
 """
-function fresnelc(z::Number)
+function fresnelcos(z::Number)
     x = (z * sqrtπ) / 2
     re_x, im_x = reim(x)
     a = (re_x - im_x) + (re_x - im_x) * im
@@ -22,7 +22,7 @@ function fresnelc(z::Number)
     y = re_y + im_y * im
     return y
 end
-function fresnelc(z::Real)
+function fresnelcos(z::Real)
     x = (z * sqrtπ) / 2
     a = x + x * im
     re_erf_a, im_erf_a = reim(erf(a))
@@ -31,15 +31,15 @@ function fresnelc(z::Real)
 end
 
 """
-    fresnels(z::Number)
+    fresnelsin(z::Number)
 
 Calculate the normalized Fresnel sine integral
 ```math
-S(z) = \\int_{0}^{z} \\sin{\\left(\\frac{\\pi t^2}{2}\\right)} \, \mathrm{d}t
+S(z) = \\int_{0}^{z} \\sin{\\left(\\frac{\\pi t^2}{2}\\right)} \\, \\mathrm{d}t
 ```
 for the number ``z``.
 """
-function fresnels(z::Number)
+function fresnelsin(z::Number)
     x = (z * sqrtπ) / 2
     re_x, im_x = reim(x)
     a = (re_x - im_x) + (re_x - im_x) * im
@@ -51,7 +51,7 @@ function fresnels(z::Number)
     y = re_y + im_y * im
     return y
 end
-function fresnels(z::Real)
+function fresnelsin(z::Real)
     x = (z * sqrtπ) / 2
     a = x + x * im
     re_erf_a, im_erf_a = reim(erf(a))
@@ -60,13 +60,13 @@ function fresnels(z::Real)
 end
 
 """
-    fresnel(z::Number)
+    fresnelsincos(z::Number)
 
-Calculate the normalized sine and cosine fresnel integrals.
+Calculate the normalized cosine and sine fresnel integrals.
 
-See also [`fresnels`](@ref), [`fresnelc`](@ref).
+See also [`fresnelsin`](@ref), [`fresnelcos`](@ref).
 """
-function fresnel(z::Number)
+function fresnelsincos(z::Number)
     x = (z * sqrtπ) / 2
     re_x, im_x = reim(x)
     a = (re_x - im_x) + (re_x - im_x) * im
@@ -79,14 +79,14 @@ function fresnel(z::Number)
     im_y_cos = (im_erf_a - re_erf_a + re_erf_b + im_erf_b) / 4
     y_sin = re_y_sin + im_y_sin * im
     y_cos = re_y_cos + im_y_cos * im
-    return (y_sin, y_cos)
+    return (y_cos, y_sin)
 end
-function fresnel(z::Real)
+function fresnelsincos(z::Real)
     x = (z * sqrtπ) / 2
     a = x + x * im
     re_erf_a, im_erf_a = reim(erf(a))
     y_sin = (re_erf_a - im_erf_a) / 2
     y_cos = (re_erf_a + im_erf_a) / 2
-    return (y_sin, y_cos)
+    return (y_cos, y_sin)
 end
 
