@@ -22,6 +22,13 @@ function fresnelc(z::Number)
     y = re_y + im_y * im
     return y
 end
+function fresnelc(z::Real)
+    x = (z * sqrtπ) / 2
+    a = x + x * im
+    re_erf_a, im_erf_a = reim(erf(a))
+    y = (re_erf_a + im_erf_a) / 2
+    return y
+end
 
 """
     fresnels(z::Number)
