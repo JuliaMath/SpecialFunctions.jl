@@ -21,7 +21,8 @@ function fresnelc(z::Number)
 end
 
 """
-        fresnels(z)
+    fresnels(z::Number)
+
 Calculates the Fresnel sine integral for the number z for
     ``S(z) = \\int_{0}^{z} \\sin{\\left(\\frac{\\pi t^2}{2}\\right)}dt``
 """
