@@ -1,5 +1,3 @@
-
-
 # Code ported from https://github.com/kiranshila/FresnelIntegrals.jl
 
 
