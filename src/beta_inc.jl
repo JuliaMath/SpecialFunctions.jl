@@ -371,19 +371,21 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
     end
     z = -nu*lnx
     if b*z == 0.0
-        return error("expansion can't be computed")
+        @debug("underflow: expansion can't be computed")
+        return w
     end
 
     # COMPUTATION OF THE EXPANSION
     #SET R = EXP(-Z)*Z**B/GAMMA(B)
     r = b*(1.0 + rgamma1pm1(b))*exp(b*log(z))
     r *= exp(a*lnx)*exp(0.5*bm1*lnx)
-    u = loggammadiv(b,a) + b*log(nu)
+    u = loggammadiv(b, a) + b*log(nu)
     u = r*exp(-u)
     if u == 0.0
-        return error("expansion can't be computed")
+        @debug("underflow: expansion can't be computed")
+        return w
     end
-    (p, q) = gamma_inc(b,z,0)
+    p, q = gamma_inc(b, z, 0)
     v = inv(nu)^2/4
     t2 = lnx^2/4
     l = w/u
@@ -412,7 +414,8 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
         dj = d[n] * j
         sm += dj
         if sm <= 0.0
-            return error("expansion can't be computed")
+            @debug("underflow: expansion can't be computed")
+            return w
         end
         if abs(dj) <= epps*(sm+l)
             break
@@ -837,7 +840,7 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64=1-x)
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
         q = beta_inc_power_series1(a0, b0, x0, epps)
         p = 1.0 - q
-    elseif max(a0,b0) > 1.0
+    elseif max(a0, b0) > 1.0
         if b0 <= 1.0
             p = beta_inc_power_series(a0, b0, x0, epps)
             q = 1.0 - p
@@ -931,7 +934,6 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     r = sqrt(-2*log(p))
     p_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
     fpu = floatmin(Float64)
-    sae = log10(fpu)
     lb = logbeta(a, b)
 
     if a > 1.0 && b > 1.0
@@ -965,12 +967,7 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     sq = 1.0
     prev = 1.0
 
-    if x < 0.0001
-        x = 0.0001
-    end
-    if x > .9999
-        x = .9999
-    end
+    x = clamp(x, 0.0001, 0.9999)
 
     # This first argument was proposed in
     #
@@ -994,33 +991,30 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     # The idea with the -5.0/a^2 - 1.0/p^0.2 - 34.0 correction is to
     # use -2r - 2 (for 16 digits) for large values of a and p but use
     # a much smaller tolerance for small values of a and p.
-    iex = max(-5.0/a^2 - 1.0/p^0.2 - 34.0, sae)
-    acu = exp10(iex)
+    iex = -5.0/a^2 - 1.0/p^0.2 - 34.0
+    acu = max(exp10(iex), 10 * fpu) # 10 * fpu instead of fpu avoids hangs for small values
 
     #iterate
     while true
         p_approx = beta_inc(a, b, x)[1]
         xin = x
-        p_approx = (p_approx - p)*min(floatmax(), exp(lb + r*log(xin) + t*log1p(-xin)))
+        p_approx = (p_approx - p)*min(
+            floatmax(),
+            exp(lb + LogExpFunctions.xlogy(r, xin) + LogExpFunctions.xlog1py(t, -xin))
+        )
 
         if p_approx * p_approx_prev <= 0.0
             prev = max(sq, fpu)
         end
-        g = 1.0
 
-        tx = x - g*p_approx
-        while true
-            adj = g*p_approx
-            sq = adj^2
+	adj = p_approx
+	tx = x - adj
+	while prev <= (sq = adj^2) || tx < 0.0 || tx > 1.0
+            adj /= 3.0
             tx = x - adj
-            if (prev > sq && tx >= 0.0 && tx <= 1.0)
-                break
-            end
-            g /= 3.0
         end
 
         #check if current estimate is acceptable
-
         if prev <= acu || p_approx^2 <= acu
             x = tx
             return (x, 1.0 - x)

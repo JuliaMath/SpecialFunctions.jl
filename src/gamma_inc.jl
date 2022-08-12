@@ -179,7 +179,7 @@ end
 """
     lambdaeta(eta)
 
-Compute the value of eta satisfying ``eta^{2}/2 = \\lambda-1-\\ln{\\lambda}``.
+Compute the value of ``\\lambda`` satisfying ``\\eta^{2}/2 = \\lambda-1-\\log{\\lambda}``.
 """
 function lambdaeta(eta::Float64)
     s = eta*eta*0.5
@@ -226,7 +226,15 @@ Refer Eqn (3.12) in the paper
 """
 function coeff1(eta::Float64)
     if abs(eta) < 1.0
-        coeff1 = @horner(eta, -3.333333333438e-1, -2.070740359969e-1, -5.041806657154e-2, -4.923635739372e-3, -4.293658292782e-5) / @horner(eta, 1.000000000000e+0, 7.045554412463e-1, 2.118190062224e-1, 3.048648397436e-2, 1.605037988091e-3)
+        coeff1 = @horner(
+            eta,
+            -3.333333333438e-1, -2.070740359969e-1, -5.041806657154e-2,
+            -4.923635739372e-3, -4.293658292782e-5
+        ) / @horner(
+            eta,
+            1.000000000000e+0, 7.045554412463e-1, 2.118190062224e-1,
+            3.048648397436e-2, 1.605037988091e-3
+        )
     else
         la = lambdaeta(eta)
         coeff1 = log(eta/(la - 1.0))/eta
@@ -243,16 +251,39 @@ Refer Eqn (3.12) in the paper
 function coeff2(eta::Float64)
 
     if eta < -5.0
-        x=eta*eta
+        x = eta*eta
         lnmeta = log(-eta)
         coeff2 = (12.0 - x - 6.0*lnmeta*lnmeta)/(12.0*x*eta)
     elseif eta < -2.0
-        coeff2 = @horner(eta, -1.72847633523e-2, -1.59372646475e-2, -4.64910887221e-3, -6.06834887760e-4, -6.14830384279e-6) / @horner(eta, 1.00000000000e+0, 7.64050615669e-1, 2.97143406325e-1, 5.79490176079e-2, 5.74558524851e-3)
+        coeff2 = @horner(
+            eta,
+            -1.72847633523e-2, -1.59372646475e-2, -4.64910887221e-3,
+            -6.06834887760e-4, -6.14830384279e-6
+        ) / @horner(
+            eta,
+            1.00000000000e+0, 7.64050615669e-1, 2.97143406325e-1,
+            5.79490176079e-2, 5.74558524851e-3)
     elseif eta < 2.0
-        coeff2 = @horner(eta, -1.72839517431e-2, -1.46362417966e-2, -3.57406772616e-3, -3.91032032692e-4, 2.49634036069e-6) / @horner(eta, 1.00000000000e+0, 6.90560400696e-1, 2.49962384741e-1, 4.43843438769e-2, 4.24073217211e-3)
+        coeff2 = @horner(
+            eta,
+            -1.72839517431e-2, -1.46362417966e-2, -3.57406772616e-3,
+            -3.91032032692e-4, 2.49634036069e-6
+        ) / @horner(
+            eta,
+            1.00000000000e+0, 6.90560400696e-1, 2.49962384741e-1,
+            4.43843438769e-2, 4.24073217211e-3
+        )
     elseif eta < 1000.0
         x = 1.0/eta
-        coeff2 = @horner(x, 9.99944669480e-1, 1.04649839762e+2, 8.57204033806e+2, 7.31901559577e+2, 4.55174411671e+1) / @horner(x, 1.00000000000e+0, 1.04526456943e+2, 8.23313447808e+2, 3.11993802124e+3, 3.97003311219e+3)
+        coeff2 = @horner(
+            x,
+            9.99944669480e-1, 1.04649839762e+2, 8.57204033806e+2,
+            7.31901559577e+2, 4.55174411671e+1
+        ) / @horner(
+            x,
+            1.00000000000e+0, 1.04526456943e+2, 8.23313447808e+2,
+            3.11993802124e+3, 3.97003311219e+3
+        )/(-12.0*eta)
     else
         coeff2 = -1.0/(12.0*eta)
     end
@@ -269,19 +300,65 @@ function coeff3(eta::Float64)
     if eta < -8.0
         x=eta*eta
         y = log(-eta)/eta
-        coeff3=(-30.0+eta*y*(6.0*x*y*y-12.0+x))/(12.0*eta*x*x)
+        coeff3=(-30.0 + eta*y*(6.0*x*y*y - 12.0 + x))/(12.0*eta*x*x)
     elseif eta < -4.0
-        coeff3 = (@horner(eta, 4.95346498136e-2, 2.99521337141e-2, 6.88296911516e-3, 5.12634846317e-4, -2.01411722031e-5) / @horner(eta, 1.00000000000e+0, 7.59803615283e-1, 2.61547111595e-1, 4.64854522477e-2, 4.03751193496e-3))/(eta*eta)
+        coeff3 = (
+            @horner(
+                eta,
+                4.95346498136e-2, 2.99521337141e-2, 6.88296911516e-3,
+                5.12634846317e-4, -2.01411722031e-5
+            ) / @horner(
+                eta,
+                1.00000000000e+0, 7.59803615283e-1, 2.61547111595e-1,
+                4.64854522477e-2, 4.03751193496e-3
+            )
+        )/(eta*eta)
     elseif eta < -2.0
-        coeff3 = @horner(eta, 4.52313583942e-3, 1.20744920113e-3, -7.89724156582e-5, -5.04476066942e-5, -5.35770949796e-6) / @horner(eta, 1.00000000000e+0, 9.12203410349e-1, 4.05368773071e-1, 9.01638932349e-2, 9.48935714996e-3)
+        coeff3 = @horner(
+            eta,
+            4.52313583942e-3, 1.20744920113e-3, -7.89724156582e-5,
+            -5.04476066942e-5, -5.35770949796e-6
+        ) / @horner(
+            eta,
+            1.00000000000e+0, 9.12203410349e-1, 4.05368773071e-1,
+            9.01638932349e-2, 9.48935714996e-3
+        )
     elseif eta < 2.0
-        coeff3 = @horner(eta, 4.39937562904e-3, 4.87225670639e-4, -1.28470657374e-4, 5.29110969589e-6, 1.57166771750e-7) / @horner(eta, 1.00000000000e+0, 7.94435257415e-1, 3.33094721709e-1, 7.03527806143e-2, 8.06110846078e-3)
+        coeff3 = @horner(
+            eta,
+            4.39937562904e-3, 4.87225670639e-4, -1.28470657374e-4,
+            5.29110969589e-6, 1.57166771750e-7
+        ) / @horner(
+            eta,
+            1.00000000000e+0, 7.94435257415e-1, 3.33094721709e-1,
+            7.03527806143e-2, 8.06110846078e-3
+        )
     elseif eta < 10.0
-        x=1.0/eta
-        coeff3 = (@horner(x, -1.14811912320e-3, -1.12850923276e-1, 1.51623048511e+0, -2.18472031183e-1, 7.30002451555e-2) / @horner(x, 1.00000000000e+0, 1.42482206905e+1, 6.97360396285e+1, 2.18938950816e+2, 2.77067027185e+2))/(eta*eta)
+        x = 1.0/eta
+        coeff3 = (
+            @horner(
+                x,
+                -1.14811912320e-3, -1.12850923276e-1, 1.51623048511e+0,
+                -2.18472031183e-1, 7.30002451555e-2
+            ) / @horner(
+                x,
+                1.00000000000e+0, 1.42482206905e+1, 6.97360396285e+1,
+                2.18938950816e+2, 2.77067027185e+2
+            )
+        )/(eta*eta)
     elseif eta < 100.0
-        x=1.0/eta
-        coeff3 = (@horner(x, -1.45727889667e-4, -2.90806748131e-1, -1.33085045450e+1, 1.99722374056e+2, -1.14311378756e+1) / @horner(x, 1.00000000000e+0, 1.39612587808e+2, 2.18901116348e+3, 7.11524019009e+3, 4.55746081453e+4))/(eta*eta)
+        x = 1.0/eta
+        coeff3 = (
+            @horner(
+                x,
+                -1.45727889667e-4, -2.90806748131e-1, -1.33085045450e+1,
+                1.99722374056e+2, -1.14311378756e+1
+            ) / @horner(
+                x,
+                1.00000000000e+0, 1.39612587808e+2, 2.18901116348e+3,
+                7.11524019009e+3, 4.55746081453e+4
+            )
+        )/(eta*eta)
     else
         eta3 = eta*eta*eta
         coeff3 = -log(eta)/(12.0*eta3)
@@ -693,7 +770,7 @@ function gamma_inc_inv_psmall(a::Float64, logr::Float64)
 end
 
 """
-    gamma_inc_inv_qsmall(a,q)
+    gamma_inc_inv_qsmall(a, q, qgammaxa)
 
 Compute `x0` - initial approximation when `q` is small from ``e^{-x_{0}} x_{0}^{a} = q \\Gamma(a)``.
 Asymptotic expansions Eqn (2.29) in the paper is used here and higher approximations are obtained using
@@ -702,9 +779,9 @@ x \\sim x_{0} - L + b \\sum_{k=1}^{\\infty} d_{k}/x_{0}^{k}
 ```
 where ``b = 1-a``, ``L = \\ln{x_0}``.
 """
-function gamma_inc_inv_qsmall(a::Float64, q::Float64)
+function gamma_inc_inv_qsmall(a::Float64, q::Float64, qgammaxa::Float64)
     b = 1.0 - a
-    eta = sqrt(-2/a*log(q*gammax(a)*sqrt(twoπ/a)))
+    eta = sqrt(-2/a*log(qgammaxa))
     x0 = a*lambdaeta(eta)
     l = log(x0)
 
@@ -715,7 +792,9 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64)
         ck3 = (@horner(l, @horner(b, -12, -24, -11), @horner(b, 12, 24, 6), @horner(b, -6, -9), 2))/6.0
         ck4 = (@horner(l, @horner(b, 72, 162, 120, 25), @horner(b, -72, -168, -114, -12), @horner(b, 36, 84, 36), @horner(b, -12, -22), 3))/12.0
         x0 = x0 - l + b*r*@horner(r, ck1, ck2, ck3, ck4)
-    else
+    elseif x0 > 1
+        # The x0 > 1 condition isn't in the original version but without it
+        # the update in the branch can cause negative initial x0
         r = 1.0/x0
         l² = l*l
         ck1 = l - 1.0
@@ -785,16 +864,13 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
         throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
     elseif a == 0.0 && x == 0.0
         throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
-    elseif a*x == 0.0
-        if x <= a
-            return (0.0, 1.0)
-        else
-            return (1.0, 0.0)
-        end
     elseif isnan(a) || isnan(x)
-        return (a*x, a*x)
-    elseif isinf(x)
+        ax = a*x
+        return (ax, ax)
+    elseif a == 0.0 || isinf(x)
         return (1.0, 0.0)
+    elseif x == 0.0
+        return (0.0, 1.0)
     end
 
     if a >= 1.0
@@ -941,8 +1017,11 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     logr = (logp + loggamma1pa) / a
     if logr < log(0.2*(1 + a)) #small value of p
         x0 = gamma_inc_inv_psmall(a, logr)
-    elseif !pcase && minpq < min(0.02, exp(-1.5*a)/gamma(a)) && a < 10 #small q
-        x0 = gamma_inc_inv_qsmall(a, minpq)
+    elseif !pcase && a < 10 && minpq < 0.02 && (qgammaxa = minpq*gammax(a)*sqrt(twoπ/a)) < 1 #small q
+        # This deviates from the original version. The qgammaxa variable
+        # here ensures that the argument of sqrt in gamma_inc_inv_qsmall
+        # is positive
+        x0 = gamma_inc_inv_qsmall(a, minpq, qgammaxa)
     elseif abs(minpq - 0.5) < 1.0e-05
         x0 = a - 1.0/3.0 + (8.0/405.0 + 184.0/25515.0/a)/a
     elseif abs(a - 1.0) < 1.0e-4
@@ -960,8 +1039,6 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     logabsgam = logabsgamma(a)[1]
     # Newton-like higher order iteration with upper limit as 15.
     while t > 1.0e-15 && n < 15
-        x = x0
-        x² = x*x
         if !haseta
             dlnr = (1.0 - a)*log(x) + x + logabsgam
             if dlnr > log(floatmax(Float64)/1000.0)
@@ -986,22 +1063,23 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
             end
 
             if a > 0.1
-                ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x²)
+                ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x^2)
 
                 # This check is not in the invincgam subroutine from IncgamFI but it probably
                 # should be since the routine fails to compute a finite value for very small p
                 if !isfinite(ck3)
                     break
                 end
-                x0 = @horner(ck1, x, 1.0, ck2, ck3)
+                Δx = ck1 * @horner(ck1, 1.0, ck2, ck3)
             else
-                x0 = @horner(ck1, x, 1.0, ck2)
+                Δx = ck1 * @horner(ck1, 1.0, ck2)
             end
         else
-            x0 = x + ck1
+            Δx = ck1
         end
 
-        t = abs(x/x0 - 1.0)
+        x0 = x + Δx
+        t = abs(Δx/x0)
         n += 1
         x = x0
     end

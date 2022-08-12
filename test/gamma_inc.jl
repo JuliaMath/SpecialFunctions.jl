@@ -185,6 +185,40 @@ end
         @test @inferred(gamma_inc_inv(1//2, 0.3f0, 0.7f0)) isa Float32
         @test @inferred(gamma_inc_inv(1, 0.2f0, 0.8f0)) isa Float32
     end
+
+    @testset "Issue 385" begin
+        a = 0.010316813105574363
+        q = 0.010101010101010102
+        @test last(gamma_inc(a, gamma_inc_inv(a, 1 - q, q))) ≈ q
+    end
+
+    @testset "Issue 387" begin
+        n = 1000
+        @testset "a=$a" for a in exp10.(range(-20, stop=20, length=n))
+            @testset "x=$x" for x = exp10.(range(-20, stop=2, length=n))
+                p, q = gamma_inc(a, x)
+                @test p < floatmin() || q < floatmin() || gamma_inc_inv(a, p, q) ≈ x
+            end
+        end
+    end
+
+    @testset "Issue 390 + 403" begin
+        a = 1.0309015068677239
+        q = 0.020202020202020204
+        @test last(gamma_inc(a, gamma_inc_inv(a, 1 - q, q))) ≈ q
+
+        a = 0.0016546512046778552
+        q = 0.7070707070707071
+        # Mathematica: InverseGammaRegularized[0.0016546512046778552, 0, 1-0.7070707070707071] = 3.04992226601142476643093`9.786272979013901*^-323
+        @test gamma_inc_inv(a, 1 - q, q) ≈ 3e-323
+    end
+
+    @testset "Distributions.jl: Issue 1567" begin
+        a = 0.0030345129757232197
+        p = 0.106
+        # Mathematica: InverseGammaRegularized[0.0030345129757232197, 0, 0.106] = 3.5283979699566549210055643`10.308610719322063*^-322
+        @test gamma_inc_inv(a, p, 1 - p) ≈ 3.5e-322
+    end
 end
 
 double(x::Real) = Float64(x)
