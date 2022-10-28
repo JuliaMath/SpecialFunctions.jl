@@ -599,17 +599,15 @@ See also [`loggamma`](@ref).
 logabsgamma(x::Real) = _logabsgamma(float(x))
 
 function _logabsgamma(x::Float64)
-    signp = Ref{Int32}()
-    y = ccall((:lgamma_r,libopenlibm),  Float64, (Float64, Ptr{Int32}), x, signp)
-    return y, Int(signp[])
+    y, s = _lgamma_r(x)
+    return y, Int(s)
 end
 function _logabsgamma(x::Float32)
-    signp = Ref{Int32}()
-    y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
-    return y, Int(signp[])
+    y, s = _lgammaf_r(x)
+    return y, Int(s)
 end
 function _logabsgamma(x::Float16)
-    y, s = _logabsgamma(Float32(x))
+    y, s = _lgammaf_r(Float32(x))
     return Float16(y), s
 end
 
@@ -643,11 +641,10 @@ See also [`logabsgamma`](@ref) for real `x`.
 """
 loggamma(x::Number) = _loggamma(float(x))
 
-function _loggamma(x::Real)
-    (y, s) = logabsgamma(x)
-    s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
-    return y
-end
+_loggamma(x::Real) = _loggamma(float(x))
+_loggamma(x::Float64) = _loggamma_r(x)
+_loggamma(x::Float32) = _loggammaf_r(x)
+_loggamma(x::Float16) = Float16(_loggammaf_r(Float32(x)))
 
 function _loggamma(x::BigFloat)
     isnan(x) && return x
