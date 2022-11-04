@@ -57,3 +57,36 @@ for (T, lgamma) in ((Float64, _lgamma_r), (Float32, _lgammaf_r))
         @test signgam == 1
     end
 end
+
+# Comparison against the "gold standard" (in context of SpecialFunctions.jl)
+using OpenLibm_jll
+
+function openlibm_logabsgamma(x::Float64)
+    signp = Ref{Int32}()
+    y = ccall((:lgamma_r,libopenlibm),  Float64, (Float64, Ptr{Int32}), x, signp)
+    return y, Int(signp[])
+end
+function openlibm_logabsgamma(x::Float32)
+    signp = Ref{Int32}()
+    y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
+    return y, Int(signp[])
+end
+
+meetstol(x::Float64, atol) = isapprox(openlibm_logabsgamma(x)[1], _lgamma_r(x)[1], atol=atol)
+meetstol(x::Float32, atol) = isapprox(openlibm_logabsgamma(x)[1], _lgammaf_r(x)[1], atol=atol)
+
+
+@testset "logabsgamma validation against OpenLibm, Float64" begin
+    @test all(x -> meetstol(x, 1e-13), -50:1e-4:50)
+    @test all(x -> meetstol(x, 1e-12), 50:1e-4:500)
+    @test all(x -> meetstol(x, 1e-11), 500:1e-3:1000)
+    @test all(x -> meetstol(x, 1e-10), 1000:1e-1:10000)
+end
+
+@testset "logabsgamma validation against OpenLibm, Float64" begin
+    @test all(x -> meetstol(x, 1f-5), -0.0f0:1f-4:25.0f0)
+    @test all(x -> meetstol(x, 1f-4), -25.0f0:1f-4:0.0f0)
+    @test all(x -> meetstol(x, 1f-4), 25.0f0:1f-4:100.0f0)
+    @test all(x -> meetstol(x, 1f-3), 100.0f0:1f-4:1000.0f0)
+    @test all(x -> meetstol(x, 1f-1), 1000.0f0:1f-1:10000.0f0)
+end
