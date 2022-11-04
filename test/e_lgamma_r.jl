@@ -1,17 +1,16 @@
 # From openlibm/test/libm-test-ulps.h, openlibm/test/libm-test.c
 
-using SpecialFunctions: _lgamma_r, _loggamma_r, _lgammaf_r, _loggammaf_r
+using SpecialFunctions: _lgamma_r, _lgammaf_r
 
 # lgamma_test block
-for (T, lgamma, labsgamma) in ((Float64, _loggamma_r, _lgamma_r),
-                               (Float32, _loggammaf_r, _lgammaf_r))
+for (T, lgamma) in ((Float64, _lgamma_r), (Float32, _lgammaf_r))
     @testset "lgamma_test, $T" begin
-        @test lgamma(T(Inf)) === T(Inf)
-        @test lgamma(T(0)) === T(Inf)
-        @test lgamma(T(NaN)) === T(NaN)
+        @test lgamma(T(Inf))[1] === T(Inf)
+        @test lgamma(T(0))[1] === T(Inf)
+        @test lgamma(T(NaN))[1] === T(NaN)
 
-        @test lgamma(T(-3)) === T(Inf)
-        @test lgamma(T(-Inf)) === T(Inf)
+        @test lgamma(T(-3))[1] === T(Inf)
+        @test lgamma(T(-Inf))[1] === T(Inf)
 
         # lgamma(1) == 0, lgamma (1) sets signgam to 1
         y, signgam = labsgamma(T(1))
@@ -32,7 +31,6 @@ for (T, lgamma, labsgamma) in ((Float64, _loggamma_r, _lgamma_r),
         y, signgam = labsgamma(T(-0.5))
         @test y === T(0.5log(4π))
         @test signgam == -1
-        @test_throws DomainError lgamma(T(-0.5))
 
         # In the two "broken" tests, an exact match not possible, even
         # in Float64, thus, we check for as close a tolerance as
