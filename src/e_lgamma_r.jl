@@ -87,9 +87,9 @@
 
 # Matches OpenLibm behavior (except commented out |x|≥2^52 early exit)
 function _lgamma_r(x::Float64)
-    u = reinterpret(UInt64, x)
-    hx = u >>> 32 % Int32
-    lx = u % UInt32
+    ux = reinterpret(UInt64, x)
+    hx = ux >>> 32 % Int32
+    lx = ux % UInt32
 
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
     signgamp = Int32(1)
