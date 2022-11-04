@@ -641,9 +641,12 @@ See also [`logabsgamma`](@ref) for real `x`.
 """
 loggamma(x::Number) = _loggamma(float(x))
 
-_loggamma(x::Float64) = _loggamma_r(x)
-_loggamma(x::Float32) = _loggammaf_r(x)
-_loggamma(x::Float16) = Float16(_loggammaf_r(Float32(x)))
+function _loggamma(x::Real)
+    (y, s) = logabsgamma(x)
+    s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
+    return y
+end
+
 
 function _loggamma(x::BigFloat)
     isnan(x) && return x
