@@ -89,49 +89,49 @@
 function _lgamma_r(x::Float64)
     u = reinterpret(UInt64, x)
     hx = u >>> 32 % Int32
-    lx = u % Int32
+    lx = u % UInt32
 
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
     signgamp = Int32(1)
     ix = hx & 0x7fffffff
-    ix ≥ 0x7ff00000 && return typemax(x), signgamp
-    ix | lx == 0x00000000 && return typemax(x), signgamp
+    ix ≥ 0x7ff00000 && return Inf, signgamp
+    ix | lx == 0x00000000 && return Inf, signgamp
     if ix < 0x3b900000 #= |x|<2**-70, return -log(|x|) =#
-        if hx < 0 # x < 0
+        if hx < Int32(0)
             signgamp = Int32(-1)
             return -log(-x), signgamp
         else
             return -log(x), signgamp
         end
     end
-    if hx < 0
-        # ix ≥ 0x43300000 && return typemax(x), signgamp #= |x|≥2^52, must be -integer =#
+    if hx < Int32(0)
+        # ix ≥ 0x43300000 && return Inf, signgamp #= |x|>=2**52, must be -integer =#
         t = sinpi(x)
-        iszero(t) && return typemax(x), signgamp #= -integer =#
+        iszero(t) && return Inf, signgamp #= -integer =#
         nadj = log(π / abs(t * x))
         if t < 0.0; signgamp = Int32(-1); end
         x = -x
     end
-    if ix ≤ 0x40000000     #= for x < 2.0 =#
-        ipart = round(x, RoundToZero)
-        fpart = x - ipart
-        if iszero(fpart)
+    if ix ≤ 0x40000000     #= for 1.0 ≤ x ≤ 2.0 =#
+        i = round(x, RoundToZero)
+        f = x - i
+        if f == 0.0 #= purge off 1 and 2 =#
             return 0.0, signgamp
-        elseif isone(ipart)
+        elseif i == 1.0
             r = 0.0
             c = 1.0
         else
             r = -log(x)
             c = 0.0
         end
-        if fpart ≥ 0.7315998077392578
+        if f ≥ 0.7315998077392578
             y = 1.0 + c - x
             z = y * y
             p1 = evalpoly(z, (7.72156649015328655494e-02, 6.73523010531292681824e-02, 7.38555086081402883957e-03, 1.19270763183362067845e-03, 2.20862790713908385557e-04, 2.52144565451257326939e-05))
             p2 = z * evalpoly(z, (3.22467033424113591611e-01, 2.05808084325167332806e-02, 2.89051383673415629091e-03, 5.10069792153511336608e-04, 1.08011567247583939954e-04, 4.48640949618915160150e-05))
             p = muladd(p1, y, p2)
             r += muladd(y, -0.5, p)
-        elseif fpart ≥ 0.2316399812698364 # or, the lb? 0.2316322326660156
+        elseif f ≥ 0.2316399812698364 # or, the lb? 0.2316322326660156
             y = x - 0.46163214496836225 - c
             z = y * y
             w = z * y
@@ -168,7 +168,7 @@ function _lgamma_r(x::Float64)
     else #= 2^58 ≤ x ≤ Inf =#
         r = muladd(x, log(x), -x)
     end
-    if hx < 0
+    if hx < Int32(0)
         r = nadj - r
     end
     return r, signgamp
