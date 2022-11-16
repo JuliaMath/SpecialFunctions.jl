@@ -108,7 +108,7 @@ function _logabsgamma(x::Float64)
         # ix ≥ 0x43300000 && return Inf, signgam #= |x|>=2**52, must be -integer =#
         t = sinpi(x)
         iszero(t) && return Inf, signgam #= -integer =#
-        nadj = log(π / abs(t * x))
+        nadj = logπ - log(abs(t * x))
         if t < 0.0; signgam = -1; end
         x = -x
     end

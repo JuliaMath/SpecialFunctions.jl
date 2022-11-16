@@ -36,7 +36,7 @@ function _logabsgamma(x::Float32)
         # ix ≥ 0x4b000000 && return Inf32, signgam #= |x|>=2**23, must be -integer =#
         t = sinpi(x)
         t == 0.0f0 && return Inf32, signgam #= -integer =#
-        nadj = log(π / abs(t * x))
+        nadj = logπ - log(abs(t * x))
         if t < 0.0f0; signgam = -1; end
         x = -x
     end
