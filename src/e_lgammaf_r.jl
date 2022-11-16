@@ -22,7 +22,7 @@ function _logabsgamma(x::Float32)
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
     signgam = 1
     ix = hx & 0x7fffffff
-    ix ≥ 0x7f800000 && return Inf32, signgam
+    ix ≥ 0x7f800000 && return x * x, signgam
     ix == 0x00000000 && return Inf32, signgam
     if ix < 0x35000000 #= |x|<2**-21, return -log(|x|) =#
         if hx < Int32(0)

@@ -94,7 +94,7 @@ function _logabsgamma(x::Float64)
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
     signgam = 1
     ix = hx & 0x7fffffff
-    ix ≥ 0x7ff00000 && return Inf, signgam
+    ix ≥ 0x7ff00000 && return x * x, signgam
     ix | lx == 0x00000000 && return Inf, signgam
     if ix < 0x3b900000 #= |x|<2**-70, return -log(|x|) =#
         if hx < Int32(0)
