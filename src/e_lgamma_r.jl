@@ -86,37 +86,37 @@
 =#
 
 # Matches OpenLibm behavior (except commented out |x|≥2^52 early exit)
-function _lgamma_r(x::Float64)
+function _logabsgamma(x::Float64)
     ux = reinterpret(UInt64, x)
     hx = ux >>> 32 % Int32
     lx = ux % UInt32
 
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
-    signgamp = Int32(1)
+    signgam = 1
     ix = hx & 0x7fffffff
-    ix ≥ 0x7ff00000 && return Inf, signgamp
-    ix | lx == 0x00000000 && return Inf, signgamp
+    ix ≥ 0x7ff00000 && return Inf, signgam
+    ix | lx == 0x00000000 && return Inf, signgam
     if ix < 0x3b900000 #= |x|<2**-70, return -log(|x|) =#
         if hx < Int32(0)
-            signgamp = Int32(-1)
-            return -log(-x), signgamp
+            signgam = -1
+            return -log(-x), signgam
         else
-            return -log(x), signgamp
+            return -log(x), signgam
         end
     end
     if hx < Int32(0)
-        # ix ≥ 0x43300000 && return Inf, signgamp #= |x|>=2**52, must be -integer =#
+        # ix ≥ 0x43300000 && return Inf, signgam #= |x|>=2**52, must be -integer =#
         t = sinpi(x)
-        iszero(t) && return Inf, signgamp #= -integer =#
+        iszero(t) && return Inf, signgam #= -integer =#
         nadj = log(π / abs(t * x))
-        if t < 0.0; signgamp = Int32(-1); end
+        if t < 0.0; signgam = -1; end
         x = -x
     end
     if ix ≤ 0x40000000     #= for 1.0 ≤ x ≤ 2.0 =#
         i = round(x, RoundToZero)
         f = x - i
         if f == 0.0 #= purge off 1 and 2 =#
-            return 0.0, signgamp
+            return 0.0, signgam
         elseif i == 1.0
             r = 0.0
             c = 1.0
@@ -171,5 +171,5 @@ function _lgamma_r(x::Float64)
     if hx < Int32(0)
         r = nadj - r
     end
-    return r, signgamp
+    return r, signgam
 end

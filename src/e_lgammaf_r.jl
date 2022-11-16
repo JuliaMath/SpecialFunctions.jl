@@ -16,28 +16,28 @@
 =#
 
 # Matches OpenLibm behavior exactly, including return of sign
-function _lgammaf_r(x::Float32)
+function _logabsgamma(x::Float32)
     hx = reinterpret(Int32, x)
 
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
-    signgamp = Int32(1)
+    signgam = 1
     ix = hx & 0x7fffffff
-    ix ≥ 0x7f800000 && return Inf32, signgamp
-    ix == 0x00000000 && return Inf32, signgamp
+    ix ≥ 0x7f800000 && return Inf32, signgam
+    ix == 0x00000000 && return Inf32, signgam
     if ix < 0x35000000 #= |x|<2**-21, return -log(|x|) =#
         if hx < Int32(0)
-            signgamp = Int32(-1)
-            return -log(-x), signgamp
+            signgam = -1
+            return -log(-x), signgam
         else
-            return -log(x), signgamp
+            return -log(x), signgam
         end
     end
     if hx < Int32(0)
-        # ix ≥ 0x4b000000 && return Inf32, signgamp #= |x|>=2**23, must be -integer =#
+        # ix ≥ 0x4b000000 && return Inf32, signgam #= |x|>=2**23, must be -integer =#
         t = sinpi(x)
-        t == 0.0f0 && return Inf32, signgamp #= -integer =#
+        t == 0.0f0 && return Inf32, signgam #= -integer =#
         nadj = log(π / abs(t * x))
-        if t < 0.0f0; signgamp = Int32(-1); end
+        if t < 0.0f0; signgam = -1; end
         x = -x
     end
 
@@ -45,7 +45,7 @@ function _lgammaf_r(x::Float32)
         i = round(x, RoundToZero)
         f = x - i
         if f == 0.0f0 #= purge off 1 and 2 =#
-            return 0.0f0, signgamp
+            return 0.0f0, signgam
         elseif i == 1.0f0
             r = 0.0f0
             c = 1.0f0
@@ -101,5 +101,5 @@ function _lgammaf_r(x::Float32)
     if hx < Int32(0)
         r = nadj - r
     end
-    return r, signgamp
+    return r, signgam
 end

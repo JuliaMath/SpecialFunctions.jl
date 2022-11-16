@@ -598,16 +598,8 @@ See also [`loggamma`](@ref).
 """
 logabsgamma(x::Real) = _logabsgamma(float(x))
 
-function _logabsgamma(x::Float64)
-    y, s = _lgamma_r(x)
-    return y, Int(s)
-end
-function _logabsgamma(x::Float32)
-    y, s = _lgammaf_r(x)
-    return y, Int(s)
-end
 function _logabsgamma(x::Float16)
-    y, s = _lgammaf_r(Float32(x))
+    y, s = _logabsgamma(Float32(x))
     return Float16(y), s
 end
 
