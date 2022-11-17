@@ -78,6 +78,9 @@ meetstol(x, atol) = isapprox(openlibm_logabsgamma(x)[1], logabsgamma(x)[1], atol
     @test all(x -> meetstol(x, 1e-12), 50:1e-4:500)
     @test all(x -> meetstol(x, 1e-11), 500:1e-3:1000)
     @test all(x -> meetstol(x, 1e-10), 1000:1e-1:10000)
+    @test meetstol(-2.1^-71, 1e-15)
+    @test meetstol(2.1^-71, 1e-15)
+    @test meetstol(2.0^60, 1e-15)
 end
 
 @testset "logabsgamma validation against OpenLibm, Float32" begin
@@ -86,4 +89,7 @@ end
     @test all(x -> meetstol(x, 1f-4), 25.0f0:1f-4:100.0f0)
     @test all(x -> meetstol(x, 1f-3), 100.0f0:1f-4:1000.0f0)
     @test all(x -> meetstol(x, 1f-1), 1000.0f0:1f-1:10000.0f0)
+    @test meetstol(-2.1f0^-71, 1f-6)
+    @test meetstol(2.1f0^-71, 1f-6)
+    @test meetstol(2.0f0^60, 1e-15)
 end
