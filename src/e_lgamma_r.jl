@@ -93,18 +93,19 @@ function _logabsgamma(x::Float64)
 
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
     signgam = 1
+    isneg = hx < Int32(0)
     ix = hx & 0x7fffffff
     ix ≥ 0x7ff00000 && return x * x, signgam
     ix | lx == 0x00000000 && return Inf, signgam
     if ix < 0x3b900000 #= |x|<2**-70, return -log(|x|) =#
-        if hx < Int32(0)
+        if isneg
             signgam = -1
             return -log(-x), signgam
         else
             return -log(x), signgam
         end
     end
-    if hx < Int32(0)
+    if isneg
         # ix ≥ 0x43300000 && return Inf, signgam #= |x|>=2**52, must be -integer =#
         t = sinpi(x)
         iszero(t) && return Inf, signgam #= -integer =#
@@ -168,7 +169,7 @@ function _logabsgamma(x::Float64)
     else #= 2^58 ≤ x ≤ Inf =#
         r = muladd(x, log(x), -x)
     end
-    if hx < Int32(0)
+    if isneg
         r = nadj - r
     end
     return r, signgam
