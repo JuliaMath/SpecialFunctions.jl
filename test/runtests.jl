@@ -30,7 +30,7 @@ tests = [
     "expint",
     "gamma_inc",
     "gamma",
-    "e_lgamma_r",
+    "logabsgamma",
     "sincosint",
     "other_tests",
     "chainrules"
