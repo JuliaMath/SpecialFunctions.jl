@@ -93,3 +93,64 @@ end
     @test meetstol(2.1f0^-71, 1f-6)
     @test meetstol(2.0f0^60, 1e-15)
 end
+
+#### A few critical values, but first, a few useful functions
+ixword(x::Float64) = (reinterpret(UInt64, x) >>> 32 & Int32) & 0x7fffffff
+ixword(x::Float32) = reinterpret(Int32, x) & 0x7fffffff
+
+function ulp(x::Float32)
+    z′ = logabsgamma(x)[1]
+    z = logabsgamma(Float64(x))[1] # Test against our Float64 implementation
+    isinf(z′) && isinf(oftype(x, z)) && return 0.0
+    iszero(z′) && iszero(z) && return 0.0
+    e = exponent(z′)
+    abs(z′ - z) * 2.0^(precision(x) - 1 - e)
+end
+function ulp(x)
+    z′ = logabsgamma(x)[1]
+    z = logabsgamma(big(x))[1] # Dispatches to MPFR
+    isinf(z′) && isinf(oftype(x, z)) && return big(0.0)
+    iszero(z′) && iszero(z) && return big(0.0)
+    e = exponent(z′)
+    abs(z′ - z) * 2.0^(precision(x) - 1 - e)
+end
+
+
+# interval: 0 < x < 2
+# First f64 which would not satisfy ixword(x) ≤ 0x40000000:
+x = 2.000001907348633
+# That is, all values between 2.0 and 2.000001907348633 would inappropriately fall
+# into the trap of ≤ 0x40000000, thereby producing completely incorrect values.
+# Hence, we must carefully test to ensure that this small region is computed
+# appropriately.
+
+@test ulp(x) < 0.1511442187367193
+@test ulp(2.0) == 0.0
+r = 2.0:1e-9:prevfloat(x)
+@test all(x -> ulp(x) < 1.0, r)
+
+# first f32 greater than 2.0f0:
+x = 2.0000002f0
+@test ulp(x) < 0.197537131607533
+# unlike f64, the representable distance between values is too small to matter
+# -- i.e. prevfloat(2.0000002f0) == 2.0f0; we check behavior anyway
+@test ulp(2.0f0) == 0.0
+
+
+# interval: 2 < x < 8
+# In fact, the first f64 which does not fall into the x < 8.0 branch is:
+x = 8.000007629394531
+@test ulp(prevfloat(x)) < 0.625524448102362
+@test ulp(x) < 0.390118045607547
+# This is overkill, but should reveal any toying around with this
+# sensitive region.
+r = 8.0:1e-9:prevfloat(x)
+@test all(x -> ulp(x) < 1.5, r)
+
+# first f32 which does not fall into x < 8.0 branch is:
+x = 8.000001f0
+@test ulp(x) < 0.614982068538667
+# But, unlike f64, the representable distance between values is too small.
+# (i.e. prevfloat(8.000001f0) == 8.0f0)
+# We still check appropriate behavior at 8.0f0
+@test ulp(8.0f0) < 0.4006594736129046

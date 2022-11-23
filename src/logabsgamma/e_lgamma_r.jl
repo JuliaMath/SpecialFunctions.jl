@@ -113,10 +113,10 @@ function _logabsgamma(x::Float64)
         if t < 0.0; signgam = -1; end
         x = -x
     end
-    if ix ≤ 0x40000000     #= for 1.0 ≤ x ≤ 2.0 =#
+    if ix < 0x40000000     #= x < 2.0 =#
         i = round(x, RoundToZero)
         f = x - i
-        if f == 0.0 #= purge off 1 and 2 =#
+        if f == 0.0 #= purge off 1; 2 handled by x < 8.0 branch =#
             return 0.0, signgam
         elseif i == 1.0
             r = 0.0
