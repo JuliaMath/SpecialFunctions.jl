@@ -124,7 +124,7 @@ x = 2.000001907348633
 # Hence, we must carefully test to ensure that this small region is computed
 # appropriately.
 
-@test ulp(x) < 0.1511442187367193
+@test ulp(x) < 0.15114421873672
 @test ulp(2.0) == 0.0
 r = 2.0:1e-9:prevfloat(x)
 @test all(x -> ulp(x) < 1.0, r)
