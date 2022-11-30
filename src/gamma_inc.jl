@@ -843,7 +843,7 @@ P(a,x)=\\frac{1}{\\Gamma (a)} \\int_{0}^{x} e^{-t}t^{a-1} dt.
 ```
 and ``q=Q(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-Q(x,a)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
+Q(a,x)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
 ```
 In terms of these, the lower incomplete gamma function is
 ``\\gamma(a,x) = P(a,x) \\Gamma(a)`` and the upper incomplete
