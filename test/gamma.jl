@@ -60,8 +60,6 @@
         @test invtrigamma(2) == invtrigamma(2.)
     end
 
-    #@test "invtrigamma" begin
-
     @testset "polygamma" begin
         @test polygamma(20, 7.) ≈ -4.644616027240543262561198814998587152547
         @test polygamma(20, Float16(7.)) ≈ -4.644616027240543262561198814998587152547
