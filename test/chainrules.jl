@@ -22,6 +22,10 @@
                 test_scalar(invdigamma, x)
             end
 
+            if x isa Real && x > 0
+                test_scalar(invtrigamma, x)
+            end
+
             if x isa Real && 0 < x < 1
                 test_scalar(erfinv, x)
                 test_scalar(erfcinv, x)

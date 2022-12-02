@@ -76,7 +76,7 @@ end
 
 @testset "missing data" begin
     for f in (digamma, erf, erfc, erfcinv, erfcx, erfi, erfinv, eta, gamma,
-              invdigamma, logfactorial, trigamma)
+              invdigamma, invtrigamma, logfactorial, trigamma)
         @test f(missing) === missing
     end
     @test beta(1.0, missing) === missing
@@ -90,7 +90,7 @@ end
     for n in numbers
         @test abs(n) == SpecialFunctions.fastabs(n)
     end
-            
+
     numbers = [1im, 2 + 2im, 0 + 100im, 1e3 + 1e-10im]
     for n in numbers
         @test abs(real(n)) + abs(imag(n)) == SpecialFunctions.fastabs(n)

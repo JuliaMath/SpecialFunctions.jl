@@ -72,7 +72,10 @@ ChainRulesCore.@scalar_rule(
     inv(trigamma(invdigamma(x))),
 )
 ChainRulesCore.@scalar_rule(trigamma(x), polygamma(2, x))
-
+ChainRulesCore.@scalar_rule(
+    invtrigamma(x),
+    inv(polygamma(2, invtrigamma(x))),
+)
 # Bessel functions
 ChainRulesCore.@scalar_rule(
     besselj(ν, x),

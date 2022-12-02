@@ -47,6 +47,21 @@
         @test abs(invdigamma(2)) == abs(invdigamma(2.))
     end
 
+    @testset "invtrigamma" begin
+        for val in [0.001, 0.01, 0.1, 1.0, 10.0]
+            @test invtrigamma(trigamma(val)) ≈ val
+        end
+
+        for val in [1e-8, 0.001, 0.01, 0.1, 1.0, 10.0, 1e7, 1e9]
+                @test trigamma(invtrigamma(val)) ≈ val
+        end
+
+        @test_throws DomainError invtrigamma(-1.0)
+        @test invtrigamma(2) == invtrigamma(2.)
+    end
+
+    #@test "invtrigamma" begin
+
     @testset "polygamma" begin
         @test polygamma(20, 7.) ≈ -4.644616027240543262561198814998587152547
         @test polygamma(20, Float16(7.)) ≈ -4.644616027240543262561198814998587152547
