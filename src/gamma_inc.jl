@@ -670,7 +670,7 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     l = x/a
     y = -a * LogExpFunctions.logmxp1(l)
     if a*eps()*eps() > 3.28e-3
-        throw(DomainError((a, x, ind_), "P(a,x) or Q(a,x) is computationally indeterminant in this case."))
+        throw(DomainError((a, x, ind), "P(a,x) or Q(a,x) is computationally indeterminant in this case."))
     end
     c = exp(-y)
     w = 0.5*erfcx(sqrt(y))
