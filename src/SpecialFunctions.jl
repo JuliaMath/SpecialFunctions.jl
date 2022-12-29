@@ -13,7 +13,6 @@ using IrrationalConstants:
     logπ,
     log2π
 
-import ChainRulesCore
 import LogExpFunctions
 
 using OpenLibm_jll
@@ -91,7 +90,9 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
-include("chainrules.jl")
+if !isdefined(Base, :get_extension)
+    include("../ext/ChainRulesCoreExt.jl")
+end
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
