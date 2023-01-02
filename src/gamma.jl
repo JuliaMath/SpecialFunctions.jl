@@ -439,7 +439,7 @@ function _zeta(s::ComplexOrReal{Float64})
             lg = loggamma(1 - s)
             rehalf = real(s)*0.5
             return zeta(1 - s) * exp(lg + absim*halfπ + s*log2π) * inv2π * Complex(
-                sinpi(rehalf), copysign(cospi(rehalf), imag(s))
+                sinpi(rehalf), flipsign(cospi(rehalf), imag(s))
             )
         else
             return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * twoπ^s * invπ
