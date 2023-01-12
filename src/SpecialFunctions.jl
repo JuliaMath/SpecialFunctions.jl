@@ -62,6 +62,7 @@ export
     invdigamma,
     polygamma,
     trigamma,
+    invtrigamma,
     gamma_inc,
     beta_inc,
     beta_inc_inv,
@@ -95,7 +96,8 @@ include("chainrules.jl")
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
-          :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
+          :eta, :gamma, :invdigamma, :invtrigamma, :logfactorial, :lgamma, :trigamma,
+          :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end
 for f in (:beta, :lbeta)

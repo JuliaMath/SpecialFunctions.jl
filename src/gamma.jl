@@ -399,6 +399,49 @@ function _invdigamma(y::Float64)
 end
 
 """
+    invtrigamma(x)
+Compute the inverse [`trigamma`](@ref) function of `x`.
+"""
+invtrigamma(y::Number) = _invtrigamma(float(y))
+
+function _invtrigamma(y::Float64)
+    # Implementation of Newton algorithm described in
+    # "Linear Models and Empirical Bayes Methods for Assessing
+    #  Differential Expression in Microarray Experiments"
+    # (Appendix "Inversion of Trigamma Function")
+    #  by Gordon K. Smyth, 2004
+
+    if y <= 0
+        throw(DomainError(y, "Only positive `y` supported."))
+    end
+
+    if y > 1e7
+        return inv(sqrt(y))
+    elseif y < 1e-6
+        return inv(y)
+    end
+
+    x_old = inv(y) + 0.5
+    x_new = x_old
+
+    # Newton iteration
+    δ = Inf
+    iteration = 0
+    while δ > 1e-8 && iteration <= 25
+        iteration += 1
+        f_x_old = trigamma(x_old)
+        δx =  f_x_old*(1-f_x_old/y) / polygamma(2, x_old)
+        x_new = x_old + δx
+        δ = - δx / x_new
+        x_old = x_new
+    end
+
+    return x_new
+end
+
+
+
+"""
     zeta(s)
 
 Riemann zeta function
