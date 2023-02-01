@@ -1,3 +1,9 @@
+module ChainRulesCoreExt
+
+using SpecialFunctions, ChainRulesCore
+
+import SpecialFunctions: sqrtπ, invπ
+
 const BESSEL_ORDER_INFO = """
 derivatives of Bessel functions with respect to the order are not implemented currently:
 https://github.com/JuliaMath/SpecialFunctions.jl/issues/160
@@ -293,3 +299,5 @@ function ChainRulesCore.rrule(::typeof(besselyx), ν::Number, x::Number)
     end
     return Ω, besselyx_pullback
 end
+
+end # module
