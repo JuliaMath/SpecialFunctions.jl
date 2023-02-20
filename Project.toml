@@ -13,7 +13,7 @@ OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 
 [extensions]
-ChainRulesCoreExt = "ChainRulesCore"
+SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
 
 [compat]
 ChainRulesCore = "0.9.44, 0.10, 1"
