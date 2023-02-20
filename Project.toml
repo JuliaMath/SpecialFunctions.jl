@@ -1,6 +1,6 @@
 name = "SpecialFunctions"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "2.1.7"
+version = "2.2.0"
 
 [deps]
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
@@ -18,7 +18,7 @@ ChainRulesCoreExt = "ChainRulesCore"
 [compat]
 ChainRulesCore = "0.9.44, 0.10, 1"
 ChainRulesTestUtils = "0.6.8, 0.7, 1"
-IrrationalConstants = "0.1"
+IrrationalConstants = "0.1, 0.2"
 LogExpFunctions = "0.3.2"
 OpenLibm_jll = "0.7, 0.8"
 OpenSpecFun_jll = "0.5"
