@@ -1,4 +1,4 @@
-module ChainRulesCoreExt
+module SpecialFunctionsChainRulesCoreExt
 
 using SpecialFunctions, ChainRulesCore
 

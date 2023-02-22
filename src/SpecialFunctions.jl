@@ -91,7 +91,7 @@ include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
 if !isdefined(Base, :get_extension)
-    include("../ext/ChainRulesCoreExt.jl")
+    include("../ext/SpecialFunctionsChainRulesCoreExt.jl")
 end
 include("deprecated.jl")
 
