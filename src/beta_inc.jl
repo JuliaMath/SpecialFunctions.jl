@@ -256,7 +256,7 @@ External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wi
 
 See also: [`beta_inc`](@ref)
 
-# Implemention
+# Implementation
 `BASYM(A,B,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)

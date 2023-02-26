@@ -209,7 +209,7 @@ end
 # So identifying the (something) with the -zeta function, we get
 # the zeta function for free and might as well export it, especially
 # since this is a common generalization of the Riemann zeta function
-# (which Julia already exports).   Note that this geneneralization
+# (which Julia already exports).   Note that this generalization
 # is equivalent to Mathematica's Zeta[s,z], and is equivalent to the
 # Hurwitz zeta function for real(z) > 0.
 
