@@ -1,15 +1,22 @@
 module SpecialFunctions
 
-# Load openspecfun libraries from our deps.jl
-let depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
-    if !isfile(depsjl_path)
-        error("SpecialFunctions is not installed properly, run `Pkg.build(\"SpecialFunctions\")`," *
-              "restart Julia and try again")
-    end
-    include(depsjl_path)
-end
+using IrrationalConstants:
+    twoπ,
+    halfπ,
+    sqrtπ,
+    sqrt2π,
+    invπ,
+    inv2π,
+    invsqrt2,
+    invsqrt2π,
+    logtwo,
+    logπ,
+    log2π
 
-__init__() = check_deps()
+import LogExpFunctions
+
+using OpenLibm_jll
+using OpenSpecFun_jll
 
 export
     airyai,
@@ -25,15 +32,18 @@ export
     besseli,
     besselix,
     besselj,
+    sphericalbesselj,
     besselj0,
     besselj1,
     besseljx,
     besselk,
     besselkx,
     bessely,
+    sphericalbessely,
     bessely0,
     bessely1,
     besselyx,
+    jinc,
     dawson,
     ellipk,
     ellipe,
@@ -43,17 +53,29 @@ export
     erfcx,
     erfi,
     erfinv,
+    logerf,
+    logerfc,
+    logerfcx,
     faddeeva,
     eta,
     digamma,
     invdigamma,
     polygamma,
     trigamma,
+    gamma_inc,
+    beta_inc,
+    beta_inc_inv,
+    gamma_inc_inv,
+    ncbeta,
+    ncF,
     hankelh1,
     hankelh1x,
     hankelh2,
     hankelh2x,
     zeta,
+    expint,
+    expinti,
+    expintx,
     sinint,
     cosint,
     lbinomial
@@ -61,12 +83,21 @@ export
 include("bessel.jl")
 include("erf.jl")
 include("ellip.jl")
+include("expint.jl")
 include("sincosint.jl")
+include("logabsgamma/e_lgammaf_r.jl")
+include("logabsgamma/e_lgamma_r.jl")
 include("gamma.jl")
+include("gamma_inc.jl")
+include("betanc.jl")
+include("beta_inc.jl")
+if !isdefined(Base, :get_extension)
+    include("../ext/SpecialFunctionsChainRulesCoreExt.jl")
+end
 include("deprecated.jl")
 
-for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv,
-          :eta, :gamma, :invdigamma, :lfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
+for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
+          :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end
 for f in (:beta, :lbeta)
@@ -75,5 +106,14 @@ for f in (:beta, :lbeta)
     @eval $(f)(::Missing, ::Missing) = missing
 end
 polygamma(m::Integer, x::Missing) = missing
+
+ # In future just use `fastabs` from Base.Math
+ # https://github.com/JuliaLang/julia/blob/93fb785831dcfcc442f82fab8746f0244c5274ae/base/special/trig.jl#L1057
+if isdefined(Base.Math, :fastabs)
+    import Base.Math: fastabs
+else
+    fastabs(x::Number) = abs(x)
+    fastabs(x::Complex) = abs(real(x)) + abs(imag(x))
+end
 
 end # module

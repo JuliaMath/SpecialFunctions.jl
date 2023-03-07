@@ -3,6 +3,17 @@
 @deprecate airy(z::Number) airyai(z)
 @deprecate airyx(z::Number) airyaix(z)
 @deprecate airyprime(z::Number) airyaiprime(z)
+@deprecate lgamma(x::Real) logabsgamma(x)[1]
+@deprecate lgamma(x::Number) loggamma(x)
+@deprecate lgamma_r(x::Real) logabsgamma(x)
+@deprecate lgamma_r(x::Number) (loggamma(x), 1)
+@deprecate lbeta(x::Real, w::Real) logabsbeta(x, w)[1]
+@deprecate lbeta(x::Number, w::Number) logbeta(x, w)
+@deprecate lfact(x) logfactorial(x)
+@deprecate lfactorial(x) logfactorial(x)
+@deprecate lbinomial(x) logabsbinomial(x)[1]
+
+
 
 function _airy(k::Integer, z::Complex{Float64})
     Base.depwarn("`airy(k,x)` is deprecated, use `airyai(x)`, `airyaiprime(x)`, `airybi(x)` or `airybiprime(x)` instead.",:airy)

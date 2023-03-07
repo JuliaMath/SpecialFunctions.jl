@@ -1,0 +1,34 @@
+name = "SpecialFunctions"
+uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
+version = "2.2.0"
+
+[deps]
+ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+IrrationalConstants = "92d709cd-6900-40b7-9082-c6be49f344b6"
+LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+OpenLibm_jll = "05823500-19ac-5b8b-9628-191a04bc5112"
+OpenSpecFun_jll = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
+
+[weakdeps]
+ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+
+[extensions]
+SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
+
+[compat]
+ChainRulesCore = "0.9.44, 0.10, 1"
+ChainRulesTestUtils = "0.6.8, 0.7, 1"
+IrrationalConstants = "0.1, 0.2"
+LogExpFunctions = "0.3.2"
+OpenLibm_jll = "0.7, 0.8"
+OpenSpecFun_jll = "0.5"
+julia = "1.3"
+
+[extras]
+ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+ChainRulesTestUtils = "cdddcdb0-9152-4a09-a978-84456f9df70a"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["ChainRulesCore", "ChainRulesTestUtils", "Random", "Test"]

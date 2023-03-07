@@ -1,82 +1,217 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using Base.Math: @horner, libm
+using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
 
 for f in (:erf, :erfc)
+    internalf = Symbol(:_, f)
+    libopenlibmf = QuoteNode(f)
+    libopenlibmf0 = QuoteNode(Symbol(f, :f))
+    openspecfunf = QuoteNode(Symbol(:Faddeeva_, f))
+    mpfrf = QuoteNode(Symbol(:mpfr_, f))
     @eval begin
-        ($f)(x::Float64) = ccall(($(string(f)),libm), Float64, (Float64,), x)
-        ($f)(x::Float32) = ccall(($(string(f,"f")),libm), Float32, (Float32,), x)
-        ($f)(x::Real) = ($f)(float(x))
-        ($f)(a::Float16) = Float16($f(Float32(a)))
-        ($f)(a::Complex{Float16}) = Complex{Float16}($f(Complex{Float32}(a)))
-        function ($f)(x::BigFloat)
+        $f(x::Number) = $internalf(float(x))
+
+        $internalf(x::Float64) = ccall(($libopenlibmf, libopenlibm), Float64, (Float64,), x)
+        $internalf(x::Float32) = ccall(($libopenlibmf0, libopenlibm), Float32, (Float32,), x)
+        $internalf(x::Float16) = Float16($internalf(Float32(x)))
+
+        $internalf(z::Complex{Float64}) = Complex{Float64}(ccall(($openspecfunf, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
+        $internalf(z::Complex{Float32}) = Complex{Float32}(ccall(($openspecfunf, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        $internalf(z::Complex{Float16}) = Complex{Float16}($internalf(Complex{Float32}(z)))
+
+        function $internalf(x::BigFloat)
             z = BigFloat()
-            ccall(($(string(:mpfr_,f)), :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+            ccall(($mpfrf, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
             return z
         end
-        ($f)(x::AbstractFloat) = error("not implemented for ", typeof(x))
     end
 end
 
-
-for ff in (:erf, :erfc, :erfcx, :erfi, (:dawson, :Dawson), (:faddeeva, :w))
-    (fname, f) = isa(ff, Tuple) ? ff : (ff, ff)
+for f in (:erfcx, :erfi, :dawson, :faddeeva)
+    internalf = Symbol(:_, f)
+    openspecfunfsym = Symbol(:Faddeeva_, f === :dawson ? :Dawson : f === :faddeeva ? :w : f)
+    openspecfunfF64 = QuoteNode(Symbol(openspecfunfsym, :_re))
+    openspecfunfCF64 = QuoteNode(openspecfunfsym)
     @eval begin
-        ($fname)(z::Complex{Float64}) = Complex{Float64}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
-        ($fname)(z::Complex{Float32}) = Complex{Float32}(ccall(($(string("Faddeeva_",f)),openspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        $f(x::Number) = $internalf(float(x))
 
-        ($fname)(z::Complex) = ($fname)(float(z))
-        ($fname)(z::Complex{<:AbstractFloat}) = throw(MethodError($fname,(z,)))
-    end
-end
+        $internalf(x::Float64) = ccall(($openspecfunfF64, libopenspecfun), Float64, (Float64,), x)
+        $internalf(x::Float32) = Float32($internalf(Float64(x)))
+        $internalf(x::Float16) = Float16($internalf(Float64(x)))
 
-for ff in (:erfcx, :erfi, (:dawson, :Dawson))
-    (fname, f) = isa(ff, Tuple) ? ff : (ff, ff)
-    @eval begin
-        ($fname)(x::Float64) = ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), x)
-        ($fname)(x::Float32) = Float32(ccall(($(string("Faddeeva_",f,"_re")),openspecfun), Float64, (Float64,), Float64(x)))
-
-        ($fname)(x::Real) = ($fname)(float(x))
-        ($fname)(x::AbstractFloat) = throw(MethodError($fname,(x,)))
+        $internalf(z::Complex{Float64}) = Complex{Float64}(ccall(($openspecfunfCF64, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
+        $internalf(z::Complex{Float32}) = Complex{Float32}(ccall(($openspecfunfCF64, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
+        $internalf(z::Complex{Float16}) = Complex{Float16}($internalf(Complex{Float32}(z)))
     end
 end
 
 faddeeva(x::Real) = faddeeva(complex(x))
 
+# MPFR has an open TODO item for this function
+# until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
+function _erfcx(x::BigFloat)
+    if x <= (Clong == Int32 ? 0x1p15 : 0x1p30)
+        # any larger gives internal overflow
+        return exp(x^2)*erfc(x)
+    elseif !isfinite(x)
+        return 1/x
+    else
+        # asymptotic series
+        # starts to diverge at iteration i = 2^30 or 2^60
+        # final term will be < Γ(2*i+1)/(2^i * Γ(i+1)) / (2^(i+1))
+        # so good to (lgamma(2*i+1) - lgamma(i+1))/log(2) - 2*i - 1
+        #            ≈ 3.07e10 or 6.75e19 bits
+        # which is larger than the memory of the respective machines
+        ϵ = eps(BigFloat)/4
+        v = 1/(2*x*x)
+        k = 1
+        s = w = -k*v
+        while abs(w) > ϵ
+            k += 2
+            w *= -k*v
+            s += w
+        end
+        return (1+s)/(x*sqrtπ)
+    end
+end
 
-"""
+@doc raw"""
     erf(x)
-Compute the error function of `x`, defined by ``\\frac{2}{\\sqrt{\\pi}} \\int_0^x e^{-t^2} dt``
-for arbitrary complex `x`.
+
+Compute the error function of ``x``, defined by
+
+```math
+\operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x \exp(-t^2) \; \mathrm{d}t
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+    erf(x, y)
+
+Accurate version of `erf(y) - erf(x)` (for real arguments only).
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
+[`erfi(x)`](@ref erfi), [`dawson(x)`](@ref dawson),
+[`erfinv(x)`](@ref erfinv), [`erfcinv(x)`](@ref erfcinv).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
 erf
 
-"""
+function erf(x::Real, y::Real)
+    if abs(x) ≤ 1/√2 && abs(y) ≤ 1/√2
+        erf(y) - erf(x)
+    elseif 0 ≤ x && 0 ≤ y
+        erfc(x) - erfc(y)
+    elseif x ≤ 0 && y ≤ 0
+        erfc(-y) - erfc(-x)
+    else
+        erf(y) - erf(x)
+    end
+end
+
+@doc raw"""
     erfc(x)
-Compute the complementary error function of `x`, defined by ``1 - \\operatorname{erf}(x)``.
+
+Compute the complementary error function of ``x``, defined by
+
+```math
+\operatorname{erfc}(x)
+= 1 - \operatorname{erf}(x)
+= \frac{2}{\sqrt{\pi}} \int_x^\infty \exp(-t^2) \; \mathrm{d}t
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+This is the accurate version of `1-erf(x)` for large ``x``.
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
+
+See also: [`erf(x)`](@ref erf).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
 erfc
 
-"""
+@doc raw"""
     erfcx(x)
 
-Compute the scaled complementary error function of `x`, defined by ``e^{x^2} \\operatorname{erfc}(x)``.
+Compute the scaled complementary error function of ``x``, defined by
+
+```math
+\operatorname{erfcx}(x)
+= e^{x^2} \operatorname{erfc}(x)
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+This is the accurate version of ``e^{x^2} \operatorname{erfc}(x)`` for large ``x``.
+Note also that ``\operatorname{erfcx}(-ix)`` computes the Faddeeva function `w(x)`.
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.3),
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
+
+See also: [`erfc(x)`](@ref erfc).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `BigFloat`: MPFR has an open TODO item for this function until then, we use
+    [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail.
 """
 erfcx
 
-"""
+@doc raw"""
     erfi(x)
 
-Compute the imaginary error function of `x`, defined by ``-i \\operatorname{erf}(ix)``.
+Compute the imaginary error function of ``x``, defined by
+
+```math
+\operatorname{erfi}(x)
+= -i \operatorname{erf}(ix)
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Imaginary_error_function).
+
+See also: [`erf(x)`](@ref erf).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 """
 erfi
 
-"""
+@doc raw"""
     dawson(x)
 
-Compute the Dawson function (scaled imaginary error function) of `x`, defined by
-``\\frac{\\sqrt{\\pi}}{2} e^{-x^2} \\operatorname{erfi}(x)``.
+Compute the Dawson function (scaled imaginary error function) of ``x``, defined by
+
+```math
+\operatorname{dawson}(x)
+= \frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)
+\quad \text{for} \quad x \in \mathbb{C} \, .
+```
+
+This is the accurate version of ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)``
+for large ``x``.
+
+External links: [DLMF](https://dlmf.nist.gov/7.2.5),
+[Wikipedia](https://en.wikipedia.org/wiki/Dawson_function).
+
+See also: [`erfi(x)`](@ref erfi).
+
+# Implementation by
+- `Float32`/`Float64`: C standard math library
+    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 """
 dawson
 
@@ -90,20 +225,33 @@ is equivalent to``\\operatorname{erfcx}(-iz)``.
 """
 faddeeva
 
-
-# Compute the inverse of the error function: erf(erfinv(x)) == x,
-# using the rational approximants tabulated in:
-#     J. M. Blair, C. A. Edwards, and J. H. Johnson, "Rational Chebyshev
-#     approximations for the inverse of the error function," Math. Comp. 30,
-#     pp. 827--830 (1976).
-#         http://dx.doi.org/10.1090/S0025-5718-1976-0421040-7
-#         http://www.jstor.org/stable/2005402
-"""
+@doc raw"""
     erfinv(x)
 
-Compute the inverse error function of a real `x`, defined by ``\\operatorname{erf}(\\operatorname{erfinv}(x)) = x``.
+Compute the inverse error function of a real ``x``, that is
+
+```math
+\operatorname{erfinv}(x) = \operatorname{erf}^{-1}(x)
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Inverse_functions).
+
+See also: [`erf(x)`](@ref erf).
+
+# Implementation
+Using the rational approximants tabulated in:
+> J. M. Blair, C. A. Edwards, and J. H. Johnson,
+> "Rational Chebyshev approximations for the inverse of the error function",
+> Math. Comp. 30, pp. 827--830 (1976).
+> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <http://www.jstor.org/stable/2005402>
+combined with Newton iterations for `BigFloat`.
 """
-function erfinv(x::Float64)
+erfinv(x::Real) = _erfinv(float(x))
+
+function _erfinv(x::Float64)
     a = abs(x)
     if a >= 1.0
         if x == 1.0
@@ -147,7 +295,7 @@ function erfinv(x::Float64)
                               -0.10014_37634_97830_70835e2,
                                0.1e1)
     else # Table 57 in Blair et al.
-        t = 1.0 / sqrt(-log(1.0 - a))
+        t = inv(sqrt(-log1p(-a)))
         return @horner(t, 0.10501_31152_37334_38116e-3,
                           0.10532_61131_42333_38164_25e-1,
                           0.26987_80273_62432_83544_516,
@@ -171,7 +319,7 @@ function erfinv(x::Float64)
     end
 end
 
-function erfinv(x::Float32)
+function _erfinv(x::Float32)
     a = abs(x)
     if a >= 1.0f0
         if x == 1.0f0
@@ -200,7 +348,7 @@ function erfinv(x::Float32)
                               -0.21757_03119_6f1,
                                0.1f1)
     else # Table 50 in Blair et al.
-        t = 1.0f0 / sqrt(-log(1.0f0 - a))
+        t = inv(sqrt(-log1p(-a)))
         return @horner(t, 0.15504_70003_116f0,
                           0.13827_19649_631f1,
                           0.69096_93488_87f0,
@@ -214,17 +362,53 @@ function erfinv(x::Float32)
     end
 end
 
-erfinv(x::Integer) = erfinv(float(x))
+function _erfinv(y::BigFloat)
+    xfloat = erfinv(Float64(y))
+    if isfinite(xfloat)
+        x = BigFloat(xfloat)
+    else
+        # Float64 overflowed, use asymptotic estimate instead
+        # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
+        x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
+        isfinite(x) || return x
+    end
+    sqrtπhalf = sqrtπ * big(0.5)
+    tol = 2eps(abs(x))
+    while true # Newton iterations
+        Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
+        x -= Δx
+        abs(Δx) < tol && break
+    end
+    return x
+end
 
-# Inverse complementary error function: use Blair tables for y = 1-x,
-# exploiting the greater accuracy of y (vs. x) when y is small.
-"""
+@doc raw"""
     erfcinv(x)
 
-Compute the inverse error complementary function of a real `x`, defined by
-``\\operatorname{erfc}(\\operatorname{erfcinv}(x)) = x``.
+Compute the inverse error complementary function of a real ``x``, that is
+
+```math
+\operatorname{erfcinv}(x) = \operatorname{erfc}^{-1}(x)
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function#Inverse_functions).
+
+See also: [`erfc(x)`](@ref erfc).
+
+# Implementation
+Using the rational approximants tabulated in:
+> J. M. Blair, C. A. Edwards, and J. H. Johnson,
+> "Rational Chebyshev approximations for the inverse of the error function",
+> Math. Comp. 30, pp. 827--830 (1976).
+> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
+> <http://www.jstor.org/stable/2005402>
+combined with Newton iterations for `BigFloat`.
 """
-function erfcinv(y::Float64)
+erfcinv(x::Real) = _erfcinv(float(x))
+
+function _erfcinv(y::Float64)
     if y > 0.0625
         return erfinv(1.0 - y)
     elseif y <= 0.0
@@ -276,7 +460,7 @@ function erfcinv(y::Float64)
     end
 end
 
-function erfcinv(y::Float32)
+function _erfcinv(y::Float32)
     if y > 0.0625f0
         return erfinv(1.0f0 - y)
     elseif y <= 0.0f0
@@ -298,32 +482,112 @@ function erfcinv(y::Float32)
     end
 end
 
-erfcinv(x::Integer) = erfcinv(float(x))
-
-# MPFR has an open TODO item for this function
-# until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
-function erfcx(x::BigFloat)
-    if x <= (Clong == Int32 ? 0x1p15 : 0x1p30)
-        # any larger gives internal overflow
-        return exp(x^2)*erfc(x)
-    elseif !isfinite(x)
-        return 1/x
+function _erfcinv(y::BigFloat)
+    yfloat = Float64(y)
+    xfloat = erfcinv(yfloat)
+    if isfinite(xfloat)
+        x = BigFloat(xfloat)
     else
-        # asymptotic series
-        # starts to diverge at iteration i = 2^30 or 2^60
-        # final term will be < Γ(2*i+1)/(2^i * Γ(i+1)) / (2^(i+1))
-        # so good to (lgamma(2*i+1) - lgamma(i+1))/log(2) - 2*i - 1
-        #            ≈ 3.07e10 or 6.75e19 bits
-        # which is larger than the memory of the respective machines
-        ϵ = eps(BigFloat)/4
-        v = 1/(2*x*x)
-        k = 1
-        s = w = -k*v
-        while abs(w) > ϵ
-            k += 2
-            w *= -k*v
-            s += w
+        # Float64 overflowed, use asymptotic estimate instead
+        # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
+        if yfloat < 1
+            x = sqrt(-log(y*sqrtπ))
+        else # y must be close to 2
+            x = -sqrt(-log((2-y)*sqrtπ))
         end
-        return (1+s)/(x*sqrt(oftype(x,pi)))
+        # TODO: Newton convergence is slow near y=0 singularity; accelerate?
+        isfinite(x) || return x
+    end
+    sqrtπhalf = sqrtπ * big(0.5)
+    tol = 2eps(abs(x))
+    while true # Newton iterations
+        Δx = sqrtπhalf * (erfc(x) - y) * exp(x^2)
+        x += Δx
+        abs(Δx) < tol && break
+    end
+    return x
+end
+
+@doc raw"""
+    logerfc(x)
+
+Compute the natural logarithm of the complementary error function of ``x``, that is
+
+```math
+\operatorname{logerfc}(x) = \operatorname{ln}(\operatorname{erfc}(x))
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+This is the accurate version of ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x``.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfcx(x)`](@ref erfcx).
+
+# Implementation
+Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
+Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
+"""
+logerfc(x::Real) = _logerfc(float(x))
+
+function _logerfc(x::Union{Float32, Float64, BigFloat})
+    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
+    if x > 0.0
+        return log(erfcx(x)) - x^2
+    else
+        return log(erfc(x))
+    end
+end
+
+@doc raw"""
+    logerfcx(x)
+
+Compute the natural logarithm of the scaled complementary error function of ``x``, that is
+
+```math
+\operatorname{logerfcx}(x) = \operatorname{ln}(\operatorname{erfcx}(x))
+\quad \text{for} \quad x \in \mathbb{R} \, .
+```
+
+This is the accurate version of ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large and negative ``x``.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erfcx(x)`](@ref erfcx).
+
+# Implementation
+Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
+Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
+"""
+logerfcx(x::Real) = _logerfcx(float(x))
+
+function _logerfcx(x::Union{Float32, Float64, BigFloat})
+    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
+    if x < 0.0
+        return log(erfc(x)) + x^2
+    else
+        return log(erfcx(x))
+    end
+end
+
+@doc raw"""
+    logerf(x, y)
+
+Compute the natural logarithm of two-argument error function. This is an accurate version of
+ `log(erf(x, y))`, which works for large `x, y`.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+
+See also: [`erf(x,y)`](@ref erf).
+"""
+function logerf(a::Real, b::Real)
+    if abs(a) ≤ invsqrt2 && abs(b) ≤ invsqrt2
+        return log(erf(a, b))
+    elseif b > a > 0
+        return logerfc(a) + LogExpFunctions.log1mexp(logerfc(b) - logerfc(a))
+    elseif a < b < 0
+        return logerfc(-b) + LogExpFunctions.log1mexp(logerfc(-a) - logerfc(-b))
+    else
+        return log(erf(a, b))
     end
 end
