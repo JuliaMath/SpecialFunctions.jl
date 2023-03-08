@@ -56,6 +56,7 @@ export
     logerf,
     logerfc,
     logerfcx,
+    faddeeva,
     eta,
     digamma,
     invdigamma,
