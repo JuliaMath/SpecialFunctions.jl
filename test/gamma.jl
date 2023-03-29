@@ -338,3 +338,44 @@ end
           0.00169495384841964531409376316336552555952269360134349446910im)
     @test beta(big(1.0), big(1.2))                  ≈ beta(1.0, 1.2) rtol=4*eps()
 end
+
+@testset "binomial" begin
+    # type stability tests
+    #   (combinations of real/complex/integer arguments of sizes 16/32/63/Big lead to correct data types)
+    @testset "type stability" begin
+        for F in [Float16, Float32, Float64]
+            @test         F  == typeof(binomial(        F( 2),         F( 2)))
+            @test Complex{F} == typeof(binomial(Complex{F}(2), Complex{F}(2)))
+        end
+        @test     BigFloat   == typeof(binomial(BigFloat(  2), BigFloat(  2)))
+    end
+
+    # check some specific, real/complex argument combinations. results from WolframAlpha
+    @testset "some specific real/complex arguments" begin
+        @test binomial( 3.5,      2.3    ) ≈   3.93413299580028
+        @test binomial(-3.5,      2.3    ) ≈   5.64332481819944
+        @test binomial( 3.5,     -2.3    ) ≈   0.00703726043773
+        @test binomial(-3.5,     -2.3    ) ≈   0.04879062507380
+        @test binomial( 3.5,      2.3+2im) ≈  14.10920342060363-014.53780610795795im
+        @test binomial( 3.5-1im,  2.3    ) ≈   3.16723141606959-003.29657673089314im
+        @test binomial( 3.5-1im,  2.3+3im) ≈ 143.19825764420579-258.14796666889352im
+    end
+
+    # check some Big arguments. results from WolframAlpha
+    @testset "Big arguments" begin
+        @test binomial(BigFloat(" 1.2222222222222222222222222222222222222222"), BigFloat("2.0")) ≈
+                       BigFloat(" 0.1358024691358024691358024691358024691358")
+        @test binomial(BigFloat(" 0.1234567890123456789012345678901234567890"), BigFloat("3.4567890123456789012345678901234567890123")) ≈
+                       BigFloat("-0.0658640218674615803572225658583379621360")
+    end
+
+
+    # compare integer arguments type casted to complex wrt integer arguments
+    @testset "comparison of integer arguments" begin
+        for n = 0:10, k = 0:n
+            @test binomial(n, k) ≈ binomial(complex(n),         k )
+            @test binomial(n, k) ≈ binomial(        n,  complex(k))
+            @test binomial(n, k) ≈ binomial(complex(n), complex(k))
+        end
+    end
+end

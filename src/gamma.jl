@@ -844,3 +844,16 @@ function logabsbinomial(n::T, k::T) where {T<:Integer}
     end
 end
 logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)
+
+"""
+    binomial(x, y)
+
+Generalized binomial coefficient for complex arguments
+``{x \\choose y} = \\frac{1}{(x+1) \\Beta(x-y+1,y+1)}``
+for ``x, y \\ \\mathbb{C}``.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficient#Two_real_or_complex_valued_arguments)
+
+See also [`beta(a,b)`](@ref SpecialFunctions.beta).
+"""
+Base.binomial(x::Number, y::Number) = inv((x+1) * beta(x-y+1, y+1))
