@@ -490,44 +490,6 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     sm += sum(reverse!(@view wk[1:i]))
     q = (rgammax(a, x) / x) * (1.0 + sm)
     return (1.0 - q, q)
-
-
-
-
-    # wk = zeros(30)
-    # flag = false
-    # acc = acc0[ind + 1]
-    # amn = a - 1.0
-    # t = amn/x
-    # wk[1] = t
-    # loop = 2
-    # for indx = 2:20
-    #    amn -= 1.0
-    #    t *= amn/x
-    #    if abs(t) <= 1.0e-3
-    #        loop = indx
-    #        flag = true
-    #        break
-    #    end
-    #    wk[indx] = t
-    # end
-    # if !flag
-    #     loop = 20
-    # end
-    # sm = t
-    # while true
-    #    if abs(t) < acc
-    #        break
-    #    end
-    #    amn -= 1.0
-    #    t *= amn/x
-    #    sm += t
-    # end
-    # for j = loop-1:-1:1
-    #    sm += wk[j]
-    # end
-    # q = (rgammax(a, x)/x)*(1.0 + sm)
-    # return (1.0 - q, q)
 end
 """
     gamma_inc_taylor_x(a,x,ind)
