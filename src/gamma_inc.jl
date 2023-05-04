@@ -444,8 +444,11 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
         sm += t
     end
 
-    # Sum terms from small to large
-    sm += sum(reverse!(@view wk[1:i]))
+    # sum terms from small to large
+    for v ∈ @view wk[i:-1:1]
+        sm += v
+    end
+    
     p = (rgammax(a, x) / a) * (1.0 + sm)
     return (p, 1.0 - p)
 end
@@ -486,8 +489,11 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
         sm += t
     end
 
-    # Sum terms from small to large
-    sm += sum(reverse!(@view wk[1:i]))
+    # sum terms from small to large
+    for v ∈ @view wk[i:-1:1]
+        sm += v
+    end
+
     q = (rgammax(a, x) / x) * (1.0 + sm)
     return (1.0 - q, q)
 end
