@@ -421,39 +421,32 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
-    wk = zeros(30)
-    flag = false
-    apn = a + 1.0
-    t = x/apn
-    wk[1] = t
-    loop = 2
-    for indx = 2:20
-       apn += 1.0
-       t *= x/apn
-       if t <= 1.0e-3
-           loop = indx
-           flag = true
-           break
-       end
-       wk[indx] = t
+    wk = zeros(20)
+    apn = a
+
+    # compute and store larger terms in wk, to add from small to large
+    t = 1
+    i = 0
+    while i < 20
+        i += 1
+        apn += 1.0
+        t *= x / apn
+        t > 1.0e-3 || break
+        wk[i] = t
     end
-    if !flag
-        loop = 20
-    end
+
+    # sum the smaller terms directly
     sm = t
-    tol = 0.5*acc #tolerance
-    while true
-       apn += 1.0
-       t *= x/apn
-       sm += t
-       if t <= tol
-           break
-       end
+    tolerance = 0.5acc
+    while t > tolerance
+        apn += 1.0
+        t *= x / apn
+        sm += t
     end
-    for j = loop-1:-1:1
-       sm += wk[j]
-    end
-    p = (rgammax(a, x)/a)*(1.0 + sm)
+
+    # Sum terms from small to large
+    sm += sum(reverse!(@view wk[1:i]))
+    p = (rgammax(a, x) / a) * (1.0 + sm)
     return (p, 1.0 - p)
 end
 """
@@ -470,40 +463,71 @@ External links: [DLMF](https://dlmf.nist.gov/8.11.2)
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
-    wk = zeros(30)
-    flag = false
     acc = acc0[ind + 1]
-    amn = a - 1.0
-    t = amn/x
-    wk[1] = t
-    loop = 2
-    for indx = 2:20
-       amn -= 1.0
-       t *= amn/x
-       if abs(t) <= 1.0e-3
-           loop = indx
-           flag = true
-           break
-       end
-       wk[indx] = t
+    wk = zeros(20)
+    amn = a
+
+    # compute and store larger terms in wk, to add from small to large
+    t = 1
+    i = 0
+    while i < 20
+        i += 1
+        amn -= 1.0
+        t *= amn / x
+        abs(t) > 1.0e-3 || break
+        wk[i] = t
     end
-    if !flag
-        loop = 20
-    end
+
+    # sum the smaller terms directly
     sm = t
-    while true
-       if abs(t) < acc
-           break
-       end
-       amn -= 1.0
-       t *= amn/x
-       sm += t
+    while abs(t) > acc
+        amn -= 1.0
+        t *= amn / x
+        sm += t
     end
-    for j = loop-1:-1:1
-       sm += wk[j]
-    end
-    q = (rgammax(a, x)/x)*(1.0 + sm)
+
+    # Sum terms from small to large
+    sm += sum(reverse!(@view wk[1:i]))
+    q = (rgammax(a, x) / x) * (1.0 + sm)
     return (1.0 - q, q)
+
+
+
+
+    # wk = zeros(30)
+    # flag = false
+    # acc = acc0[ind + 1]
+    # amn = a - 1.0
+    # t = amn/x
+    # wk[1] = t
+    # loop = 2
+    # for indx = 2:20
+    #    amn -= 1.0
+    #    t *= amn/x
+    #    if abs(t) <= 1.0e-3
+    #        loop = indx
+    #        flag = true
+    #        break
+    #    end
+    #    wk[indx] = t
+    # end
+    # if !flag
+    #     loop = 20
+    # end
+    # sm = t
+    # while true
+    #    if abs(t) < acc
+    #        break
+    #    end
+    #    amn -= 1.0
+    #    t *= amn/x
+    #    sm += t
+    # end
+    # for j = loop-1:-1:1
+    #    sm += wk[j]
+    # end
+    # q = (rgammax(a, x)/x)*(1.0 + sm)
+    # return (1.0 - q, q)
 end
 """
     gamma_inc_taylor_x(a,x,ind)
