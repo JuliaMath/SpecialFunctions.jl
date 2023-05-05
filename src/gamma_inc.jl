@@ -471,7 +471,7 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     amn = a
 
     # compute and store larger terms in wk, to add from small to large
-    t = 1
+    t = 1.0
     i = 0
     while i < 20
         i += 1
@@ -490,8 +490,8 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     end
 
     # sum terms from small to large
-    for v ∈ @view wk[i:-1:1]
-        sm += v
+    for j in i:(-1):1
+        sm += wk[j]
     end
 
     q = (rgammax(a, x) / x) * (1.0 + sm)
