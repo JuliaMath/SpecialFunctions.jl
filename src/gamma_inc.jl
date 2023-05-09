@@ -421,22 +421,16 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
-    wk = zeros(20)
-    apn = a
 
-    # compute and store larger terms in wk, to add from small to large
-    t = 1.0
-    i = 0
-    while i < 20
-        i += 1
-        apn += 1.0
-        t *= x / apn
-        t > 1.0e-3 || break
-        wk[i] = t
-    end
+    # compute first 21 terms
+    ts = cumprod(ntuple(i -> x / (a + i), Val(21)))
+    last_t = findfirst(<(1.0e-3), ts)
+    last_t = last_t === nothing ? 20 : last_t - 1
+    next_t = last_t + 1
 
     # sum the smaller terms directly
-    sm = t
+    sm = t = ts[next_t]
+    apn = a + next_t
     tolerance = 0.5acc
     while t > tolerance
         apn += 1.0
@@ -445,8 +439,8 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     end
 
     # sum terms from small to large
-    for j ∈ i:(-1):1
-        sm += wk[j]
+    for j ∈ last_t:(-1):1
+        sm += ts[j]
     end
     
     p = (rgammax(a, x) / a) * (1.0 + sm)
@@ -467,22 +461,16 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
-    wk = zeros(20)
-    amn = a
 
-    # compute and store larger terms in wk, to add from small to large
-    t = 1.0
-    i = 0
-    while i < 20
-        i += 1
-        amn -= 1.0
-        t *= amn / x
-        abs(t) > 1.0e-3 || break
-        wk[i] = t
-    end
+    # compute first 21 terms
+    ts = cumprod(ntuple(i -> (a - i) / x, Val(21)))
+    last_t = findfirst(x -> abs(x) < 1.0e-3, ts)
+    last_t = last_t === nothing ? 20 : last_t - 1
+    next_t = last_t + 1
 
     # sum the smaller terms directly
-    sm = t
+    sm = t = ts[next_t]
+    amn = a - next_t
     while abs(t) > acc
         amn -= 1.0
         t *= amn / x
@@ -490,8 +478,8 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     end
 
     # sum terms from small to large
-    for j in i:(-1):1
-        sm += wk[j]
+    for j in last_t:(-1):1
+        sm += ts[j]
     end
 
     q = (rgammax(a, x) / x) * (1.0 + sm)
