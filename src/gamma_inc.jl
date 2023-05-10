@@ -485,6 +485,9 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     q = (rgammax(a, x) / x) * (1.0 + sm)
     return (1.0 - q, q)
 end
+if VERSION < v"1.5.0"
+     cumprod(itr) = accumulate(mul_prod, itr)
+end
 """
     gamma_inc_taylor_x(a,x,ind)
 
