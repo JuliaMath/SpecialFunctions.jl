@@ -444,6 +444,7 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     end
     
     p = (rgammax(a, x) / a) * (1.0 + sm)
+    
     return (p, 1.0 - p)
 end
 """
@@ -481,8 +482,9 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     for j in last_t:(-1):1
         sm += ts[j]
     end
-
+    
     q = (rgammax(a, x) / x) * (1.0 + sm)
+    
     return (1.0 - q, q)
 end
 """
