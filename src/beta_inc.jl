@@ -1028,11 +1028,11 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     end
 end
 
-function _beta_inc_inv(a::T, b::T, p::T) where {T<:Union{Float16, Float32}}
+function _beta_inc_inv(a::T, b::T, p::T) where {T<:Real}
     x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p))
     T(x), T(y)
 end
-function _beta_inc_inv(a::T, b::T, p::T, q::T) where {T<:Union{Float16, Float32}}
+function _beta_inc_inv(a::T, b::T, p::T, q::T) where {T<:Real}
     x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p), Float64(q))
     T(x), T(y)
 end

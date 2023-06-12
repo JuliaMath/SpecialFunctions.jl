@@ -1086,7 +1086,7 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     return x
 end
 
-function __gamma_inc_inv(a::T, minpq::T, pcase::Bool) where {T<:Union{Float16,Float32}}
+function __gamma_inc_inv(a::T, minpq::T, pcase::Bool) where {T<:Real}
     return T(__gamma_inc_inv(Float64(a), Float64(minpq), pcase))
 end
 

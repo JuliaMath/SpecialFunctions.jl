@@ -184,6 +184,7 @@ end
     @testset "Promotion of arguments" begin
         @test @inferred(gamma_inc_inv(1//2, 0.3f0, 0.7f0)) isa Float32
         @test @inferred(gamma_inc_inv(1, 0.2f0, 0.8f0)) isa Float32
+        @test @inferred(gamma_inc_inv(1, big(1//10), big(9//10))) isa BigFloat
     end
 
     @testset "Issue 385" begin

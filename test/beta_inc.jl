@@ -311,4 +311,10 @@ end
         @test beta_inc_inv(0.01, 0.1, y)[1] ≈ 0.7803014210919872
         @test beta_inc(0.01, 0.1, beta_inc_inv(0.01, 0.1, y)[1])[1] ≈ y
     end
+
+    @testset "BigFloat" begin
+        @test beta_inc_inv(1, 2, big(1//2))[1] ≈ big(1//2) * (2 - sqrt(big(2))) atol=eps()
+        @test beta_inc_inv(1, 2, big(1//3))[1] ≈ big(1//3) * (3 - sqrt(big(6))) atol=eps()
+        @test beta_inc_inv(1, 2, big(1//4))[1] ≈ big(1//2) * (2 - sqrt(big(3))) atol=eps()
+    end
 end
