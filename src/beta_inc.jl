@@ -754,7 +754,9 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64=1-x)
         end
     end
 
-    if x == 0.0
+    if isnan(x) || isnan(y) || isnan(a) || isnan(b)
+        return (NaN, NaN)
+    elseif x == 0.0
         return (0.0, 1.0)
     elseif y == 0.0
         return (1.0, 0.0)
