@@ -35,7 +35,7 @@
             @test @inferred(dawson(T(1))) isa T
             @test dawson(T(1)) ≈ T(0.53807950691276841914) rtol=2*eps(T)
 
-            @test @inferred(faddeeva(T(1))) isa T
+            @test @inferred(faddeeva(T(1))) isa Complex{T}
             @test faddeeva(T(1)) ≈ 0.36787944117144233402+0.60715770584139372446im rtol=2*eps(T)
         end
 
