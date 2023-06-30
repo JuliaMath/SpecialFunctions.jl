@@ -34,11 +34,15 @@
 
             @test @inferred(dawson(T(1))) isa T
             @test dawson(T(1)) ≈ T(0.53807950691276841914) rtol=2*eps(T)
+
+            @test @inferred(faddeva(T(1))) isa T
+            @test faddeeva(T(1)) ≈ 0.36787944117144233402+0.60715770584139372446im rtol=2*eps(T)
         end
 
         @test logerfc(1000) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
         @test erfinv(Integer(0)) == 0 == erfinv(0//1)
         @test erfcinv(Integer(1)) == 0 == erfcinv(1//1)
+        @test faddeeva(0) == faddeeva(0//1) == 1
     end
 
     @testset "complex arguments" begin
@@ -65,6 +69,10 @@
         @test dawson(ComplexF16(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
         @test dawson(ComplexF32(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
         @test dawson(ComplexF64(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
+
+        @test faddeeva(ComplexF16(1+2im)) ≈ 0.21849261527489066692+0.09299780939260188228im
+        @test faddeeva(ComplexF32(1+2im)) ≈ 0.21849261527489066692+0.09299780939260188228im
+        @test faddeeva(ComplexF64(1+2im)) ≈ 0.21849261527489066692+0.09299780939260188228im
     end
 
     @testset "BigFloat arguments" begin
@@ -85,6 +93,8 @@
         @test_throws MethodError erfi(big(1.0))
 
         @test_throws MethodError dawson(BigFloat(1))
+
+        @test_throws MethodError faddeeva(BigFloat(1))
 
         for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1+big"1e-50", big"1.2", 2-big"1e-50")
             @test erfc(erfcinv(y)) ≈ y
@@ -110,6 +120,7 @@
         @test_throws MethodError erfinv(NotAFloat())
         @test_throws MethodError erfcinv(NotAFloat())
         @test_throws MethodError dawson(NotAFloat())
+        @test_throws MethodError faddeeva(NotAFloat())
     end
 
     @testset "inverse" begin

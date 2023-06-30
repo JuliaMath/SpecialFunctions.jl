@@ -304,6 +304,8 @@ end
         # See https://github.com/JuliaStats/StatsFuns.jl/issues/133#issuecomment-1069602721
         y = 2.0e-280
         @test beta_inc(2.0, 1.0, beta_inc_inv(2.0, 1.0, y, 1.0)[1])[1] ≈ y
+        # See https://github.com/JuliaStats/GLM.jl/issues/538#issuecomment-1603447448
+        @test isequal(beta_inc(6.0, 112.5, NaN), (NaN, NaN))
     end
 
     @testset "StatsFuns#145" begin

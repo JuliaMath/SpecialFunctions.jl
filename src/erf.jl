@@ -28,9 +28,9 @@ for f in (:erf, :erfc)
     end
 end
 
-for f in (:erfcx, :erfi, :dawson)
+for f in (:erfcx, :erfi, :dawson, :faddeeva)
     internalf = Symbol(:_, f)
-    openspecfunfsym = Symbol(:Faddeeva_, f === :dawson ? :Dawson : f)
+    openspecfunfsym = Symbol(:Faddeeva_, f === :dawson ? :Dawson : f === :faddeeva ? :w : f)
     openspecfunfF64 = QuoteNode(Symbol(openspecfunfsym, :_re))
     openspecfunfCF64 = QuoteNode(openspecfunfsym)
     @eval begin
@@ -45,6 +45,8 @@ for f in (:erfcx, :erfi, :dawson)
         $internalf(z::Complex{Float16}) = Complex{Float16}($internalf(Complex{Float32}(z)))
     end
 end
+
+faddeeva(x::Real) = faddeeva(complex(x))
 
 # MPFR has an open TODO item for this function
 # until then, we use [DLMF 7.12.1](https://dlmf.nist.gov/7.12.1) for the tail
@@ -212,6 +214,16 @@ See also: [`erfi(x)`](@ref erfi).
     [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 """
 dawson
+
+"""
+    faddeeva(z)
+
+Compute the Faddeeva function of complex `z`, defined by
+``e^{-z^2} \\operatorname{erfc}(-iz)``.
+Note that this function, also named `w` (original Faddeeva package) or `wofz` (Scilab package),
+is equivalent to``\\operatorname{erfcx}(-iz)``.
+"""
+faddeeva
 
 @doc raw"""
     erfinv(x)

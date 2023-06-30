@@ -209,7 +209,7 @@ end
 # So identifying the (something) with the -zeta function, we get
 # the zeta function for free and might as well export it, especially
 # since this is a common generalization of the Riemann zeta function
-# (which Julia already exports).   Note that this geneneralization
+# (which Julia already exports).   Note that this generalization
 # is equivalent to Mathematica's Zeta[s,z], and is equivalent to the
 # Hurwitz zeta function for real(z) > 0.
 
@@ -439,7 +439,7 @@ function _zeta(s::ComplexOrReal{Float64})
             lg = loggamma(1 - s)
             rehalf = real(s)*0.5
             return zeta(1 - s) * exp(lg + absim*halfπ + s*log2π) * inv2π * Complex(
-                sinpi(rehalf), copysign(cospi(rehalf), imag(s))
+                sinpi(rehalf), flipsign(cospi(rehalf), imag(s))
             )
         else
             return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * twoπ^s * invπ
@@ -598,16 +598,6 @@ See also [`loggamma`](@ref).
 """
 logabsgamma(x::Real) = _logabsgamma(float(x))
 
-function _logabsgamma(x::Float64)
-    signp = Ref{Int32}()
-    y = ccall((:lgamma_r,libopenlibm),  Float64, (Float64, Ptr{Int32}), x, signp)
-    return y, Int(signp[])
-end
-function _logabsgamma(x::Float32)
-    signp = Ref{Int32}()
-    y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
-    return y, Int(signp[])
-end
 function _logabsgamma(x::Float16)
     y, s = _logabsgamma(Float32(x))
     return Float16(y), s
@@ -648,6 +638,7 @@ function _loggamma(x::Real)
     s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
+
 
 function _loggamma(x::BigFloat)
     isnan(x) && return x

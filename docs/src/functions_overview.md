@@ -47,6 +47,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`erfi(x)`](@ref SpecialFunctions.erfi)       | imaginary error function defined as ``-i \operatorname{erf}(ix)`` |
 | [`erfinv(x)`](@ref SpecialFunctions.erfinv)   | inverse function to [`erf()`](@ref SpecialFunctions.erf) |
 | [`dawson(x)`](@ref SpecialFunctions.dawson)   | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)`` for large ``x`` |
+| [`faddeeva(x)`](@ref SpecialFunctions.faddeeva) | [Faddeeva function](https://en.wikipedia.org/wiki/Faddeeva_function), equivalent to ``\operatorname{erfcx}(-ix)`` |
 
 
 ## [Airy and Related Functions](https://dlmf.nist.gov/9)

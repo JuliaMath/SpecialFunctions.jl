@@ -256,7 +256,7 @@ External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wi
 
 See also: [`beta_inc`](@ref)
 
-# Implemention
+# Implementation
 `BASYM(A,B,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)
@@ -754,7 +754,9 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64=1-x)
         end
     end
 
-    if x == 0.0
+    if isnan(x) || isnan(y) || isnan(a) || isnan(b)
+        return (NaN, NaN)
+    elseif x == 0.0
         return (0.0, 1.0)
     elseif y == 0.0
         return (1.0, 0.0)
@@ -899,9 +901,8 @@ function _beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
 end
 
 
-#GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms AS 63: The Incomplete Beta Integral and AS 64: Inverse of the Incomplete Beta Integeral,
-#Applied Statistics,
-#Volume 26, Number 1, 1977, pages 111-114.
+#GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms: AS 63: The Incomplete Beta Integral AS 64: Inverse of the Incomplete Beta Function Ratio,
+#Applied Statistics, Volume 26, Number 1, 1977, pages 111-114.  https://doi.org/10.2307/2346887
 
 """
     beta_inc_inv(a, b, p, q=1-p)

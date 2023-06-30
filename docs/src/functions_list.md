@@ -11,6 +11,7 @@ SpecialFunctions.erfcx
 SpecialFunctions.logerfc
 SpecialFunctions.logerfcx
 SpecialFunctions.erfi
+SpecialFunctions.faddeeva
 SpecialFunctions.dawson
 SpecialFunctions.erfinv
 SpecialFunctions.erfcinv
