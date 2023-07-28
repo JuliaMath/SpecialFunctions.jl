@@ -1,5 +1,7 @@
 module SpecialFunctions
 
+using Compat
+
 using IrrationalConstants:
     twoπ,
     halfπ,
@@ -12,6 +14,9 @@ using IrrationalConstants:
     logtwo,
     logπ,
     log2π
+
+# FIXME temporary until the fate of inve is decided
+Base.@irrational inve 0.367879441171442321595 inv(big(ℯ))
 
 import LogExpFunctions
 
@@ -78,7 +83,10 @@ export
     expintx,
     sinint,
     cosint,
-    lbinomial
+    lbinomial,
+    lambertw,
+    lambertwbp,
+    LambertW
 
 include("bessel.jl")
 include("erf.jl")
@@ -91,6 +99,7 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
+include("lambertw.jl")
 if !isdefined(Base, :get_extension)
     include("../ext/SpecialFunctionsChainRulesCoreExt.jl")
 end

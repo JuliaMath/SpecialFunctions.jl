@@ -96,3 +96,9 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 |:-------- |:----------- |
 | [`eta(x)`](@ref SpecialFunctions.eta)                         | [Dirichlet eta function](https://en.wikipedia.org/wiki/Dirichlet_eta_function) at `x`                                                                           |
 | [`zeta(x)`](@ref SpecialFunctions.zeta)                       | [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function) at `x`                                                                             |
+
+## [Lambert's W Function](https://dlmf.nist.gov/4.13)
+| Function | Description |
+|:-------- |:----------- |
+| [`lambertw(x, [k=0])`](@ref SpecialFunctions.lambertw)        | [Lambert's W function](https://en.wikipedia.org/wiki/Lambert_W_function) at `x` for `k`-th branch   |
+| [`lambertwbp(x, [k=0])`](@ref SpecialFunctions.lambertwbp)    | Accurate value of ``1 + W_k(-\frac{1}{\mathrm{e}} + x)`` for small `x`                              |
