@@ -34,9 +34,10 @@ function _digamma(z::ComplexOrReal{Float64})
     else
         ψ = zero(z)
     end
-    if x < 7
+    X = 8
+    if x < X
         # shift using recurrence formula
-        n = 7 - floor(Int,x)
+        n = X - floor(Int,x)
         for ν = 1:n-1
             ψ -= inv(z + ν)
         end
