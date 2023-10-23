@@ -12,6 +12,7 @@
             @test digamma(convert(elty, 7e-7)) ≈ convert(elty, -1428572.005785942019703646)
             @test digamma(convert(elty, -0.5)) ≈ convert(elty, .03648997397857652055902367)
             @test digamma(convert(elty, -1.1)) ≈ convert(elty,  10.15416395914385769902271)
+            # issue #450
             @test digamma(convert(elty, 0)) == convert(elty,  -Inf)
             @test digamma(convert(elty, -1)) == convert(elty,  -Inf)
 
@@ -272,6 +273,9 @@ end
     @test zeta(-6+13im) ≅ conj(zeta(-6-13im)) ≅ 133.4764526350263089084083707864441932569167866714712267139316498-54.15465727586582149098585229287107039070546786014930791081909684im
     @test 1e-12 > relerr(zeta(-2+13im, 3), 2.3621038290867825837364823054-3.9497600485207119519185591345im)
     @test 1e-12 > relerr(zeta(-2-13im, 3), 2.3621038290867825837364823054+3.9497600485207119519185591345im)
+
+    # issue #450
+    @test SpecialFunctions.cotderiv(0, 2.0) == Inf
 end
 
 @testset "logabsbinomial" begin
