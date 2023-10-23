@@ -62,7 +62,8 @@ end
 
 Accurate for integer arguments
 """
-_cotpi(x) = cospi(x) / sinpi(x)
+_cotpi(x) = @static VERSION >= v"1.10.0-DEV.525" ? inv(tanpi(x)) : cospi(x) / sinpi(x)
+
 """
     trigamma(x)
 
