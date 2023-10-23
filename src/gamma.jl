@@ -62,7 +62,7 @@ end
 
 Accurate for integer arguments
 """
-_cotpi(x) = \(sincospi(x)...)
+_cotpi(x) = cospi(x) / sinpi(x)
 """
     trigamma(x)
 
