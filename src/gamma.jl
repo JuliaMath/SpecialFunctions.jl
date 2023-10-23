@@ -28,7 +28,7 @@ function _digamma(z::ComplexOrReal{Float64})
     # argument," Computer Phys. Commun.  vol. 4, pp. 221–226 (1972).
     x = real(z)
     if x <= 0 # reflection formula
-        ψ = -π * cot(π*z)
+        ψ = -π * _cotpi(z)
         z = 1 - z
         x = real(z)
     else
@@ -58,6 +58,12 @@ function _digamma(x::BigFloat)
 end
 
 """
+    _cotpi(x) = cot(π * x)
+
+Accurate for integer arguments
+"""
+_cotpi(x) = \(sincospi(x)...)
+"""
     trigamma(x)
 
 Compute the trigamma function of `x` (the logarithmic second derivative of `gamma(x)`).
@@ -68,12 +74,13 @@ function _trigamma(z::ComplexOrReal{Float64})
     # via the derivative of the Kölbig digamma formulation
     x = real(z)
     if x <= 0 # reflection formula
-        return (π * csc(π*z))^2 - trigamma(1 - z)
+        return (π / sinpi(z))^2 - trigamma(1 - z)
     end
     ψ = zero(z)
-    if x < 8
+    N = 10
+    if x < N
         # shift using recurrence formula
-        n = 8 - floor(Int,x)
+        n = N - floor(Int,x)
         ψ += inv(z)^2
         for ν = 1:n-1
             ψ += inv(z + ν)^2
@@ -133,12 +140,12 @@ const cotderiv_Q = [cotderiv_q(m) for m in 1:100]
 function cotderiv(m::Integer, z)
     isinf(imag(z)) && return zero(z)
     if m <= 0
-        m == 0 && return π * cot(π*z)
+        m == 0 && return π * _cotpi(z)
         throw(DomainError(m, "`m` must be nonnegative."))
     end
     if m <= length(cotderiv_Q)
         q = cotderiv_Q[m]
-        x = cot(π*z)
+        x = _cotpi(z)
         y = x*x
         s = q[1] + q[2] * y
         t = y
