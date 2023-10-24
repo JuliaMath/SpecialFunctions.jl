@@ -276,6 +276,7 @@ end
 
     # issue #450
     @test SpecialFunctions.cotderiv(0, 2.0) == Inf
+    @test_throws DomainError SpecialFunctions.cotderiv(-1, 2.0)
 end
 
 @testset "logabsbinomial" begin
