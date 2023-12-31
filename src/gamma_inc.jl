@@ -1196,3 +1196,26 @@ function _loggamma(a::Number, x::Number)
     end
     return a*log(x) + log(expintx(1 - a, x)) - x
 end
+
+"""
+Computes the lower incomplete gamma function using the gamma function ratio.
+    
+`IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
+
+"""
+function lowergamma(a, x, IND::Integer=0)
+    P, Q = gamma_inc(a, x, IND)
+    Γ = gamma(a, zero(a), IND)
+    return P * Γ
+end
+
+"""
+Computes the upper incomplete gamma function using the gamma function ratio.
+
+`IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
+"""
+function uppergamma(a, x, IND::Integer=0)
+    P, Q = gamma_inc(a, x, IND)
+    Γ = gamma(a, zero(a), IND)
+    return Q * Γ
+end

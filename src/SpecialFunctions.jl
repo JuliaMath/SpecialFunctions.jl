@@ -78,7 +78,9 @@ export
     expintx,
     sinint,
     cosint,
-    lbinomial
+    lbinomial,
+    lowergamma,
+    uppergamma
 
 include("bessel.jl")
 include("erf.jl")
