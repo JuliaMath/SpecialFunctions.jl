@@ -592,7 +592,7 @@ _gamma(z::Complex) = exp(loggamma(z))
     logabsgamma(x)
 
 Compute the logarithm of absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x`and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
+[`Real`](@ref) `x` and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
 
 See also [`loggamma`](@ref).
 """
