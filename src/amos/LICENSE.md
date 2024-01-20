@@ -12,7 +12,7 @@ See below for the license.
  *
  * A Portable Package for Bessel Functions of a Complex Argument
  * and Nonnegative Order
- * 
+ *
  * This algorithm is a package of subroutines for computing Bessel
  * functions and Airy functions.  The routines are updated
  * versions of those routines found in TOMS algorithm 644.
@@ -43,25 +43,25 @@ See below for the license.
  * The original Fortran code can be found at https://www.netlib.org/amos/
  *
  * References:
- * 
+ *
  * [1]: Abramowitz, M. and Stegun, I. A., Handbook of Mathematical
  *      Functions, NBS Applied Math Series 55, U.S. Dept. of Commerce,
  *      Washington, D.C., 1955
- * 
+ *
  * [2]: Amos, D. E., Algorithm 644, A Portable Package For Bessel
  *      Functions of a Complex Argument and Nonnegative Order, ACM
  *      Transactions on Mathematical Software, Vol. 12, No. 3,
  *      September 1986, Pages 265-273, DOI:10.1145/7921.214331
- * 
+ *
  * [3]: Amos, D. E., Remark on Algorithm 644, ACM Transactions on
  *      Mathematical Software, Vol. 16, No. 4, December 1990, Page
  *      404, DOI:10.1145/98267.98299
- * 
+ *
  * [4]: Amos, D. E., A remark on Algorithm 644: "A portable package
  *      for Bessel functions of a complex argument and nonnegative order",
  *      ACM Transactions on Mathematical Software, Vol. 21, No. 4,
  *      December 1995, Pages 388-393, DOI:10.1145/212066.212078
- * 
+ *
  * [5]: Cody, W. J., Algorithm 665, MACHAR: A Subroutine to
  *      Dynamically Determine Machine Parameters, ACM Transactions on
  *      Mathematical Software, Vol. 14, No. 4, December 1988, Pages
