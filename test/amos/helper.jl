@@ -20,12 +20,12 @@ const SPECIAL_FLOAT32 = Float64[
 
 
 """
-input: 
+input:
     zarr[ (+) ]
 
 output:
-    zarr[ 
-        (+), (-), 
+    zarr[
+        (+), (-),
         inv.(+), inv.(-),
     ]
 """
@@ -37,7 +37,7 @@ function gen_neg_inv(zarr::Vector{Float64})
 end
 
 """
-input: 
+input:
     zarr[ (+,+) ]
 
 output:
@@ -82,4 +82,57 @@ end
         y in gen_phase4(test_y)
         tuchk(y, ascle, tol)
     end
+end
+
+"Pure julia log(gamma(z))"
+function gammalog(z::Float64)
+    if z > 0.0
+        gam = gamma(z)
+        if gam > 0.0
+            return log(gam)
+        end
+    end
+
+    return NaN
+end
+
+@testset "AMOS.gammaln" begin
+    test_y = [
+        SPECIAL_FLOAT32...,
+        # [0, 1)
+        rand(Float64, 10)...,
+        # 1e-0 ~ 1e-16
+        [ 10.0^i for i in 0:-1:-16 ]...,
+        -1.0, -10., -Inf,
+        NaN,
+    ]
+
+    for y in (test_y)
+        ref_jl = gammalog(y)    # pure julia impl, ground truth
+        ref = AMOS._gammaln(y)  # call AMOS, baseline
+        res = AMOS.gammaln(y)   # fortran translation
+
+        if isnan(ref)
+            @test isnan(res)
+            if isinf(ref_jl)
+                # broken on 0x1.fffffep+127
+                @test_broken isnan(ref_jl)
+            else
+                @test isnan(ref_jl)
+            end
+        else
+            @test ref ≈ res
+            @test ref == res
+
+            if isinf(ref_jl)
+                # broken on 0x1.fffffcp-127
+                @test_broken ref_jl ≈ res
+            else
+                @test ref_jl ≈ res
+            end
+        end
+    end
+
+    @test_broken AMOS.gammaln(0x1.fffffep+127) == Inf
+    @test_broken AMOS.gammaln(0x1.fffffcp-127) == gammalog(0x1.fffffcp-127)
 end
