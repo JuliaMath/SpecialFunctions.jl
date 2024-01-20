@@ -3,12 +3,12 @@
 """
     uchk(y::ComplexF64, ascle::Float64, tol::Float64)
 
-Y ENTERS AS A SCALED QUANTITY WHOSE MAGNITUDE IS GREATER THAN
-`EXP(-ALIM) = ASCLE = 1.0E+3*D1MACH(1)/TOL`.
-THE TEST IS MADE TO SEE IF THE MAGNITUDE OF THE REAL OR IMAGINARY PARTWOULD
-UNDERFLOW WHEN Y IS SCALED (BY TOL) TO ITS PROPER VALUE.
-Y IS ACCEPTED IF THE UNDERFLOW IS AT LEAST ONE PRECISION BELOW THE MAGNITUDE OF THE LARGEST COMPONENT;
-OTHERWISE THE PHASE ANGLE DOES NOT HAVE ABSOLUTE ACCURACY AND AN UNDERFLOW IS ASSUMED.
+`y` enters as a scaled quantity whose magnitude is greater than
+`Exp(-alim) = ascle = 1.0e+3*d1mach(1)/tol`.
+The test is made to see if the magnitude of the real or imaginary part would
+Underflow when `y` is scaled (by `tol`) to its proper value.
+`y` is accepted if the underflow is at least one precision below the magnitude of the largest component;
+Otherwise the phase angle does not have absolute accuracy and an underflow is assumed.
 
 # Impl Ref
 - [`openspecfun/amos/zuchk.f`](https://github.com/JuliaMath/openspecfun/blob/v0.5.6/amos/zuchk.f)
