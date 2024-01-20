@@ -24,13 +24,15 @@ input:
     zarr[ (+) ]
 
 output:
-    zarr[ (+), (-) ]
+    zarr[ 
+        (+), (-), 
+        inv.(+), inv.(-),
+    ]
 """
 function gen_neg_inv(zarr::Vector{Float64})
     vcat(
-        zarr,
-        -1.0 * zarr,
-        inv.(zarr)
+        zarr, -1.0*zarr,
+        inv.(zarr), -1.0*inv.(zarr),
     )
 end
 
