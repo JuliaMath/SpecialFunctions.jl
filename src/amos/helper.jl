@@ -12,6 +12,7 @@ Otherwise the phase angle does not have absolute accuracy and an underflow is as
 
 # Impl Ref
 - [`openspecfun/amos/zuchk.f`](https://github.com/JuliaMath/openspecfun/blob/v0.5.6/amos/zuchk.f)
+- [`scipy/scipy/special/_amos.c:amos_uchk`](https://github.com/scipy/scipy/blob/b882f1b7ebe55e534f29a8d68a54e4ecd30aeb1a/scipy/special/_amos.c#L4405-L4439)
 """
 function uchk(y::ComplexF64, ascle::Float64, tol::Float64)
     yr = abs(real(y))
@@ -51,6 +52,7 @@ VALUES IS USED FOR SPEED OF EXECUTION.
 
 # Impl Ref
 - [`openspecfun/amos/dgamln.f`](https://github.com/JuliaMath/openspecfun/blob/v0.5.6/amos/dgamln.f)
+- [`scipy/scipy/special/_amos.c:amos_gamln`](https://github.com/scipy/scipy/blob/b882f1b7ebe55e534f29a8d68a54e4ecd30aeb1a/scipy/special/_amos.c#L3678C8-L3775)
 """
 function gammaln(z::Float64)
     con::Float64 = 1.83787706640934548  # ln(2*pi)
