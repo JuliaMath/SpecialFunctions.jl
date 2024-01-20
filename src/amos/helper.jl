@@ -88,7 +88,7 @@ function gammaln(z::Float64)
         if zp >= wdtol
             zsq = zp * zp
             tst = t1 * wdtol
-            # `i=1` is outside `if`
+            # NOTE: `i=1` is outside `if`
             for i = 2:22
                 zp *= zsq
                 trm = GAMMALN_CF[i] * zp
@@ -107,8 +107,9 @@ function gammaln(z::Float64)
 
         zp = 1.0
         nz = trunc(zinc)
-        for i = 0:(nz-1)
-            zp *= z + i
+        for i = 1:nz
+            # NOTE: Parentheses are required to avoid overflow
+            zp *= z + (i - 1)
         end #= 60 =#
 
         tlg = log(zdmy)
