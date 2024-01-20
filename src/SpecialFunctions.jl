@@ -80,6 +80,7 @@ export
     cosint,
     lbinomial
 
+include("amos/AMOS.jl")
 include("bessel.jl")
 include("erf.jl")
 include("ellip.jl")
