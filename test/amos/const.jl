@@ -9,3 +9,9 @@
     @test AMOS.D1_MACH[4] == eps(Float64)
     @test AMOS.D1_MACH[5] == log10(2)
 end
+
+@testset "AMOS.GAMMALN_GLN" begin
+    for idx in 1:100
+        @test AMOS.GAMMALN_GLN[idx] == log(gamma(idx))
+    end
+end
