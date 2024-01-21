@@ -80,3 +80,40 @@ function _kscl!(
 
     nz[]
 end
+
+"""
+`_s1s2!` will modify `s1_ref` and `s2_ref`.
+
+return (nz, iuf)
+"""
+function _s1s2!(
+    zr::ComplexF64,
+    s1_ref::Ref{ComplexF64},
+    s2_ref::Ref{ComplexF64},
+    ascle::Float64,
+    alim::Float64,
+    iuf::Int
+)
+    s1r = Ref{Float64}(real(s1_ref[]))
+    s1i = Ref{Float64}(imag(s1_ref[]))
+    s2r = Ref{Float64}(real(s2_ref[]))
+    s2i = Ref{Float64}(imag(s2_ref[]))
+    nz = Ref{Int32}()
+    iuf_ref = Ref{Int32}(iuf)
+
+    ccall((:zs1s2_, libopenspecfun), Cvoid,
+            (Ref{Float64}, Ref{Float64},  # (ZRR,ZRI) 
+             Ref{Float64}, Ref{Float64},  # (S1R,S1I)
+             Ref{Float64}, Ref{Float64},  # (S2R,S2I)
+            #    NZ,         ASCLE,        ALIM,         IUF
+             Ref{Int32}, Ref{Float64}, Ref{Float64}, Ref{Int32}
+            ),
+             real(zr), imag(zr), 
+             s1r, s1i,
+             s2r, s2i,
+             nz, ascle, alim, iuf_ref)
+    
+    s1_ref[] = complex(s1r[], s1i[])
+    s2_ref[] = complex(s2r[], s2i[])
+    nz[], Int(iuf_ref[])
+end

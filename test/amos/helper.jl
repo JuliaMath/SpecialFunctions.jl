@@ -228,3 +228,66 @@ end
         tkscl!(y, complex(zr), 2.0, length(y))
     end
 end
+
+"test if one of input is NaN"
+contains_nan(ref, impl) = isnan(ref) || isnan(impl)
+contains_nan(ref::Ref{T}, impl::Ref{T}) where {T} =
+    contains_nan(ref[], impl[])
+
+naninf(f) = isnan(f) || isinf(f)
+
+@testset "AMOS.s1s2!" begin
+    function test_s1s2(
+        zr::ComplexF64,
+        s1::ComplexF64,
+        s2::ComplexF64,
+        ascle::Float64=1e-30,
+        alim::Float64=1e-6,
+        iuf::Int=0
+    )
+        s1_ref, s1_impl = Ref(s1), Ref(s1)
+        s2_ref, s2_impl = Ref(s2), Ref(s2)
+        
+        nz_ref, iuf_ref = AMOS._s1s2!(zr, s1_ref, s2_ref, ascle, alim, iuf)
+        nz_impl, iuf_impl = AMOS.s1s2!(zr, s1_impl, s2_impl, ascle, alim, iuf)
+        
+        @test nz_ref == nz_impl
+        @test iuf_ref == iuf_impl
+        if contains_nan(s1_ref, s1_impl)
+            @test s1_ref[] === s1_impl[]
+        else
+            @test s1_ref[] ≈ s1_impl[]
+        end
+        if contains_nan(s2_ref, s2_impl)
+            @test s2_ref[] === s2_impl[]
+        else
+            @test s2_ref[] ≈ s2_impl[]
+        end
+    end
+
+    test_zr = [
+        SPECIAL_FLOAT32...,
+    ]
+    s1s2 = [
+        SPECIAL_FLOAT32...,
+    ] |> complex
+    lim_scale = [
+        # 1e-0 ~ 1e-8
+        [ 10.0^i for i in 0:-1:-8 ]...,
+    ]
+    iuf_test = [ -1, 0, 1, 2 ]
+    
+    for zr in test_zr,
+        s1 in s1s2,
+        s2 in reverse(s1s2),
+        ascle in lim_scale,
+        alim in lim_scale,
+        iuf in iuf_test
+        # TODO
+        naninf(zr) && continue
+        naninf(s1) && continue
+        naninf(s2) && continue
+
+        test_s1s2(complex(zr), s1, s2, ascle, alim, iuf)
+    end
+end
