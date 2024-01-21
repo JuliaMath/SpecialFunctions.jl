@@ -54,7 +54,21 @@ function gen_phase4(zarr::Vector{ComplexF64})
         -1.0im * zarr,
     )
 end
+function gen_phase4(zvv::Vector{Vector{ComplexF64}})
+    gen_phase4.(zvv)
+end
 
+"""test if ComplexF64 contains NaN or Inf in real or imag parts.
+"""
+function contains_inf_nan(z::Vector{ComplexF64})
+    z |> real .|> isinf |> any ||
+        z |> imag .|> isinf |> any ||
+        z |> real .|> isnan |> any ||
+        z |> imag .|> isnan |> any
+end
+
+
+# ==== Test Set ====#
 
 @testset "AMOS.uchk" begin
     function tuchk(y::ComplexF64, ascle::Float64, tol::Float64)
@@ -135,4 +149,82 @@ end
 
     @test_broken AMOS.gammaln(0x1.fffffep+127) == Inf
     @test_broken AMOS.gammaln(0x1.fffffcp-127) == gammalog(0x1.fffffcp-127)
+end
+
+@testset "AMOS.kscl!" begin
+    function tkscl!(
+        y::Vector{ComplexF64},
+        zr::ComplexF64,
+        fnu::Float64=2.0,
+        n::Int=2,
+        rz::ComplexF64=0.5+0.5*im,
+        ascle::Float64=1e-30,
+        tol::Float64=1e-15,
+        elim::Float64=20.,
+    )
+        # @info "input" y zr fnu n rz ascle tol elim
+        y_ref = copy(y)
+        y_res = copy(y)
+        ref = AMOS._kscl!(y_ref,zr,fnu,n,rz,ascle,tol,elim)
+        res = AMOS.kscl!(y_res,zr,fnu,n,rz,ascle,tol,elim)
+
+        @test ref == res
+        if ref != res
+            @info "ref != res" ref res
+            @info "params" zr fnu n rz ascle elim
+            @show y y_ref y_res
+        end
+
+        if contains_inf_nan(y_ref)
+            # use === to test NaN/Inf
+            @test all(y_ref .=== y_res)
+        else
+            @test isapprox(y_ref, y_res)
+            # @info "isapprox"  ref zr y y_ref y_res
+            # @show y_ref
+            # @show y_res
+            if !isapprox(y_ref, y_res)
+                @info "!isapprox"  ref zr y y_ref y_res
+                @info "params" zr fnu n rz ascle elim
+                @show y y_ref y_res
+            end
+        end
+    end
+
+    test_y = [
+        # ComplexF64[],  # TODO: n==0
+        # n=1
+        ComplexF64[0.0],
+        ComplexF64[1.0],
+        ComplexF64[pi],
+        [ rand(ComplexF64, 1) for _ in 1:10 ]...,
+        # n=2
+        ComplexF64[0.0, 0.0],
+        ComplexF64[1., 1.],
+        ComplexF64[1., 0.],
+        ComplexF64[0., 1.],
+        ComplexF64[1., 2.],
+        [ rand(ComplexF64, 2) for _ in 1:10 ]...,
+        # n=5
+        ComplexF64[ complex(i,i) for i in 1:5 ],
+    ]
+    test_zr = [
+        SPECIAL_FLOAT32...,
+        # [0, 1)
+        rand(Float64, 10)...,
+        # 1e-0 ~ 1e-16
+        [ 10.0^i for i in 0:-1:-16 ]...,
+        1.0,
+        pi, ℯ,
+    ]
+
+    for y in gen_phase4(test_y),
+        zr in gen_neg_inv(test_zr)
+        # TODO: @test_broken
+        isnan(zr) && continue
+        isinf(zr) && continue
+        0x1.fffffep+127==zr && continue
+
+        tkscl!(y, complex(zr), 2.0, length(y))
+    end
 end
