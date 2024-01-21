@@ -1,4 +1,10 @@
 
+@testset "AMOS.const" begin
+    # defined in `amos_asyi`: `pi, rpi`
+    @test Float64(pi) == 3.14159265358979324
+    @test AMOS.INV_2PI == 0.159154943091895336
+end
+
 @testset "AMOS.I1_MACH,D1_MACH" begin
     # I1_MACH
     @test size(AMOS.I1_MACH) == (16,)

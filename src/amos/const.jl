@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: BSD-3-Clause OR MIT
 
+"`1 / (2*pi)`"
+const INV_2PI = 1.0 / (2*pi)
+
+
 # TODO: Use NamedTuple?
 """
     I1_MACH :: Int32
