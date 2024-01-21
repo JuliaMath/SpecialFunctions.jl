@@ -1,8 +1,6 @@
 module AMOS
 include("const.jl")
-include("helper.jl")
 include("warp.jl")
-
 
 # internal subroutines
 _subroutine_names = [
@@ -11,7 +9,7 @@ _subroutine_names = [
     "gammaln",
     "s1s2",
 # Only deps on leaf functions
-
+    "kscl",
 # Othsers
 ] # _subroutine_names
 
