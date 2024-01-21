@@ -136,9 +136,9 @@ end
     )
 
 # fortran comments
-SET K FUNCTIONS TO ZERO ON UNDERFLOW, CONTINUE RECURRENCE
-ON SCALED FUNCTIONS UNTIL TWO MEMBERS COME ON SCALE, THEN
-RETURN WITH MIN(NZ+2,N) VALUES SCALED BY 1/TOL.
+Set k functions to zero on underflow,
+continue recurrence on scaled functions until two members come on scale,
+then return with `min(nz+2,n)` values scaled by `1/tol`.
 
 # Impl Ref
 - [`openspecfun/amos/zkscl.f`](https://github.com/JuliaMath/openspecfun/blob/v0.5.6/amos/zkscl.f)
