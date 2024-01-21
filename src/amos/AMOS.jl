@@ -7,7 +7,8 @@ include("warp.jl")
 # internal subroutines
 _subroutine_names = [
 # No deps, leaf Functions
-    "uchk"
+    "uchk",
+    "gammaln",
 # Only deps on leaf functions
 
 # Othsers
