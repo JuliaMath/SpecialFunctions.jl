@@ -477,3 +477,65 @@ end
         test_seri(y, z, fnu, kode, length(y), 1e-6, eps(), 2*eps())
     end
 end
+
+# TODO: improve code coverage
+@testset "AMOS.bknu!" begin
+    function test_bknu(
+        y::Vector{ComplexF64},
+        z::ComplexF64, 
+        fnu::Float64,
+        kode::Int, 
+        n::Int, 
+        tol::Float64,
+        elim::Float64, 
+        alim::Float64
+    )
+        y_ref, y_impl = copy(y), copy(y)
+
+        nz_ref = AMOS._bknu!(y_ref, z, fnu, kode, n, tol, elim, alim)
+        nz_impl = AMOS.bknu!(y_impl, z, fnu, kode, n, tol, elim, alim)
+        
+        @test nz_ref == nz_impl
+        if contains_nan(y_ref, y_impl)
+            cmp = all(y_ref .=== y_impl)
+            @test cmp
+            if !cmp
+                @info "contains_nan" y_ref y_impl
+                @show y z fnu kode n tol elim alim
+            end
+        else
+            @test y_ref ≈ y_impl
+        end
+    end
+
+    test_y = [
+        # n=1
+        ComplexF64[0.0],
+        ComplexF64[1.0],
+        ComplexF64[pi],
+        [ rand(ComplexF64, 1) for _ in 1:10 ]...,
+        # n=2
+        ComplexF64[0.0, 0.0],
+        ComplexF64[1., 1.],
+        ComplexF64[1., 0.],
+        ComplexF64[0., 1.],
+        ComplexF64[1., 2.],
+        [ rand(ComplexF64, 2) for _ in 1:10 ]...,
+        # n=5
+        ComplexF64[ complex(i,i) for i in 1:5 ],
+    ]
+    test_z = [
+        SPECIAL_FLOAT32...,
+    ] |> complex
+
+    for y in test_y,
+        z in test_z,
+        fnu in [ 0., 1. ],
+        kode in [ 1, 2 ]
+        naninf(z) && continue
+        z==0.0 && continue  # div by zero
+        abs(z)>typemax(Int) && continue  # InexactError: Int64
+
+        test_bknu(y, z, fnu, kode, length(y), 1e-6, eps(), 2*eps())
+    end
+end

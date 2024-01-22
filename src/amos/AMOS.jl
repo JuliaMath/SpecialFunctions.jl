@@ -13,6 +13,7 @@ _subroutine_names = [
     "kscl",
     "mlri",
     "seri",
+    "bknu",
 # Othsers
 ] # _subroutine_names
 
