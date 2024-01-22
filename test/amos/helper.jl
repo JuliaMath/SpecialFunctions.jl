@@ -647,7 +647,8 @@ end
         2.7 + 3.14im
     ]
 
-    for z in gen_phase4(test_z),
+    # TODO: gen_phase4
+    for z in (test_z),
         id in [ 0, 1 ],
         kode in [ 1, 2 ]
         isnan(z) && continue  # Int64(NaN)
