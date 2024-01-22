@@ -22,4 +22,7 @@ for fname in _subroutine_names
     include(joinpath("subroutines", "$(fname).jl"))
 end
 
+# AMOS API
+include("airy.jl")
+
 end # AMOS

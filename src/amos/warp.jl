@@ -354,3 +354,8 @@ function _acai!(
     
     nz[]
 end
+
+#
+# `_airy(z::Complex{Float64}, id::Int32, kode::Int32)`
+#   defined in SpecialFunctions
+#

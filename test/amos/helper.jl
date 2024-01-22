@@ -605,3 +605,54 @@ end
         test_acai(y, z, fnu, kode, 1, length(y), 3.1, 1e-6, eps(), 2*eps())
     end
 end
+
+
+@testset "AMOS.airy" begin
+    function test_airy(
+        z::ComplexF64,
+        id::Int,
+        kode::Int,
+    )
+        y_ref = SpecialFunctions._airy(z, Int32(id), Int32(kode))
+        y_impl = AMOS.airy(z, id, kode)
+
+        if contains_nan(y_ref, y_impl)
+            cmp = all(y_ref .=== y_impl)
+            @test cmp
+            if !cmp
+                @info "contains_nan" y_ref y_impl
+                @show z id kode
+            end
+        else
+            @test y_ref ≈ y_impl
+            if !isapprox(y_ref, y_impl)
+                @info "!isapprox" y_ref y_impl
+                @show z id kode
+            end
+        end
+    end
+
+    test_z = Float64[
+        SPECIAL_FLOAT32...,
+        [ rand() for _ in 1:10 ]...,
+        pi,
+        [ 10.0^i for i in 1:6 ]...,
+    ] |> complex    
+    test_z = [
+        test_z...,
+        [ rand(ComplexF64) for _ in 1:10 ]...,
+        
+        0.1 + 0.2im,
+        3.14 + 2.7im,
+        2.7 + 3.14im
+    ]
+
+    for z in gen_phase4(test_z),
+        id in [ 0, 1 ],
+        kode in [ 1, 2 ]
+        isnan(z) && continue  # Int64(NaN)
+        abs(z)>1.3e6 && continue  # too large arg
+
+        test_airy(z, id, kode)
+    end
+end
