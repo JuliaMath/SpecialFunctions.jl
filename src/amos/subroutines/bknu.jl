@@ -539,7 +539,7 @@ function bknu!(
 @label _line270
     #= 270 =#
     y[1] = s1;
-    if n == 1
+    if n != 1
         y[2] = s2
     end
     #= 280 =#
@@ -551,15 +551,15 @@ function bknu!(
     end
 
     kk = nz + 1;
-    s1 = y[kk-1];
-    y[kk-1] = s1 * csr[0];
+    s1 = y[kk];
+    y[kk] = s1 * csr[1];
     if inu == 1
         return nz;
     end
 
     kk = nz + 2;
-    s2 = y[kk-1];
-    y[kk-1] = s2 * csr[0];
+    s2 = y[kk];
+    y[kk] = s2 * csr[1];
     if inu == 2
         return nz;
     end
