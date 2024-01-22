@@ -117,3 +117,51 @@ function _s1s2!(
     s2_ref[] = complex(s2r[], s2i[])
     nz[], Int(iuf_ref[])
 end
+
+"""
+Will modify `y[]`.
+
+Return `nz`.
+"""
+function _asyi!(
+    y::Vector{ComplexF64},
+    z::ComplexF64, 
+    fnu::Float64, 
+    kode::Int, 
+    n::Int, 
+    rl::Float64, 
+    tol::Float64,
+    elim::Float64, 
+    alim::Float64
+)
+    y_len = length(y)
+    yr = real.(y)
+    yi = imag.(y)
+    nz = Ref{Int32}()
+
+    ccall((:zasyi_, libopenspecfun),
+        Cvoid,
+        (
+            # (ZR,ZI), 
+            Ref{Float64}, Ref{Float64}, 
+            # FNU, KODE, N, 
+            Ref{Float64}, Ref{Int32}, Ref{Int32},
+            # (YR,YI), 
+            Ptr{Float64}, Ptr{Float64},
+            # NZ, RL, TOL, ELIM, ALIM
+            Ref{Int32}, Ref{Float64}, Ref{Float64},
+            Ref{Float64}, Ref{Float64}
+        ),
+        real(z), imag(z),
+        fnu, kode, n,
+        yr, yi,
+        nz, rl, tol, elim, alim
+    )
+    
+    # Update `y`
+    y_new = complex.(yr, yi)
+    update_arr!(y, y_new)
+    @assert length(y) == y_len
+    
+    nz[]
+end

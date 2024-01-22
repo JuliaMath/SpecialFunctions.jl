@@ -8,6 +8,7 @@ _subroutine_names = [
     "uchk",
     "gammaln",
     "s1s2",
+    "asyi",
 # Only deps on leaf functions
     "kscl",
 # Othsers
