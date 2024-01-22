@@ -12,6 +12,7 @@ _subroutine_names = [
 # Only deps on leaf functions
     "kscl",
     "mlri",
+    "seri",
 # Othsers
 ] # _subroutine_names
 
