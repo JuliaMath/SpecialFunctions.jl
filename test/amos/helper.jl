@@ -431,19 +431,19 @@ end
         y_ref, y_impl = copy(y), copy(y)
 
         nz_ref = AMOS._seri!(y_ref, z, fnu, kode, n, tol, elim, alim)
-        # nz_impl = AMOS.seri!(y_impl, z, fnu, kode, n, tol, elim, alim)
+        nz_impl = AMOS.seri!(y_impl, z, fnu, kode, n, tol, elim, alim)
         
-        # @test nz_ref == nz_impl
-        # if contains_nan(y_ref, y_impl)
-        #     cmp = all(y_ref .=== y_impl)
-        #     @test cmp
-        #     if !cmp
-        #         @info "contains_nan" y_ref y_impl
-        #         @show y z fnu kode n tol elim alim
-        #     end
-        # else
-        #     @test y_ref ≈ y_impl
-        # end
+        @test nz_ref == nz_impl
+        if contains_nan(y_ref, y_impl)
+            cmp = all(y_ref .=== y_impl)
+            @test cmp
+            if !cmp
+                @info "contains_nan" y_ref y_impl
+                @show y z fnu kode n tol elim alim
+            end
+        else
+            @test y_ref ≈ y_impl
+        end
     end
 
     test_y = [
