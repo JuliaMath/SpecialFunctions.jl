@@ -165,3 +165,48 @@ function _asyi!(
     
     nz[]
 end
+
+
+"""
+Will modify `y[]`.
+
+Return `nz`.
+"""
+function _mlri!(
+    y::Vector{ComplexF64},
+    z::ComplexF64,
+    fnu::Float64,
+    kode::Int,
+    n::Int,
+    tol::Float64,
+)
+    y_len = length(y)
+    yr = real.(y)
+    yi = imag.(y)
+    nz = Ref{Int32}()
+
+    ccall((:zmlri_, libopenspecfun),
+        Cvoid,
+        (
+            # (ZR,ZI),
+            Ref{Float64}, Ref{Float64}, 
+            # FNU, KODE, N,
+            Ref{Float64}, Ref{Int32}, Ref{Int32},
+            # (YR,YI),
+            Ptr{Float64}, Ptr{Float64},
+            # NZ, TOL
+            Ref{Int32}, Ref{Float64},
+        ),
+        real(z), imag(z),
+        fnu, kode, n,
+        yr, yi,
+        nz, tol,
+    )
+
+    # Update `y`
+    y_new = complex.(yr, yi)
+    update_arr!(y, y_new)
+    @assert length(y) == y_len
+    
+    nz[]
+end
