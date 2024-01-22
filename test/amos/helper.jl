@@ -539,3 +539,69 @@ end
         test_bknu(y, z, fnu, kode, length(y), 1e-6, eps(), 2*eps())
     end
 end
+
+
+@testset "AMOS.acai!" begin
+    function test_acai(
+        y::Vector{ComplexF64},
+        z::ComplexF64, 
+        fnu::Float64, 
+        kode::Int,
+        mr::Int, 
+        n::Int, 
+        rl::Float64, 
+        tol::Float64,
+        elim::Float64, 
+        alim::Float64
+    )
+        y_ref, y_impl = copy(y), copy(y)
+
+        nz_ref = AMOS._acai!(y_ref, z, fnu, kode, mr, n, rl, tol, elim, alim)
+        nz_impl = AMOS.acai!(y_impl, z, fnu, kode, mr, n, rl, tol, elim, alim)
+        
+        if contains_nan(y_ref, y_impl)
+            cmp = all(y_ref .=== y_impl)
+            if !cmp
+                # @info "contains_nan" y_ref y_impl
+                # @show y z fnu kode mr n rl tol elim alim
+                @test_broken cmp
+            else
+                @test nz_ref == nz_impl
+                @test cmp
+            end
+        else
+            @test nz_ref == nz_impl
+            @test y_ref ≈ y_impl
+        end
+    end
+
+    test_y = [
+        # n=1
+        ComplexF64[0.0],
+        ComplexF64[1.0],
+        ComplexF64[pi],
+        [ rand(ComplexF64, 1) for _ in 1:10 ]...,
+        # n=2
+        ComplexF64[0.0, 0.0],
+        ComplexF64[1., 1.],
+        ComplexF64[1., 0.],
+        ComplexF64[0., 1.],
+        ComplexF64[1., 2.],
+        [ rand(ComplexF64, 2) for _ in 1:10 ]...,
+        # n=5
+        ComplexF64[ complex(i,i) for i in 1:5 ],
+    ]
+    test_z = [
+        SPECIAL_FLOAT32...,
+    ] |> complex
+
+    for y in test_y,
+        z in test_z,
+        fnu in [ 0., 1. ],
+        kode in [ 1, 2 ]
+        naninf(z) && continue
+        z==0.0 && continue  # div by zero
+
+        test_acai(y, z, fnu, kode, 1, length(y), 3.1, 1e-6, eps(), 2*eps())
+    end
+end

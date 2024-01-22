@@ -15,6 +15,7 @@ _subroutine_names = [
     "seri",
     "bknu",
 # Othsers
+    "acai",
 ] # _subroutine_names
 
 for fname in _subroutine_names
