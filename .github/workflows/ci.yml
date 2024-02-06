@@ -39,6 +39,7 @@ jobs:
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # required
+          fail_ci_if_error: true
           file: ./lcov.info
           flags: unittests
   docs:
