@@ -38,6 +38,7 @@ jobs:
       - uses: codecov/codecov-action@v4
         continue-on-error: true
         with:
+          token: ${{ secrets.CODECOV_TOKEN }} # required
           file: ./lcov.info
           flags: unittests
   docs:
