@@ -35,9 +35,11 @@ jobs:
         continue-on-error: ${{ matrix.version == 'nightly' }}
       - uses: julia-actions/julia-processcoverage@v1
         continue-on-error: true
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         continue-on-error: true
         with:
+          token: ${{ secrets.CODECOV_TOKEN }} # required
+          fail_ci_if_error: true
           file: ./lcov.info
           flags: unittests
   docs:
