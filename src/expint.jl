@@ -131,7 +131,7 @@ end
 
 function _expint(z::Complex{Float64}, ::Val{expscaled}=Val{false}()) where {expscaled}
     if real(z) < 0
-        return _expint(1, z, 1000, Val{expscaled}())
+        return _expint(one(z), z, 1000, Val{expscaled}())
     else
         return expint_opt(z, Val{expscaled}())
     end
@@ -208,9 +208,10 @@ En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp
 # returns the two terms from the above equation separately
 function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     A = float(1 - ν)
-    B::typeof(A) = 1
-    Bprev::typeof(A) = 0
-    Aprev::typeof(A) = 1
+    A, _ = promote(A, z)
+    B = one(A)
+    Bprev = zero(B)
+    Aprev = one(A)
     ϵ = 10*eps(real(B))
     scale = sqrt(floatmax(real(A)))
 
