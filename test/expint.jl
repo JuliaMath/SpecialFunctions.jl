@@ -158,6 +158,9 @@ using Base.MathConstants
                 Γ, cf, iter = SpecialFunctions.En_cf_gamma(1 / 2, x)
                 @test Γ + cf*exp(-x) ≈ y
             end
+            # type stability
+            @test @inferred(SpecialFunctions.En_cf_gamma(1, 1.0 + 2.1im, 1000)) isa Tuple{ComplexF64,ComplexF64,Int}
+            @test @inferred(SpecialFunctions.En_cf_gamma(1, 1.0f0, 1000)) isa Tuple{Float32,Float32,Int}
         end
         @testset "En_expand_origin" begin
             for (x, y) in zip(xs, ys)
