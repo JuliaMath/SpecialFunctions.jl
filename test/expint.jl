@@ -158,6 +158,8 @@ using Base.MathConstants
                 Γ, cf, iter = SpecialFunctions.En_cf_gamma(1 / 2, x)
                 @test Γ + cf*exp(-x) ≈ y
             end
+            # type stability
+            @inferred SpecialFunctions.En_cf_gamma(1, 1.0 + 2.1im, 1000)
         end
         @testset "En_expand_origin" begin
             for (x, y) in zip(xs, ys)
