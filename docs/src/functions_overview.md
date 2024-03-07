@@ -2,7 +2,10 @@
 Here the *Special Functions* are listed according to the structure of [NIST Digital Library of Mathematical Functions](https://dlmf.nist.gov/).
 
 
-## [Gamma Function](https://dlmf.nist.gov/5)
+## Gamma Function
+
+- [Gamma Function - DLMF](https://dlmf.nist.gov/5)
+
 | Function | Description |
 |:-------- |:----------- |
 | [`gamma(z)`](@ref SpecialFunctions.gamma(::Number)) | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) ``\Gamma(z)`` |
