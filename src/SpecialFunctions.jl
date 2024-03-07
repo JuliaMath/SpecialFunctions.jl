@@ -58,14 +58,26 @@ export
     logerfcx,
     faddeeva,
     eta,
+
+    # Gamma functions
+    gamma,
+    loggamma,
+    logabsgamma,
+    logfactorial,
     digamma,
     invdigamma,
-    polygamma,
     trigamma,
+    polygamma,
     gamma_inc,
+    gamma_inc_inv,
+    # beta functions
+    beta,
+    logbeta,
+    logabsbeta,
+    logabsbinomial,
     beta_inc,
     beta_inc_inv,
-    gamma_inc_inv,
+
     ncbeta,
     ncF,
     hankelh1,

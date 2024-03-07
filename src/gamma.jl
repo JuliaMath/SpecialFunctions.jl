@@ -2,8 +2,6 @@
 
 using Base.MPFR: MPFRRoundingMode, ROUNDING_MODE
 
-export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
-
 const ComplexOrReal{T} = Union{T,Complex{T}}
 
 # Bernoulli numbers B_{2k}, using tabulated numerators and denominators from
