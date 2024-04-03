@@ -207,10 +207,10 @@ En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
 # returns the two terms from the above equation separately
 function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
-    A = float(1 - ν)
-    B::typeof(A) = 1
-    Bprev::typeof(A) = 0
-    Aprev::typeof(A) = 1
+    A, z = map(float, promote(1 - ν, z))
+    B = oneunit(A)
+    Bprev = zero(B)
+    Aprev = oneunit(A)
     ϵ = 10*eps(real(B))
     scale = sqrt(floatmax(real(A)))
 
