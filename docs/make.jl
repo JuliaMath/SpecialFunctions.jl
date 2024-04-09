@@ -1,5 +1,7 @@
 using SpecialFunctions, Documenter
 
+# `using SpecialFunctions` for all doctests
+DocMeta.setdocmeta!(SpecialFunctions, :DocTestSetup, :(using SpecialFunctions); recursive=true)
 makedocs(modules=[SpecialFunctions],
          sitename="SpecialFunctions.jl",
          authors="Jeff Bezanson, Stefan Karpinski, Viral B. Shah, et al.",
