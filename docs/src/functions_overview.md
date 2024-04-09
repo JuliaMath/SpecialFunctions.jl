@@ -2,7 +2,10 @@
 Here the *Special Functions* are listed according to the structure of [NIST Digital Library of Mathematical Functions](https://dlmf.nist.gov/).
 
 
-## [Gamma Function](https://dlmf.nist.gov/5)
+## Gamma Function
+
+- [Gamma Function - DLMF](https://dlmf.nist.gov/5)
+
 | Function | Description |
 |:-------- |:----------- |
 | [`gamma(z)`](@ref SpecialFunctions.gamma(::Number)) | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) ``\Gamma(z)`` |
@@ -16,12 +19,13 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number))  | [upper incomplete gamma function ``\Gamma(a,z)``](https://en.wikipedia.org/wiki/Incomplete_gamma_function) |
 | [`loggamma(a,z)`](@ref SpecialFunctions.loggamma(::Number,::Number))                                           | accurate `log(gamma(a,x))` for large arguments                 |
 | [`gamma_inc(a,x,IND)`](@ref SpecialFunctions.gamma_inc)  | [incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates P(a,x) and Q(a,x)for accuracy specified by IND and returns tuple (p,q)) |
-| [`beta_inc(a,b,x,y)`](@ref SpecialFunctions.beta_inc)  | [incomplete beta function ratio Ix(a,b) and Iy(a,b)](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function) (i.e evaluates Ix(a,b) and Iy(a,b) and returns tuple (p,q)) |
 | [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)  | [inverse of incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates x given P(a,x)=p and Q(a,x)=q  |
 | [`beta(x,y)`](@ref SpecialFunctions.beta)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
 | [`logbeta(x,y)`](@ref SpecialFunctions.logbeta)                                          | accurate `log(beta(x,y))` for large `x` or `y`      |
 | [`logabsbeta(x,y)`](@ref SpecialFunctions.logabsbeta)                                          | accurate `log(abs(beta(x,y)))` for large `x` or `y`     |
 | [`logabsbinomial(x,y)`](@ref SpecialFunctions.logabsbinomial)                                          | accurate `log(abs(binomial(n,k)))` for large `n` and `k` near `n/2`     |
+| [`beta_inc(a,b,x,y)`](@ref SpecialFunctions.beta_inc)         | [incomplete beta function ratio Ix(a,b) and Iy(a,b)](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function) (i.e evaluates Ix(a,b) and Iy(a,b) and returns tuple (p,q)) |
+| [`beta_inc_inv(a,b,p,q)`](@ref SpecialFunctions.beta_inc_inv) | Inverse of the incomplete beta function (i.e evaluates x given ``I_{x}(a, b) = p``) |
 
 
 ## [Exponential and Trigonometric Integrals](https://dlmf.nist.gov/6)
