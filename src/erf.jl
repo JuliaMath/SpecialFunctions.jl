@@ -363,34 +363,33 @@ function _erfinv(x::Float16)
     elseif a == Float16(1)
         return copysign(Inf16, x)
     else
-
-    # Perform calculations with `Float32`
-    x32 = Float32(x)
-    a32 = Float32(a)
-    if a32 <= 0.75f0 # Table 7 in Blair et al.
-        t = x32^2 - 0.5625f0
-        y = x32 * @horner(t, -0.10976_672f1,
+        # Perform calculations with `Float32`
+        x32 = Float32(x)
+        a32 = Float32(a)
+        if a32 <= 0.75f0 # Table 7 in Blair et al.
+            t = x32^2 - 0.5625f0
+            y = x32 * @horner(t, -0.10976_672f1,
                               0.53062_1f0) /
-                  @horner(t, -0.10123_953f1,
+                      @horner(t, -0.10123_953f1,
                               0.1f1)
-    elseif a32 <= 0.9375f0 # Table 26 in Blair et al.
-        t = x32^2 - 0.87890625f0
-        y = x32 * @horner(t, 0.10178_950f1,
-                            -0.32827_601f1) /
-                  @horner(t, 0.72455_99f0,
-                            -0.33871_553f1,
-                             0.1f1)
-    else # Table 47 in Blair et al.
-        t = inv(sqrt(-log1p(-a32)))
-        y = @horner(t, 0.98650_088f0,
-                       0.92601_777f0) /
-            (copysign(t, x32) *
-             @horner(t, 0.98424_719f0,
-                        0.10074_7432f0,
-                        0.1f0))
+        elseif a32 <= 0.9375f0 # Table 26 in Blair et al.
+            t = x32^2 - 0.87890625f0
+            y = x32 * @horner(t, 0.10178_950f1,
+                              -0.32827_601f1) /
+                      @horner(t, 0.72455_99f0,
+                              -0.33871_553f1,
+                              0.1f1)
+        else # Table 47 in Blair et al.
+            t = inv(sqrt(-log1p(-a32)))
+            y = @horner(t, 0.98650_088f0,
+                        0.92601_777f0) /
+                (copysign(t, x32) *
+                 @horner(t, 0.98424_719f0,
+                         0.10074_7432f0,
+                         0.1f0))
+        end
+        return Float16(y)
     end
-
-    return Float16(y)
 end
 
 function _erfinv(y::BigFloat)
