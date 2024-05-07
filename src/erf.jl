@@ -379,14 +379,15 @@ function _erfinv(x::Float16)
                       @horner(t, 0.72455_99f0,
                               -0.33871_553f1,
                               0.1f1)
-        else # Table 47 in Blair et al.
-            t = inv(sqrt(-log1p(-a32)))
-            y = @horner(t, 0.98650_088f0,
-                        0.92601_777f0) /
-                (copysign(t, x32) *
-                 @horner(t, 0.98424_719f0,
-                         0.10074_7432f0,
-                         0.1f0))
+        else
+            # Simpler alternative to Table 47 in Blair et al.
+            # because of the reduced accuracy requirement
+            # (it turns out that this branch only covers 128 values).
+            # Note that the use of log(1-x) rather than log1p is intentional since it will be
+            # slightly faster and 1-x is exact.
+            # Ref: https://github.com/JuliaMath/SpecialFunctions.jl/pull/372#discussion_r1592710586
+            t = sqrt(-log(1-a32))
+            y = copysign(@horner(t, -0.429159f0, 1.04868f0), x32)
         end
         return Float16(y)
     end
