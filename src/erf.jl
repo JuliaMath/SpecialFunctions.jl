@@ -366,12 +366,11 @@ function _erfinv(x::Float16)
         # Perform calculations with `Float32`
         x32 = Float32(x)
         a32 = Float32(a)
-        if a32 <= 0.75f0 # Table 7 in Blair et al.
-            t = x32^2 - 0.5625f0
-            y = x32 * @horner(t, -0.10976_672f1,
-                              0.53062_1f0) /
-                      @horner(t, -0.10123_953f1,
-                              0.1f1)
+        if a32 <= 0.75f0
+            # Simpler and more accurate alternative to Table 7 in Blair et al.
+            # Ref: https://github.com/JuliaMath/SpecialFunctions.jl/pull/372#discussion_r1592832735
+            t = muladd(-6.73815f1, x32, 1f0) / muladd(-4.18798f0, x32, 4.54263f0)
+            y = copysign(muladd(0.88622695f0, x32, t), x32)
         elseif a32 <= 0.9375f0 # Table 26 in Blair et al.
             t = x32^2 - 0.87890625f0
             y = x32 * @horner(t, 0.10178_950f1,
