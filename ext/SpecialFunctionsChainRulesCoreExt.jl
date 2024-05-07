@@ -1,3 +1,9 @@
+module SpecialFunctionsChainRulesCoreExt
+
+using SpecialFunctions, ChainRulesCore
+
+import SpecialFunctions: sqrtπ, invπ
+
 const BESSEL_ORDER_INFO = """
 derivatives of Bessel functions with respect to the order are not implemented currently:
 https://github.com/JuliaMath/SpecialFunctions.jl/issues/160
@@ -193,3 +199,105 @@ ChainRulesCore.@scalar_rule(
 ChainRulesCore.@scalar_rule(expinti(x), exp(x) / x)
 ChainRulesCore.@scalar_rule(sinint(x), sinc(invπ * x))
 ChainRulesCore.@scalar_rule(cosint(x), cos(x) / x)
+
+# elliptic integrals
+ChainRulesCore.@scalar_rule(
+    ellipk(m),
+    iszero(m) ? oftype(Ω, π) / 8 : (ellipe(m) / (1 - m) - Ω) / (2 * m),
+)
+ChainRulesCore.@scalar_rule(
+    ellipe(m),
+    iszero(m) ? -oftype(Ω, π) / 8 : (Ω - ellipk(m)) / (2 * m),
+)
+
+# non-holomorphic functions
+function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselix), ν::Number, x::Number)
+    # primal
+    Ω = besselix(ν, x)
+
+    # derivative
+    ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    a = (besselix(ν - 1, x) + besselix(ν + 1, x)) / 2
+    ΔΩ = if Δx isa Real
+        muladd(muladd(-sign(real(x)), Ω, a), Δx, ∂Ω_∂ν * Δν)
+    else
+        muladd(a, Δx, muladd(-sign(real(x)) * real(Δx), Ω, ∂Ω_∂ν * Δν))
+    end
+
+    return Ω, ΔΩ
+end
+function ChainRulesCore.rrule(::typeof(besselix), ν::Number, x::Number)
+    Ω = besselix(ν, x)
+    project_x = ChainRulesCore.ProjectTo(x)
+    function besselix_pullback(ΔΩ)
+        ν̄ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+        a = (besselix(ν - 1, x) + besselix(ν + 1, x)) / 2
+        x̄ = project_x(muladd(conj(a), ΔΩ, - sign(real(x)) * real(conj(Ω) * ΔΩ)))
+        return ChainRulesCore.NoTangent(), ν̄, x̄
+    end
+    return Ω, besselix_pullback
+end
+
+function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besseljx), ν::Number, x::Number)
+    # primal
+    Ω = besseljx(ν, x)
+
+    # derivative
+    ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    a = (besseljx(ν - 1, x) - besseljx(ν + 1, x)) / 2
+    ΔΩ = if Δx isa Real
+        muladd(a, Δx, ∂Ω_∂ν * Δν)
+    else
+        muladd(a, Δx, muladd(-sign(imag(x)) * imag(Δx), Ω, ∂Ω_∂ν * Δν))
+    end
+
+    return Ω, ΔΩ
+end
+function ChainRulesCore.rrule(::typeof(besseljx), ν::Number, x::Number)
+    Ω = besseljx(ν, x)
+    project_x = ChainRulesCore.ProjectTo(x)
+    function besseljx_pullback(ΔΩ)
+        ν̄ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+        a = (besseljx(ν - 1, x) - besseljx(ν + 1, x)) / 2
+        x̄ = if x isa Real
+            project_x(a * ΔΩ)
+        else
+            project_x(muladd(conj(a), ΔΩ, - sign(imag(x)) * real(conj(Ω) * ΔΩ) * im))
+        end
+        return ChainRulesCore.NoTangent(), ν̄, x̄
+    end
+    return Ω, besseljx_pullback
+end
+
+function ChainRulesCore.frule((_, Δν, Δx), ::typeof(besselyx), ν::Number, x::Number)
+    # primal
+    Ω = besselyx(ν, x)
+
+    # derivative
+    ∂Ω_∂ν = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+    a = (besselyx(ν - 1, x) - besselyx(ν + 1, x)) / 2
+    ΔΩ = if Δx isa Real
+        muladd(a, Δx, ∂Ω_∂ν * Δν)
+    else
+        muladd(a, Δx, muladd(-sign(imag(x)) * imag(Δx), Ω, ∂Ω_∂ν * Δν))
+    end
+
+    return Ω, ΔΩ
+end
+function ChainRulesCore.rrule(::typeof(besselyx), ν::Number, x::Number)
+    Ω = besselyx(ν, x)
+    project_x = ChainRulesCore.ProjectTo(x)
+    function besselyx_pullback(ΔΩ)
+        ν̄ = ChainRulesCore.@not_implemented(BESSEL_ORDER_INFO)
+        a = (besselyx(ν - 1, x) - besselyx(ν + 1, x)) / 2
+        x̄ = if x isa Real
+            project_x(a * ΔΩ)
+        else
+            project_x(muladd(conj(a), ΔΩ, - sign(imag(x)) * real(conj(Ω) * ΔΩ) * im))
+        end
+        return ChainRulesCore.NoTangent(), ν̄, x̄
+    end
+    return Ω, besselyx_pullback
+end
+
+end # module

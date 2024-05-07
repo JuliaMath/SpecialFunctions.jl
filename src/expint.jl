@@ -207,10 +207,10 @@ En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
 # returns the two terms from the above equation separately
 function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
-    A = float(1 - ν)
-    B::typeof(A) = 1
-    Bprev::typeof(A) = 0
-    Aprev::typeof(A) = 1
+    A, z = map(float, promote(1 - ν, z))
+    B = oneunit(A)
+    Bprev = zero(B)
+    Aprev = oneunit(A)
     ϵ = 10*eps(real(B))
     scale = sqrt(floatmax(real(A)))
 
@@ -508,7 +508,7 @@ end
     expint(z)
     expint(ν, z)
 
-Computes the exponential integral ``\\operatorname{E}_\\nu(z) = \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+Computes the exponential integral ``\\operatorname{E}_\\nu(z) = \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
 If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
 External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
@@ -520,7 +520,7 @@ expint(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{false
     expintx(z)
     expintx(ν, z)
 
-Computes the scaled exponential integral ``\\exp(z) \\operatorname{E}_\\nu(z) = e^z \\int_0^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+Computes the scaled exponential integral ``\\exp(z) \\operatorname{E}_\\nu(z) = e^z \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
 If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
 See also: [`expint(ν, z)`](@ref SpecialFunctions.expint)

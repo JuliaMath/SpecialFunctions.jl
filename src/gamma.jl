@@ -2,8 +2,6 @@
 
 using Base.MPFR: MPFRRoundingMode, ROUNDING_MODE
 
-export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
-
 const ComplexOrReal{T} = Union{T,Complex{T}}
 
 # Bernoulli numbers B_{2k}, using tabulated numerators and denominators from
@@ -28,15 +26,16 @@ function _digamma(z::ComplexOrReal{Float64})
     # argument," Computer Phys. Commun.  vol. 4, pp. 221–226 (1972).
     x = real(z)
     if x <= 0 # reflection formula
-        ψ = -π * cot(π*z)
+        ψ = -π * _cotpi(z)
         z = 1 - z
         x = real(z)
     else
         ψ = zero(z)
     end
-    if x < 7
+    X = 8
+    if x < X
         # shift using recurrence formula
-        n = 7 - floor(Int,x)
+        n = X - floor(Int,x)
         for ν = 1:n-1
             ψ -= inv(z + ν)
         end
@@ -57,6 +56,13 @@ function _digamma(x::BigFloat)
 end
 
 """
+    _cotpi(x) = cot(π * x)
+
+Accurate for integer arguments
+"""
+_cotpi(x) = @static VERSION >= v"1.10.0-DEV.525" ? inv(tanpi(x)) : cospi(x) / sinpi(x)
+
+"""
     trigamma(x)
 
 Compute the trigamma function of `x` (the logarithmic second derivative of `gamma(x)`).
@@ -67,12 +73,13 @@ function _trigamma(z::ComplexOrReal{Float64})
     # via the derivative of the Kölbig digamma formulation
     x = real(z)
     if x <= 0 # reflection formula
-        return (π * csc(π*z))^2 - trigamma(1 - z)
+        return (π / sinpi(z))^2 - trigamma(1 - z)
     end
     ψ = zero(z)
-    if x < 8
+    N = 10
+    if x < N
         # shift using recurrence formula
-        n = 8 - floor(Int,x)
+        n = N - floor(Int,x)
         ψ += inv(z)^2
         for ν = 1:n-1
             ψ += inv(z + ν)^2
@@ -132,12 +139,12 @@ const cotderiv_Q = [cotderiv_q(m) for m in 1:100]
 function cotderiv(m::Integer, z)
     isinf(imag(z)) && return zero(z)
     if m <= 0
-        m == 0 && return π * cot(π*z)
+        m == 0 && return π * _cotpi(z)
         throw(DomainError(m, "`m` must be nonnegative."))
     end
     if m <= length(cotderiv_Q)
         q = cotderiv_Q[m]
-        x = cot(π*z)
+        x = _cotpi(z)
         y = x*x
         s = q[1] + q[2] * y
         t = y
@@ -209,7 +216,7 @@ end
 # So identifying the (something) with the -zeta function, we get
 # the zeta function for free and might as well export it, especially
 # since this is a common generalization of the Riemann zeta function
-# (which Julia already exports).   Note that this geneneralization
+# (which Julia already exports).   Note that this generalization
 # is equivalent to Mathematica's Zeta[s,z], and is equivalent to the
 # Hurwitz zeta function for real(z) > 0.
 
@@ -439,7 +446,7 @@ function _zeta(s::ComplexOrReal{Float64})
             lg = loggamma(1 - s)
             rehalf = real(s)*0.5
             return zeta(1 - s) * exp(lg + absim*halfπ + s*log2π) * inv2π * Complex(
-                sinpi(rehalf), copysign(cospi(rehalf), imag(s))
+                sinpi(rehalf), flipsign(cospi(rehalf), imag(s))
             )
         else
             return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * twoπ^s * invπ
@@ -550,6 +557,25 @@ Compute the gamma function for complex ``z``, defined by
 ```
 and by analytic continuation in the whole complex plane.
 
+# Examples
+
+```jldoctest
+julia> gamma(0)
+Inf
+
+julia> gamma(1)
+1.0
+
+julia> gamma(2)
+1.0
+
+julia> gamma(0.5)^2 ≈ π
+true
+
+julia> gamma(4 + 1) == prod(1:4) == factorial(4)
+true
+```
+
 External links:
 [DLMF](https://dlmf.nist.gov/5.2.1),
 [Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
@@ -592,22 +618,12 @@ _gamma(z::Complex) = exp(loggamma(z))
     logabsgamma(x)
 
 Compute the logarithm of absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x`and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
+[`Real`](@ref) `x` and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
 
 See also [`loggamma`](@ref).
 """
 logabsgamma(x::Real) = _logabsgamma(float(x))
 
-function _logabsgamma(x::Float64)
-    signp = Ref{Int32}()
-    y = ccall((:lgamma_r,libopenlibm),  Float64, (Float64, Ptr{Int32}), x, signp)
-    return y, Int(signp[])
-end
-function _logabsgamma(x::Float32)
-    signp = Ref{Int32}()
-    y = ccall((:lgammaf_r,libopenlibm),  Float32, (Float32, Ptr{Int32}), x, signp)
-    return y, Int(signp[])
-end
 function _logabsgamma(x::Float16)
     y, s = _logabsgamma(Float32(x))
     return Float16(y), s
@@ -648,6 +664,7 @@ function _loggamma(x::Real)
     s < 0 && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
+
 
 function _loggamma(x::BigFloat)
     isnan(x) && return x
@@ -837,13 +854,6 @@ logabsbeta(a::Real, b::Real) = logabsbeta(promote(a, b)...)
 logabsbeta(a::Number, b::Number) = loggamma(a) + loggamma(b) - loggamma(a + b), 1
 
 ## from base/numbers.jl
-
-# this trickery is needed while the deprecated method in Base exists
-@static if !hasmethod(Base.factorial, Tuple{Number})
-    import Base: factorial
-end
-factorial(x) = Base.factorial(x) # to make SpecialFunctions.factorial work unconditionally
-factorial(x::Number) = gamma(x + 1) # fallback for x not Integer
 
 """
     logabsbinomial(n, k)

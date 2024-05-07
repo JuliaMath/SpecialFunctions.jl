@@ -256,7 +256,7 @@ External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wi
 
 See also: [`beta_inc`](@ref)
 
-# Implemention
+# Implementation
 `BASYM(A,B,LAMBDA,EPS)` from Didonato and Morris (1982)
 """
 function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)
@@ -371,19 +371,21 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
     end
     z = -nu*lnx
     if b*z == 0.0
-        return error("expansion can't be computed")
+        @debug("underflow: expansion can't be computed")
+        return w
     end
 
     # COMPUTATION OF THE EXPANSION
     #SET R = EXP(-Z)*Z**B/GAMMA(B)
     r = b*(1.0 + rgamma1pm1(b))*exp(b*log(z))
     r *= exp(a*lnx)*exp(0.5*bm1*lnx)
-    u = loggammadiv(b,a) + b*log(nu)
+    u = loggammadiv(b, a) + b*log(nu)
     u = r*exp(-u)
     if u == 0.0
-        return error("expansion can't be computed")
+        @debug("underflow: expansion can't be computed")
+        return w
     end
-    (p, q) = gamma_inc(b,z,0)
+    p, q = gamma_inc(b, z, 0)
     v = inv(nu)^2/4
     t2 = lnx^2/4
     l = w/u
@@ -412,7 +414,8 @@ function beta_inc_asymptotic_asymmetric(a::Float64, b::Float64, x::Float64, y::F
         dj = d[n] * j
         sm += dj
         if sm <= 0.0
-            return error("expansion can't be computed")
+            @debug("underflow: expansion can't be computed")
+            return w
         end
         if abs(dj) <= epps*(sm+l)
             break
@@ -725,11 +728,14 @@ External links: [DLMF](https://dlmf.nist.gov/8.17.1), [Wikipedia](https://en.wik
 
 See also: [`beta_inc_inv`](@ref)
 """
-function beta_inc(a::Real, b::Real, x::Real, y::Real=1-x)
+function beta_inc(a::Real, b::Real, x::Real)
+    return _beta_inc(map(float, promote(a, b, x))...)
+end
+function beta_inc(a::Real, b::Real, x::Real, y::Real)
     return _beta_inc(map(float, promote(a, b, x, y))...)
 end
 
-function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
+function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64=1-x)
     p = 0.0
     q = 0.0
    # lambda = a - (a+b)*x
@@ -748,7 +754,9 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
         end
     end
 
-    if x == 0.0
+    if isnan(x) || isnan(y) || isnan(a) || isnan(b)
+        return (NaN, NaN)
+    elseif x == 0.0
         return (0.0, 1.0)
     elseif y == 0.0
         return (1.0, 0.0)
@@ -834,7 +842,7 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     elseif a0 < min(epps, epps*b0) && b0*x0 <= 1.0
         q = beta_inc_power_series1(a0, b0, x0, epps)
         p = 1.0 - q
-    elseif max(a0,b0) > 1.0
+    elseif max(a0, b0) > 1.0
         if b0 <= 1.0
             p = beta_inc_power_series(a0, b0, x0, epps)
             q = 1.0 - p
@@ -883,15 +891,18 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64)
     return ind ? (q, p) : (p, q)
 end
 
+function _beta_inc(a::T, b::T, x::T) where {T<:Union{Float16, Float32}}
+    p, q = _beta_inc(Float64(a), Float64(b), Float64(x))
+    T(p), T(q)
+end
 function _beta_inc(a::T, b::T, x::T, y::T) where {T<:Union{Float16, Float32}}
     p, q = _beta_inc(Float64(a), Float64(b), Float64(x), Float64(y))
     T(p), T(q)
 end
 
 
-#GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms AS 63: The Incomplete Beta Integral and AS 64: Inverse of the Incomplete Beta Integeral,
-#Applied Statistics,
-#Volume 26, Number 1, 1977, pages 111-114.
+#GW Cran, KJ Martin, GE Thomas, Remark AS R19 and Algorithm AS 109: A Remark on Algorithms: AS 63: The Incomplete Beta Integral AS 64: Inverse of the Incomplete Beta Function Ratio,
+#Applied Statistics, Volume 26, Number 1, 1977, pages 111-114.  https://doi.org/10.2307/2346887
 
 """
     beta_inc_inv(a, b, p, q=1-p)
@@ -901,11 +912,14 @@ of the regularized incomplete beta function ``I_{x}(a, b)``.
 
 See also: [`beta_inc`](@ref)
 """
-function beta_inc_inv(a::Real, b::Real, p::Real, q::Real=1-p)
+function beta_inc_inv(a::Real, b::Real, p::Real)
+    return _beta_inc_inv(map(float, promote(a, b, p))...)
+end
+function beta_inc_inv(a::Real, b::Real, p::Real, q::Real)
     return _beta_inc_inv(map(float, promote(a, b, p, q))...)
 end
 
-function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64)
+function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     #change tail if necessary
     if p > 0.5
         y, x = _beta_inc_inv(b, a, q, p)
@@ -920,7 +934,7 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64)
     x = p
     r = sqrt(-2*log(p))
     p_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
-    fpu = 1e-30
+    fpu = floatmin(Float64)
     lb = logbeta(a, b)
 
     if a > 1.0 && b > 1.0
@@ -954,40 +968,54 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64)
     sq = 1.0
     prev = 1.0
 
-    if x < 0.0001
-        x = 0.0001
-    end
-    if x > .9999
-        x = .9999
-    end
+    x = clamp(x, 0.0001, 0.9999)
 
-    iex = max(-5.0/a^2 - 1.0/p^0.2 - 13.0, -30.0)
-    acu = 10.0^iex
+    # This first argument was proposed in
+    #
+    # K. J. Berry, P. W. Mielke, Jr and G. W. Cran (1990).
+    # Algorithm AS R83: A Remark on Algorithm AS 109: Inverse of the
+    #   Incomplete Beta Function Ratio.
+    # Journal of the Royal Statistical Society.
+    # Series C (Applied Statistics), 39(2), 309–310. doi:10.2307/2347779
+    #
+    # but the last term has been changed from 13 to 34 since the
+    # the original article
+    #
+    # Majumder, K. L., & Bhattacharjee, G. P. (1973).
+    # Algorithm as 64: Inverse of the incomplete beta function ratio.
+    # Journal of the Royal Statistical Society.
+    # Series C (Applied Statistics), 22(3), 411-414.
+    #
+    # argues that the iex value should be set to -2r - 2 where r is the
+    # required number of accurate digits.
+    #
+    # The idea with the -5.0/a^2 - 1.0/p^0.2 - 34.0 correction is to
+    # use -2r - 2 (for 16 digits) for large values of a and p but use
+    # a much smaller tolerance for small values of a and p.
+    iex = -5.0/a^2 - 1.0/p^0.2 - 34.0
+    acu = max(exp10(iex), 10 * fpu) # 10 * fpu instead of fpu avoids hangs for small values
 
     #iterate
     while true
         p_approx = beta_inc(a, b, x)[1]
         xin = x
-        p_approx = (p_approx - p)*min(floatmax(), exp(lb + r*log(xin) + t*log1p(-xin)))
+        p_approx = (p_approx - p)*min(
+            floatmax(),
+            exp(lb + LogExpFunctions.xlogy(r, xin) + LogExpFunctions.xlog1py(t, -xin))
+        )
 
         if p_approx * p_approx_prev <= 0.0
             prev = max(sq, fpu)
         end
-        g = 1.0
 
-        tx = x - g*p_approx
-        while true
-            adj = g*p_approx
-            sq = adj^2
+	adj = p_approx
+	tx = x - adj
+	while prev <= (sq = adj^2) || tx < 0.0 || tx > 1.0
+            adj /= 3.0
             tx = x - adj
-            if (prev > sq && tx >= 0.0 && tx <= 1.0)
-                break
-            end
-            g /= 3.0
         end
 
         #check if current estimate is acceptable
-
         if prev <= acu || p_approx^2 <= acu
             x = tx
             return (x, 1.0 - x)
@@ -1002,6 +1030,10 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64)
     end
 end
 
+function _beta_inc_inv(a::T, b::T, p::T) where {T<:Union{Float16, Float32}}
+    x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p))
+    T(x), T(y)
+end
 function _beta_inc_inv(a::T, b::T, p::T, q::T) where {T<:Union{Float16, Float32}}
     x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p), Float64(q))
     T(x), T(y)

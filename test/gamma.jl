@@ -12,6 +12,9 @@
             @test digamma(convert(elty, 7e-7)) ≈ convert(elty, -1428572.005785942019703646)
             @test digamma(convert(elty, -0.5)) ≈ convert(elty, .03648997397857652055902367)
             @test digamma(convert(elty, -1.1)) ≈ convert(elty,  10.15416395914385769902271)
+            # issue #450
+            @test digamma(convert(elty, 0)) == convert(elty,  -Inf)
+            @test digamma(convert(elty, -1)) == convert(elty,  -Inf)
 
             @test digamma(convert(elty, 0.1)) ≈ convert(elty, -10.42375494041108)
             @test digamma(convert(elty, 1/2)) ≈ convert(elty, -γ - log(4))
@@ -35,6 +38,8 @@
             @test trigamma(convert(elty, 4)) ≈ convert(elty, π^2/6 - 49/36)
             @test trigamma(convert(elty, 5)) ≈ convert(elty, π^2/6 - 205/144)
             @test trigamma(convert(elty, 10)) ≈ convert(elty, π^2/6 - 9778141/6350400)
+            @test trigamma(convert(elty, 0)) == convert(elty, Inf)
+            @test trigamma(convert(elty, -1)) == convert(elty, Inf)
         end
     end
 
@@ -68,10 +73,6 @@
         @test loggamma(1.4+3.7im) ≈ -3.7094025330996841898 + 2.4568090502768651184im
         @test loggamma(1.4+3.7im) ≈ log(gamma(1.4+3.7im))
         @test loggamma(-4.2+0im) ≈ logabsgamma(-4.2)[1] - 5pi*im
-        @test SpecialFunctions.factorial(3.0) == gamma(4.0) == factorial(3)
-        for x in (3.2, 2+1im, 3//2, 3.2+0.1im)
-            @test SpecialFunctions.factorial(x) == gamma(1+x)
-        end
         @test logfactorial(0) == logfactorial(1) == 0
         @test logfactorial(2) == loggamma(3)
         # Ensure that the domain of logfactorial matches that of factorial (issue #21318)
@@ -266,6 +267,16 @@ end
     @test 1e-10 > relerr(zeta(.4 + 4053.0im), -0.1248993234383550+0.9195498409364987im)
     @test 1e-13 > relerr(zeta(.4 + 12.01im), 1.0233184799021265846512208845-0.8008078492939259287905322251im)
     @test zeta(.4 + 12.01im) == conj(zeta(.4 - 12.01im))
+
+    # issue #420
+    @test zeta(-2+13im) ≅ conj(zeta(-2-13im)) ≅ -0.30019019877262619754737023564024299182018857012958761814433485-5.5583626885487917197617298283836431070419020764882132809770386im
+    @test zeta(-6+13im) ≅ conj(zeta(-6-13im)) ≅ 133.4764526350263089084083707864441932569167866714712267139316498-54.15465727586582149098585229287107039070546786014930791081909684im
+    @test 1e-12 > relerr(zeta(-2+13im, 3), 2.3621038290867825837364823054-3.9497600485207119519185591345im)
+    @test 1e-12 > relerr(zeta(-2-13im, 3), 2.3621038290867825837364823054+3.9497600485207119519185591345im)
+
+    # issue #450
+    @test SpecialFunctions.cotderiv(0, 2.0) == Inf
+    @test_throws DomainError SpecialFunctions.cotderiv(-1, 2.0)
 end
 
 @testset "logabsbinomial" begin

@@ -1,60 +1,48 @@
 @testset "error functions" begin
     @testset "real argument" begin
-        @test erf(Float16(1))   ≈ 0.84270079294971486934 rtol=2*eps(Float16)
-        @test erf(Float32(1))   ≈ 0.84270079294971486934 rtol=2*eps(Float32)
-        @test erf(Float64(1))   ≈ 0.84270079294971486934 rtol=2*eps(Float64)
+        for T in (Float16, Float32, Float64)
+            @test @inferred(erf(T(1))) isa T
+            @test erf(T(1))   ≈ T(0.84270079294971486934) rtol=2*eps(T)
 
-        @test erfc(Float16(1))  ≈ 0.15729920705028513066 rtol=2*eps(Float16)
-        @test erfc(Float32(1))  ≈ 0.15729920705028513066 rtol=2*eps(Float32)
-        @test erfc(Float64(1))  ≈ 0.15729920705028513066 rtol=2*eps(Float64)
+            @test @inferred(erfc(T(1))) isa T
+            @test erfc(T(1))  ≈ T(0.15729920705028513066) rtol=2*eps(T)
 
-        @test erfcx(Float16(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float16)
-        @test erfcx(Float32(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float32)
-        @test erfcx(Float64(1)) ≈ 0.42758357615580700442 rtol=2*eps(Float64)
+            @test @inferred(erfcx(T(1))) isa T
+            @test erfcx(T(1)) ≈ T(0.42758357615580700442) rtol=2*eps(T)
 
-        @test_throws MethodError logerfc(Float16(1))
-        @test_throws MethodError logerfc(Float16(-1))
-        @test logerfc(Float32(-100)) ≈ 0.6931471805599453 rtol=2*eps(Float32)
-        @test logerfc(Float64(-100)) ≈ 0.6931471805599453 rtol=2*eps(Float64)
-        @test logerfc(Float32(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
-        @test logerfc(Float64(1000)) ≈ -1.0000074801207219e6 rtol=2*eps(Float64)
+            @test @inferred(logerfc(T(1))) isa T
+            @test logerfc(T(-100)) ≈ T(0.6931471805599453) rtol=2*eps(T)
+            @test logerfc(T(1000)) ≈ T(-1.0000074801207219e6) rtol=2*eps(T)
+            @test logerfc(T(10000)) ≈ T(log(erfc(BigFloat(10000, precision=100)))) rtol=2*eps(T)
+
+            @test @inferred(logerfcx(T(1))) isa T
+            @test logerfcx(T(1)) ≈ T(-0.849605509933248248576017509499) rtol=2eps(T)
+            @test logerfcx(T(-1)) ≈ T(1.61123231767807049464268192445) rtol=2eps(T)
+            @test logerfcx(T(-100)) ≈ T(10000.6931471805599453094172321) rtol=2eps(T)
+            @test logerfcx(T(100)) ≈ T(-5.17758512266433257046678208395) rtol=2eps(T)
+            @test logerfcx(T(-1000)) ≈ T(1.00000069314718055994530941723e6) rtol=2eps(T)
+            @test logerfcx(T(1000)) ≈ T(-7.48012072190621214066734919080) rtol=2eps(T)
+
+            @test @inferred(erfi(T(1))) isa T
+            @test erfi(T(1)) ≈ T(1.6504257587975428760) rtol=2*eps(T)
+
+            @test @inferred(erfinv(T(1))) isa T
+            @test erfinv(T(0.84270079294971486934)) ≈ 1 rtol=2*eps(T)
+
+            @test @inferred(erfcinv(T(1))) isa T
+            @test erfcinv(T(0.15729920705028513066)) ≈ 1 rtol=2*eps(T)
+
+            @test @inferred(dawson(T(1))) isa T
+            @test dawson(T(1)) ≈ T(0.53807950691276841914) rtol=2*eps(T)
+
+            @test @inferred(faddeeva(T(1))) isa Complex{T}
+            @test faddeeva(T(1)) ≈ 0.36787944117144233402+0.60715770584139372446im rtol=2*eps(T)
+        end
+
         @test logerfc(1000) ≈ -1.0000074801207219e6 rtol=2*eps(Float32)
-        @test logerfc(Float32(10000)) ≈ log(erfc(BigFloat(10000, precision=100))) rtol=2*eps(Float32)
-        @test logerfc(Float64(10000)) ≈ log(erfc(BigFloat(10000, precision=100))) rtol=2*eps(Float64)
-
-        @test_throws MethodError logerfcx(Float16(1))
-        @test_throws MethodError logerfcx(Float16(-1))
-        @test iszero(logerfcx(0))
-        @test logerfcx(Float32(1)) ≈ -0.849605509933248248576017509499 rtol=2eps(Float32)
-        @test logerfcx(Float64(1)) ≈ -0.849605509933248248576017509499 rtol=2eps(Float32)
-        @test logerfcx(Float32(-1)) ≈ 1.61123231767807049464268192445 rtol=2eps(Float32)
-        @test logerfcx(Float64(-1)) ≈ 1.61123231767807049464268192445 rtol=2eps(Float32)
-        @test logerfcx(Float32(-100)) ≈ 10000.6931471805599453094172321 rtol=2eps(Float32)
-        @test logerfcx(Float64(-100)) ≈ 10000.6931471805599453094172321 rtol=2eps(Float64)
-        @test logerfcx(Float32(100)) ≈ -5.17758512266433257046678208395 rtol=2eps(Float32)
-        @test logerfcx(Float64(100)) ≈ -5.17758512266433257046678208395 rtol=2eps(Float64)
-        @test logerfcx(Float32(-1000)) ≈ 1.00000069314718055994530941723e6 rtol=2eps(Float32)
-        @test logerfcx(Float64(-1000)) ≈ 1.00000069314718055994530941723e6 rtol=2eps(Float64)
-        @test logerfcx(Float32(1000)) ≈ -7.48012072190621214066734919080 rtol=2eps(Float32)
-        @test logerfcx(Float64(1000)) ≈ -7.48012072190621214066734919080 rtol=2eps(Float64)
-
-        @test erfi(Float16(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float16)
-        @test erfi(Float32(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float32)
-        @test erfi(Float64(1)) ≈ 1.6504257587975428760 rtol=2*eps(Float64)
-
         @test erfinv(Integer(0)) == 0 == erfinv(0//1)
-        @test_throws MethodError erfinv(Float16(1))
-        @test erfinv(Float32(0.84270079294971486934)) ≈ 1 rtol=2*eps(Float32)
-        @test erfinv(Float64(0.84270079294971486934)) ≈ 1 rtol=2*eps(Float64)
-
         @test erfcinv(Integer(1)) == 0 == erfcinv(1//1)
-        @test_throws MethodError erfcinv(Float16(1))
-        @test erfcinv(Float32(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float32)
-        @test erfcinv(Float64(0.15729920705028513066)) ≈ 1 rtol=2*eps(Float64)
-
-        @test dawson(Float16(1)) ≈ 0.53807950691276841914 rtol=2*eps(Float16)
-        @test dawson(Float32(1)) ≈ 0.53807950691276841914 rtol=2*eps(Float32)
-        @test dawson(Float64(1)) ≈ 0.53807950691276841914 rtol=2*eps(Float64)
+        @test faddeeva(0) == faddeeva(0//1) == 1
     end
 
     @testset "complex arguments" begin
@@ -81,6 +69,10 @@
         @test dawson(ComplexF16(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
         @test dawson(ComplexF32(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
         @test dawson(ComplexF64(1+2im)) ≈ -13.388927316482919244-11.828715103889593303im
+
+        @test faddeeva(ComplexF16(1+2im)) ≈ 0.21849261527489066692+0.09299780939260188228im
+        @test faddeeva(ComplexF32(1+2im)) ≈ 0.21849261527489066692+0.09299780939260188228im
+        @test faddeeva(ComplexF64(1+2im)) ≈ 0.21849261527489066692+0.09299780939260188228im
     end
 
     @testset "BigFloat arguments" begin
@@ -101,6 +93,8 @@
         @test_throws MethodError erfi(big(1.0))
 
         @test_throws MethodError dawson(BigFloat(1))
+
+        @test_throws MethodError faddeeva(BigFloat(1))
 
         for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1+big"1e-50", big"1.2", 2-big"1e-50")
             @test erfc(erfcinv(y)) ≈ y
@@ -126,6 +120,7 @@
         @test_throws MethodError erfinv(NotAFloat())
         @test_throws MethodError erfcinv(NotAFloat())
         @test_throws MethodError dawson(NotAFloat())
+        @test_throws MethodError faddeeva(NotAFloat())
     end
 
     @testset "inverse" begin
