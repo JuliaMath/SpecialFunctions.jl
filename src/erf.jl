@@ -253,13 +253,10 @@ erfinv(x::Real) = _erfinv(float(x))
 
 function _erfinv(x::Float64)
     a = abs(x)
-    if a >= 1.0
-        if x == 1.0
-            return Inf
-        elseif x == -1.0
-            return -Inf
-        end
+    if a > 1.0
         throw(DomainError(a, "`abs(x)` cannot be greater than 1."))
+    elseif a == 1.0
+        return copysign(Inf, x)
     elseif a <= 0.75 # Table 17 in Blair et al.
         t = x*x - 0.5625
         return x * @horner(t, 0.16030_49558_44066_229311e2,
@@ -321,13 +318,10 @@ end
 
 function _erfinv(x::Float32)
     a = abs(x)
-    if a >= 1.0f0
-        if x == 1.0f0
-            return Inf32
-        elseif x == -1.0f0
-            return -Inf32
-        end
+    if a > 1f0
         throw(DomainError(a, "`abs(x)` cannot be greater than 1."))
+    elseif a == 1f0
+        return copysign(Inf32, x)
     elseif a <= 0.75f0 # Table 10 in Blair et al.
         t = x*x - 0.5625f0
         return x * @horner(t, -0.13095_99674_22f2,
@@ -359,6 +353,42 @@ function _erfinv(x::Float32)
                @horner(t, 0.15502_48498_22f0,
                           0.13852_28141_995f1,
                           0.1f1))
+    end
+end
+
+function _erfinv(x::Float16)
+    a = abs(x)
+    if a > Float16(1)
+        throw(DomainError(a, "`abs(x)` cannot be greater than 1."))
+    elseif a == Float16(1)
+        return copysign(Inf16, x)
+    else
+        # Perform calculations with `Float32`
+        x32 = Float32(x)
+        a32 = Float32(a)
+        if a32 <= 0.75f0
+            # Simpler and more accurate alternative to Table 7 in Blair et al.
+            # Ref: https://github.com/JuliaMath/SpecialFunctions.jl/pull/372#discussion_r1592832735
+            t = muladd(-6.73815f1, x32, 1f0) / muladd(-4.18798f0, x32, 4.54263f0)
+            y = copysign(muladd(0.88622695f0, x32, t), x32)
+        elseif a32 <= 0.9375f0 # Table 26 in Blair et al.
+            t = x32^2 - 0.87890625f0
+            y = x32 * @horner(t, 0.10178_950f1,
+                              -0.32827_601f1) /
+                      @horner(t, 0.72455_99f0,
+                              -0.33871_553f1,
+                              0.1f1)
+        else
+            # Simpler alternative to Table 47 in Blair et al.
+            # because of the reduced accuracy requirement
+            # (it turns out that this branch only covers 128 values).
+            # Note that the use of log(1-x) rather than log1p is intentional since it will be
+            # slightly faster and 1-x is exact.
+            # Ref: https://github.com/JuliaMath/SpecialFunctions.jl/pull/372#discussion_r1592710586
+            t = sqrt(-log(1-a32))
+            y = copysign(@horner(t, -0.429159f0, 1.04868f0), x32)
+        end
+        return Float16(y)
     end
 end
 
@@ -482,6 +512,25 @@ function _erfcinv(y::Float32)
     end
 end
 
+function _erfcinv(y::Float16)
+    if y > Float16(0.0625)
+        return erfinv(Float16(1) - y)
+    elseif y <= Float16(0)
+        if y == Float16(0)
+            return Inf16
+        end
+        throw(DomainError(y, "`y` must be nonnegative."))
+    else # Table 47 in Blair et al.
+        t = 1.0f0 / sqrt(-log(Float32(y)))
+        x = @horner(t, 0.98650_088f0,
+                       0.92601_777f0) /
+            (t * @horner(t, 0.98424_719f0,
+                            0.10074_7432f0,
+                            0.1f0))
+        return Float16(x)
+    end
+end
+
 function _erfcinv(y::BigFloat)
     yfloat = Float64(y)
     xfloat = erfcinv(yfloat)
@@ -526,13 +575,9 @@ See also: [`erfcx(x)`](@ref erfcx).
 
 # Implementation
 Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
-Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
-logerfc(x::Real) = _logerfc(float(x))
-
-function _logerfc(x::Union{Float32, Float64, BigFloat})
-    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
-    if x > 0.0
+function logerfc(x::Real)
+    if x > zero(x)
         return log(erfcx(x)) - x^2
     else
         return log(erfc(x))
@@ -557,13 +602,9 @@ See also: [`erfcx(x)`](@ref erfcx).
 
 # Implementation
 Based on the [`erfc(x)`](@ref erfc) and [`erfcx(x)`](@ref erfcx) functions.
-Currently only implemented for `Float32`, `Float64`, and `BigFloat`.
 """
-logerfcx(x::Real) = _logerfcx(float(x))
-
-function _logerfcx(x::Union{Float32, Float64, BigFloat})
-    # Don't include Float16 in the Union, otherwise logerfc would currently work for x <= 0.0, but not x > 0.0
-    if x < 0.0
+function logerfcx(x::Real)
+    if x < zero(x)
         return log(erfc(x)) + x^2
     else
         return log(erfcx(x))
