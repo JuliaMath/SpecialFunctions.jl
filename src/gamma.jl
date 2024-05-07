@@ -558,7 +558,7 @@ Compute the gamma function for complex ``z``, defined by
 and by analytic continuation in the whole complex plane.
 
 # Examples
-Special Values:
+
 ```jldoctest
 julia> gamma(0)
 Inf
@@ -568,26 +568,11 @@ julia> gamma(1)
 
 julia> gamma(2)
 1.0
-```
-
-``\Gamma(0.5)^2 = \pi``
-```jldoctest
-julia> gamma(0.5)^2
-3.1415926535897936
 
 julia> gamma(0.5)^2 ≈ π
 true
-```
 
-For integer `n`: ``\Gamma(n+1) = prod(1:n) = factorial(n)``
-```jldoctest
-julia> gamma(4+1)
-24.0
-
-julia> prod(1:4)  # == 1*2*3*4
-24
-
-julia> gamma(4+1) == prod(1:4) == factorial(4)
+julia> gamma(4 + 1) == prod(1:4) == factorial(4)
 true
 ```
 
