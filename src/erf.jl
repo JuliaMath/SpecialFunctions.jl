@@ -253,13 +253,10 @@ erfinv(x::Real) = _erfinv(float(x))
 
 function _erfinv(x::Float64)
     a = abs(x)
-    if a >= 1.0
-        if x == 1.0
-            return Inf
-        elseif x == -1.0
-            return -Inf
-        end
+    if a > 1.0
         throw(DomainError(a, "`abs(x)` cannot be greater than 1."))
+    elseif a == 1.0
+        return copysign(Inf, x)
     elseif a <= 0.75 # Table 17 in Blair et al.
         t = x*x - 0.5625
         return x * @horner(t, 0.16030_49558_44066_229311e2,
@@ -321,13 +318,10 @@ end
 
 function _erfinv(x::Float32)
     a = abs(x)
-    if a >= 1.0f0
-        if x == 1.0f0
-            return Inf32
-        elseif x == -1.0f0
-            return -Inf32
-        end
+    if a > 1f0
         throw(DomainError(a, "`abs(x)` cannot be greater than 1."))
+    elseif a == 1f0
+        return copysign(Inf32, x)
     elseif a <= 0.75f0 # Table 10 in Blair et al.
         t = x*x - 0.5625f0
         return x * @horner(t, -0.13095_99674_22f2,
@@ -364,14 +358,11 @@ end
 
 function _erfinv(x::Float16)
     a = abs(x)
-    if a >= Float16(1)
-        if x == Float16(1)
-            return Inf16
-        elseif x == -Float16(1)
-            return -Inf16
-        end
+    if a > Float16(1)
         throw(DomainError(a, "`abs(x)` cannot be greater than 1."))
-    end
+    elseif a == Float16(1)
+        return copysign(Inf16, x)
+    else
 
     # Perform calculations with `Float32`
     x32 = Float32(x)
