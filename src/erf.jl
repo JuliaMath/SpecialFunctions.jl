@@ -367,13 +367,13 @@ function _erfinv(x::Float16)
         x32 = Float32(x)
         a32 = Float32(a)
         if a32 <= 0.895f0
-            t = muladd(-0.664556f0, x32, 1f0) / muladd(-4.14539f0, x32, 4.53331f0)
-            y = muladd(0.88622695f0, x32, t)
+            t = a32^2*muladd(-0.664556f0, a32, 1f0) / muladd(-4.14539f0, a32, 4.53331f0)
+            y = muladd(0.88622695f0, a32, t)
         else
             # Note that the use of log(1-x) rather than log1p is intentional since
             # it will be slightly faster and 1-x is exact.
             t = @fastmath sqrt(-log(1-a32))
-            y = 1f0 + (t - 1.35934f0) / muladd(-0.12807f0, x32, 1.08437f0)
+            y = 1f0 + (t - 1.35934f0) / muladd(-0.12807f0, a32, 1.08437f0)
         end
         return Float16(copysign(y, x32))
     end
