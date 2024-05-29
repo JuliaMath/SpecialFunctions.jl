@@ -15,5 +15,5 @@ The latest version of the package is available for Julia versions 1.3
 and up. To install it, run the following at the Julia REPL:
 
 ```julia
-Pkg.add("SpecialFunctions")
+import Pkg; Pkg.add("SpecialFunctions")
 ```
