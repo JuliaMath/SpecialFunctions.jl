@@ -603,9 +603,9 @@ function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64})
     @inbounds return Float64(Base._fact_table64[n-1])
 end
 
-_gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
-_gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
-_gamma(x::Float16)       = Float16(_gamma(Float32(x)))
+_gamma(x::Float64) = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
+_gamma(x::Float32) = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
+_gamma(x::Float16) = Float16(_gamma(Float32(x)))
 
 function _gamma(x::BigFloat)
     isnan(x) && return x

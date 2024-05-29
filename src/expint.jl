@@ -58,7 +58,7 @@ function E₁_taylor_coefficients(::Type{T}, n::Integer) where {T<:Number}
     # iteratively compute the terms in the series, starting with k=1
     term::T = 1
     terms = T[-eulergamma, term]
-    for k=2:n
+    for k = 2:n
         term = -term * (k-1) / (k * k)
         push!(terms, term)
     end

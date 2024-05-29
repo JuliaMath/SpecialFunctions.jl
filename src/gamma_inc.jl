@@ -219,9 +219,9 @@ function lambdaeta(eta::Float64)
 end
 
 """
-Computing the first coefficient for the expansion :
+Computing the first coefficient for the expansion:
 ```math
-\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+\\epsilon (\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3}
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -291,9 +291,9 @@ function coeff2(eta::Float64)
     return coeff2
 end
 """
-Computing the third and last coefficient for the expansion :
+Computing the third and last coefficient for the expansion:
 ```math
-\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+\\epsilon(\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3}
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -371,7 +371,7 @@ end
 """
     gamma_inc_cf(a, x, ind)
 
-Computes ``P(a,x)`` by continued fraction expansion given by :
+Computes ``P(a,x)`` by continued fraction expansion given by:
 ```math
 R(a,x) \\cdot \\cfrac{1}{1-\\cfrac{z}{a+1+\\cfrac{z}{a+2-\\cfrac{(a+1)z}{a+3+\\cfrac{2z}{a+4-\\cfrac{(a+2)z}{a+5+\\cfrac{3z}{a+6-\\ddots}}}}}}}
 ```
@@ -410,7 +410,7 @@ end
 """
     gamma_inc_taylor(a, x, ind)
 
-Compute ``P(a,x)`` using Taylor Series for P/R given by :
+Compute ``P(a,x)`` using Taylor Series for P/R given by:
 ```math
 R(a,x)/a * (1 + \\sum_{n=1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))
 ```
@@ -812,7 +812,7 @@ end
     gamma_inc_inv_alarge(a, minpq, pcase)
 
 Compute `x0` - initial approximation when `a` is large.
-The inversion problem is rewritten as :
+The inversion problem is rewritten as:
 ```math
 0.5 \\operatorname{erfc}(\\eta \\sqrt{a/2}) + R_{a}(\\eta) = q
 ```
