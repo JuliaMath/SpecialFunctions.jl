@@ -12,7 +12,7 @@ Uses the recursive relation
 ```math
 I_{x}(a,b+1;0) = I_{x}(a,b;0) - \\Gamma(a+b)/\\Gamma(a+1)\\Gamma(b)x^{a}(1-x)^{b}
 ```
-and ``\\Gamma(a+1) = a\\Gamma(a)`` given in https://dlmf.nist.gov/8.17.21.
+and ``\\Gamma(a+1) = a\\Gamma(a)`` given in [DLMF](https://dlmf.nist.gov/8.17.21).
 """
 function ncbeta_tail(a::Float64, b::Float64, lambda::Float64, x::Float64)
     if x <= 0.0
@@ -175,7 +175,8 @@ F(x, v1, v2; \\lambda) = I_{v1*x/(v1*x + v2)}(v1/2, v2/2; \\lambda)
 ```
 where ``I_{x}(a,b; \\lambda)`` is the noncentral beta function computed above.
 
-Wikipedia: https://en.wikipedia.org/wiki/Noncentral_F-distribution
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Noncentral_F-distribution)
 """
 function ncF(x::Float64, v1::Float64, v2::Float64, lambda::Float64)
     return ncbeta(v1/2, v2/2, lambda, (v1*x)/(v1*x + v2))
