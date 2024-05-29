@@ -77,7 +77,7 @@ end
 """
     esum(mu,x)
 
-Compute ``e^{mu+x}``
+Compute ``e^{\\mu+x}``
 """
 function esum(mu::Float64, x::Float64)
     if x > 0.0
@@ -96,7 +96,7 @@ end
 """
     beta_integrand(a, b, x, y, mu=0.0)
 
-Compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
+Compute ``e^{\\mu} * x^{a}y^{b}/B(a,b)``
 """
 function beta_integrand(a::Float64, b::Float64, x::Float64, y::Float64, mu::Float64=0.0)
     a0, b0 = minmax(a,b)
@@ -514,9 +514,9 @@ end
 """
     beta_inc_power_series(a, b, x, epps)
 
-Computes ``I_x(a,b)`` using power series :
+Computes ``I_x(a,b)`` using power series:
 ```math
-I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{j=1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j})
+I_{x}(a,b) = G(a,b) x^{a}/a \\left[1 + a \\sum_{j=1}^{\\infty} ((1-b)(2-b)...(j-b)/j!(a+j)) x^{j}\\right]
 ```
 External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 

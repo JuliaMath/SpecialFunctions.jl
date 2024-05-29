@@ -33,7 +33,7 @@ const d80 = -.652623918595309E-03
 """
     rgamma1pm1(a)
 
-Computation of ``1/Gamma(a+1) - 1`` for `-0.5<=a<=1.5` : ``1/\\Gamma (a+1) - 1``
+Computation of ``1/\\Gamma(a+1) - 1`` for `-0.5<=a<=1.5` : ``1/\\Gamma (a+1) - 1``
 Uses the relation `gamma(a+1) = a*gamma(a)`.
 """
 function rgamma1pm1(a::Float64)
@@ -161,8 +161,9 @@ end
     gammax(x)
 
 ```math
-\operatorname{gammax}(x) = \begin{cases}e^{\operatorname{stirling}(x)}\quad\quad\quad \text{if} \quad x>0,\\
-\frac{\Gamma(x)}{\sqrt{2 \pi}e^{-x + (x-0.5)\operatorname{log}(x)}},\quad \text{if} \quad x\leq 0.
+\operatorname{gammax}(x) = \begin{cases}
+e^{\operatorname{stirling}(x)}\quad\quad\quad \text{if} \quad x>0,\\
+\dfrac{\Gamma(x)}{\sqrt{2 \pi}e^{-x + (x-0.5)\operatorname{log}(x)}},\quad \text{if} \quad x\leq 0.
 \end{cases}
 ```
 """
@@ -372,7 +373,7 @@ end
 
 Computes ``P(a,x)`` by continued fraction expansion given by :
 ```math
-R(a,x) * \\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a+4-\\frac{(a+2)z}{a+5+\\frac{3z}{a+6-\\dots}}}}}}}
+R(a,x) \\cdot \\cfrac{1}{1-\\cfrac{z}{a+1+\\cfrac{z}{a+2-\\cfrac{(a+1)z}{a+3+\\cfrac{2z}{a+4-\\cfrac{(a+2)z}{a+5+\\cfrac{3z}{a+6-\\ddots}}}}}}}
 ```
 Used when `1 <= a <= BIG` and `x < x0`.
 
@@ -557,7 +558,7 @@ end
 
 Compute ``P(a,x)`` using minimax approximations given by :
 ```math
-1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
+1/2 * \\operatorname{erfc}(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
 ``` where
 ```math
 T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
@@ -621,7 +622,7 @@ end
 
 Compute ``P(a,x)`` using Temme's expansion given by :
 ```math
-1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
+1/2 * \\operatorname{erfc}(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
 ``` where
 ```math
 T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
@@ -814,7 +815,7 @@ The inversion problem is rewritten as :
 For large values of `a` we can write: ``\\eta(q,a) = \\eta_{0}(q,a) + \\epsilon(\\eta_{0},a)``
 and it is possible to expand:
 ```math
-\\epsilon(\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3} + ...
+\\epsilon(\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3} + \\cdots
 ```
 which is calculated by [`coeff1`](@ref), [`coeff2`](@ref) and [`coeff3`](@ref) functions below.
 This returns a tuple `(x0,fp)`, where `fp` is computed since it's an
@@ -838,13 +839,13 @@ end
     gamma_inc(a,x,IND=0)
 
 Returns a tuple ``(p, q)`` where ``p + q = 1``, and
-``p=P(a,x)`` is the Incomplete gamma function ratio given by:
+``p = P(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-P(a,x)=\\frac{1}{\\Gamma (a)} \\int_{0}^{x} e^{-t}t^{a-1} dt.
+P(a,x) = \\frac{1}{\\Gamma (a)} \\int_{0}^{x} e^{-t}t^{a-1} dt.
 ```
 and ``q=Q(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-Q(a,x)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
+Q(a,x) = \\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
 ```
 In terms of these, the lower incomplete gamma function is
 ``\\gamma(a,x) = P(a,x) \\Gamma(a)`` and the upper incomplete
@@ -985,7 +986,8 @@ end
 """
     gamma_inc_inv(a,p,q)
 
-Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in ``P(a,x)=p`` and ``Q(a,x)=q``.
+Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in
+``P(a,x) = p`` and ``Q(a,x) = q``.
 
 External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 

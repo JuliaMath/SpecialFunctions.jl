@@ -508,7 +508,10 @@ end
     expint(z)
     expint(ν, z)
 
-Computes the exponential integral ``\\operatorname{E}_\\nu(z) = \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
+Computes the exponential integral
+```math
+\\operatorname{E}_\\nu(z) = \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt.
+```
 If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
 External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
@@ -520,8 +523,12 @@ expint(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{false
     expintx(z)
     expintx(ν, z)
 
-Computes the scaled exponential integral ``\\exp(z) \\operatorname{E}_\\nu(z) = e^z \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt``.
-If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
+Computes the scaled exponential integral
+```math
+\\exp(z) \\operatorname{E}_\\nu(z) = e^z \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt.
+```
+If ``\\nu`` is not specified, ``\\nu = 1`` is used. Arbitrary complex
+``\\nu`` and ``z`` are supported.
 
 See also: [`expint(ν, z)`](@ref SpecialFunctions.expint)
 """
@@ -533,8 +540,12 @@ expintx(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{true
 """
     expinti(x::Real)
 
-Computes the exponential integral function ``\\operatorname{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt``,
-which is equivalent to ``-\\Re[\\operatorname{E}_1(-x)]`` where ``\\operatorname{E}_1`` is the `expint` function.
+Computes the exponential integral function
+```math
+\\operatorname{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt,
+```
+which is equivalent to ``-\\Re[\\operatorname{E}_1(-x)]`` where
+``\\operatorname{E}_1`` is the `expint` function.
 """
 expinti(x::Real) = x ≤ 0 ? -expint(-x) : -real(expint(complex(-x)))
 

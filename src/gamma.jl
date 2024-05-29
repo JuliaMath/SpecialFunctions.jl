@@ -225,13 +225,13 @@ end
 
 Generalized zeta function defined by
 ```math
-\\zeta(s, z)=\\sum_{k=0}^\\infty \\frac{1}{((k+z)^2)^{s/2}},
+\\zeta(s, z) = \\sum_{k=0}^\\infty \\frac{1}{((k+z)^2)^{s/2}},
 ```
-where any term with ``k+z=0`` is excluded.  For ``\\Re z > 0``,
+where any term with ``k+z = 0`` is excluded.  For ``\\Re z > 0``,
 this definition is equivalent to the Hurwitz zeta function
 ``\\sum_{k=0}^\\infty (k+z)^{-s}``.
 
-The Riemann zeta function is recovered as ``\\zeta(s)=\\zeta(s,1)``.
+The Riemann zeta function is recovered as ``\\zeta(s) = \\zeta(s,1)``.
 
 External links: [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function), [Hurwitz zeta function](https://en.wikipedia.org/wiki/Hurwitz_zeta_function)
 """
@@ -411,7 +411,7 @@ end
 Riemann zeta function
 
 ```math
-\\zeta(s)=\\sum_{n=1}^\\infty \\frac{1}{n^s}\\quad\\text{for}\\quad s\\in\\mathbb{C}.
+\\zeta(s) = \\sum_{n=1}^\\infty \\frac{1}{n^s}\\quad\\text{for}\\quad s\\in\\mathbb{C}.
 ```
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Riemann_zeta_function)
@@ -551,7 +551,7 @@ Compute the gamma function for complex ``z``, defined by
     n!
     & \text{for} \quad z = n+1 \;, n = 0,1,2,\dots
     \\
-    \int_0^\infty t^{z-1} {\mathrm e}^{-t} \, {\mathrm d}t
+    \int_0^\infty t^{z-1} e^{-t} \, dt
     & \text{for} \quad \Re(z) > 0
 \end{cases}
 ```
