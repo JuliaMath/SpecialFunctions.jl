@@ -816,8 +816,9 @@ and it is possible to expand:
 ```math
 \\epsilon(\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3} + ...
 ```
-which is calculated by coeff1, coeff2 and coeff3 functions below.
-This returns a tuple `(x0,fp)`, where `fp` is computed since it's an approximation for the coefficient after inverting the original power series.
+which is calculated by [`coeff1`](@ref), [`coeff2`](@ref) and [`coeff3`](@ref) functions below.
+This returns a tuple `(x0,fp)`, where `fp` is computed since it's an
+approximation for the coefficient after inverting the original power series.
 """
 function gamma_inc_inv_alarge(a::Float64, minpq::Float64, pcase::Bool)
     r = erfcinv(2*minpq)
