@@ -5,7 +5,7 @@ const errmax = 1e-15
 #Applied Statistics,Volume 36, Number 2, 1987, pages 241-244
 
 """
-	ncbeta_tail(x,a,b,lambda)
+    ncbeta_tail(x,a,b,lambda)
 
 Compute tail of the noncentral beta distribution.
 Uses the recursive relation
@@ -141,7 +141,7 @@ end
 #Applied Statistics, Volume 46, Number 1, 1997, pages 146-156
 
 """
-	ncbeta(a,b,lambda,x)
+    ncbeta(a,b,lambda,x)
 
 Compute the CDF of the noncentral beta distribution given by
 ```math
@@ -181,11 +181,11 @@ function ncF(x::Float64, v1::Float64, v2::Float64, lambda::Float64)
 end
 
 function ncbeta(a::T,b::T,lambda::T,x::T) where {T<:Union{Float16,Float32}}
-	T.(ncbeta(Float64(a),Float64(b),Float64(lambda),Float64(x)))
+    T.(ncbeta(Float64(a),Float64(b),Float64(lambda),Float64(x)))
 end
 
 function ncF(x::T,v1::T,v2::T,lambda::T) where {T<:Union{Float16,Float32}}
-	T.(ncF(Float64(x),Float64(v1),Float64(v2),Float64(lambda)))
+    T.(ncF(Float64(x),Float64(v1),Float64(v2),Float64(lambda)))
 end
 
 ncbeta(a::Real,b::Real,lambda::Real,x::Real) = ncbeta(promote(float(a),float(b),float(lambda),float(x))...)

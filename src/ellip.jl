@@ -197,8 +197,9 @@ External links: [DLMF](https://dlmf.nist.gov/19.2.8), [Wikipedia](https://en.wik
 See also: [`ellipk(m)`](@ref SpecialFunctions.ellipk).
 
 # Arguments
-- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to the elliptic modulus ``k`` by ``k^2=m`` and to the modular
-    angle ``\alpha`` by ``k=\sin \alpha``.
+- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to
+       the elliptic modulus ``k`` by ``k^2=m`` and to the modular angle
+       ``\alpha`` by ``k=\sin \alpha``.
 
 # Implementation
 Using piecewise approximation polynomial as given in

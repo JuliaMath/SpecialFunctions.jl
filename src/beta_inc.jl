@@ -1008,9 +1008,9 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
             prev = max(sq, fpu)
         end
 
-	adj = p_approx
-	tx = x - adj
-	while prev <= (sq = adj^2) || tx < 0.0 || tx > 1.0
+        adj = p_approx
+        tx = x - adj
+        while prev <= (sq = adj^2) || tx < 0.0 || tx > 1.0
             adj /= 3.0
             tx = x - adj
         end
@@ -1038,4 +1038,3 @@ function _beta_inc_inv(a::T, b::T, p::T, q::T) where {T<:Union{Float16, Float32}
     x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p), Float64(q))
     T(x), T(y)
 end
-

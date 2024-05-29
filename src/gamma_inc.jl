@@ -31,7 +31,7 @@ const d70 = .344367606892378E-03
 const d80 = -.652623918595309E-03
 
 """
-   rgamma1pm1(a)
+    rgamma1pm1(a)
 
 Computation of ``1/Gamma(a+1) - 1`` for `-0.5<=a<=1.5` : ``1/\\Gamma (a+1) - 1``
 Uses the relation `gamma(a+1) = a*gamma(a)`.
@@ -428,14 +428,14 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     wk[1] = t
     loop = 2
     for indx = 2:20
-       apn += 1.0
-       t *= x/apn
-       if t <= 1.0e-3
-           loop = indx
-           flag = true
-           break
-       end
-       wk[indx] = t
+        apn += 1.0
+        t *= x/apn
+        if t <= 1.0e-3
+            loop = indx
+            flag = true
+            break
+        end
+        wk[indx] = t
     end
     if !flag
         loop = 20
@@ -443,15 +443,15 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     sm = t
     tol = 0.5*acc #tolerance
     while true
-       apn += 1.0
-       t *= x/apn
-       sm += t
-       if t <= tol
-           break
-       end
+        apn += 1.0
+        t *= x/apn
+        sm += t
+        if t <= tol
+            break
+        end
     end
     for j = loop-1:-1:1
-       sm += wk[j]
+        sm += wk[j]
     end
     p = (rgammax(a, x)/a)*(1.0 + sm)
     return (p, 1.0 - p)
@@ -950,7 +950,10 @@ end
 
 function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, a, x, ROUNDING_MODE[])
+    ccall((:mpfr_gamma_inc, :libmpfr),
+          Int32,
+          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
+          z, a, x, ROUNDING_MODE[])
     q = z/gamma(a)
     return (1.0 - q, q)
 end
@@ -1112,8 +1115,8 @@ See also the [`gamma_inc`](@ref) function to compute both the upper and lower
 
 External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 """
-gamma(a::Number,x::Number) = _gamma(promotereal(float(a), float(x))...)
-gamma(a::Integer,x::Number) = _gamma(a, float(x))
+gamma(a::Number,  x::Number) = _gamma(promotereal(float(a), float(x))...)
+gamma(a::Integer, x::Number) = _gamma(a, float(x))
 
 function _gamma(a::Number, x::Number)
     if a isa Real && x isa Real && !isfinite(a*x)
