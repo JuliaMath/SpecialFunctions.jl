@@ -1102,7 +1102,7 @@ promotereal(x, y) = promote(x,y)
 
 Returns the upper incomplete gamma function
 ```math
-\\Gamma(a,x) = \\int_x^\\infty t^{a-1} e^{-t} dt \\,
+\\Gamma(a,x) = \\int_x^\\infty t^{a-1} e^{-t} dt
 ```
 supporting arbitrary real or complex `a` and `x`.
 
@@ -1161,7 +1161,7 @@ end
 
 Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
 ```math
-\\log \\Gamma(a,x) = \\log \\int_x^\\infty t^{a-1} e^{-t} dt \\,
+\\log \\Gamma(a,x) = \\log \\int_x^\\infty t^{a-1} e^{-t} dt
 ```
 supporting arbitrary real or complex `a` and `x`.
 
