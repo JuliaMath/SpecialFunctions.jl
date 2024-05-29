@@ -233,7 +233,9 @@ this definition is equivalent to the Hurwitz zeta function
 
 The Riemann zeta function is recovered as ``\\zeta(s) = \\zeta(s,1)``.
 
-External links: [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function), [Hurwitz zeta function](https://en.wikipedia.org/wiki/Hurwitz_zeta_function)
+External links:
+[Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function),
+[Hurwitz zeta function](https://en.wikipedia.org/wiki/Hurwitz_zeta_function)
 """
 zeta(s::Number, z::Number) = _zeta(map(float, promote(s, z))...)
 
@@ -335,8 +337,8 @@ end
 """
     polygamma(m, x)
 
-Compute the polygamma function of order `m` of argument `x` (the `(m+1)`th derivative of the
-logarithm of `gamma(x)`)
+Compute the polygamma function of order `m` of argument `x` (the `(m+1)`th
+derivative of the logarithm of `gamma(x)`)
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Polygamma_function)
 
@@ -580,7 +582,8 @@ External links:
 [DLMF](https://dlmf.nist.gov/5.2.1),
 [Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
 
-See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log \Gamma(z)`` and
+See also:
+[`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log \Gamma(z)`` and
 [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number)) for
 the upper incomplete gamma function ``\Gamma(a,z)``.
 
@@ -796,7 +799,8 @@ end
 """
     logabsbeta(x, y)
 
-Compute the natural logarithm of the absolute value of the [`beta`](@ref) function, returning a tuple `(log(abs(beta(x,y))), sign(beta(x,y)))`
+Compute the natural logarithm of the absolute value of the [`beta`](@ref)
+function, returning a tuple `(log(abs(beta(x,y))), sign(beta(x,y)))`
 
 See also [`logbeta`](@ref).
 """

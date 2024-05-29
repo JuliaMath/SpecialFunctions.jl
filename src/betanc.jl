@@ -57,7 +57,8 @@ end
 Compute CDF of noncentral beta if lambda >= 54 using:
 First ``\\lambda/2`` is calculated and the Poisson term is calculated using
 ``P(j-1) = j/\\lambda P(j)`` and ``P(j+1) = \\lambda/(j+1) P(j)``.
-Then backward recurrences are used until either the Poisson weights fall below `errmax` or `iterlo` is reached.
+Then backward recurrences are used until either the Poisson weights fall below
+`errmax` or `iterlo` is reached.
 ```math
 I_{x}(a+j-1,b) = I_{x}(a+j,b) + \\Gamma(a+b+j-1)/\\Gamma(a+j)\\Gamma(b)x^{a+j-1}(1-x)^{b}
 ```
@@ -149,7 +150,8 @@ Compute the CDF of the noncentral beta distribution given by
 I_{x}(a,b; \\lambda) = \\sum_{j=0}^{\\infty} q(\\lambda/2,j) I_{x}(a+j,b;0)
 ```
 For ``\\lambda < 54`` : algorithm suggested by Lenth(1987) in `ncbeta_tail(a,b,lambda,x)`.
-Else for ``\\lambda >= 54`` : modification in Chattamvelli(1997) in `ncbeta_poisson(a,b,lambda,x)` by using both forward and backward recurrences.
+Else for ``\\lambda >= 54`` : modification in Chattamvelli(1997) in
+`ncbeta_poisson(a,b,lambda,x)` by using both forward and backward recurrences.
 """
 function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     ans = x

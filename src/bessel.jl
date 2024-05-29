@@ -341,7 +341,9 @@ proportional to ``\\exp(∓iz)/\\sqrt{z}`` for large ``|z|``, and so the
 when `z` has a large imaginary part.  The `besselhx` function cancels this
 exponential factor (analytically), so it avoids these problems.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`besselh`](@ref)
 """
@@ -445,9 +447,14 @@ end
 
 Modified Bessel function of the first kind of order `nu`, ``I_\\nu(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.25.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.25.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
-See also: [`besselix(nu,x)`](@ref SpecialFunctions.besselix), [`besselj(nu,x)`](@ref SpecialFunctions.besselj), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
+See also:
+[`besselix(nu,x)`](@ref SpecialFunctions.besselix),
+[`besselj(nu,x)`](@ref SpecialFunctions.besselj),
+[`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besseli(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
@@ -461,9 +468,14 @@ end
 
 Scaled modified Bessel function of the first kind of order `nu`, ``I_\\nu(x) e^{- | \\operatorname{Re}(x) |}``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.25.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.25.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
-See also: [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselj(nu,x)`](@ref SpecialFunctions.besselj), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
+See also:
+[`besseli(nu,x)`](@ref SpecialFunctions.besseli),
+[`besselj(nu,x)`](@ref SpecialFunctions.besselj),
+[`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besselix(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
@@ -477,9 +489,14 @@ end
 
 Bessel function of the first kind of order `nu`, ``J_\\nu(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
-See also: [`besseljx(nu,x)`](@ref SpecialFunctions.besseljx), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
+See also:
+[`besseljx(nu,x)`](@ref SpecialFunctions.besseljx),
+[`besseli(nu,x)`](@ref SpecialFunctions.besseli),
+[`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besselj(nu::Real, x::AbstractFloat)
     if isinteger(nu)
@@ -497,9 +514,14 @@ end
 
 Scaled Bessel function of the first kind of order `nu`, ``J_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
-See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselk(nu,x)`](@ref SpecialFunctions.besselk)
+See also:
+[`besselj(nu,x)`](@ref SpecialFunctions.besselj),
+[`besseli(nu,x)`](@ref SpecialFunctions.besseli),
+[`besselk(nu,x)`](@ref SpecialFunctions.besselk)
 """
 function besseljx(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
@@ -513,9 +535,14 @@ end
 
 Modified Bessel function of the second kind of order `nu`, ``K_\\nu(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.25.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.25.3),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
-See also: See also: [`besselkx(nu,x)`](@ref SpecialFunctions.besselkx), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
+See also:
+[`besselkx(nu,x)`](@ref SpecialFunctions.besselkx),
+[`besseli(nu,x)`](@ref SpecialFunctions.besseli),
+[`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselk(nu::Real, x::AbstractFloat)
     if x < 0
@@ -531,9 +558,14 @@ end
 
 Scaled modified Bessel function of the second kind of order `nu`, ``K_\\nu(x) e^x``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.25.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.25.3),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
-See also: [`besselk(nu,x)`](@ref SpecialFunctions.besselk), [`besseli(nu,x)`](@ref SpecialFunctions.besseli), [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
+See also:
+[`besselk(nu,x)`](@ref SpecialFunctions.besselk),
+[`besseli(nu,x)`](@ref SpecialFunctions.besseli),
+[`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselkx(nu::Real, x::AbstractFloat)
     if x < 0
@@ -549,7 +581,9 @@ end
 
 Bessel function of the second kind of order `nu`, ``Y_\\nu(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.3),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also [`besselyx(nu,x)`](@ref SpecialFunctions.besselyx) for a scaled variant.
 """
@@ -568,7 +602,9 @@ end
 Scaled Bessel function of the second kind of order `nu`,
 ``Y_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.3),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
@@ -617,7 +653,9 @@ besselh(nu::Float32, k::Integer, x::Float32) = Complex{Float32}(besselh(Float64(
 
 Bessel function of the first kind of order 0, ``J_0(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
 See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
@@ -632,7 +670,9 @@ end
 
 Bessel function of the first kind of order 1, ``J_1(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
 See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
@@ -653,7 +693,9 @@ end
 
 Bessel function of the second kind of order 0, ``Y_0(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.3),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also: [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
@@ -671,7 +713,9 @@ end
 
 Bessel function of the second kind of order 1, ``Y_1(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.3), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.3),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also: [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
 """
@@ -711,9 +755,9 @@ end
 """
     sphericalbessely(nu, x)
 
-Spherical bessel function of the second kind at order `nu`, ``y_ν(x)``. This is the singular
-solution to the radial part of the Helmholz equation in spherical coordinates. Sometimes
-known as a spherical Neumann function.
+Spherical bessel function of the second kind at order `nu`, ``y_ν(x)``. This is
+the singular solution to the radial part of the Helmholz equation in spherical
+coordinates. Sometimes known as a spherical Neumann function.
 """
 sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + one(nu)/2, x)
 
@@ -722,7 +766,9 @@ sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + one
 
 Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.5), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.5),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh1x`](@ref SpecialFunctions.hankelh1x)
 """
@@ -733,7 +779,9 @@ hankelh1(nu, z) = besselh(nu, 1, z)
 
 Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.6), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.6),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh2x(nu,x)`](@ref SpecialFunctions.hankelh2x)
 """
@@ -744,7 +792,9 @@ hankelh2(nu, z) = besselh(nu, 2, z)
 
 Scaled Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x) e^{-x i}``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.5), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.5),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh1`](@ref SpecialFunctions.hankelh1)
 """
@@ -755,7 +805,9 @@ hankelh1x(nu, z) = besselhx(nu, 1, z)
 
 Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i}``.
 
-External links: [DLMF](https://dlmf.nist.gov/10.2.6), [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
+External links:
+[DLMF](https://dlmf.nist.gov/10.2.6),
+[Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh2(nu,x)`](@ref SpecialFunctions.hankelh2)
 """

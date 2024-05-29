@@ -564,8 +564,11 @@ Compute ``P(a,x)`` using minimax approximations given by :
 T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
 ```
 
-This is a higher accuracy approximation of Temme expansion, which deals with the region near `a ≈ x` with `a` large.
-Refer Appendix F in the paper for the extensive set of coefficients calculated using Brent's multiple precision arithmetic(set at 50 digits) in BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70 .
+This is a higher accuracy approximation of Temme expansion, which deals with
+the region near `a ≈ x` with `a` large.
+Refer Appendix F in the paper for the extensive set of coefficients calculated
+using Brent's multiple precision arithmetic(set at 50 digits) in
+BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70.
 
 External links: [DLMF](https://dlmf.nist.gov/8.12.8)
 
@@ -627,7 +630,8 @@ Compute ``P(a,x)`` using Temme's expansion given by :
 ```math
 T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
 ```
-This mainly solves the problem near the region when `a ≈ x` with a large, and is a lower accuracy version of the minimax approximation.
+This mainly solves the problem near the region when `a ≈ x` with a large, and
+is a lower accuracy version of the minimax approximation.
 
 External links: [DLMF](https://dlmf.nist.gov/8.12.8)
 
@@ -851,11 +855,16 @@ In terms of these, the lower incomplete gamma function is
 ``\\gamma(a,x) = P(a,x) \\Gamma(a)`` and the upper incomplete
 gamma function is ``\\Gamma(a,x) = Q(a,x) \\Gamma(a)``.
 
-`IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
+`IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy,
+`IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links:
+[DLMF](https://dlmf.nist.gov/8.2.4),
+[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
-See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
+See also
+[`gamma(z)`](@ref SpecialFunctions.gamma),
+[`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
 gamma_inc(a::Real,x::Real,ind::Integer=0) = _gamma_inc(promote(float(a),float(x))...,ind)
 
@@ -989,7 +998,9 @@ end
 Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in
 ``P(a,x) = p`` and ``Q(a,x) = q``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links:
+[DLMF](https://dlmf.nist.gov/8.2.4),
+[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
