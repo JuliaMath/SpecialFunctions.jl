@@ -621,7 +621,7 @@ _gamma(z::Complex) = exp(loggamma(z))
     logabsgamma(x)
 
 Compute the logarithm of absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x` and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
+`Real` `x` and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
 
 See also [`loggamma`](@ref).
 """
@@ -842,10 +842,13 @@ logabsbeta(a::Number, b::Number) = loggamma(a) + loggamma(b) - loggamma(a + b), 
 """
     logabsbinomial(n, k)
 
-Accurate natural logarithm of the absolute value of the [`binomial`](@ref)
+Accurate natural logarithm of the absolute value of the `binomial`
 coefficient `binomial(n, k)` for large `n` and `k` near `n/2`.
 
 Returns a tuple `(log(abs(binomial(n,k))), sign(binomial(n,k)))`.
+
+External links
+[`Base.binomial`](https://docs.julialang.org/en/v1/base/math/#Base.binomial)
 """
 function logabsbinomial(n::T, k::T) where {T<:Integer}
     S = float(T)
