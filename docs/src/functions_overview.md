@@ -1,5 +1,5 @@
 # Functions
-Here the *Special Functions* are listed according to the structure of [NIST Digital Library of Mathematical Functions](https://dlmf.nist.gov/).
+Here the *Special Functions* are listed according to the structure of [NIST Digital Library of Mathematical Functions (DLMF)](https://dlmf.nist.gov/).
 
 
 ## Gamma Function

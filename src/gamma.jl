@@ -579,7 +579,7 @@ true
 ```
 
 External links:
-[DLMF](https://dlmf.nist.gov/5.2.1),
+[DLMF 5.2.1](https://dlmf.nist.gov/5.2.1),
 [Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
 
 See also:

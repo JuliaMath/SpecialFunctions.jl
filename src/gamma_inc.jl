@@ -377,7 +377,7 @@ R(a,x) \\cdot \\cfrac{1}{1-\\cfrac{z}{a+1+\\cfrac{z}{a+2-\\cfrac{(a+1)z}{a+3+\\c
 ```
 Used when `1 <= a <= BIG` and `x < x0`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.9.2)
+External links: [DLMF 8.9.2](https://dlmf.nist.gov/8.9.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -416,7 +416,7 @@ R(a,x)/a * (1 + \\sum_{n=1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))
 ```
 Used when `1 <= a <= BIG` and `x <= max{a, ln 10}`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.11.2)
+External links: [DLMF 8.11.2](https://dlmf.nist.gov/8.11.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -466,7 +466,7 @@ R(a,x)/a * (1 + \\sum_{n=1}^{N-1}(a_{n}/x^{n} + \\Theta _{n}a_{n}/x^{n}))
 ```
 where `R(a,x) = rgammax(a,x)`. Used when `1 <= a <= BIG` and `x >= x0`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.11.2)
+External links: [DLMF 8.11.2](https://dlmf.nist.gov/8.11.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -570,7 +570,7 @@ Refer Appendix F in the paper for the extensive set of coefficients calculated
 using Brent's multiple precision arithmetic(set at 50 digits) in
 BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70.
 
-External links: [DLMF](https://dlmf.nist.gov/8.12.8)
+External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -633,7 +633,7 @@ T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
 This mainly solves the problem near the region when `a ≈ x` with a large, and
 is a lower accuracy version of the minimax approximation.
 
-External links: [DLMF](https://dlmf.nist.gov/8.12.8)
+External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -668,7 +668,7 @@ E(y) = 1/2 - (1 - y/3)*(\\sqrt(y/\\pi))
 ```
 Used instead of it's previous function when ``\\sigma <= e_{0}/\\sqrt{a}``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.12.8)
+External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 """
 function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     iop = ind + 1
@@ -859,7 +859,7 @@ gamma function is ``\\Gamma(a,x) = Q(a,x) \\Gamma(a)``.
 `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
 
 External links:
-[DLMF](https://dlmf.nist.gov/8.2.4),
+[DLMF 8.2.4](https://dlmf.nist.gov/8.2.4),
 [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also
@@ -999,7 +999,7 @@ Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in
 ``P(a,x) = p`` and ``Q(a,x) = q``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/8.2.4),
+[DLMF 8.2.4](https://dlmf.nist.gov/8.2.4),
 [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
@@ -1126,7 +1126,9 @@ supporting arbitrary real or complex `a` and `x`.
 See also the [`gamma_inc`](@ref) function to compute both the upper and lower
 (``\\gamma(a,x)``) incomplete gamma functions scaled by ``\\Gamma(a)``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links:
+[DLMF 8.2.2](https://dlmf.nist.gov/8.2.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 """
 gamma(a::Number,  x::Number) = _gamma(promotereal(float(a), float(x))...)
 gamma(a::Integer, x::Number) = _gamma(a, float(x))

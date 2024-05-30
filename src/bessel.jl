@@ -66,7 +66,9 @@ end
 
 Airy function of the first kind ``\\operatorname{Ai}(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airyaix`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 """
@@ -78,7 +80,9 @@ airyai(z::Complex{Float64}) = _airy(z, Int32(0), Int32(1))
 
 Derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airyaiprimex`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 """
@@ -90,7 +94,9 @@ airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
 
 Airy function of the second kind ``\\operatorname{Bi}(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 8.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airybix`](@ref), [`airybiprime`](@ref),  [`airyai`](@ref)
 """
@@ -102,7 +108,9 @@ airybi(z::Complex{Float64}) = _biry(z, Int32(0), Int32(1))
 
 Derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x)``.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airybiprimex`](@ref), [`airybi`](@ref), [`airyai`](@ref)
 """
@@ -115,7 +123,9 @@ airybiprime(z::Complex{Float64}) = _biry(z, Int32(1), Int32(1))
 Scaled Airy function of the first kind ``\\operatorname{Ai}(x) e^{\\frac{2}{3} x
 \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airyai`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 """
@@ -128,7 +138,9 @@ airyaix(z::Complex{Float64}) = _airy(z, Int32(0), Int32(2))
 Scaled derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)
 e^{\\frac{2}{3} x \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airyaiprime`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 """
@@ -140,7 +152,9 @@ airyaiprimex(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(2))
 
 Scaled Airy function of the second kind ``\\operatorname{Bi}(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airybi`](@ref), [`airybiprime`](@ref), [`airyai`](@ref)
 """
@@ -152,7 +166,9 @@ airybix(z::Complex{Float64}) = _biry(z, Int32(0), Int32(2))
 
 Scaled derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
 
-External links: [DLMF](https://dlmf.nist.gov/9.2), [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
+External links:
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airybiprime`](@ref), [`airybi`](@ref), [`airyai`](@ref)
 """
@@ -342,7 +358,7 @@ when `z` has a large imaginary part.  The `besselhx` function cancels this
 exponential factor (analytically), so it avoids these problems.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2),
+[DLMF 10.2](https://dlmf.nist.gov/10.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`besselh`](@ref)
@@ -448,7 +464,7 @@ end
 Modified Bessel function of the first kind of order `nu`, ``I_\\nu(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.25.2),
+[DLMF 10.25.2](https://dlmf.nist.gov/10.25.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
 See also:
@@ -469,7 +485,7 @@ end
 Scaled modified Bessel function of the first kind of order `nu`, ``I_\\nu(x) e^{- | \\operatorname{Re}(x) |}``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.25.2),
+[DLMF 10.25.2](https://dlmf.nist.gov/10.25.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
 See also:
@@ -490,7 +506,7 @@ end
 Bessel function of the first kind of order `nu`, ``J_\\nu(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.2),
+[DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
 See also:
@@ -515,7 +531,7 @@ end
 Scaled Bessel function of the first kind of order `nu`, ``J_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.2),
+[DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
 See also:
@@ -536,7 +552,7 @@ end
 Modified Bessel function of the second kind of order `nu`, ``K_\\nu(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.25.3),
+[DLMF 10.25.3](https://dlmf.nist.gov/10.25.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
 See also:
@@ -559,7 +575,7 @@ end
 Scaled modified Bessel function of the second kind of order `nu`, ``K_\\nu(x) e^x``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.25.3),
+[DLMF 10.25.3](https://dlmf.nist.gov/10.25.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1)
 
 See also:
@@ -582,7 +598,7 @@ end
 Bessel function of the second kind of order `nu`, ``Y_\\nu(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.3),
+[DLMF 10.2.3](https://dlmf.nist.gov/10.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also [`besselyx(nu,x)`](@ref SpecialFunctions.besselyx) for a scaled variant.
@@ -603,7 +619,7 @@ Scaled Bessel function of the second kind of order `nu`,
 ``Y_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.3),
+[DLMF 10.2.3](https://dlmf.nist.gov/10.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
@@ -654,7 +670,7 @@ besselh(nu::Float32, k::Integer, x::Float32) = Complex{Float32}(besselh(Float64(
 Bessel function of the first kind of order 0, ``J_0(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.2),
+[DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
 See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
@@ -671,7 +687,7 @@ end
 Bessel function of the first kind of order 1, ``J_1(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.2),
+[DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind:_J%CE%B1)
 
 See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
@@ -694,7 +710,7 @@ end
 Bessel function of the second kind of order 0, ``Y_0(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.3),
+[DLMF 10.2.3](https://dlmf.nist.gov/10.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also: [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
@@ -714,7 +730,7 @@ end
 Bessel function of the second kind of order 1, ``Y_1(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.3),
+[DLMF 10.2.3](https://dlmf.nist.gov/10.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind:_Y%CE%B1)
 
 See also: [`bessely(nu,x)`](@ref SpecialFunctions.bessely)
@@ -767,7 +783,7 @@ sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + one
 Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.5),
+[DLMF 10.2.5](https://dlmf.nist.gov/10.2.5),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh1x`](@ref SpecialFunctions.hankelh1x)
@@ -780,7 +796,7 @@ hankelh1(nu, z) = besselh(nu, 1, z)
 Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x)``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.6),
+[DLMF 10.2.6](https://dlmf.nist.gov/10.2.6),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh2x(nu,x)`](@ref SpecialFunctions.hankelh2x)
@@ -793,7 +809,7 @@ hankelh2(nu, z) = besselh(nu, 2, z)
 Scaled Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x) e^{-x i}``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.5),
+[DLMF 10.2.5](https://dlmf.nist.gov/10.2.5),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh1`](@ref SpecialFunctions.hankelh1)
@@ -806,7 +822,7 @@ hankelh1x(nu, z) = besselhx(nu, 1, z)
 Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i}``.
 
 External links:
-[DLMF](https://dlmf.nist.gov/10.2.6),
+[DLMF 10.2.6](https://dlmf.nist.gov/10.2.6),
 [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function#Hankel_functions:_H(1)%CE%B1,_H(2)%CE%B1)
 
 See also: [`hankelh2(nu,x)`](@ref SpecialFunctions.hankelh2)

@@ -90,7 +90,9 @@ Compute the error function of ``x``, defined by
 
 Accurate version of `erf(y) - erf(x)` (for real arguments only).
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
+External links:
+[DLMF 7.2.1](https://dlmf.nist.gov/7.2.1),
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
 See also: [`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
 [`erfi(x)`](@ref erfi), [`dawson(x)`](@ref dawson),
@@ -129,7 +131,7 @@ Compute the complementary error function of ``x``, defined by
 
 This is the accurate version of `1-erf(x)` for large ``x``.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.2),
+External links: [DLMF 7.2.2](https://dlmf.nist.gov/7.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
 See also: [`erf(x)`](@ref erf).
@@ -155,7 +157,7 @@ Compute the scaled complementary error function of ``x``, defined by
 This is the accurate version of ``e^{x^2} \operatorname{erfc}(x)`` for large ``x``.
 Note also that ``\operatorname{erfcx}(-ix)`` computes the Faddeeva function `w(x)`.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.3),
+External links: [DLMF 7.2.3](https://dlmf.nist.gov/7.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
 See also: [`erfc(x)`](@ref erfc).
@@ -204,7 +206,7 @@ Compute the Dawson function (scaled imaginary error function) of ``x``, defined 
 This is the accurate version of ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)``
 for large ``x``.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.5),
+External links: [DLMF 7.2.5](https://dlmf.nist.gov/7.2.5),
 [Wikipedia](https://en.wikipedia.org/wiki/Dawson_function).
 
 See also: [`erfi(x)`](@ref erfi).

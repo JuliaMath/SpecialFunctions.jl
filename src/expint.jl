@@ -514,7 +514,9 @@ Computes the exponential integral
 ```
 If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
 
-External links: [DLMF](https://dlmf.nist.gov/8.19), [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
+External links:
+[DLMF 8.19](https://dlmf.nist.gov/8.19),
+[Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
 """
 expint(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{false}())
 
