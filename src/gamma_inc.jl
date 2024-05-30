@@ -509,11 +509,11 @@ end
 """
     gamma_inc_taylor_x(a,x,ind)
 
-Computes ``P(a,x)`` based on Taylor expansion of ``P(a,x)/x**a`` given by:
+Computes ``P(a,x)`` based on Taylor expansion of ``P(a,x)/x^a`` given by:
 ```math
 J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)
 ```
-and ``P(a,x)/x**a`` is given by :
+and ``P(a,x)/x^a`` is given by:
 ```math
 (1 - J)/ \\Gamma(a+1)
 ```
