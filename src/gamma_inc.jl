@@ -568,7 +568,7 @@ This is a higher accuracy approximation of Temme expansion, which deals with
 the region near `a ≈ x` with `a` large.
 Refer Appendix F in the paper for the extensive set of coefficients calculated
 using Brent's multiple precision arithmetic(set at 50 digits) in
-BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70.
+> Brent, R. P. A Fortran multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70, doi: 10.1145/355769.355775.
 
 External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 
