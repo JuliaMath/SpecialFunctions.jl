@@ -86,15 +86,12 @@ Compute the error function of ``x``, defined by
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
-    erf(x, y)
-
-Accurate version of `erf(y) - erf(x)` (for real arguments only).
-
 External links:
 [DLMF 7.2.1](https://dlmf.nist.gov/7.2.1),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
-See also: [`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
+See also:
+[`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
 [`erfi(x)`](@ref erfi), [`dawson(x)`](@ref dawson),
 [`erfinv(x)`](@ref erfinv), [`erfcinv(x)`](@ref erfcinv).
 
@@ -103,8 +100,12 @@ See also: [`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
     [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
-erf
+function erf(::Real) end
+"""
+    erf(x, y)
 
+Accurate version of `erf(y) - erf(x)` (for real arguments only).
+"""
 function erf(x::Real, y::Real)
     if abs(x) ≤ 1/√2 && abs(y) ≤ 1/√2
         erf(y) - erf(x)
