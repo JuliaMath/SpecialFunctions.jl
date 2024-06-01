@@ -215,34 +215,34 @@ function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, 
     #CONT FRACTION
 
     while true
-     n += 1.0
-     t = n/a
-     w = n*(b - n)*x
-     e = a/s
-     alpha = (p*(p+c0)*e*e)*(w*x)
-     e = (1.0 + t)/(c1 + 2*t)
-     beta = n + w/s +e*(c + n*yp1)
-     p = 1.0 + t
-     s += 2.0
+        n += 1.0
+        t = n/a
+        w = n*(b - n)*x
+        e = a/s
+        alpha = (p*(p+c0)*e*e)*(w*x)
+        e = (1.0 + t)/(c1 + 2*t)
+        beta = n + w/s +e*(c + n*yp1)
+        p = 1.0 + t
+        s += 2.0
 
-     #update an, bn, anp1, bnp1
-     t = alpha*an  + beta*anp1
-     an = anp1
-     anp1 = t
-     t = alpha*bn + beta*bnp1
-     bn = bnp1
-     bnp1 = t
+        #update an, bn, anp1, bnp1
+        t = alpha*an  + beta*anp1
+        an = anp1
+        anp1 = t
+        t = alpha*bn + beta*bnp1
+        bn = bnp1
+        bnp1 = t
 
-     r0 = r
-     r = anp1/bnp1
-     if abs(r - r0) <= epps*r
-        break
-     end
-     #rescale
-     an /= bnp1
-     bn /= bnp1
-     anp1 = r
-     bnp1 = 1.0
+        r0 = r
+        r = anp1/bnp1
+        if abs(r - r0) <= epps*r
+            break
+        end
+        #rescale
+        an /= bnp1
+        bn /= bnp1
+        anp1 = r
+        bnp1 = 1.0
     end
     return ans*r
 end
