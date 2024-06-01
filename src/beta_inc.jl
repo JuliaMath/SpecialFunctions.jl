@@ -7,7 +7,7 @@ const exparg_p =  log(prevfloat(floatmax(Float64)))
 @doc raw"""
     loggammadiv(a,b)
 
-Computes ``\log(\Gamma(b)/\Gamma(a+b))`` when b >= 8
+Computes ``\log(\Gamma(b)/\Gamma(a+b))`` when `b >= 8`
 """
 loggammadiv(a::Number, b::Number) = _loggammadiv(promote(float(a), float(b))...)
 

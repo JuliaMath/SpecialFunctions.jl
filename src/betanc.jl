@@ -54,7 +54,7 @@ end
 @doc raw"""
     ncbeta_poisson(a,b,lambda,x)
 
-Compute CDF of noncentral beta if lambda >= 54 using:
+Compute CDF of noncentral beta if `lambda >= 54` using:
 First ``\lambda/2`` is calculated and the Poisson term is calculated using
 ``P(j-1) = j/\lambda P(j)`` and ``P(j+1) = \lambda/(j+1) P(j)``.
 Then backward recurrences are used until either the Poisson weights fall below
