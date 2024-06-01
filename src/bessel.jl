@@ -61,10 +61,10 @@ function _biry(z::Complex{Float64}, id::Int32, kode::Int32)
 end
 
 
-"""
+@doc raw"""
     airyai(x)
 
-Airy function of the first kind ``\\operatorname{Ai}(x)``.
+Airy function of the first kind ``\operatorname{Ai}(x)``.
 
 External links:
 [DLMF 9.2](https://dlmf.nist.gov/9.2),
@@ -75,10 +75,10 @@ See also: [`airyaix`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 function airyai end
 airyai(z::Complex{Float64}) = _airy(z, Int32(0), Int32(1))
 
-"""
+@doc raw"""
     airyaiprime(x)
 
-Derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)``.
+Derivative of the Airy function of the first kind ``\operatorname{Ai}'(x)``.
 
 External links:
 [DLMF 9.2](https://dlmf.nist.gov/9.2),
@@ -89,10 +89,10 @@ See also: [`airyaiprimex`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 function airyaiprime end
 airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
 
-"""
+@doc raw"""
     airybi(x)
 
-Airy function of the second kind ``\\operatorname{Bi}(x)``.
+Airy function of the second kind ``\operatorname{Bi}(x)``.
 
 External links:
 [DLMF 8.2](https://dlmf.nist.gov/9.2),
@@ -103,10 +103,10 @@ See also: [`airybix`](@ref), [`airybiprime`](@ref),  [`airyai`](@ref)
 function airybi end
 airybi(z::Complex{Float64}) = _biry(z, Int32(0), Int32(1))
 
-"""
+@doc raw"""
     airybiprime(x)
 
-Derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x)``.
+Derivative of the Airy function of the second kind ``\operatorname{Bi}'(x)``.
 
 External links:
 [DLMF 9.2](https://dlmf.nist.gov/9.2),
@@ -117,11 +117,12 @@ See also: [`airybiprimex`](@ref), [`airybi`](@ref), [`airyai`](@ref)
 function airybiprime end
 airybiprime(z::Complex{Float64}) = _biry(z, Int32(1), Int32(1))
 
-"""
+@doc raw"""
     airyaix(x)
 
-Scaled Airy function of the first kind ``\\operatorname{Ai}(x) e^{\\frac{2}{3} x
-\\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
+Scaled Airy function of the first kind
+``\operatorname{Ai}(x) e^{\frac{2}{3} x \sqrt{x}}``.
+Throws `DomainError` for negative `Real` arguments.
 
 External links:
 [DLMF 9.2](https://dlmf.nist.gov/9.2),
@@ -132,11 +133,12 @@ See also: [`airyai`](@ref), [`airyaiprime`](@ref), [`airybi`](@ref)
 function airyaix end
 airyaix(z::Complex{Float64}) = _airy(z, Int32(0), Int32(2))
 
-"""
+@doc raw"""
     airyaiprimex(x)
 
-Scaled derivative of the Airy function of the first kind ``\\operatorname{Ai}'(x)
-e^{\\frac{2}{3} x \\sqrt{x}}``.  Throws `DomainError` for negative `Real` arguments.
+Scaled derivative of the Airy function of the first kind
+``\operatorname{Ai}'(x) e^{\frac{2}{3} x \sqrt{x}}``.
+Throws `DomainError` for negative `Real` arguments.
 
 External links:
 [DLMF 9.2](https://dlmf.nist.gov/9.2),
@@ -147,10 +149,11 @@ See also: [`airyaiprime`](@ref), [`airyai`](@ref), [`airybi`](@ref)
 function airyaiprimex end
 airyaiprimex(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(2))
 
-"""
+@doc raw"""
     airybix(x)
 
-Scaled Airy function of the second kind ``\\operatorname{Bi}(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
+Scaled Airy function of the second kind
+``\operatorname{Bi}(x) e^{- \left| \operatorname{Re} \left( \frac{2}{3} x \sqrt{x} \right) \right|}``.
 
 External links:
 [DLMF 9.2](https://dlmf.nist.gov/9.2),
@@ -161,10 +164,11 @@ See also: [`airybi`](@ref), [`airybiprime`](@ref), [`airyai`](@ref)
 function airybix end
 airybix(z::Complex{Float64}) = _biry(z, Int32(0), Int32(2))
 
-"""
+@doc raw"""
     airybiprimex(x)
 
-Scaled derivative of the Airy function of the second kind ``\\operatorname{Bi}'(x) e^{- \\left| \\operatorname{Re} \\left( \\frac{2}{3} x \\sqrt{x} \\right) \\right|}``.
+Scaled derivative of the Airy function of the second kind
+``\operatorname{Bi}'(x) e^{- \left| \operatorname{Re} \left( \frac{2}{3} x \sqrt{x} \right) \right|}``.
 
 External links:
 [DLMF 9.2](https://dlmf.nist.gov/9.2),
@@ -344,15 +348,15 @@ function besselh(nu::Float64, k::Integer, x::Float64)
     end
 end
 
-"""
+@doc raw"""
     besselhx(nu, [k=1,] z)
 
-Compute the scaled Hankel function ``\\exp(∓iz) H_ν^{(k)}(z)``, where
+Compute the scaled Hankel function ``\exp(∓iz) H_ν^{(k)}(z)``, where
 ``k`` is 1 or 2, ``H_ν^{(k)}(z)`` is `besselh(nu, k, z)`, and ``∓`` is
 ``-`` for ``k=1`` and ``+`` for ``k=2``.  `k` defaults to 1 if it is omitted.
 
 The reason for this function is that ``H_ν^{(k)}(z)`` is asymptotically
-proportional to ``\\exp(∓iz)/\\sqrt{z}`` for large ``|z|``, and so the
+proportional to ``\exp(∓iz)/\sqrt{z}`` for large ``|z|``, and so the
 [`besselh`](@ref) function is susceptible to overflow or underflow
 when `z` has a large imaginary part.  The `besselhx` function cancels this
 exponential factor (analytically), so it avoids these problems.
@@ -458,10 +462,10 @@ function besselyx(nu::Float64, z::Complex{Float64})
     end
 end
 
-"""
+@doc raw"""
     besseli(nu, x)
 
-Modified Bessel function of the first kind of order `nu`, ``I_\\nu(x)``.
+Modified Bessel function of the first kind of order `nu`, ``I_\nu(x)``.
 
 External links:
 [DLMF 10.25.2](https://dlmf.nist.gov/10.25.2),
@@ -479,10 +483,10 @@ function besseli(nu::Real, x::AbstractFloat)
     real(besseli(float(nu), complex(x)))
 end
 
-"""
+@doc raw"""
     besselix(nu, x)
 
-Scaled modified Bessel function of the first kind of order `nu`, ``I_\\nu(x) e^{- | \\operatorname{Re}(x) |}``.
+Scaled modified Bessel function of the first kind of order `nu`, ``I_\nu(x) e^{- | \operatorname{Re}(x) |}``.
 
 External links:
 [DLMF 10.25.2](https://dlmf.nist.gov/10.25.2),
@@ -500,10 +504,10 @@ function besselix(nu::Real, x::AbstractFloat)
     real(besselix(float(nu), complex(x)))
 end
 
-"""
+@doc raw"""
     besselj(nu, x)
 
-Bessel function of the first kind of order `nu`, ``J_\\nu(x)``.
+Bessel function of the first kind of order `nu`, ``J_\nu(x)``.
 
 External links:
 [DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
@@ -525,10 +529,10 @@ function besselj(nu::Real, x::AbstractFloat)
     real(besselj(float(nu), complex(x)))
 end
 
-"""
+@doc raw"""
     besseljx(nu, x)
 
-Scaled Bessel function of the first kind of order `nu`, ``J_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
+Scaled Bessel function of the first kind of order `nu`, ``J_\nu(x) e^{- | \operatorname{Im}(x) |}``.
 
 External links:
 [DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
@@ -546,10 +550,10 @@ function besseljx(nu::Real, x::AbstractFloat)
     real(besseljx(float(nu), complex(x)))
 end
 
-"""
+@doc raw"""
     besselk(nu, x)
 
-Modified Bessel function of the second kind of order `nu`, ``K_\\nu(x)``.
+Modified Bessel function of the second kind of order `nu`, ``K_\nu(x)``.
 
 External links:
 [DLMF 10.25.3](https://dlmf.nist.gov/10.25.3),
@@ -569,10 +573,10 @@ function besselk(nu::Real, x::AbstractFloat)
     real(besselk(float(nu), complex(x)))
 end
 
-"""
+@doc raw"""
     besselkx(nu, x)
 
-Scaled modified Bessel function of the second kind of order `nu`, ``K_\\nu(x) e^x``.
+Scaled modified Bessel function of the second kind of order `nu`, ``K_\nu(x) e^x``.
 
 External links:
 [DLMF 10.25.3](https://dlmf.nist.gov/10.25.3),
@@ -816,10 +820,10 @@ See also: [`hankelh1`](@ref SpecialFunctions.hankelh1)
 """
 hankelh1x(nu, z) = besselhx(nu, 1, z)
 
-"""
+@doc raw"""
     hankelh2x(nu, x)
 
-Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x) e^{x i}``.
+Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\nu(x) e^{x i}``.
 
 External links:
 [DLMF 10.2.6](https://dlmf.nist.gov/10.2.6),
@@ -829,11 +833,14 @@ See also: [`hankelh2(nu,x)`](@ref SpecialFunctions.hankelh2)
 """
 hankelh2x(nu, z) = besselhx(nu, 2, z)
 
-"""
+@doc raw"""
     jinc(x)
 
 Bessel function of the first kind divided by `x`.
-Following convention: ``\\operatorname{jinc}{x} = \\frac{2 J_1{\\pi x}}{\\pi x}``.
+Following convention:
+```math
+\operatorname{jinc}{x} = \frac{2 J_1({\pi x})}{\pi x}.
+```
 Sometimes known as sombrero or besinc function.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Sombrero_function)

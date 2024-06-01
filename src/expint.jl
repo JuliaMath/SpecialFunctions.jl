@@ -504,15 +504,15 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
     end
 end
 
-"""
+@doc raw"""
     expint(z)
     expint(ν, z)
 
 Computes the exponential integral
 ```math
-\\operatorname{E}_\\nu(z) = \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt.
+\operatorname{E}_\nu(z) = \int_1^\infty \frac{e^{-zt}}{t^\nu} dt.
 ```
-If ``\\nu`` is not specified, ``\\nu=1`` is used. Arbitrary complex ``\\nu`` and ``z`` are supported.
+If ``\nu`` is not specified, ``\nu=1`` is used. Arbitrary complex ``\nu`` and ``z`` are supported.
 
 External links:
 [DLMF 8.19](https://dlmf.nist.gov/8.19),
@@ -521,16 +521,16 @@ External links:
 expint(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{false}())
 
 
-"""
+@doc raw"""
     expintx(z)
     expintx(ν, z)
 
 Computes the scaled exponential integral
 ```math
-\\exp(z) \\operatorname{E}_\\nu(z) = e^z \\int_1^\\infty \\frac{e^{-zt}}{t^\\nu} dt.
+\exp(z) \operatorname{E}_\nu(z) = e^z \int_1^\infty \frac{e^{-zt}}{t^\nu} dt.
 ```
-If ``\\nu`` is not specified, ``\\nu = 1`` is used. Arbitrary complex
-``\\nu`` and ``z`` are supported.
+If ``\nu`` is not specified, ``\nu = 1`` is used. Arbitrary complex
+``\nu`` and ``z`` are supported.
 
 See also: [`expint(ν, z)`](@ref SpecialFunctions.expint)
 """
@@ -539,15 +539,15 @@ expintx(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{true
 ##############################################################################
 # expinti function Ei
 
-"""
+@doc raw"""
     expinti(x::Real)
 
 Computes the exponential integral function
 ```math
-\\operatorname{Ei}(x) = \\int_{-\\infty}^x \\frac{e^t}{t} dt,
+\operatorname{Ei}(x) = \int_{-\infty}^x \frac{e^t}{t} dt,
 ```
-which is equivalent to ``-\\Re[\\operatorname{E}_1(-x)]`` where
-``\\operatorname{E}_1`` is the `expint` function.
+which is equivalent to ``-\Re[\operatorname{E}_1(-x)]`` where
+``\operatorname{E}_1`` is the `expint` function.
 """
 expinti(x::Real) = x ≤ 0 ? -expint(-x) : -real(expint(complex(-x)))
 
