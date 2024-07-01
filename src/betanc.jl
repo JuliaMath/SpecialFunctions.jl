@@ -173,7 +173,7 @@ end
 
 Compute CDF of noncentral F distribution given by:
 ```math
-F(x, v1, v2; \lambda) = I_{v1*x/(v1*x + v2)}(v1/2, v2/2; \lambda)
+F(x, v_1, v_2; \lambda) = I_{v_1 x/(v_1 x + v_2)}(v_1/2, v_2/2; \lambda)
 ```
 where ``I_{x}(a,b; \lambda)`` is the noncentral beta function computed above.
 
