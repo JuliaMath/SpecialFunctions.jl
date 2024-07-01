@@ -851,11 +851,11 @@ end
 Returns a tuple ``(p, q)`` where ``p + q = 1``, and
 ``p = P(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-P(a,x) = \frac{1}{\Gamma (a)} \int_{0}^{x} e^{-t}t^{a-1} dt.
+P(a,x) = \frac{1}{\Gamma (a)} \int_{0}^{x} e^{-t}t^{a-1} \mathrm{d}t.
 ```
 and ``q = Q(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-Q(a,x) = \frac{1}{\Gamma (a)} \int_{x}^{\infty} e^{-t}t^{a-1} dt.
+Q(a,x) = \frac{1}{\Gamma (a)} \int_{x}^{\infty} e^{-t}t^{a-1} \mathrm{d}t.
 ```
 In terms of these, the lower incomplete gamma function is
 ``\gamma(a,x) = P(a,x) \Gamma(a)`` and the upper incomplete
@@ -1124,7 +1124,7 @@ promotereal(x, y) = promote(x,y)
 
 Returns the upper incomplete gamma function
 ```math
-\Gamma(a,x) = \int_x^\infty t^{a-1} e^{-t} dt
+\Gamma(a,x) = \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
 ```
 supporting arbitrary real or complex `a` and `x`.
 
@@ -1185,7 +1185,7 @@ end
 
 Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
 ```math
-\log \Gamma(a,x) = \log \int_x^\infty t^{a-1} e^{-t} dt
+\log \Gamma(a,x) = \log \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
 ```
 supporting arbitrary real or complex `a` and `x`.
 

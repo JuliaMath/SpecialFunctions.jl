@@ -233,7 +233,7 @@ Compute the sine integral function of ``x``, defined by
 
 ```math
 \operatorname{Si}(x)
-:= \int_0^x \frac{\sin t}{t} \, dt
+:= \int_0^x \frac{\sin t}{t} \, \mathrm{d}t
 \quad \text{for} \quad
 x \in \mathbb{R} \,.
 ```
@@ -265,7 +265,7 @@ Compute the cosine integral function of ``x``, defined by
 
 ```math
 \operatorname{Ci}(x)
-:= \gamma + \log x + \int_0^x \frac{\cos (t) - 1}{t} \, dt
+:= \gamma + \log x + \int_0^x \frac{\cos (t) - 1}{t} \, \mathrm{d}t
 \quad \text{for} \quad
 x > 0 \,,
 ```

@@ -556,7 +556,7 @@ Compute the gamma function for complex ``z``, defined by
     n!
     & \text{for} \quad z = n+1 \;, n = 0,1,2,\dots
     \\
-    \int_0^\infty t^{z-1} e^{-t} \, dt
+    \int_0^\infty t^{z-1} e^{-t} \, \mathrm{d}t
     & \text{for} \quad \Re(z) > 0
 \end{cases}
 ```

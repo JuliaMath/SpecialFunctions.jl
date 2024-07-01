@@ -82,7 +82,7 @@ end
 Compute the error function of ``x``, defined by
 
 ```math
-\operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x \exp(-t^2) \; dt
+\operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x \exp(-t^2) \; \mathrm{d}t
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
@@ -126,7 +126,7 @@ Compute the complementary error function of ``x``, defined by
 ```math
 \operatorname{erfc}(x)
 = 1 - \operatorname{erf}(x)
-= \frac{2}{\sqrt{\pi}} \int_x^\infty \exp(-t^2) \; dt
+= \frac{2}{\sqrt{\pi}} \int_x^\infty \exp(-t^2) \; \mathrm{d}t
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 

@@ -733,7 +733,7 @@ end
 Return a tuple ``(I_{x}(a,b), 1-I_{x}(a,b))`` where ``I_{x}(a,b)`` is the regularized
 incomplete beta function given by
 ```math
-I_{x}(a,b) = \frac{1}{B(a,b)} \int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
+I_{x}(a,b) = \frac{1}{B(a,b)} \int_{0}^{x} t^{a-1}(1-t)^{b-1} \mathrm{d}t,
 ```
 where ``B(a,b) = \Gamma(a)\Gamma(b)/\Gamma(a+b)``.
 

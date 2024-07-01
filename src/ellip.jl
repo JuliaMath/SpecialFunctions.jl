@@ -11,7 +11,7 @@ Computes Complete Elliptic Integral of 1st kind ``K(m)`` for parameter ``m`` giv
 ```math
 \operatorname{ellipk}(m)
 = K(m)
-= \int_0^{ \frac{\pi}{2} } \frac{1}{\sqrt{1 - m \sin^2 \theta}} \, d\theta
+= \int_0^{ \frac{\pi}{2} } \frac{1}{\sqrt{1 - m \sin^2 \theta}} \, \mathrm{d}\theta
 \quad \text{for} \quad m \in \left( -\infty, 1 \right] \, .
 ```
 
@@ -191,7 +191,7 @@ Computes Complete Elliptic Integral of 2nd kind ``E(m)`` for parameter ``m`` giv
 ```math
 \operatorname{ellipe}(m)
 = E(m)
-= \int_0^{ \frac{\pi}{2} } \sqrt{1 - m \sin^2 \theta} \, d\theta
+= \int_0^{ \frac{\pi}{2} } \sqrt{1 - m \sin^2 \theta} \, \mathrm{d}\theta
 \quad \text{for} \quad m \in \left( -\infty, 1 \right] .
 ```
 
