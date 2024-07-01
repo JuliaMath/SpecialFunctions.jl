@@ -100,7 +100,7 @@ See also:
     [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
-function erf(::Real) end
+function erf end
 """
     erf(x, y)
 

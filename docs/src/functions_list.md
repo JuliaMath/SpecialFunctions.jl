@@ -86,6 +86,7 @@ cosint
 
 ```@docs
 erf
+erf(::Real, ::Real)
 erfc
 logerf
 erfcinv
