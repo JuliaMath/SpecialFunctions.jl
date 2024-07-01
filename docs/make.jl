@@ -8,6 +8,8 @@ makedocs(modules=[SpecialFunctions],
          format = Documenter.HTML(; assets = String[]),
          pages=["Home" => "index.md",
                 "Overview" => "functions_overview.md",
-                "Reference" => "functions_list.md"])
+                "Reference" => "functions_list.md"],
+         #warnonly=[:missing_docs],
+        )
 
 deploydocs(repo="github.com/JuliaMath/SpecialFunctions.jl.git")

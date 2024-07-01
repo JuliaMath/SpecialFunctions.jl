@@ -86,13 +86,12 @@ Compute the error function of ``x``, defined by
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
-    erf(x, y)
+External links:
+[DLMF 7.2.1](https://dlmf.nist.gov/7.2.1),
+[Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
-Accurate version of `erf(y) - erf(x)` (for real arguments only).
-
-External links: [DLMF](https://dlmf.nist.gov/7.2.1), [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
-
-See also: [`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
+See also:
+[`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
 [`erfi(x)`](@ref erfi), [`dawson(x)`](@ref dawson),
 [`erfinv(x)`](@ref erfinv), [`erfcinv(x)`](@ref erfcinv).
 
@@ -101,8 +100,12 @@ See also: [`erfc(x)`](@ref erfc), [`erfcx(x)`](@ref erfcx),
     [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
-erf
+function erf end
+"""
+    erf(x, y)
 
+Accurate version of `erf(y) - erf(x)` (for real arguments only).
+"""
 function erf(x::Real, y::Real)
     if abs(x) ≤ 1/√2 && abs(y) ≤ 1/√2
         erf(y) - erf(x)
@@ -129,7 +132,7 @@ Compute the complementary error function of ``x``, defined by
 
 This is the accurate version of `1-erf(x)` for large ``x``.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.2),
+External links: [DLMF 7.2.2](https://dlmf.nist.gov/7.2.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
 See also: [`erf(x)`](@ref erf).
@@ -155,7 +158,7 @@ Compute the scaled complementary error function of ``x``, defined by
 This is the accurate version of ``e^{x^2} \operatorname{erfc}(x)`` for large ``x``.
 Note also that ``\operatorname{erfcx}(-ix)`` computes the Faddeeva function `w(x)`.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.3),
+External links: [DLMF 7.2.3](https://dlmf.nist.gov/7.2.3),
 [Wikipedia](https://en.wikipedia.org/wiki/Error_function#Complementary_error_function).
 
 See also: [`erfc(x)`](@ref erfc).
@@ -204,7 +207,7 @@ Compute the Dawson function (scaled imaginary error function) of ``x``, defined 
 This is the accurate version of ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)``
 for large ``x``.
 
-External links: [DLMF](https://dlmf.nist.gov/7.2.5),
+External links: [DLMF 7.2.5](https://dlmf.nist.gov/7.2.5),
 [Wikipedia](https://en.wikipedia.org/wiki/Dawson_function).
 
 See also: [`erfi(x)`](@ref erfi).
@@ -215,13 +218,13 @@ See also: [`erfi(x)`](@ref erfi).
 """
 dawson
 
-"""
+@doc raw"""
     faddeeva(z)
 
 Compute the Faddeeva function of complex `z`, defined by
-``e^{-z^2} \\operatorname{erfc}(-iz)``.
+``e^{-z^2} \operatorname{erfc}(-iz)``.
 Note that this function, also named `w` (original Faddeeva package) or `wofz` (Scilab package),
-is equivalent to``\\operatorname{erfcx}(-iz)``.
+is equivalent to ``\operatorname{erfcx}(-iz)``.
 """
 faddeeva
 
@@ -563,11 +566,11 @@ end
 Compute the natural logarithm of the complementary error function of ``x``, that is
 
 ```math
-\operatorname{logerfc}(x) = \operatorname{ln}(\operatorname{erfc}(x))
+\operatorname{logerfc}(x) = \ln(\operatorname{erfc}(x))
 \quad \text{for} \quad x \in \mathbb{R} \, .
 ```
 
-This is the accurate version of ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x``.
+This is the accurate version of ``\ln(\operatorname{erfc}(x))`` for large ``x``.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
@@ -590,11 +593,11 @@ end
 Compute the natural logarithm of the scaled complementary error function of ``x``, that is
 
 ```math
-\operatorname{logerfcx}(x) = \operatorname{ln}(\operatorname{erfcx}(x))
+\operatorname{logerfcx}(x) = \ln(\operatorname{erfcx}(x))
 \quad \text{for} \quad x \in \mathbb{R} \, .
 ```
 
-This is the accurate version of ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large and negative ``x``.
+This is the accurate version of ``\ln(\operatorname{erfcx}(x))`` for large and negative ``x``.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
@@ -615,7 +618,7 @@ end
     logerf(x, y)
 
 Compute the natural logarithm of two-argument error function. This is an accurate version of
- `log(erf(x, y))`, which works for large `x, y`.
+`log(erf(x, y))`, which works for large `x`, `y`.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
