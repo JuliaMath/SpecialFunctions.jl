@@ -151,9 +151,3 @@ ellipe
 eta
 zeta
 ```
-
-## Misc
-
-```@docs
-_cotpi
-```
