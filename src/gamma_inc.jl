@@ -564,7 +564,7 @@ end
 
 Compute ``P(a,x)`` using minimax approximations given by :
 ```math
-1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi*a}* T(a,\lambda)
+1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ``` where
 ```math
 T(a,\lambda) = \sum_{0}^{N} c_{k}(z)a^{-k}
@@ -631,7 +631,7 @@ end
 
 Compute ``P(a,x)`` using Temme's expansion given by :
 ```math
-1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi*a}* T(a,\lambda)
+1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ``` where
 ```math
 T(a,\lambda) = \sum_{0}^{N} c_{k}(z)a^{-k}
@@ -664,13 +664,13 @@ end
 @doc raw"""
     gamma_inc_temme_1(a, x, z, ind)
 
-Computes ``P(a,x)`` using simplified Temme expansion near ``y=0`` by :
+Computes ``P(a,x)`` using simplified Temme expansion near ``y=0`` by:
 ```math
-E(y) - (1 - y)/\sqrt{2\pi*a} * T(a,\lambda)
+E(y) - (1 - y)/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ```
 where
 ```math
-E(y) = 1/2 - (1 - y/3)* \sqrt{y/\pi}
+E(y) = 1/2 - (1 - y/3) ⋅ \sqrt{y/\pi}
 ```
 Used instead of it's previous function when ``\sigma \leq e_{0}/\sqrt{a}``.
 
