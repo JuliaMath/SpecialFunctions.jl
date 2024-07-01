@@ -566,11 +566,11 @@ end
 Compute the natural logarithm of the complementary error function of ``x``, that is
 
 ```math
-\operatorname{logerfc}(x) = \operatorname{ln}(\operatorname{erfc}(x))
+\operatorname{logerfc}(x) = \ln(\operatorname{erfc}(x))
 \quad \text{for} \quad x \in \mathbb{R} \, .
 ```
 
-This is the accurate version of ``\operatorname{ln}(\operatorname{erfc}(x))`` for large ``x``.
+This is the accurate version of ``\ln(\operatorname{erfc}(x))`` for large ``x``.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
@@ -593,11 +593,11 @@ end
 Compute the natural logarithm of the scaled complementary error function of ``x``, that is
 
 ```math
-\operatorname{logerfcx}(x) = \operatorname{ln}(\operatorname{erfcx}(x))
+\operatorname{logerfcx}(x) = \ln(\operatorname{erfcx}(x))
 \quad \text{for} \quad x \in \mathbb{R} \, .
 ```
 
-This is the accurate version of ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large and negative ``x``.
+This is the accurate version of ``\ln(\operatorname{erfcx}(x))`` for large and negative ``x``.
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Error_function).
 
