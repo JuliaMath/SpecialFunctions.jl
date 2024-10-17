@@ -238,7 +238,8 @@ Compute the sine integral function of ``x``, defined by
 x \in \mathbb{R} \,.
 ```
 
-External links: [DLMF](https://dlmf.nist.gov/6.2.9),
+External links:
+[DLMF 6.2.9](https://dlmf.nist.gov/6.2.9),
 [Wikipedia](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral).
 
 See also: [`cosint(x)`](@ref SpecialFunctions.cosint).
@@ -270,7 +271,8 @@ x > 0 \,,
 ```
 where ``\gamma`` is the Euler-Mascheroni constant.
 
-External links: [DLMF](https://dlmf.nist.gov/6.2.13),
+External links:
+[DLMF 6.2.13](https://dlmf.nist.gov/6.2.13),
 [Wikipedia](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral).
 
 See also: [`sinint(x)`](@ref SpecialFunctions.sinint).

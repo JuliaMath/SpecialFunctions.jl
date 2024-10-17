@@ -4,15 +4,15 @@ const errmax = 1e-15
 #Russell Lenth, Algorithm AS 226: Computing Noncentral Beta Probabilities,
 #Applied Statistics,Volume 36, Number 2, 1987, pages 241-244
 
-"""
-	ncbeta_tail(x,a,b,lambda)
+@doc raw"""
+    ncbeta_tail(x,a,b,lambda)
 
 Compute tail of the noncentral beta distribution.
 Uses the recursive relation
 ```math
-I_{x}(a,b+1;0) = I_{x}(a,b;0) - \\Gamma(a+b)/\\Gamma(a+1)\\Gamma(b)x^{a}(1-x)^{b}
+I_{x}(a,b+1;0) = I_{x}(a,b;0) - \Gamma(a+b)/\Gamma(a+1)\Gamma(b) x^a (1-x)^b
 ```
-and ``\\Gamma(a+1) = a\\Gamma(a)`` given in https://dlmf.nist.gov/8.17.21.
+and ``\Gamma(a+1) = a\Gamma(a)`` given in [DLMF 8.17.21](https://dlmf.nist.gov/8.17.21).
 """
 function ncbeta_tail(a::Float64, b::Float64, lambda::Float64, x::Float64)
     if x <= 0.0
@@ -51,18 +51,20 @@ function ncbeta_tail(a::Float64, b::Float64, lambda::Float64, x::Float64)
     return ans
 end
 
-"""
+@doc raw"""
     ncbeta_poisson(a,b,lambda,x)
 
-Compute CDF of noncentral beta if lambda >= 54 using:
-First ``\\lambda/2`` is calculated and the Poisson term is calculated using ``P(j-1)=j/\\lambda P(j)`` and ``P(j+1) = \\lambda/(j+1) P(j)``.
-Then backward recurrences are used until either the Poisson weights fall below `errmax` or `iterlo` is reached.
+Compute CDF of noncentral beta if `lambda >= 54` using:
+First ``\lambda/2`` is calculated and the Poisson term is calculated using
+``P(j-1) = j/\lambda P(j)`` and ``P(j+1) = \lambda/(j+1) P(j)``.
+Then backward recurrences are used until either the Poisson weights fall below
+`errmax` or `iterlo` is reached.
 ```math
-I_{x}(a+j-1,b) = I_{x}(a+j,b) + \\Gamma(a+b+j-1)/\\Gamma(a+j)\\Gamma(b)x^{a+j-1}(1-x)^{b}
+I_{x}(a+j-1,b) = I_{x}(a+j,b) + \Gamma(a+b+j-1)/\Gamma(a+j)\Gamma(b)x^{a+j-1}(1-x)^{b}
 ```
 Then forward recurrences are used until error bound falls below `errmax`.
 ```math
-I_{x}(a+j+1,b) = I_{x}(a+j,b) - \\Gamma(a+b+j)/\\Gamma(a+j)\\Gamma(b)x^{a+j}(1-x)^{b}
+I_{x}(a+j+1,b) = I_{x}(a+j,b) - \Gamma(a+b+j)/\Gamma(a+j)\Gamma(b)x^{a+j}(1-x)^{b}
 ```
 """
 function ncbeta_poisson(a::Float64, b::Float64, lambda::Float64, x::Float64)
@@ -140,15 +142,16 @@ end
 #R Chattamvelli, R Shanmugam, Algorithm AS 310: Computing the Non-central Beta Distribution Function,
 #Applied Statistics, Volume 46, Number 1, 1997, pages 146-156
 
-"""
-	ncbeta(a,b,lambda,x)
+@doc raw"""
+    ncbeta(a,b,lambda,x)
 
 Compute the CDF of the noncentral beta distribution given by
 ```math
-I_{x}(a,b;\\lambda ) = \\sum_{j=0}^{\\infty}q(\\lambda/2,j)I_{x}(a+j,b;0)
+I_{x}(a,b; \lambda) = \sum_{j=0}^{\infty} q(\lambda/2,j) I_{x}(a+j,b;0)
 ```
-For ``\\lambda < 54`` : algorithm suggested by Lenth(1987) in `ncbeta_tail(a,b,lambda,x)`.
-Else for ``\\lambda >= 54`` : modification in Chattamvelli(1997) in `ncbeta_poisson(a,b,lambda,x)` by using both forward and backward recurrences.
+For ``\lambda < 54`` : algorithm suggested by Lenth(1987) in `ncbeta_tail(a,b,lambda,x)`.
+Else for ``\lambda \geq 54``: modification in Chattamvelli(1997) in
+`ncbeta_poisson(a,b,lambda,x)` by using both forward and backward recurrences.
 """
 function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     ans = x
@@ -165,27 +168,28 @@ function ncbeta(a::Float64, b::Float64, lambda::Float64, x::Float64)
     end
 end
 
-"""
+@doc raw"""
     ncF(x,v1,v2,lambda)
 
 Compute CDF of noncentral F distribution given by:
 ```math
-F(x, v1, v2; lambda) = I_{v1*x/(v1*x + v2)}(v1/2, v2/2; \\lambda)
+F(x, v_1, v_2; \lambda) = I_{v_1 x/(v_1 x + v_2)}(v_1/2, v_2/2; \lambda)
 ```
-where ``I_{x}(a,b; lambda)`` is the noncentral beta function computed above.
+where ``I_{x}(a,b; \lambda)`` is the noncentral beta function computed above.
 
-Wikipedia: https://en.wikipedia.org/wiki/Noncentral_F-distribution
+External links:
+[Wikipedia](https://en.wikipedia.org/wiki/Noncentral_F-distribution)
 """
 function ncF(x::Float64, v1::Float64, v2::Float64, lambda::Float64)
     return ncbeta(v1/2, v2/2, lambda, (v1*x)/(v1*x + v2))
 end
 
 function ncbeta(a::T,b::T,lambda::T,x::T) where {T<:Union{Float16,Float32}}
-	T.(ncbeta(Float64(a),Float64(b),Float64(lambda),Float64(x)))
+    T.(ncbeta(Float64(a),Float64(b),Float64(lambda),Float64(x)))
 end
 
 function ncF(x::T,v1::T,v2::T,lambda::T) where {T<:Union{Float16,Float32}}
-	T.(ncF(Float64(x),Float64(v1),Float64(v2),Float64(lambda)))
+    T.(ncF(Float64(x),Float64(v1),Float64(v2),Float64(lambda)))
 end
 
 ncbeta(a::Real,b::Real,lambda::Real,x::Real) = ncbeta(promote(float(a),float(b),float(lambda),float(x))...)
