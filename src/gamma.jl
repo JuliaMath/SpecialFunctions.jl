@@ -2,8 +2,6 @@
 
 using Base.MPFR: MPFRRoundingMode, ROUNDING_MODE
 
-export gamma, loggamma, logabsgamma, beta, logbeta, logabsbeta, logfactorial, logabsbinomial
-
 const ComplexOrReal{T} = Union{T,Complex{T}}
 
 # Bernoulli numbers B_{2k}, using tabulated numerators and denominators from
@@ -28,15 +26,16 @@ function _digamma(z::ComplexOrReal{Float64})
     # argument," Computer Phys. Commun.  vol. 4, pp. 221–226 (1972).
     x = real(z)
     if x <= 0 # reflection formula
-        ψ = -π * cot(π*z)
+        ψ = -π * _cotpi(z)
         z = 1 - z
         x = real(z)
     else
         ψ = zero(z)
     end
-    if x < 7
+    X = 8
+    if x < X
         # shift using recurrence formula
-        n = 7 - floor(Int,x)
+        n = X - floor(Int,x)
         for ν = 1:n-1
             ψ -= inv(z + ν)
         end
@@ -57,6 +56,13 @@ function _digamma(x::BigFloat)
 end
 
 """
+    _cotpi(x) = cot(π * x)
+
+Accurate for integer arguments
+"""
+_cotpi(x) = @static VERSION >= v"1.10.0-DEV.525" ? inv(tanpi(x)) : cospi(x) / sinpi(x)
+
+"""
     trigamma(x)
 
 Compute the trigamma function of `x` (the logarithmic second derivative of `gamma(x)`).
@@ -67,12 +73,13 @@ function _trigamma(z::ComplexOrReal{Float64})
     # via the derivative of the Kölbig digamma formulation
     x = real(z)
     if x <= 0 # reflection formula
-        return (π * csc(π*z))^2 - trigamma(1 - z)
+        return (π / sinpi(z))^2 - trigamma(1 - z)
     end
     ψ = zero(z)
-    if x < 8
+    N = 10
+    if x < N
         # shift using recurrence formula
-        n = 8 - floor(Int,x)
+        n = N - floor(Int,x)
         ψ += inv(z)^2
         for ν = 1:n-1
             ψ += inv(z + ν)^2
@@ -132,12 +139,12 @@ const cotderiv_Q = [cotderiv_q(m) for m in 1:100]
 function cotderiv(m::Integer, z)
     isinf(imag(z)) && return zero(z)
     if m <= 0
-        m == 0 && return π * cot(π*z)
+        m == 0 && return π * _cotpi(z)
         throw(DomainError(m, "`m` must be nonnegative."))
     end
     if m <= length(cotderiv_Q)
         q = cotderiv_Q[m]
-        x = cot(π*z)
+        x = _cotpi(z)
         y = x*x
         s = q[1] + q[2] * y
         t = y
@@ -213,20 +220,22 @@ end
 # is equivalent to Mathematica's Zeta[s,z], and is equivalent to the
 # Hurwitz zeta function for real(z) > 0.
 
-"""
+@doc raw"""
     zeta(s, z)
 
 Generalized zeta function defined by
 ```math
-\\zeta(s, z)=\\sum_{k=0}^\\infty \\frac{1}{((k+z)^2)^{s/2}},
+\zeta(s, z) = \sum_{k=0}^\infty \frac{1}{((k+z)^2)^{s/2}},
 ```
-where any term with ``k+z=0`` is excluded.  For ``\\Re z > 0``,
+where any term with ``k+z = 0`` is excluded.  For ``\Re z > 0``,
 this definition is equivalent to the Hurwitz zeta function
-``\\sum_{k=0}^\\infty (k+z)^{-s}``.
+``\sum_{k=0}^\infty (k+z)^{-s}``.
 
-The Riemann zeta function is recovered as ``\\zeta(s)=\\zeta(s,1)``.
+The Riemann zeta function is recovered as ``\zeta(s) = \zeta(s,1)``.
 
-External links: [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function), [Hurwitz zeta function](https://en.wikipedia.org/wiki/Hurwitz_zeta_function)
+External links:
+[Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function),
+[Hurwitz zeta function](https://en.wikipedia.org/wiki/Hurwitz_zeta_function)
 """
 zeta(s::Number, z::Number) = _zeta(map(float, promote(s, z))...)
 
@@ -328,8 +337,8 @@ end
 """
     polygamma(m, x)
 
-Compute the polygamma function of order `m` of argument `x` (the `(m+1)`th derivative of the
-logarithm of `gamma(x)`)
+Compute the polygamma function of order `m` of argument `x` (the `(m+1)`th
+derivative of the logarithm of `gamma(x)`)
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Polygamma_function)
 
@@ -398,13 +407,13 @@ function _invdigamma(y::Float64)
     return x_new
 end
 
-"""
+@doc raw"""
     zeta(s)
 
 Riemann zeta function
 
 ```math
-\\zeta(s)=\\sum_{n=1}^\\infty \\frac{1}{n^s}\\quad\\text{for}\\quad s\\in\\mathbb{C}.
+\zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s}\quad\text{for}\quad s\in\mathbb{C}.
 ```
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Riemann_zeta_function)
@@ -476,10 +485,13 @@ function _zeta(x::BigFloat)
     return z
 end
 
-"""
+@doc raw"""
     eta(s)
 
-Dirichlet eta function ``\\eta(s) = \\sum^\\infty_{n=1}(-1)^{n-1}/n^{s}``.
+Dirichlet eta function
+```math
+\eta(s) = \sum_{n=1}^\infty (-1)^{n-1} / n^{s}.
+```
 """
 eta(s::Number) = _eta(float(s))
 
@@ -544,17 +556,37 @@ Compute the gamma function for complex ``z``, defined by
     n!
     & \text{for} \quad z = n+1 \;, n = 0,1,2,\dots
     \\
-    \int_0^\infty t^{z-1} {\mathrm e}^{-t} \, {\mathrm d}t
+    \int_0^\infty t^{z-1} e^{-t} \, \mathrm{d}t
     & \text{for} \quad \Re(z) > 0
 \end{cases}
 ```
 and by analytic continuation in the whole complex plane.
 
+# Examples
+
+```jldoctest
+julia> gamma(0)
+Inf
+
+julia> gamma(1)
+1.0
+
+julia> gamma(2)
+1.0
+
+julia> gamma(0.5)^2 ≈ π
+true
+
+julia> gamma(4 + 1) == prod(1:4) == factorial(4)
+true
+```
+
 External links:
-[DLMF](https://dlmf.nist.gov/5.2.1),
+[DLMF 5.2.1](https://dlmf.nist.gov/5.2.1),
 [Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
 
-See also: [`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log \Gamma(z)`` and
+See also:
+[`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log \Gamma(z)`` and
 [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number)) for
 the upper incomplete gamma function ``\Gamma(a,z)``.
 
@@ -574,9 +606,9 @@ function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64})
     @inbounds return Float64(Base._fact_table64[n-1])
 end
 
-_gamma(x::Float64)       = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
-_gamma(x::Float32)       = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
-_gamma(x::Float16)       = Float16(_gamma(Float32(x)))
+_gamma(x::Float64) = nan_dom_err(ccall((:tgamma, libopenlibm), Float64, (Float64,), x), x)
+_gamma(x::Float32) = nan_dom_err(ccall((:tgammaf, libopenlibm), Float32, (Float32,), x), x)
+_gamma(x::Float16) = Float16(_gamma(Float32(x)))
 
 function _gamma(x::BigFloat)
     isnan(x) && return x
@@ -592,7 +624,7 @@ _gamma(z::Complex) = exp(loggamma(z))
     logabsgamma(x)
 
 Compute the logarithm of absolute value of [`gamma`](@ref) for
-[`Real`](@ref) `x`and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
+`Real` `x` and returns a tuple `(log(abs(gamma(x))), sign(gamma(x)))`.
 
 See also [`loggamma`](@ref).
 """
@@ -622,11 +654,11 @@ logfactorial(x::Integer) = x < 0 ? throw(DomainError(x, "`x` must be non-negativ
 """
     loggamma(x)
 
-Computes the logarithm of [`gamma`](@ref) for given `x`. If `x` is a `Real`, then it
-throws a `DomainError` if `gamma(x)` is negative.
+Computes the logarithm of [`gamma`](@ref) for given `x`. If `x` is a `Real`,
+then it throws a `DomainError` if `gamma(x)` is negative.
 
 If `x` is complex, then `exp(loggamma(x))` matches `gamma(x)` (up to floating-point error),
-but `loggamma(x)` may differ from `log(gamma(x))` by an integer multiple of ``2\\pi i``
+but `loggamma(x)` may differ from `log(gamma(x))` by an integer multiple of ``2πi``
 (i.e. it may employ a different branch cut).
 
 See also [`logabsgamma`](@ref) for real `x`.
@@ -734,10 +766,10 @@ function loggamma_asymptotic(z::Complex{Float64})
                          6.4102564102564102564102561e-03,-2.9550653594771241830065352e-02)
 end
 
-"""
+@doc raw"""
     beta(x, y)
 
-Euler integral of the first kind ``\\operatorname{B}(x,y) = \\Gamma(x)\\Gamma(y)/\\Gamma(x+y)``.
+Euler integral of the first kind ``\operatorname{B}(x,y) = \Gamma(x)\Gamma(y)/\Gamma(x+y)``.
 """
 function beta(a::Number, b::Number)
     lab, sign = logabsbeta(a, b)
@@ -752,10 +784,10 @@ if Base.MPFR.version() >= v"4.0.0"
     end
 end
 
-"""
+@doc raw"""
     logbeta(x, y)
 
-Natural logarithm of the [`beta`](@ref) function ``\\log(|\\operatorname{B}(x,y)|)``.
+Natural logarithm of the [`beta`](@ref) function ``\log(|\operatorname{B}(x,y)|)``.
 
 See also [`logabsbeta`](@ref).
 """
@@ -770,7 +802,8 @@ end
 """
     logabsbeta(x, y)
 
-Compute the natural logarithm of the absolute value of the [`beta`](@ref) function, returning a tuple `(log(abs(beta(x,y))), sign(beta(x,y)))`
+Compute the natural logarithm of the absolute value of the [`beta`](@ref)
+function, returning a tuple `(log(abs(beta(x,y))), sign(beta(x,y)))`
 
 See also [`logbeta`](@ref).
 """
@@ -812,10 +845,13 @@ logabsbeta(a::Number, b::Number) = loggamma(a) + loggamma(b) - loggamma(a + b), 
 """
     logabsbinomial(n, k)
 
-Accurate natural logarithm of the absolute value of the [`binomial`](@ref)
+Accurate natural logarithm of the absolute value of the `binomial`
 coefficient `binomial(n, k)` for large `n` and `k` near `n/2`.
 
 Returns a tuple `(log(abs(binomial(n,k))), sign(binomial(n,k)))`.
+
+External links
+[`Base.binomial`](https://docs.julialang.org/en/v1/base/math/#Base.binomial)
 """
 function logabsbinomial(n::T, k::T) where {T<:Integer}
     S = float(T)

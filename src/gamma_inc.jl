@@ -30,11 +30,12 @@ const d6  = [-.592166437353694E-03]
 const d70 = .344367606892378E-03
 const d80 = -.652623918595309E-03
 
-"""
-   rgamma1pm1(a)
+@doc raw"""
+    rgamma1pm1(a)
 
-   Computation of ``1/Gamma(a+1) - 1`` for `-0.5<=a<=1.5` : ``1/\\Gamma (a+1) - 1``
-   Uses the relation `gamma(a+1) = a*gamma(a)`.
+Computation of ``1/\Gamma(a+1) - 1`` for `-0.5<=a<=1.5`: ``1/\Gamma (a+1) - 1``.
+
+Uses the relation `gamma(a+1) = a*gamma(a)`.
 """
 function rgamma1pm1(a::Float64)
     @assert -0.5 <= a <= 1.5
@@ -56,10 +57,10 @@ function rgamma1pm1(a::Float64)
     end
 end
 
-"""
+@doc raw"""
     rgammax(a,x)
 
-Evaluation of ``1/\\Gamma(a) e^{-x} x^{a}``. Based on `DRCOMP` from the `NSWC` library.
+Evaluation of ``1/\Gamma(a) e^{-x} x^{a}``. Based on `DRCOMP` from the `NSWC` library.
 """
 function rgammax(a::Float64, x::Float64)
     if x == 0.0
@@ -81,10 +82,10 @@ function rgammax(a::Float64, x::Float64)
     end
 end
 
-"""
+@doc raw"""
     auxgam(x)
 
-Compute function `g` in ``1/\\Gamma(x+1) = 1+x*(x-1)*g(x)``, `-1 <= x <= 1`.
+Compute function `g` in ``1/\Gamma(x+1) = 1 + x (x-1) g(x)``, `-1 <= x <= 1`.
 """
 function auxgam(x::Float64)
     @assert -1 <= x <= 1
@@ -96,10 +97,10 @@ function auxgam(x::Float64)
     end
 end
 
-"""
+@doc raw"""
     loggamma1p(x)
 
-Compute ``log(\\Gamma(1+x))`` for `-1 < x <= 1`.
+Compute ``\log(\Gamma(1+x))`` for `-1 < x <= 1`.
 """
 function loggamma1p(x::Float64)
     @assert -1 < x <= 1
@@ -130,10 +131,10 @@ function chepolsum(x::Float64, a::Array{Float64,1})
     end
 end
 
-"""
+@doc raw"""
     stirling_error(x)
 
-Compute ``\\ln{\\Gamma(x)} - (x-0.5)*\\ln{x} + x - \\ln{(2\\pi)}/2``. Adapted from `stirling` in `IncgamFI`.
+Compute ``\ln{\Gamma(x)} - (x-0.5)*\ln{x} + x - \ln{(2\pi)}/2``. Adapted from `stirling` in `IncgamFI`.
 """
 function stirling_error(x::Float64)
     if x < floatmin(Float64)*1000.0
@@ -161,8 +162,9 @@ end
     gammax(x)
 
 ```math
-\operatorname{gammax}(x) = \begin{cases}e^{\operatorname{stirling}(x)}\quad\quad\quad \text{if} \quad x>0,\\
-\frac{\Gamma(x)}{\sqrt{2 \pi}e^{-x + (x-0.5)\operatorname{log}(x)}},\quad \text{if} \quad x\leq 0.
+\operatorname{gammax}(x) = \begin{cases}
+e^{\operatorname{stirling}(x)}\quad\quad\quad \text{if} \quad x>0,\\
+\dfrac{\Gamma(x)}{\sqrt{2 \pi}e^{-x + (x-0.5)\log(x)}},\quad \text{if} \quad x\leq 0.
 \end{cases}
 ```
 """
@@ -176,10 +178,10 @@ function gammax(x::Float64)
     end
 end
 
-"""
+@doc raw"""
     lambdaeta(eta)
 
-Compute the value of ``\\lambda`` satisfying ``\\eta^{2}/2 = \\lambda-1-\\log{\\lambda}``.
+Compute the value of ``\lambda`` satisfying ``\eta^{2}/2 = \lambda-1-\log{\lambda}``.
 """
 function lambdaeta(eta::Float64)
     s = eta*eta*0.5
@@ -217,10 +219,10 @@ function lambdaeta(eta::Float64)
     return la
 end
 
-"""
-Computing the first coefficient for the expansion :
+@doc raw"""
+Computing the first coefficient for the expansion:
 ```math
-\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+\epsilon (\eta_{0},a) = \epsilon_{1}(\eta_{0},a)/a + \epsilon_{2}(\eta_{0},a)/a^{2} + \epsilon_{3}(\eta_{0},a)/a^{3}
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -241,10 +243,11 @@ function coeff1(eta::Float64)
     end
     return coeff1
 end
-"""
-Computing the second coefficient for the expansion :
+
+@doc raw"""
+Computing the second coefficient for the expansion:
 ```math
-\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+\epsilon (\eta_{0},a) = \epsilon_{1} (\eta_{0},a)/a + \epsilon_{2} (\eta_{0},a)/a^{2} + \epsilon_{3} (\eta_{0},a)/a^{3}
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -289,10 +292,11 @@ function coeff2(eta::Float64)
     end
     return coeff2
 end
-"""
-Computing the third and last coefficient for the expansion :
+
+@doc raw"""
+Computing the third and last coefficient for the expansion:
 ```math
-\\epsilon (\\eta_{0},a) = \\epsilon_{1} (\\eta_{0},a)/a + \\epsilon_{2} (\\eta_{0},a)/a^{2} + \\epsilon_{3} (\\eta_{0},a)/a^{3}
+\epsilon(\eta_{0},a) = \epsilon_{1}(\eta_{0},a)/a + \epsilon_{2}(\eta_{0},a)/a^{2} + \epsilon_{3}(\eta_{0},a)/a^{3}
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -367,16 +371,16 @@ function coeff3(eta::Float64)
 end
 
 
-"""
+@doc raw"""
     gamma_inc_cf(a, x, ind)
 
-Computes ``P(a,x)`` by continued fraction expansion given by :
+Computes ``P(a,x)`` by continued fraction expansion given by:
 ```math
-R(a,x) * \\frac{1}{1-\\frac{z}{a+1+\\frac{z}{a+2-\\frac{(a+1)z}{a+3+\\frac{2z}{a+4-\\frac{(a+2)z}{a+5+\\frac{3z}{a+6-\\dots}}}}}}}
+R(a,x) \cdot \cfrac{1}{1-\cfrac{z}{a+1+\cfrac{z}{a+2-\cfrac{(a+1)z}{a+3+\cfrac{2z}{a+4-\cfrac{(a+2)z}{a+5+\cfrac{3z}{a+6-\ddots}}}}}}}
 ```
 Used when `1 <= a <= BIG` and `x < x0`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.9.2)
+External links: [DLMF 8.9.2](https://dlmf.nist.gov/8.9.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -406,16 +410,17 @@ function gamma_inc_cf(a::Float64, x::Float64, ind::Integer)
     q = rgammax(a, x)*a2n
     return (1.0 - q, q)
 end
-"""
+
+@doc raw"""
     gamma_inc_taylor(a, x, ind)
 
-Compute ``P(a,x)`` using Taylor Series for P/R given by :
+Compute ``P(a,x)`` using Taylor Series for P/R given by:
 ```math
-R(a,x)/a * (1 + \\sum_{n=1}^{\\infty} x^{n}/((a+1)(a+2)...(a+n)))
+R(a,x)/a * (1 + \sum_{n=1}^{\infty} x^{n}/((a+1)(a+2)...(a+n)))
 ```
 Used when `1 <= a <= BIG` and `x <= max{a, ln 10}`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.11.2)
+External links: [DLMF 8.11.2](https://dlmf.nist.gov/8.11.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -447,16 +452,17 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     
     return (p, 1.0 - p)
 end
-"""
+
+@doc raw"""
     gamma_inc_asym(a, x, ind)
 
 Compute ``P(a,x)`` using asymptotic expansion given by:
 ```math
-R(a,x)/a * (1 + \\sum_{n=1}^{N-1}(a_{n}/x^{n} + \\Theta _{n}a_{n}/x^{n}))
+R(a,x)/a * (1 + \sum_{n=1}^{N-1}(a_{n}/x^{n} + \Theta _{n}a_{n}/x^{n}))
 ```
 where `R(a,x) = rgammax(a,x)`. Used when `1 <= a <= BIG` and `x >= x0`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.11.2)
+External links: [DLMF 8.11.2](https://dlmf.nist.gov/8.11.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -487,16 +493,17 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     
     return (1.0 - q, q)
 end
-"""
+
+@doc raw"""
     gamma_inc_taylor_x(a,x,ind)
 
-Computes ``P(a,x)`` based on Taylor expansion of ``P(a,x)/x**a`` given by:
+Computes ``P(a,x)`` based on Taylor expansion of ``P(a,x)/x^a`` given by:
 ```math
-J = -a * \\sum_{1}^{\\infty} (-x)^{n}/((a+n)n!)
+J = -a * \sum_{1}^{\infty} (-x)^{n}/((a+n)n!)
 ```
-and ``P(a,x)/x**a`` is given by :
+and ``P(a,x)/x^a`` is given by:
 ```math
-(1 - J)/ \\Gamma(a+1)
+(1 - J) / \Gamma(a+1)
 ```
 resulting from term-by-term integration of `gamma_inc(a,x,ind)`.
 This is used when `a < 1` and `x < 1.1` - Refer Eqn (9) in the paper.
@@ -534,21 +541,24 @@ function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
     end
 end
 
-"""
+@doc raw"""
     gamma_inc_minimax(a,x,z)
 
 Compute ``P(a,x)`` using minimax approximations given by :
 ```math
-1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
+1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ``` where
 ```math
-T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
+T(a,\lambda) = \sum_{0}^{N} c_{k}(z)a^{-k}
 ```
 
-This is a higher accuracy approximation of Temme expansion, which deals with the region near `a ≈ x` with `a` large.
-Refer Appendix F in the paper for the extensive set of coefficients calculated using Brent's multiple precision arithmetic(set at 50 digits) in BRENT, R. P. A FORTRAN multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70 .
+This is a higher accuracy approximation of Temme expansion, which deals with
+the region near `a ≈ x` with `a` large.
+Refer Appendix F in the paper for the extensive set of coefficients calculated
+using Brent's multiple precision arithmetic(set at 50 digits) in
+> Brent, R. P. A Fortran multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70, doi: 10.1145/355769.355775.
 
-External links: [DLMF](https://dlmf.nist.gov/8.12.8)
+External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -598,19 +608,20 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
     end
 end
 
-"""
+@doc raw"""
     gamma_inc_temme(a, x, z)
 
 Compute ``P(a,x)`` using Temme's expansion given by :
 ```math
-1/2 * erfc(\\sqrt{y}) - e^{-y}/\\sqrt{2\\pi*a}* T(a,\\lambda)
+1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ``` where
 ```math
-T(a,\\lambda) = \\sum_{0}^{N} c_{k}(z)a^{-k}
+T(a,\lambda) = \sum_{0}^{N} c_{k}(z)a^{-k}
 ```
-This mainly solves the problem near the region when `a ≈ x` with a large, and is a lower accuracy version of the minimax approximation.
+This mainly solves the problem near the region when `a ≈ x` with a large, and
+is a lower accuracy version of the minimax approximation.
 
-External links: [DLMF](https://dlmf.nist.gov/8.12.8)
+External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -632,20 +643,20 @@ function gamma_inc_temme(a::Float64, x::Float64, z::Float64)
     end
 end
 
-"""
+@doc raw"""
     gamma_inc_temme_1(a, x, z, ind)
 
-Computes ``P(a,x)`` using simplified Temme expansion near ``y=0`` by :
+Computes ``P(a,x)`` using simplified Temme expansion near ``y=0`` by:
 ```math
-E(y) - (1 - y)/\\sqrt{2\\pi*a} * T(a,\\lambda)
+E(y) - (1 - y)/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ```
 where
 ```math
-E(y) = 1/2 - (1 - y/3)*(\\sqrt(y/\\pi))
+E(y) = 1/2 - (1 - y/3) ⋅ \sqrt{y/\pi}
 ```
-Used instead of it's previous function when ``\\sigma <= e_{0}/\\sqrt{a}``.
+Used instead of it's previous function when ``\sigma \leq e_{0}/\sqrt{a}``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.12.8)
+External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 """
 function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     iop = ind + 1
@@ -723,16 +734,16 @@ function gamma_inc_fsum(a::Float64, x::Float64)
 
 end
 
-"""
+@doc raw"""
     gamma_inc_inv_psmall(a, logr)
 
 Compute `x0` - initial approximation when `p` is small.
 Here we invert the series in Eqn (2.20) in the paper and write the inversion problem as:
 ```math
-x = r\\left[1 + a\\sum_{k=1}^{\\infty}\\frac{(-x)^{n}}{(a+n)n!}\\right]^{-1/a},
+x = r\left[1 + a\sum_{k=1}^{\infty}\frac{(-x)^{n}}{(a+n)n!}\right]^{-1/a},
 ```
-where ``r = (p\\Gamma(1+a))^{1/a}``
-Inverting this relation we obtain ``x = r + \\sum_{k=2}^{\\infty}c_{k}r^{k}``.
+where ``r = (p\Gamma(1+a))^{1/a}``
+Inverting this relation we obtain ``x = r + \sum_{k=2}^{\infty} c_{k} r^{k}``.
 """
 function gamma_inc_inv_psmall(a::Float64, logr::Float64)
     r    = exp(logr)
@@ -751,15 +762,15 @@ function gamma_inc_inv_psmall(a::Float64, logr::Float64)
     return x0
 end
 
-"""
+@doc raw"""
     gamma_inc_inv_qsmall(a, q, qgammaxa)
 
-Compute `x0` - initial approximation when `q` is small from ``e^{-x_{0}} x_{0}^{a} = q \\Gamma(a)``.
+Compute `x0` - initial approximation when `q` is small from ``e^{-x_{0}} x_{0}^{a} = q \Gamma(a)``.
 Asymptotic expansions Eqn (2.29) in the paper is used here and higher approximations are obtained using
 ```math
-x \\sim x_{0} - L + b \\sum_{k=1}^{\\infty} d_{k}/x_{0}^{k}
+x \sim x_{0} - L + b \sum_{k=1}^{\infty} d_{k}/x_{0}^{k}
 ```
-where ``b = 1-a``, ``L = \\ln{x_0}``.
+where ``b = 1-a``, ``L = \ln{x_0}``.
 """
 function gamma_inc_inv_qsmall(a::Float64, q::Float64, qgammaxa::Float64)
     b = 1.0 - a
@@ -785,21 +796,22 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64, qgammaxa::Float64)
     return x0
 end
 
-"""
+@doc raw"""
     gamma_inc_inv_alarge(a, minpq, pcase)
 
 Compute `x0` - initial approximation when `a` is large.
-The inversion problem is rewritten as :
+The inversion problem is rewritten as:
 ```math
-0.5 \\operatorname{erfc}(\\eta \\sqrt{a/2}) + R_{a}(\\eta) = q
+0.5 \operatorname{erfc}(\eta \sqrt{a/2}) + R_{a}(\eta) = q
 ```
-For large values of `a` we can write: ``\\eta(q,a) = \\eta_{0}(q,a) + \\epsilon(\\eta_{0},a)``
+For large values of `a` we can write: ``\eta(q,a) = \eta_{0}(q,a) + \epsilon(\eta_{0},a)``
 and it is possible to expand:
 ```math
-\\epsilon(\\eta_{0},a) = \\epsilon_{1}(\\eta_{0},a)/a + \\epsilon_{2}(\\eta_{0},a)/a^{2} + \\epsilon_{3}(\\eta_{0},a)/a^{3} + ...
+\epsilon(\eta_{0},a) = \epsilon_{1}(\eta_{0},a)/a + \epsilon_{2}(\eta_{0},a)/a^{2} + \epsilon_{3}(\eta_{0},a)/a^{3} + \cdots
 ```
-which is calculated by coeff1, coeff2 and coeff3 functions below.
-This returns a tuple `(x0,fp)`, where `fp` is computed since it's an approximation for the coefficient after inverting the original power series.
+which is calculated by [`coeff1`](@ref), [`coeff2`](@ref) and [`coeff3`](@ref) functions below.
+This returns a tuple `(x0,fp)`, where `fp` is computed since it's an
+approximation for the coefficient after inverting the original power series.
 """
 function gamma_inc_inv_alarge(a::Float64, minpq::Float64, pcase::Bool)
     r = erfcinv(2*minpq)
@@ -815,27 +827,32 @@ end
 # Volume 12 Issue 4, Dec. 1986 Pages 377-393
 # doi>10.1145/22721.23109
 
-"""
+@doc raw"""
     gamma_inc(a,x,IND=0)
 
 Returns a tuple ``(p, q)`` where ``p + q = 1``, and
-``p=P(a,x)`` is the Incomplete gamma function ratio given by:
+``p = P(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-P(a,x)=\\frac{1}{\\Gamma (a)} \\int_{0}^{x} e^{-t}t^{a-1} dt.
+P(a,x) = \frac{1}{\Gamma (a)} \int_{0}^{x} e^{-t}t^{a-1} \mathrm{d}t.
 ```
-and ``q=Q(a,x)`` is the Incomplete gamma function ratio given by:
+and ``q = Q(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-Q(a,x)=\\frac{1}{\\Gamma (a)} \\int_{x}^{\\infty} e^{-t}t^{a-1} dt.
+Q(a,x) = \frac{1}{\Gamma (a)} \int_{x}^{\infty} e^{-t}t^{a-1} \mathrm{d}t.
 ```
 In terms of these, the lower incomplete gamma function is
-``\\gamma(a,x) = P(a,x) \\Gamma(a)`` and the upper incomplete
-gamma function is ``\\Gamma(a,x) = Q(a,x) \\Gamma(a)``.
+``\gamma(a,x) = P(a,x) \Gamma(a)`` and the upper incomplete
+gamma function is ``\Gamma(a,x) = Q(a,x) \Gamma(a)``.
 
-`IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy, `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
+`IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy,
+`IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links:
+[DLMF 8.2.4](https://dlmf.nist.gov/8.2.4),
+[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
-See also [`gamma(z)`](@ref SpecialFunctions.gamma), [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
+See also
+[`gamma(z)`](@ref SpecialFunctions.gamma),
+[`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)
 """
 gamma_inc(a::Real,x::Real,ind::Integer=0) = _gamma_inc(promote(float(a),float(x))...,ind)
 
@@ -931,7 +948,10 @@ end
 
 function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, a, x, ROUNDING_MODE[])
+    ccall((:mpfr_gamma_inc, :libmpfr),
+          Int32,
+          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
+          z, a, x, ROUNDING_MODE[])
     q = z/gamma(a)
     return (1.0 - q, q)
 end
@@ -963,9 +983,12 @@ end
 """
     gamma_inc_inv(a,p,q)
 
-Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in ``P(a,x)=p`` and ``Q(a,x)=q``.
+Inverts the `gamma_inc(a,x)` function, by computing `x` given `a`,`p`,`q` in
+``P(a,x) = p`` and ``Q(a,x) = q``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2.4), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links:
+[DLMF 8.2.4](https://dlmf.nist.gov/8.2.4),
+[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc).
 """
@@ -1078,23 +1101,25 @@ promotereal(x::Real, y::Number) = let (u, v) = promote(x, y); real(u), v; end
 promotereal(x::Number, y::Real) = let (u, v) = promote(x, y); u, real(v); end
 promotereal(x, y) = promote(x,y)
 
-"""
+@doc raw"""
     gamma(a,x)
 
 Returns the upper incomplete gamma function
 ```math
-\\Gamma(a,x) = \\int_x^\\infty t^{a-1} e^{-t} dt \\,
+\Gamma(a,x) = \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
 ```
 supporting arbitrary real or complex `a` and `x`.
 
-(The ordinary gamma function [`gamma(x)`](@ref) corresponds to ``\\Gamma(a) = \\Gamma(a,0)``.
+(The ordinary gamma function [`gamma(x)`](@ref) corresponds to ``\Gamma(a) = \Gamma(a,0)``.
 See also the [`gamma_inc`](@ref) function to compute both the upper and lower
-(``\\gamma(a,x)``) incomplete gamma functions scaled by ``\\Gamma(a)``.
+(``\gamma(a,x)``) incomplete gamma functions scaled by ``\Gamma(a)``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.2.2), [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
+External links:
+[DLMF 8.2.2](https://dlmf.nist.gov/8.2.2),
+[Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 """
-gamma(a::Number,x::Number) = _gamma(promotereal(float(a), float(x))...)
-gamma(a::Integer,x::Number) = _gamma(a, float(x))
+gamma(a::Number,  x::Number) = _gamma(promotereal(float(a), float(x))...)
+gamma(a::Integer, x::Number) = _gamma(a, float(x))
 
 function _gamma(a::Number, x::Number)
     if a isa Real && x isa Real && !isfinite(a*x)
@@ -1137,17 +1162,17 @@ function _gamma_big(a::Real,x::Real)
     return z
 end
 
-"""
+@doc raw"""
     loggamma(a,x)
 
 Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
 ```math
-\\log \\Gamma(a,x) = \\log \\int_x^\\infty t^{a-1} e^{-t} dt \\,
+\log \Gamma(a,x) = \log \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
 ```
 supporting arbitrary real or complex `a` and `x`.
 
 If `a` and/or `x` is complex, then `exp(loggamma(a,x))` matches `gamma(a,x)` (up to floating-point error),
-but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2\\pi i``
+but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2\pi i``
 (i.e. it may employ a different branch cut).
 
 See also [`loggamma(x)`](@ref).

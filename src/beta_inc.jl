@@ -4,10 +4,10 @@ const exparg_n = log(nextfloat(floatmin(Float64)))
 const exparg_p =  log(prevfloat(floatmax(Float64)))
 
 #COMPUTE log(gamma(b)/gamma(a+b)) when b >= 8
-"""
+@doc raw"""
     loggammadiv(a,b)
 
-Computes ``log(\\Gamma(b)/\\Gamma(a+b))`` when b >= 8
+Computes ``\log(\Gamma(b)/\Gamma(a+b))`` when `b >= 8`
 """
 loggammadiv(a::Number, b::Number) = _loggammadiv(promote(float(a), float(b))...)
 
@@ -48,8 +48,7 @@ end
 """
     stirling_corr(a0,b0)
 
-Compute stirling(a0) + stirling(b0) - stirling(a0 + b0)
-for a0, b0 >= 8
+Compute `stirling(a0) + stirling(b0) - stirling(a0 + b0)` for `a0, b0 >= 8`
 """
 function stirling_corr(a0::Float64, b0::Float64)
     a = min(a0, b0)
@@ -74,10 +73,10 @@ function stirling_corr(a0::Float64, b0::Float64)
     return @horner(t, .833333333333333E-01, -.277777777760991E-02, .793650666825390E-03, -.595202931351870E-03, .837308034031215E-03, -.165322962780713E-02)/a + w
 end
 
-"""
+@doc raw"""
     esum(mu,x)
 
-Compute ``e^{mu+x}``
+Compute ``e^{\mu+x}``
 """
 function esum(mu::Float64, x::Float64)
     if x > 0.0
@@ -93,10 +92,10 @@ function esum(mu::Float64, x::Float64)
     end
 end
 
-"""
+@doc raw"""
     beta_integrand(a, b, x, y, mu=0.0)
 
-Compute ``e^{mu} * x^{a}y^{b}/B(a,b)``
+Compute ``e^{\mu} x^a y^b / B(a,b)``
 """
 function beta_integrand(a::Float64, b::Float64, x::Float64, y::Float64, mu::Float64=0.0)
     a0, b0 = minmax(a,b)
@@ -178,13 +177,15 @@ function beta_integrand(a::Float64, b::Float64, x::Float64, y::Float64, mu::Floa
     end
 end
 
-"""
+@doc raw"""
     beta_inc_cont_fraction(a,b,x,y,lambda,epps)
 
 Compute ``I_{x}(a,b)`` using continued fraction expansion when `a, b > 1`.
-It is assumed that ``\\lambda = (a+b)*y - b``
+It is assumed that ``\lambda = (a+b)*y - b``
 
-External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -214,45 +215,47 @@ function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, 
     #CONT FRACTION
 
     while true
-     n += 1.0
-     t = n/a
-     w = n*(b - n)*x
-     e = a/s
-     alpha = (p*(p+c0)*e*e)*(w*x)
-     e = (1.0 + t)/(c1 + 2*t)
-     beta = n + w/s +e*(c + n*yp1)
-     p = 1.0 + t
-     s += 2.0
+        n += 1.0
+        t = n/a
+        w = n*(b - n)*x
+        e = a/s
+        alpha = (p*(p+c0)*e*e)*(w*x)
+        e = (1.0 + t)/(c1 + 2*t)
+        beta = n + w/s +e*(c + n*yp1)
+        p = 1.0 + t
+        s += 2.0
 
-     #update an, bn, anp1, bnp1
-     t = alpha*an  + beta*anp1
-     an = anp1
-     anp1 = t
-     t = alpha*bn + beta*bnp1
-     bn = bnp1
-     bnp1 = t
+        #update an, bn, anp1, bnp1
+        t = alpha*an  + beta*anp1
+        an = anp1
+        anp1 = t
+        t = alpha*bn + beta*bnp1
+        bn = bnp1
+        bnp1 = t
 
-     r0 = r
-     r = anp1/bnp1
-     if abs(r - r0) <= epps*r
-        break
-     end
-     #rescale
-     an /= bnp1
-     bn /= bnp1
-     anp1 = r
-     bnp1 = 1.0
+        r0 = r
+        r = anp1/bnp1
+        if abs(r - r0) <= epps*r
+            break
+        end
+        #rescale
+        an /= bnp1
+        bn /= bnp1
+        anp1 = r
+        bnp1 = 1.0
     end
     return ans*r
 end
 
-"""
+@doc raw"""
     beta_inc_asymptotic_symmetric(a,b,lambda,epps)
 
 Compute ``I_{x}(a,b)`` using asymptotic expansion for `a, b >= 15`.
-It is assumed that ``\\lambda = (a+b)*y - b``.
+It is assumed that ``\lambda = (a+b)*y - b``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -353,7 +356,9 @@ end
 Evaluation of ``I_{x}(a,b)`` using asymptotic expansion.
 It is assumed `a >= 15` and `b <= 1`, and epps is tolerance used.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 """
@@ -431,7 +436,9 @@ end
 
 Variant of `BPSER(A,B,X,EPS)`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -475,7 +482,9 @@ end
 
 Another variant of `BPSER(A,B,X,EPS)`.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -511,14 +520,16 @@ function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float6
 end
 
 #B .LE. 1 OR B*X .LE. 0.7
-"""
+@doc raw"""
     beta_inc_power_series(a, b, x, epps)
 
-Computes ``I_x(a,b)`` using power series :
+Computes ``I_x(a,b)`` using power series:
 ```math
-I_{x}(a,b) = G(a,b)x^{a}/a (1 + a\\sum_{j=1}^{\\infty}((1-b)(2-b)...(j-b)/j!(a+j)) x^{j})
+I_{x}(a,b) = G(a,b) x^{a}/a \left[1 + a \sum_{j=1}^{\infty} ((1-b)(2-b)\dots(j-b)/j!(a+j)) x^{j}\right]
 ```
-External links: [DLMF](https://dlmf.nist.gov/8.17.22), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 
@@ -616,9 +627,11 @@ end
     beta_inc_diff(a, b, x, y, n, epps)
 
 Compute ``I_{x}(a,b) - I_{x}(a+n,b)`` where `n` is positive integer and epps is tolerance.
-A generalised version of [DLMF](https://dlmf.nist.gov/8.17.20).
+A generalised version of [DLMF 8.17.20](https://dlmf.nist.gov/8.17.20).
 
-External links: [DLMF](https://dlmf.nist.gov/8.17.20), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.20](https://dlmf.nist.gov/8.17.20),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc`](@ref)
 """
@@ -714,17 +727,19 @@ end
 #DLMF : https://dlmf.nist.gov/8.17#E1
 #Wikipedia : https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function
 
-"""
+@doc raw"""
     beta_inc(a, b, x, y=1-x)
 
 Return a tuple ``(I_{x}(a,b), 1-I_{x}(a,b))`` where ``I_{x}(a,b)`` is the regularized
 incomplete beta function given by
 ```math
-I_{x}(a,b) = \\frac{1}{B(a,b)} \\int_{0}^{x} t^{a-1}(1-t)^{b-1} dt,
+I_{x}(a,b) = \frac{1}{B(a,b)} \int_{0}^{x} t^{a-1}(1-t)^{b-1} \mathrm{d}t,
 ```
-where ``B(a,b) = \\Gamma(a)\\Gamma(b)/\\Gamma(a+b)``.
+where ``B(a,b) = \Gamma(a)\Gamma(b)/\Gamma(a+b)``.
 
-External links: [DLMF](https://dlmf.nist.gov/8.17.1), [Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
+External links:
+[DLMF 8.17.1](https://dlmf.nist.gov/8.17.1),
+[Wikipedia](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function)
 
 See also: [`beta_inc_inv`](@ref)
 """
@@ -754,7 +769,9 @@ function _beta_inc(a::Float64, b::Float64, x::Float64, y::Float64=1-x)
         end
     end
 
-    if x == 0.0
+    if isnan(x) || isnan(y) || isnan(a) || isnan(b)
+        return (NaN, NaN)
+    elseif x == 0.0
         return (0.0, 1.0)
     elseif y == 0.0
         return (1.0, 0.0)
@@ -1006,9 +1023,9 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
             prev = max(sq, fpu)
         end
 
-	adj = p_approx
-	tx = x - adj
-	while prev <= (sq = adj^2) || tx < 0.0 || tx > 1.0
+        adj = p_approx
+        tx = x - adj
+        while prev <= (sq = adj^2) || tx < 0.0 || tx > 1.0
             adj /= 3.0
             tx = x - adj
         end
@@ -1036,4 +1053,3 @@ function _beta_inc_inv(a::T, b::T, p::T, q::T) where {T<:Union{Float16, Float32}
     x, y = _beta_inc_inv(Float64(a), Float64(b), Float64(p), Float64(q))
     T(x), T(y)
 end
-
