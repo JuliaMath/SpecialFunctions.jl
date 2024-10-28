@@ -478,7 +478,7 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     # sum the smaller terms directly
     sm = t = ts[next_t]
     amn = a - next_t
-    while abs(t) > acc
+    while abs(t) >= acc
         amn -= 1.0
         t *= amn / x
         sm += t
