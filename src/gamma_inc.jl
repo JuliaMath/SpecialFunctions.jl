@@ -426,39 +426,29 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
-    wk = zeros(30)
-    flag = false
-    apn = a + 1.0
-    t = x/apn
-    wk[1] = t
-    loop = 2
-    for indx = 2:20
+    tolerance = 0.5acc
+
+    # compute first 21 terms
+    ts = cumprod(ntuple(i -> x / (a + i), Val(21)))
+    
+    # sum the smaller terms directly
+    first_small_t = something(findfirst(<(1.0e-3), ts), 21)
+    sm = t = ts[first_small_t]
+    apn = a + first_small_t
+    while t > tolerance
         apn += 1.0
-        t *= x/apn
-        if t <= 1.0e-3
-            loop = indx
-            flag = true
-            break
-        end
-        wk[indx] = t
-    end
-    if !flag
-        loop = 20
-    end
-    sm = t
-    tol = 0.5*acc #tolerance
-    while true
-        apn += 1.0
-        t *= x/apn
+        t *= x / apn
         sm += t
-        if t <= tol
-            break
-        end
     end
-    for j = loop-1:-1:1
-        sm += wk[j]
+
+    # sum terms from small to large
+    last_large_t = first_small_t - 1
+    for j ∈ last_large_t:(-1):1
+        sm += ts[j]
     end
-    p = (rgammax(a, x)/a)*(1.0 + sm)
+    
+    p = (rgammax(a, x) / a) * (1.0 + sm)
+    
     return (p, 1.0 - p)
 end
 
@@ -476,39 +466,29 @@ External links: [DLMF 8.11.2](https://dlmf.nist.gov/8.11.2)
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
-    wk = zeros(30)
-    flag = false
     acc = acc0[ind + 1]
-    amn = a - 1.0
-    t = amn/x
-    wk[1] = t
-    loop = 2
-    for indx = 2:20
-       amn -= 1.0
-       t *= amn/x
-       if abs(t) <= 1.0e-3
-           loop = indx
-           flag = true
-           break
-       end
-       wk[indx] = t
+
+    # compute first 21 terms
+    ts = cumprod(ntuple(i -> (a - i) / x, Val(21)))
+
+    # sum the smaller terms directly
+    first_small_t = something(findfirst(x -> abs(x) < 1.0e-3, ts), 21)
+    sm = t = ts[first_small_t]
+    amn = a - first_small_t
+    while abs(t) ≥ acc
+        amn -= 1.0
+        t *= amn / x
+        sm += t
     end
-    if !flag
-        loop = 20
+
+    # sum terms from small to large
+    last_large_t = first_small_t - 1
+    for j in last_large_t:(-1):1
+        sm += ts[j]
     end
-    sm = t
-    while true
-       if abs(t) < acc
-           break
-       end
-       amn -= 1.0
-       t *= amn/x
-       sm += t
-    end
-    for j = loop-1:-1:1
-       sm += wk[j]
-    end
-    q = (rgammax(a, x)/x)*(1.0 + sm)
+    
+    q = (rgammax(a, x) / x) * (1.0 + sm)
+    
     return (1.0 - q, q)
 end
 
