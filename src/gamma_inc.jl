@@ -426,17 +426,15 @@ See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
 function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     acc = acc0[ind + 1]
+    tolerance = 0.5acc
 
     # compute first 21 terms
     ts = cumprod(ntuple(i -> x / (a + i), Val(21)))
-    last_t = findfirst(<(1.0e-3), ts)
-    last_t = last_t === nothing ? 20 : last_t - 1
-    next_t = last_t + 1
-
+    
     # sum the smaller terms directly
-    sm = t = ts[next_t]
-    apn = a + next_t
-    tolerance = 0.5acc
+    first_small_t = something(findfirst(<(1.0e-3), ts), 21)
+    sm = t = ts[first_small_t]
+    apn = a + first_small_t
     while t > tolerance
         apn += 1.0
         t *= x / apn
@@ -444,7 +442,8 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     end
 
     # sum terms from small to large
-    for j ∈ last_t:(-1):1
+    last_large_t = first_small_t - 1
+    for j ∈ last_large_t:(-1):1
         sm += ts[j]
     end
     
@@ -471,21 +470,20 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
 
     # compute first 21 terms
     ts = cumprod(ntuple(i -> (a - i) / x, Val(21)))
-    last_t = findfirst(x -> abs(x) < 1.0e-3, ts)
-    last_t = last_t === nothing ? 20 : last_t - 1
-    next_t = last_t + 1
 
     # sum the smaller terms directly
-    sm = t = ts[next_t]
-    amn = a - next_t
-    while abs(t) >= acc
+    first_small_t = something(findfirst(x -> abs(x) < 1.0e-3, ts), 21)
+    sm = t = ts[first_small_t]
+    amn = a - first_small_t
+    while abs(t) ≥ acc
         amn -= 1.0
         t *= amn / x
         sm += t
     end
 
     # sum terms from small to large
-    for j in last_t:(-1):1
+    last_large_t = first_small_t - 1
+    for j in last_large_t:(-1):1
         sm += ts[j]
     end
     
