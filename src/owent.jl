@@ -120,7 +120,10 @@ function owent(h::T, a::T) where {T <: Real}
         , T(0.031167227832798003), T(0.027426509708356944), T(0.023570760839324363), T(0.01961616045735561), T(0.015579315722943824), T(0.011477234579234613), T(0.0073275539012762885)
         , T(0.0031533460523059122))
 
-        towen = dot(w, t2.(h,a,x))
+        towen = zero(a)
+        @inbounds for i in eachindex(w)
+            towen += w[i] * t2(h,a,x[i])
+        end
 
         return towen
     else

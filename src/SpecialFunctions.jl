@@ -1,7 +1,5 @@
 module SpecialFunctions
 
-import LinearAlgebra: dot
-
 using IrrationalConstants:
     twoπ,
     halfπ,
