@@ -1,9 +1,6 @@
 # Owen's T function tests
 
-using Test
-using IrrationalConstants
-using LinearAlgebra
-using SpecialFunctions
+using IrrationalConstants: inv2π, invsqrt2
 
 # test values for accurate and precise calculation
 hvec = [0.0625, 6.5, 7.0, 4.78125, 2.0, 1.0, 0.0625, 1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.125, 0.125, 0.125, 0.125, 0.0078125
