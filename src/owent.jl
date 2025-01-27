@@ -1,13 +1,12 @@
 # Owen's T Function
 #    Written by Andy Gough; August 2021 (see https://github.com/JuliaStats/StatsFuns.jl/issues/99#issuecomment-1124581689)
-#    Edited by Johanni Brea to make type stable; January 2025
+#    Edited by Johanni Brea; January 2025
 #    Rev 1.09
 #    MIT License
 #
 # dependencies
 #   IrrationalConstants
 #   SpecialFunctions
-#   LinearAlgebra
 #
 # HISTORY
 # In the past 20 or so years, most implementations of Owen's T function have followed the algorithms given in "Fast and accurate Calculation of Owen's
@@ -33,32 +32,31 @@
 # T1 through T4 are not implemented. Instead, if a < 0.999999, T5 is used to calculate Owen's T (using 48 point Gauss-Legendre quadrature)
 # For 0.999999 < a < 1.0, T6 is implemented.
 #
-# REFERENCES
-# [1] "Fast and accurate Calculation of Owen's T-Function", by M. Patefield and D. Tandy, Journal of Statistical Software, 5 (5), 1 - 25 (2000)
-# [2] "Tables for Computing Bivariate Normal Probabilities", by Donald P. Owen, The Annals of Mathematical Statistics, Vol. 27, No. 4 (Dec 1956), pp. 1075-1090
-#
 # Partial Derivatives (FYI)
 # D[owent[x,a],x] = -exp(-0.5*x^2)*erf(a*x/sqrt2)/(2*sqrt2π)
 # D[owent[x,a],a] = exp(-0.5*(1+a^2)*(x^2))/((1+a^2)*2π)
 #
 @doc raw"""
-owent(h,a) : Returns the value of Owen's T function for (h,a)
+    owent(h, a)
 
-Owen's T function:
+Returns the value of Owen's T function
 ```math
 T(h,a) = \frac{1}{2\pi } \int_{0}^{a} \frac{e^{-\frac{1}{2}h^2(1+x^2)}}{1+x^2}dx\quad(-\infty < h,a < +\infty)
 ```
 
-For *h* and *a* > 0, *T(h,a)* gives the volume of the uncorrelated bivariate normal distribution with zero mean and unit variance
-over the area from *y = ax* and *y = 0* and to the right of *x = h*.
+For *h* and *a* > 0, *T(h,a)* gives the volume of the uncorrelated bivariate normal distribution with zero mean and unit variance over the area from *y = ax* and *y = 0* and to the right of *x = h*.
 
-EXAMPLE:
+## Example
 ```
 julia> owent(0.0625, 0.025)
 0.003970281304296922
 ```
 
-Worst case accuracy is about 2e-16.
+## References
+"Fast and accurate Calculation of Owen's T-Function", by M. Patefield and D. Tandy, Journal of Statistical Software, 5 (5), 1 - 25 (2000)
+
+"Tables for Computing Bivariate Normal Probabilities", by Donald P. Owen, The Annals of Mathematical Statistics, Vol. 27, No. 4 (Dec 1956), pp. 1075-1090
+#
 """
 function owent(h::T, a::T) where {T <: Real}
 
