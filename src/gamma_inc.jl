@@ -543,7 +543,7 @@ end
 @doc raw"""
     gamma_inc_minimax(a,x,z)
 
-Compute ``P(a,x)`` using minimax approximations given by :
+Compute ``P(a,x)`` using minimax approximations given by:
 ```math
 1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ``` where
