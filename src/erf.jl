@@ -426,7 +426,7 @@ External links:
 See also: [`erfc(x)`](@ref erfc).
 
 # Implementation
-Using the rational approximants tabulated in [Blair (1976)](@citet blair_1976)
+Using the rational approximants tabulated in [Blair (1976)](@cite blair_1976)
 combined with Newton iterations for `BigFloat`.
 """
 erfcinv(x::Real) = _erfcinv(float(x))
