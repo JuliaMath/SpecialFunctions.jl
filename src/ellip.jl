@@ -11,8 +11,8 @@ Computes Complete Elliptic Integral of 1st kind ``K(m)`` for parameter ``m`` giv
 ```math
 \operatorname{ellipk}(m)
 = K(m)
-= \int_0^{ \frac{\pi}{2} } \frac{1}{\sqrt{1 - m \sin^2 \theta}} \, \mathrm{d}\theta
-\quad \text{for} \quad m \in \left( -\infty, 1 \right] \, .
+= \int_0^{ \frac{π}{2} } \frac{1}{\sqrt{1 - m \sin^2 θ}} \, \mathrm{d}θ
+\quad \text{for} \quad m \in \left( -∞, 1 \right] \, .
 ```
 
 External links:
@@ -22,9 +22,9 @@ External links:
 See also: [`ellipe(m)`](@ref SpecialFunctions.ellipe).
 
 # Arguments
-- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to
+- `m`: parameter ``m``, restricted to the domain ``(-∞,1]``, is related to
        the elliptic modulus ``k`` by ``k^2=m`` and to the modular angle
-       ``\alpha`` by ``k = \sin \alpha``.
+       ``α`` by ``k = \sin α``.
 
 # Implementation
 Using piecewise approximation polynomial as given in
@@ -40,7 +40,7 @@ For ``m<0``, followed by
 > Journal of Computational and Applied Mathematics. 282.
 > DOI 10.13140/2.1.1946.6245.,
 > <https://www.researchgate.net/publication/267330394>
-As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
+As suggested in this paper, the domain is restricted to ``(-∞,1]``.
 """
 ellipk(m::Real) = _ellipk(float(m))
 
@@ -191,8 +191,8 @@ Computes Complete Elliptic Integral of 2nd kind ``E(m)`` for parameter ``m`` giv
 ```math
 \operatorname{ellipe}(m)
 = E(m)
-= \int_0^{ \frac{\pi}{2} } \sqrt{1 - m \sin^2 \theta} \, \mathrm{d}\theta
-\quad \text{for} \quad m \in \left( -\infty, 1 \right] .
+= \int_0^{ \frac{π}{2} } \sqrt{1 - m \sin^2 θ} \, \mathrm{d}θ
+\quad \text{for} \quad m \in \left( -∞, 1 \right] .
 ```
 
 External links:
@@ -202,9 +202,9 @@ External links:
 See also: [`ellipk(m)`](@ref SpecialFunctions.ellipk).
 
 # Arguments
-- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to
+- `m`: parameter ``m``, restricted to the domain ``(-∞,1]``, is related to
        the elliptic modulus ``k`` by ``k^2=m`` and to the modular angle
-       ``\alpha`` by ``k=\sin \alpha``.
+       ``α`` by ``k = \sin α``.
 
 # Implementation
 Using piecewise approximation polynomial as given in
@@ -220,7 +220,7 @@ For ``m<0``, followed by
 > Journal of Computational and Applied Mathematics. 282.
 > DOI 10.13140/2.1.1946.6245.,
 > <https://www.researchgate.net/publication/267330394>
-As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
+As suggested in this paper, the domain is restricted to ``(-∞,1]``.
 """
 ellipe(m::Real) = _ellipe(float(m))
 

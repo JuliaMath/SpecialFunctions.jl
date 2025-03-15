@@ -8,7 +8,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 
 | Function | Description |
 |:-------- |:----------- |
-| [`gamma(z)`](@ref SpecialFunctions.gamma(::Number))                  | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) ``\Gamma(z)``                                                                                                                         |
+| [`gamma(z)`](@ref SpecialFunctions.gamma(::Number))                  | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) ``Γ(z)``                                                                                                                              |
 | [`loggamma(x)`](@ref SpecialFunctions.loggamma(::Number))            | accurate `log(gamma(x))` for large `x`                                                                                                                                                               |
 | [`logabsgamma(x)`](@ref SpecialFunctions.logabsgamma)                | accurate `log(abs(gamma(x)))` for large `x`                                                                                                                                                          |
 | [`logfactorial(x)`](@ref SpecialFunctions.logfactorial)              | accurate `log(factorial(x))` for large `x`; same as `loggamma(x+1)` for `x > 1`, zero otherwise                                                                                                      |
@@ -16,7 +16,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`invdigamma(x)`](@ref SpecialFunctions.invdigamma)                  | [invdigamma function](http://bariskurt.com/calculating-the-inverse-of-digamma-function/) (i.e. inverse of `digamma` function at `x` using fixed-point iteration algorithm)                           |
 | [`trigamma(x)`](@ref SpecialFunctions.trigamma)                      | [trigamma function](https://en.wikipedia.org/wiki/Trigamma_function) (i.e the logarithmic second derivative of `gamma` at `x`)                                                                       |
 | [`polygamma(m,x)`](@ref SpecialFunctions.polygamma)                  | [polygamma function](https://en.wikipedia.org/wiki/Polygamma_function) (i.e the (m+1)-th derivative of the `loggamma` function at `x`)                                                               |
-| [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number))       | [upper incomplete gamma function ``\Gamma(a,z)``](https://en.wikipedia.org/wiki/Incomplete_gamma_function)                                                                                           |
+| [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number))       | [upper incomplete gamma function ``Γ(a,z)``](https://en.wikipedia.org/wiki/Incomplete_gamma_function)                                                                                                |
 | [`loggamma(a,z)`](@ref SpecialFunctions.loggamma(::Number,::Number)) | accurate `log(gamma(a,x))` for large arguments                                                                                                                                                       |
 | [`gamma_inc(a,x,IND)`](@ref SpecialFunctions.gamma_inc)              | [incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates P(a,x) and Q(a,x) for accuracy specified by IND and returns tuple (p,q)) |
 | [`gamma_inc_inv(a,p,q)`](@ref SpecialFunctions.gamma_inc_inv)        | [inverse of incomplete gamma function ratio P(a,x) and Q(a,x)](https://en.wikipedia.org/wiki/Incomplete_gamma_function) (i.e evaluates x given P(a,x)=p and Q(a,x)=q)                                |
@@ -34,11 +34,11 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 
 | Function | Description |
 |:-------- |:----------- |
-| [`expint(ν, z)`](@ref SpecialFunctions.expint) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{E}_\nu(z)``            |
-| [`expinti(x)`](@ref SpecialFunctions.expinti)  | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{Ei}(x)``               |
-| [`expintx(x)`](@ref SpecialFunctions.expintx)  | scaled [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``e^z \operatorname{E}_\nu(z)`` |
-| [`sinint(x)`](@ref SpecialFunctions.sinint)    | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``\operatorname{Si}(x)``      |
-| [`cosint(x)`](@ref SpecialFunctions.cosint)    | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``\operatorname{Ci}(x)``  |
+| [`expint(ν, z)`](@ref SpecialFunctions.expint) | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{E}_ν(z)``             |
+| [`expinti(x)`](@ref SpecialFunctions.expinti)  | [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``\operatorname{Ei}(x)``              |
+| [`expintx(x)`](@ref SpecialFunctions.expintx)  | scaled [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``e^z \operatorname{E}_ν(z)``  |
+| [`sinint(x)`](@ref SpecialFunctions.sinint)    | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``\operatorname{Si}(x)``     |
+| [`cosint(x)`](@ref SpecialFunctions.cosint)    | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``\operatorname{Ci}(x)`` |
 
 
 ## Error Functions, Dawson’s and Fresnel Integrals
@@ -56,7 +56,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`logerfcx(x)`](@ref SpecialFunctions.logerfcx) | log of the scaled complementary error function, i.e. accurate ``\operatorname{ln}(\operatorname{erfcx}(x))`` for large negative ``x`` |
 | [`erfi(x)`](@ref SpecialFunctions.erfi)         | imaginary error function defined as ``-i \operatorname{erf}(ix)`` |
 | [`erfinv(x)`](@ref SpecialFunctions.erfinv)     | inverse function to [`erf()`](@ref SpecialFunctions.erf) |
-| [`dawson(x)`](@ref SpecialFunctions.dawson)     | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)`` for large ``x`` |
+| [`dawson(x)`](@ref SpecialFunctions.dawson)     | scaled imaginary error function, a.k.a. Dawson function, i.e. accurate ``\frac{\sqrt{π}}{2} e^{-x^2} \operatorname{erfi}(x)`` for large ``x`` |
 | [`faddeeva(x)`](@ref SpecialFunctions.faddeeva) | [Faddeeva function](https://en.wikipedia.org/wiki/Faddeeva_function), equivalent to ``\operatorname{erfcx}(-ix)`` |
 
 
