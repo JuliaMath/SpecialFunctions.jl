@@ -324,6 +324,9 @@ function _erf(x::Float64)
         end
     else
         
+        if(isnan(x))
+             return NaN
+        end
 
         if (sign)
             return -1.0
