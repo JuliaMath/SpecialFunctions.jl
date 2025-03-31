@@ -25,9 +25,9 @@ for f in (:erf, :erfc)
     end
 end
 
-    erfc(x::Float64) = ccall((erfc, libopenlibm), Float64, (Float64,), x)
-    erfc(x::Float32) = ccall((erfcf, libopenlibm), Float32, (Float32,), x)
-    erfc(x::Float16) = Float16(erfc(Float32(x)))
+    _erfc(x::Float64) = ccall((_erfc, libopenlibm), Float64, (Float64,), x)
+    _erfc(x::Float32) = ccall((_erfcf, libopenlibm), Float32, (Float32,), x)
+    _erfc(x::Float16) = Float16(_erfc(Float32(x)))
 
 for f in (:erfcx, :erfi, :dawson, :faddeeva)
     internalf = Symbol(:_, f)
@@ -104,7 +104,7 @@ See also:
 #    Fast erf implementation using a mix of
 #    rational and polynomial approximations.
 #    Highest measured error is 1.01 ULPs at 0x1.39956ac43382fp+0.  
-function erf(x::Float64)
+function _erf(x::Float64)
     # Minimax approximation of erf
      PA=(0x1.06eba8214db68p-3, -0x1.812746b037948p-2, 0x1.ce2f21a03872p-4,-0x1.b82ce30e6548p-6, 0x1.565bcc360a2f2p-8, -0x1.c02d812bc979ap-11,0x1.f99bddfc1ebe9p-14, -0x1.f42c457cee912p-17, 0x1.b0e414ec20ee9p-20,-0x1.18c47fd143c5ep-23)
     # Rational approximation on [0x1p-28, 0.84375] 
@@ -141,19 +141,6 @@ function erf(x::Float64)
 
     if (ia < 0x3feb0000)
     #  a = |x| < 0.84375.  
-
-        if (ia < 0x3e300000)
-        # a < 2^(-28).  
-            if (ia < 0x00800000)
-            # a < 2^(-1015).  
-                y =  fma(TwoOverSqrtPiMinusOne, x, x)
-
-                ## case of underflow TBD
-                #return check_uflow (y)
-                return y
-            end   
-            return x + TwoOverSqrtPiMinusOne * x
-        end
 
         x2 = x * x
 
@@ -349,9 +336,9 @@ function erf(x::Float64)
 
 end
 
-erf(x::Float32)=Float32(erf(Float64(x)))
+_erf(x::Float32)=Float32(_erf(Float64(x)))
 
-erf(x::Float16)=Float16(erf(Float64(x)))
+_erf(x::Float16)=Float16(_erf(Float64(x)))
 
 
 function erf end
