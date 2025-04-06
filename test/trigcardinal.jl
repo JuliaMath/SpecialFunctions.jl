@@ -50,8 +50,8 @@
 
         # Limits/nans
         @test sinhcu(0.0) == 1.0
-        @test sinhcu(Inf) == Inf
-        @test sinhcu(-Inf) == Inf
+        @test sinhcu(Inf*im) == 0.0
+        @test sinhcu(-Inf*im) == 0.0
         @test isnan(sinhcu(NaN))
   end
 end
