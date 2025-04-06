@@ -8,14 +8,20 @@ isinf_real(x::Number) = isinf(real(x)) && isfinite(imag(x))
 isinf_imag(x::Real) = false
 isinf_imag(x::Number) = isfinite(real(x)) && isinf(imag(x))
 
-# sincu copied exactly from Boost library
+# sincu copied from Boost library and correct limit behavior added
 # https://www.boost.org/doc/libs/1_87_1/boost/math/special_functions/sinc.hpp
+"""
+    sincu(x)
+
+Compute the unnormalized sinc function ``\\operatorname{sincu}(x) = \\sin(x) / (x)`` 
+with accuracy near the origin.
+"""
 sincu(x) = _sinc(float(x))
 function _sinc(x::Union{T,Complex{T}}) where {T}
     if isinf_real(x)
         return zero(x)
     end
-    
+
     nrm = fastabs(x)
     if nrm >= 3.3*sqrt(sqrt(eps(T)))
         return sin(x)/x
@@ -25,8 +31,15 @@ function _sinc(x::Union{T,Complex{T}}) where {T}
     end
 end
 
-# sinhcu copied exactly from Boost library 
+# sinhcu copied from Boost library and correct limit behavior added
 # https://www.boost.org/doc/libs/1_87_1/boost/math/special_functions/sinhc.hpp
+
+"""
+    sinhcu(x)
+
+Compute the unnormalized sinhc function ``\\operatorname{sinhcu}(x) = \\sinh(x) / (x)`` 
+with accuracy accuracy near the origin.
+"""
 sinhcu(x) = _sinhcu(float(x))
 function _sinhcu(x::Union{T,Complex{T}}) where {T}
     taylor_0_bound = eps(T)

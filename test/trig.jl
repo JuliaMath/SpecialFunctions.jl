@@ -1,4 +1,4 @@
-@testset "Cardinal trigonometric" begin
+@testset "Special trigonometric functions" begin
     @testset "sincu (unnormalized sinc)" begin
         a = 1.0
         @test sincu(a) ≈ sin(a)/a

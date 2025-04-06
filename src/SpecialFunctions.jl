@@ -107,7 +107,7 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
-include("trigcardinal.jl")
+include("trig.jl")
 
 if !isdefined(Base, :get_extension)
     include("../ext/SpecialFunctionsChainRulesCoreExt.jl")

@@ -34,7 +34,7 @@ tests = [
     "sincosint",
     "other_tests",
     "chainrules",
-    "trigcardinal"
+    "trig"
 ]
 
 const testdir = dirname(@__FILE__)

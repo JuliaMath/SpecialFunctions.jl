@@ -118,3 +118,11 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 |:-------- |:----------- |
 | [`eta(x)`](@ref SpecialFunctions.eta) | [Dirichlet eta function](https://en.wikipedia.org/wiki/Dirichlet_eta_function) at `x` |
 | [`zeta(x)`](@ref SpecialFunctions.zeta) | [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function) at `x` |
+
+## Special Trigonometric Functions
+
+| Function | Description |
+|:-------- |:----------- |
+| [`sincu(x)`](@ref SpecialFunctions.sincu) | [Unnormalized sine cardinal function](https://en.wikipedia.org/wiki/Sinc_function) at `x` |
+| [`sinhcu(x)`](@ref SpecialFunctions.sinhcu) | [Unnormalized hyperbolic sinc function](https://mathworld.wolfram.com/SinhcFunction.html) at `x` |
+
