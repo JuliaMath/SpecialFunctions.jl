@@ -166,7 +166,7 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
     A::typeof(B) = 1
     Aprev::typeof(B) = 1
     ϵ = 10*eps(real(B))
-    scale = sqrt(floatmax(real(A)))
+    scale = sqrt(floatmax(typeof(real(A))))
 
     # two recurrence steps / loop
     iters = 1
@@ -212,7 +212,7 @@ function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
     Bprev = zero(B)
     Aprev = oneunit(A)
     ϵ = 10*eps(real(B))
-    scale = sqrt(floatmax(real(A)))
+    scale = sqrt(floatmax(typeof(real(A))))
 
     iters = 0
     for i = 1:n
