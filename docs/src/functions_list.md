@@ -151,3 +151,9 @@ ellipe
 eta
 zeta
 ```
+
+## Special Trigonometric Functions
+```@docs
+sincu
+sinhcu
+```
