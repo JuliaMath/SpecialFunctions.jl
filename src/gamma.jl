@@ -416,7 +416,27 @@ Riemann zeta function
 \zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s}\quad\text{for}\quad s\in\mathbb{C}.
 ```
 
-External links: [Wikipedia](https://en.wikipedia.org/wiki/Riemann_zeta_function)
+# Examples
+```jldoctest
+julia> zeta(-1)
+-0.08333333333333338
+
+julia> zeta(0)
+-0.5
+
+julia> zeta(0.5)
+-1.4603545088095873
+
+julia> zeta(1)
+NaN
+
+julia> zeta(Inf)
+1.0
+```
+
+External links:
+[DLMF 25.2(i)](https://dlmf.nist.gov/25.2#i),
+[Wikipedia](https://en.wikipedia.org/wiki/Riemann_zeta_function)
 """
 zeta(s::Number) = _zeta(float(s))
 
