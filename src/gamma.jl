@@ -418,14 +418,14 @@ Riemann zeta function
 
 # Examples
 ```jldoctest
-julia> zeta(-1)
+julia> zeta(-1)     # -1/12
 -0.08333333333333338
 
 julia> zeta(0)
 -0.5
 
-julia> zeta(0.5)
--1.4603545088095873
+julia> zeta(-10)    # zeta(-2n) == 0
+-0.0
 
 julia> zeta(1)
 NaN
