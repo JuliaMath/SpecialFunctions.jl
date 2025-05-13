@@ -225,13 +225,13 @@ end
 
 Generalized zeta function defined by
 ```math
-\zeta(s, z) = \sum_{k=0}^\infty \frac{1}{((k+z)^2)^{s/2}},
+ζ(s, z) = \sum_{k=0}^∞ \frac{1}{((k+z)^2)^{s/2}},
 ```
 where any term with ``k+z = 0`` is excluded.  For ``\Re z > 0``,
 this definition is equivalent to the Hurwitz zeta function
-``\sum_{k=0}^\infty (k+z)^{-s}``.
+``\sum_{k=0}^∞ (k+z)^{-s}``.
 
-The Riemann zeta function is recovered as ``\zeta(s) = \zeta(s,1)``.
+The Riemann zeta function is recovered as ``ζ(s) = ζ(s,1)``.
 
 External links:
 [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function),
@@ -413,7 +413,7 @@ end
 Riemann zeta function
 
 ```math
-\zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s}\quad\text{for}\quad s\in\mathbb{C}.
+ζ(s) = \sum_{n=1}^∞ \frac{1}{n^s} \quad \text{for}\quad s\in\mathbb{C}.
 ```
 
 External links: [Wikipedia](https://en.wikipedia.org/wiki/Riemann_zeta_function)
@@ -490,7 +490,7 @@ end
 
 Dirichlet eta function
 ```math
-\eta(s) = \sum_{n=1}^\infty (-1)^{n-1} / n^{s}.
+η(s) = \sum_{n=1}^∞ (-1)^{n-1} / n^{s}.
 ```
 """
 eta(s::Number) = _eta(float(s))
@@ -550,14 +550,10 @@ end
 Compute the gamma function for complex ``z``, defined by
 
 ```math
-\Gamma(z)
-:=
-\begin{cases}
-    n!
-    & \text{for} \quad z = n+1 \;, n = 0,1,2,\dots
+Γ(z) := \begin{cases}
+    n! & \text{for} \quad z = n+1 \;, n = 0,1,2,\dots
     \\
-    \int_0^\infty t^{z-1} e^{-t} \, \mathrm{d}t
-    & \text{for} \quad \Re(z) > 0
+    \int_0^∞ t^{z-1} e^{-t} \, \mathrm{d}t & \text{for} \quad \Re(z) > 0
 \end{cases}
 ```
 and by analytic continuation in the whole complex plane.
@@ -586,9 +582,9 @@ External links:
 [Wikipedia](https://en.wikipedia.org/wiki/Gamma_function).
 
 See also:
-[`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log \Gamma(z)`` and
+[`loggamma(z)`](@ref SpecialFunctions.loggamma) for ``\log Γ(z)`` and
 [`gamma(a,z)`](@ref SpecialFunctions.gamma(::Number,::Number)) for
-the upper incomplete gamma function ``\Gamma(a,z)``.
+the upper incomplete gamma function ``Γ(a,z)``.
 
 # Implementation by
 - `Float`: C standard math library
@@ -769,7 +765,7 @@ end
 @doc raw"""
     beta(x, y)
 
-Euler integral of the first kind ``\operatorname{B}(x,y) = \Gamma(x)\Gamma(y)/\Gamma(x+y)``.
+Euler integral of the first kind ``\operatorname{B}(x,y) = Γ(x)Γ(y)/Γ(x+y)``.
 """
 function beta(a::Number, b::Number)
     lab, sign = logabsbeta(a, b)

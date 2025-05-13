@@ -465,7 +465,7 @@ end
 @doc raw"""
     besseli(nu, x)
 
-Modified Bessel function of the first kind of order `nu`, ``I_\nu(x)``.
+Modified Bessel function of the first kind of order `nu`, ``I_ν(x)``.
 
 External links:
 [DLMF 10.25.2](https://dlmf.nist.gov/10.25.2),
@@ -486,7 +486,7 @@ end
 @doc raw"""
     besselix(nu, x)
 
-Scaled modified Bessel function of the first kind of order `nu`, ``I_\nu(x) e^{- | \operatorname{Re}(x) |}``.
+Scaled modified Bessel function of the first kind of order `nu`, ``I_ν(x) e^{- | \operatorname{Re}(x) |}``.
 
 External links:
 [DLMF 10.25.2](https://dlmf.nist.gov/10.25.2),
@@ -507,7 +507,7 @@ end
 @doc raw"""
     besselj(nu, x)
 
-Bessel function of the first kind of order `nu`, ``J_\nu(x)``.
+Bessel function of the first kind of order `nu`, ``J_ν(x)``.
 
 External links:
 [DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
@@ -532,7 +532,7 @@ end
 @doc raw"""
     besseljx(nu, x)
 
-Scaled Bessel function of the first kind of order `nu`, ``J_\nu(x) e^{- | \operatorname{Im}(x) |}``.
+Scaled Bessel function of the first kind of order `nu`, ``J_ν(x) e^{- | \operatorname{Im}(x) |}``.
 
 External links:
 [DLMF 10.2.2](https://dlmf.nist.gov/10.2.2),
@@ -553,7 +553,7 @@ end
 @doc raw"""
     besselk(nu, x)
 
-Modified Bessel function of the second kind of order `nu`, ``K_\nu(x)``.
+Modified Bessel function of the second kind of order `nu`, ``K_ν(x)``.
 
 External links:
 [DLMF 10.25.3](https://dlmf.nist.gov/10.25.3),
@@ -576,7 +576,7 @@ end
 @doc raw"""
     besselkx(nu, x)
 
-Scaled modified Bessel function of the second kind of order `nu`, ``K_\nu(x) e^x``.
+Scaled modified Bessel function of the second kind of order `nu`, ``K_ν(x) e^x``.
 
 External links:
 [DLMF 10.25.3](https://dlmf.nist.gov/10.25.3),
@@ -599,7 +599,7 @@ end
 """
     bessely(nu, x)
 
-Bessel function of the second kind of order `nu`, ``Y_\\nu(x)``.
+Bessel function of the second kind of order `nu`, ``Y_ν(x)``.
 
 External links:
 [DLMF 10.2.3](https://dlmf.nist.gov/10.2.3),
@@ -620,7 +620,7 @@ end
     besselyx(nu, x)
 
 Scaled Bessel function of the second kind of order `nu`,
-``Y_\\nu(x) e^{- | \\operatorname{Im}(x) |}``.
+``Y_ν(x) e^{- | \\operatorname{Im}(x) |}``.
 
 External links:
 [DLMF 10.2.3](https://dlmf.nist.gov/10.2.3),
@@ -784,7 +784,7 @@ sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + one
 """
     hankelh1(nu, x)
 
-Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x)``.
+Bessel function of the third kind of order `nu`, ``H^{(1)}_ν(x)``.
 
 External links:
 [DLMF 10.2.5](https://dlmf.nist.gov/10.2.5),
@@ -797,7 +797,7 @@ hankelh1(nu, z) = besselh(nu, 1, z)
 """
     hankelh2(nu, x)
 
-Bessel function of the third kind of order `nu`, ``H^{(2)}_\\nu(x)``.
+Bessel function of the third kind of order `nu`, ``H^{(2)}_ν(x)``.
 
 External links:
 [DLMF 10.2.6](https://dlmf.nist.gov/10.2.6),
@@ -810,7 +810,7 @@ hankelh2(nu, z) = besselh(nu, 2, z)
 """
     hankelh1x(nu, x)
 
-Scaled Bessel function of the third kind of order `nu`, ``H^{(1)}_\\nu(x) e^{-x i}``.
+Scaled Bessel function of the third kind of order `nu`, ``H^{(1)}_ν(x) e^{-x i}``.
 
 External links:
 [DLMF 10.2.5](https://dlmf.nist.gov/10.2.5),
@@ -823,7 +823,7 @@ hankelh1x(nu, z) = besselhx(nu, 1, z)
 @doc raw"""
     hankelh2x(nu, x)
 
-Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_\nu(x) e^{x i}``.
+Scaled Bessel function of the third kind of order `nu`, ``H^{(2)}_ν(x) e^{x i}``.
 
 External links:
 [DLMF 10.2.6](https://dlmf.nist.gov/10.2.6),
@@ -839,7 +839,7 @@ hankelh2x(nu, z) = besselhx(nu, 2, z)
 Bessel function of the first kind divided by `x`.
 Following convention:
 ```math
-\operatorname{jinc}{x} = \frac{2 J_1({\pi x})}{\pi x}.
+\operatorname{jinc}{x} = \frac{2 J_1({π x})}{π x}.
 ```
 Sometimes known as sombrero or besinc function.
 

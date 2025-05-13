@@ -7,7 +7,7 @@ const exparg_p =  log(prevfloat(floatmax(Float64)))
 @doc raw"""
     loggammadiv(a,b)
 
-Computes ``\log(\Gamma(b)/\Gamma(a+b))`` when `b >= 8`
+Computes ``\log(Γ(b)/Γ(a+b))`` when `b >= 8`
 """
 loggammadiv(a::Number, b::Number) = _loggammadiv(promote(float(a), float(b))...)
 
@@ -76,7 +76,7 @@ end
 @doc raw"""
     esum(mu,x)
 
-Compute ``e^{\mu+x}``
+Compute ``e^{μ+x}``
 """
 function esum(mu::Float64, x::Float64)
     if x > 0.0
@@ -95,7 +95,7 @@ end
 @doc raw"""
     beta_integrand(a, b, x, y, mu=0.0)
 
-Compute ``e^{\mu} x^a y^b / B(a,b)``
+Compute ``e^{μ} x^a y^b / B(a,b)``
 """
 function beta_integrand(a::Float64, b::Float64, x::Float64, y::Float64, mu::Float64=0.0)
     a0, b0 = minmax(a,b)
@@ -181,7 +181,7 @@ end
     beta_inc_cont_fraction(a,b,x,y,lambda,epps)
 
 Compute ``I_{x}(a,b)`` using continued fraction expansion when `a, b > 1`.
-It is assumed that ``\lambda = (a+b)*y - b``
+It is assumed that ``λ = (a+b)*y - b``
 
 External links:
 [DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
@@ -251,7 +251,7 @@ end
     beta_inc_asymptotic_symmetric(a,b,lambda,epps)
 
 Compute ``I_{x}(a,b)`` using asymptotic expansion for `a, b >= 15`.
-It is assumed that ``\lambda = (a+b)*y - b``.
+It is assumed that ``λ = (a+b)*y - b``.
 
 External links:
 [DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
@@ -525,7 +525,7 @@ end
 
 Computes ``I_x(a,b)`` using power series:
 ```math
-I_{x}(a,b) = G(a,b) x^{a}/a \left[1 + a \sum_{j=1}^{\infty} ((1-b)(2-b)\dots(j-b)/j!(a+j)) x^{j}\right]
+I_{x}(a,b) = G(a,b) x^{a}/a \left[1 + a \sum_{j=1}^∞ ((1-b)(2-b)\dots(j-b)/j!(a+j)) x^{j}\right]
 ```
 External links:
 [DLMF 8.17.22](https://dlmf.nist.gov/8.17.22),
@@ -733,9 +733,9 @@ end
 Return a tuple ``(I_{x}(a,b), 1-I_{x}(a,b))`` where ``I_{x}(a,b)`` is the regularized
 incomplete beta function given by
 ```math
-I_{x}(a,b) = \frac{1}{B(a,b)} \int_{0}^{x} t^{a-1}(1-t)^{b-1} \mathrm{d}t,
+I_{x}(a,b) = \frac{1}{B(a,b)} \int_0^x t^{a-1}(1-t)^{b-1} \mathrm{d}t,
 ```
-where ``B(a,b) = \Gamma(a)\Gamma(b)/\Gamma(a+b)``.
+where ``B(a,b) = Γ(a)Γ(b)/Γ(a+b)``.
 
 External links:
 [DLMF 8.17.1](https://dlmf.nist.gov/8.17.1),

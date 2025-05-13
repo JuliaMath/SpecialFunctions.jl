@@ -33,7 +33,7 @@ const d80 = -.652623918595309E-03
 @doc raw"""
     rgamma1pm1(a)
 
-Computation of ``1/\Gamma(a+1) - 1`` for `-0.5<=a<=1.5`: ``1/\Gamma (a+1) - 1``.
+Computation of ``1/Γ(a+1) - 1`` for `-0.5<=a<=1.5`: ``1/Γ(a+1) - 1``.
 
 Uses the relation `gamma(a+1) = a*gamma(a)`.
 """
@@ -60,7 +60,7 @@ end
 @doc raw"""
     rgammax(a,x)
 
-Evaluation of ``1/\Gamma(a) e^{-x} x^{a}``. Based on `DRCOMP` from the `NSWC` library.
+Evaluation of ``1/Γ(a) e^{-x} x^{a}``. Based on `DRCOMP` from the `NSWC` library.
 """
 function rgammax(a::Float64, x::Float64)
     if x == 0.0
@@ -85,7 +85,7 @@ end
 @doc raw"""
     auxgam(x)
 
-Compute function `g` in ``1/\Gamma(x+1) = 1 + x (x-1) g(x)``, `-1 <= x <= 1`.
+Compute function `g` in ``1/Γ(x+1) = 1 + x (x-1) g(x)``, `-1 <= x <= 1`.
 """
 function auxgam(x::Float64)
     @assert -1 <= x <= 1
@@ -100,7 +100,7 @@ end
 @doc raw"""
     loggamma1p(x)
 
-Compute ``\log(\Gamma(1+x))`` for `-1 < x <= 1`.
+Compute ``\log(Γ(1+x))`` for `-1 < x <= 1`.
 """
 function loggamma1p(x::Float64)
     @assert -1 < x <= 1
@@ -134,7 +134,7 @@ end
 @doc raw"""
     stirling_error(x)
 
-Compute ``\ln{\Gamma(x)} - (x-0.5)*\ln{x} + x - \ln{(2\pi)}/2``. Adapted from `stirling` in `IncgamFI`.
+Compute ``\ln{Γ(x)} - (x-0.5)*\ln{x} + x - \ln(2π) / 2``. Adapted from `stirling` in `IncgamFI`.
 """
 function stirling_error(x::Float64)
     if x < floatmin(Float64)*1000.0
@@ -164,7 +164,7 @@ end
 ```math
 \operatorname{gammax}(x) = \begin{cases}
 e^{\operatorname{stirling}(x)}\quad\quad\quad \text{if} \quad x>0,\\
-\dfrac{\Gamma(x)}{\sqrt{2 \pi}e^{-x + (x-0.5)\log(x)}},\quad \text{if} \quad x\leq 0.
+\dfrac{Γ(x)}{\sqrt{2 π}e^{-x + (x-0.5)\log(x)}},\quad \text{if} \quad x\leq 0.
 \end{cases}
 ```
 """
@@ -181,7 +181,7 @@ end
 @doc raw"""
     lambdaeta(eta)
 
-Compute the value of ``\lambda`` satisfying ``\eta^{2}/2 = \lambda-1-\log{\lambda}``.
+Compute the value of ``λ`` satisfying ``η^{2}/2 = λ - 1 - \log λ``.
 """
 function lambdaeta(eta::Float64)
     s = eta*eta*0.5
@@ -222,7 +222,7 @@ end
 @doc raw"""
 Computing the first coefficient for the expansion:
 ```math
-\epsilon (\eta_{0},a) = \epsilon_{1}(\eta_{0},a)/a + \epsilon_{2}(\eta_{0},a)/a^{2} + \epsilon_{3}(\eta_{0},a)/a^{3}
+ε (η_0,a) = ε_1(η_0,a)a / a + ε_2(η_0,a) / a^2 + ε_3(η_0,a) / a^3
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -247,7 +247,7 @@ end
 @doc raw"""
 Computing the second coefficient for the expansion:
 ```math
-\epsilon (\eta_{0},a) = \epsilon_{1} (\eta_{0},a)/a + \epsilon_{2} (\eta_{0},a)/a^{2} + \epsilon_{3} (\eta_{0},a)/a^{3}
+ε(η_0,a) = ε_1(η_0,a)/a + ε_2(η_0,a)/a^2 + ε_3(η_0,a)/a^3
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -296,7 +296,7 @@ end
 @doc raw"""
 Computing the third and last coefficient for the expansion:
 ```math
-\epsilon(\eta_{0},a) = \epsilon_{1}(\eta_{0},a)/a + \epsilon_{2}(\eta_{0},a)/a^{2} + \epsilon_{3}(\eta_{0},a)/a^{3}
+ε(η_0,a) = ε_1(η_0,a)/a + ε_2(η_0,a)/a^2 + ε_3(η_0,a)/a^3
 ```
 Refer Eqn (3.12) in the paper
 """
@@ -416,7 +416,7 @@ end
 
 Compute ``P(a,x)`` using Taylor Series for P/R given by:
 ```math
-R(a,x)/a * (1 + \sum_{n=1}^{\infty} x^{n}/((a+1)(a+2)...(a+n)))
+R(a,x)/a * (1 + \sum_{n=1}^∞ x^n / ((a+1)(a+2)\dots(a+n)))
 ```
 Used when `1 <= a <= BIG` and `x <= max{a, ln 10}`.
 
@@ -457,7 +457,7 @@ end
 
 Compute ``P(a,x)`` using asymptotic expansion given by:
 ```math
-R(a,x)/a * (1 + \sum_{n=1}^{N-1}(a_{n}/x^{n} + \Theta _{n}a_{n}/x^{n}))
+R(a,x)/a * (1 + \sum_{n=1}^{N-1}(a_{n}/x^{n} + Θ_n a_n / x^n))
 ```
 where `R(a,x) = rgammax(a,x)`. Used when `1 <= a <= BIG` and `x >= x0`.
 
@@ -497,11 +497,11 @@ end
 
 Computes ``P(a,x)`` based on Taylor expansion of ``P(a,x)/x^a`` given by:
 ```math
-J = -a * \sum_{1}^{\infty} (-x)^{n}/((a+n)n!)
+J = -a * \sum_1^∞ (-x)^{n}/((a+n)n!)
 ```
 and ``P(a,x)/x^a`` is given by:
 ```math
-(1 - J) / \Gamma(a+1)
+(1 - J) / Γ(a+1)
 ```
 resulting from term-by-term integration of `gamma_inc(a,x,ind)`.
 This is used when `a < 1` and `x < 1.1` - Refer Eqn (9) in the paper.
@@ -544,10 +544,10 @@ end
 
 Compute ``P(a,x)`` using minimax approximations given by :
 ```math
-1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
+1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2π a} ⋅ T(a,λ)
 ``` where
 ```math
-T(a,\lambda) = \sum_{0}^{N} c_{k}(z)a^{-k}
+T(a,λ) = \sum_0^N c_{k}(z)a^{-k}
 ```
 
 This is a higher accuracy approximation of Temme expansion, which deals with
@@ -609,12 +609,12 @@ end
 @doc raw"""
     gamma_inc_temme(a, x, z)
 
-Compute ``P(a,x)`` using Temme's expansion given by :
+Compute ``P(a,x)`` using Temme's expansion given by:
 ```math
-1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
+1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2π a} ⋅ T(a,λ)
 ``` where
 ```math
-T(a,\lambda) = \sum_{0}^{N} c_{k}(z)a^{-k}
+T(a,λ) = \sum_0^N c_{k}(z)a^{-k}
 ```
 This mainly solves the problem near the region when `a ≈ x` with a large, and
 is a lower accuracy version of the minimax approximation.
@@ -646,13 +646,13 @@ end
 
 Computes ``P(a,x)`` using simplified Temme expansion near ``y=0`` by:
 ```math
-E(y) - (1 - y)/\sqrt{2\pi a} ⋅ T(a,\lambda)
+E(y) - (1 - y)/\sqrt{2π a} ⋅ T(a,λ)
 ```
 where
 ```math
-E(y) = 1/2 - (1 - y/3) ⋅ \sqrt{y/\pi}
+E(y) = 1/2 - (1 - y/3) ⋅ \sqrt{y/π}
 ```
-Used instead of it's previous function when ``\sigma \leq e_{0}/\sqrt{a}``.
+Used instead of it's previous function when ``σ ≤ e_0/\sqrt{a}``.
 
 External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 """
@@ -738,10 +738,10 @@ end
 Compute `x0` - initial approximation when `p` is small.
 Here we invert the series in Eqn (2.20) in the paper and write the inversion problem as:
 ```math
-x = r\left[1 + a\sum_{k=1}^{\infty}\frac{(-x)^{n}}{(a+n)n!}\right]^{-1/a},
+x = r \left[1 + a\sum_{k=1}^∞ \frac{(-x)^n}{(a+n)n!}\right]^{-1/a},
 ```
-where ``r = (p\Gamma(1+a))^{1/a}``
-Inverting this relation we obtain ``x = r + \sum_{k=2}^{\infty} c_{k} r^{k}``.
+where ``r = (p Γ(1+a))^{1/a}``
+Inverting this relation we obtain ``x = r + \sum_{k=2}^∞ c_k r^k``.
 """
 function gamma_inc_inv_psmall(a::Float64, logr::Float64)
     r    = exp(logr)
@@ -763,10 +763,10 @@ end
 @doc raw"""
     gamma_inc_inv_qsmall(a, q, qgammaxa)
 
-Compute `x0` - initial approximation when `q` is small from ``e^{-x_{0}} x_{0}^{a} = q \Gamma(a)``.
+Compute `x0` - initial approximation when `q` is small from ``e^{-x_0} x_0^a = q Γ(a)``.
 Asymptotic expansions Eqn (2.29) in the paper is used here and higher approximations are obtained using
 ```math
-x \sim x_{0} - L + b \sum_{k=1}^{\infty} d_{k}/x_{0}^{k}
+x \sim x_{0} - L + b \sum_{k=1}^∞ d_{k}/x_{0}^{k}
 ```
 where ``b = 1-a``, ``L = \ln{x_0}``.
 """
@@ -800,12 +800,12 @@ end
 Compute `x0` - initial approximation when `a` is large.
 The inversion problem is rewritten as:
 ```math
-0.5 \operatorname{erfc}(\eta \sqrt{a/2}) + R_{a}(\eta) = q
+0.5 \operatorname{erfc}(η \sqrt{a/2}) + R_{a}(η) = q
 ```
-For large values of `a` we can write: ``\eta(q,a) = \eta_{0}(q,a) + \epsilon(\eta_{0},a)``
+For large values of `a` we can write: ``η(q,a) = η_0(q,a) + ε(η_0,a)``
 and it is possible to expand:
 ```math
-\epsilon(\eta_{0},a) = \epsilon_{1}(\eta_{0},a)/a + \epsilon_{2}(\eta_{0},a)/a^{2} + \epsilon_{3}(\eta_{0},a)/a^{3} + \cdots
+ε(η_0,a) = ε_1(η_0,a)/a + ε_2(η_0,a)/a^2 + ε_3(η_0,a)/a^3 + \cdots
 ```
 which is calculated by [`coeff1`](@ref), [`coeff2`](@ref) and [`coeff3`](@ref) functions below.
 This returns a tuple `(x0,fp)`, where `fp` is computed since it's an
@@ -831,15 +831,15 @@ end
 Returns a tuple ``(p, q)`` where ``p + q = 1``, and
 ``p = P(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-P(a,x) = \frac{1}{\Gamma (a)} \int_{0}^{x} e^{-t}t^{a-1} \mathrm{d}t.
+P(a,x) = \frac{1}{Γ(a)} \int_0^x e^{-t} t^{a-1} \mathrm{d}t.
 ```
 and ``q = Q(a,x)`` is the Incomplete gamma function ratio given by:
 ```math
-Q(a,x) = \frac{1}{\Gamma (a)} \int_{x}^{\infty} e^{-t}t^{a-1} \mathrm{d}t.
+Q(a,x) = \frac{1}{Γ(a)} \int_x^∞ e^{-t}t^{a-1} \mathrm{d}t.
 ```
 In terms of these, the lower incomplete gamma function is
-``\gamma(a,x) = P(a,x) \Gamma(a)`` and the upper incomplete
-gamma function is ``\Gamma(a,x) = Q(a,x) \Gamma(a)``.
+``γ(a,x) = P(a,x) Γ(a)`` and the upper incomplete
+gamma function is ``Γ(a,x) = Q(a,x) Γ(a)``.
 
 `IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy,
 `IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
@@ -1104,13 +1104,13 @@ promotereal(x, y) = promote(x,y)
 
 Returns the upper incomplete gamma function
 ```math
-\Gamma(a,x) = \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
+Γ(a,x) = \int_x^∞ t^{a-1} e^{-t} \mathrm{d}t
 ```
 supporting arbitrary real or complex `a` and `x`.
 
-(The ordinary gamma function [`gamma(x)`](@ref) corresponds to ``\Gamma(a) = \Gamma(a,0)``.
+(The ordinary gamma function [`gamma(x)`](@ref) corresponds to ``Γ(a) = Γ(a,0)``.
 See also the [`gamma_inc`](@ref) function to compute both the upper and lower
-(``\gamma(a,x)``) incomplete gamma functions scaled by ``\Gamma(a)``.
+(``γ(a,x)``) incomplete gamma functions scaled by ``Γ(a)``.
 
 External links:
 [DLMF 8.2.2](https://dlmf.nist.gov/8.2.2),
@@ -1165,12 +1165,12 @@ end
 
 Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
 ```math
-\log \Gamma(a,x) = \log \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
+\log Γ(a,x) = \log \int_x^∞ t^{a-1} e^{-t} \mathrm{d}t
 ```
 supporting arbitrary real or complex `a` and `x`.
 
 If `a` and/or `x` is complex, then `exp(loggamma(a,x))` matches `gamma(a,x)` (up to floating-point error),
-but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2\pi i``
+but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2πi``
 (i.e. it may employ a different branch cut).
 
 See also [`loggamma(x)`](@ref).

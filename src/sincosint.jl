@@ -265,11 +265,11 @@ Compute the cosine integral function of ``x``, defined by
 
 ```math
 \operatorname{Ci}(x)
-:= \gamma + \log x + \int_0^x \frac{\cos (t) - 1}{t} \, \mathrm{d}t
+:= γ + \log x + \int_0^x \frac{\cos (t) - 1}{t} \, \mathrm{d}t
 \quad \text{for} \quad
 x > 0 \,,
 ```
-where ``\gamma`` is the Euler-Mascheroni constant.
+where ``γ`` is the Euler-Mascheroni constant.
 
 External links:
 [DLMF 6.2.13](https://dlmf.nist.gov/6.2.13),

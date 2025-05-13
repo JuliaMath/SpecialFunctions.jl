@@ -82,7 +82,7 @@ end
 Compute the error function of ``x``, defined by
 
 ```math
-\operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x \exp(-t^2) \; \mathrm{d}t
+\operatorname{erf}(x) = \frac{2}{\sqrt{π}} \int_0^x \exp(-t^2) \; \mathrm{d}t
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
@@ -126,7 +126,7 @@ Compute the complementary error function of ``x``, defined by
 ```math
 \operatorname{erfc}(x)
 = 1 - \operatorname{erf}(x)
-= \frac{2}{\sqrt{\pi}} \int_x^\infty \exp(-t^2) \; \mathrm{d}t
+= \frac{2}{\sqrt{π}} \int_x^∞ \exp(-t^2) \; \mathrm{d}t
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
@@ -200,11 +200,11 @@ Compute the Dawson function (scaled imaginary error function) of ``x``, defined 
 
 ```math
 \operatorname{dawson}(x)
-= \frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)
+= \frac{\sqrt{π}}{2} e^{-x^2} \operatorname{erfi}(x)
 \quad \text{for} \quad x \in \mathbb{C} \, .
 ```
 
-This is the accurate version of ``\frac{\sqrt{\pi}}{2} e^{-x^2} \operatorname{erfi}(x)``
+This is the accurate version of ``\frac{\sqrt{π}}{2} e^{-x^2} \operatorname{erfi}(x)``
 for large ``x``.
 
 External links: [DLMF 7.2.5](https://dlmf.nist.gov/7.2.5),
