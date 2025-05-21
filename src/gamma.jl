@@ -227,7 +227,7 @@ Generalized zeta function defined by
 ```math
 \zeta(s, z) = \sum_{k=0}^\infty \frac{1}{((k+z)^2)^{s/2}},
 ```
-where any term with ``k+z = 0`` is excluded.  For ``\Re z > 0``,
+where any term with ``k+z = 0`` is excluded.  For ``\Re(z) > 0``,
 this definition is equivalent to the Hurwitz zeta function
 ``\sum_{k=0}^\infty (k+z)^{-s}``.
 

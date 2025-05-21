@@ -760,7 +760,7 @@ end
 """
     sphericalbesselj(nu, x)
 
-Spherical bessel function of the first kind at order `nu`, ``j_ν(x)``. This is the non-singular
+Spherical Bessel function of the first kind at order `nu`, ``j_ν(x)``. This is the non-singular
 solution to the radial part of the Helmholz equation in spherical coordinates.
 """
 function sphericalbesselj(nu, x::T) where {T}
@@ -775,7 +775,7 @@ end
 """
     sphericalbessely(nu, x)
 
-Spherical bessel function of the second kind at order `nu`, ``y_ν(x)``. This is
+Spherical Bessel function of the second kind at order `nu`, ``y_ν(x)``. This is
 the singular solution to the radial part of the Helmholz equation in spherical
 coordinates. Sometimes known as a spherical Neumann function.
 """

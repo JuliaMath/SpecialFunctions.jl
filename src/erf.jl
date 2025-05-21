@@ -244,13 +244,8 @@ External links:
 See also: [`erf(x)`](@ref erf).
 
 # Implementation
-Using the rational approximants tabulated in:
-> J. M. Blair, C. A. Edwards, and J. H. Johnson,
-> "Rational Chebyshev approximations for the inverse of the error function",
-> Math. Comp. 30, pp. 827--830 (1976).
-> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
-> <http://www.jstor.org/stable/2005402>
-combined with Newton iterations for `BigFloat`.
+Using the rational approximants tabulated in [Blair (1976)](@cite blair_1976) combined with
+Newton iterations for `BigFloat`.
 """
 erfinv(x::Real) = _erfinv(float(x))
 
@@ -431,12 +426,7 @@ External links:
 See also: [`erfc(x)`](@ref erfc).
 
 # Implementation
-Using the rational approximants tabulated in:
-> J. M. Blair, C. A. Edwards, and J. H. Johnson,
-> "Rational Chebyshev approximations for the inverse of the error function",
-> Math. Comp. 30, pp. 827--830 (1976).
-> <https://doi.org/10.1090/S0025-5718-1976-0421040-7>,
-> <http://www.jstor.org/stable/2005402>
+Using the rational approximants tabulated in [Blair (1976)](@cite blair_1976)
 combined with Newton iterations for `BigFloat`.
 """
 erfcinv(x::Real) = _erfcinv(float(x))

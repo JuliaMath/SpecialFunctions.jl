@@ -190,7 +190,7 @@ External links:
 See also: [`beta_inc`](@ref)
 
 # Implementation
-`BFRAC(A,B,X,Y,LAMBDA,EPS)` from Didonato and Morris (1982)
+`BFRAC(A,B,X,Y,LAMBDA,EPS)` from [Didonato and Morris (1992)](@cite didonato_1992)
 """
 function beta_inc_cont_fraction(a::Float64, b::Float64, x::Float64, y::Float64, lambda::Float64, epps::Float64)
     @assert a > 1.0
@@ -260,7 +260,7 @@ External links:
 See also: [`beta_inc`](@ref)
 
 # Implementation
-`BASYM(A,B,LAMBDA,EPS)` from Didonato and Morris (1982)
+`BASYM(A,B,LAMBDA,EPS)` from [Didonato and Morris (1992)](@cite didonato_1992)
 """
 function beta_inc_asymptotic_symmetric(a::Float64, b::Float64, lambda::Float64, epps::Float64)
     @assert a >= 15.0
@@ -443,7 +443,7 @@ External links:
 See also: [`beta_inc`](@ref)
 
 # Implementation
-`FPSER(A,B,X,EPS)` from Didonato and Morris (1982)
+`FPSER(A,B,X,EPS)` from [Didonato and Morris (1992)](@cite didonato_1992)
 """
 function beta_inc_power_series2(a::Float64, b::Float64, x::Float64, epps::Float64)
     @assert b < epps*min(1.0, a)
@@ -489,7 +489,7 @@ External links:
 See also: [`beta_inc`](@ref)
 
 # Implementation
-`APSER(A,B,X,EPS)` from Didonato and Morris (1982)
+`APSER(A,B,X,EPS)` from [Didonato and Morris (1992)](@cite didonato_1992)
 """
 function beta_inc_power_series1(a::Float64, b::Float64, x::Float64, epps::Float64)
     @assert a   <= epps*min(1.0, b)
@@ -534,7 +534,7 @@ External links:
 See also: [`beta_inc`](@ref)
 
 # Implementation
-`BPSER(A,B,X,EPS)` from Didonato and Morris (1982)
+`BPSER(A,B,X,EPS)` from [Didonato and Morris (1992)](@cite didonato_1992)
 """
 function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64)
     @assert b <= 1.0 || b*x <= 0.7
