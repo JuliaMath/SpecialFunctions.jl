@@ -2,7 +2,23 @@
     @testset "real argument" begin
         for T in (Float16, Float32, Float64)
             @test @inferred(erf(T(1))) isa T
+            @test erf(T(0.25))   ≈ T(0.27632639016823696) rtol=2*eps(T)
+            @test erf(T(0.75))   ≈ T(0.7111556336535151) rtol=2*eps(T)
             @test erf(T(1))   ≈ T(0.84270079294971486934) rtol=2*eps(T)
+            @test erf(T(1.5))   ≈ T(0.9661051464753108) rtol=2*eps(T)
+            @test erf(T(2.5))   ≈ T(0.9995930479825551) rtol=2*eps(T)
+            @test erf(T(3.5))   ≈ T(0.9999992569016276) rtol=2*eps(T)
+            @test erf(T(4.5))   ≈ T(0.9999999998033839) rtol=2*eps(T)
+            @test erf(T(6))   ≈ T(1.0) rtol=2*eps(T)
+
+            @test erf(T(-0.25))   ≈ T(-0.27632639016823696) rtol=2*eps(T)
+            @test erf(T(-0.75))   ≈ T(-0.7111556336535151) rtol=2*eps(T)
+            @test erf(T(-1))   ≈ T(-0.84270079294971486934) rtol=2*eps(T)
+            @test erf(T(-1.5))   ≈ T(-0.9661051464753108) rtol=2*eps(T)
+            @test erf(T(-2.5))   ≈ T(-0.9995930479825551) rtol=2*eps(T)
+            @test erf(T(-3.5))   ≈ T(-0.9999992569016276) rtol=2*eps(T)
+            @test erf(T(-4.5))   ≈ T(-0.9999999998033839) rtol=2*eps(T)
+            @test erf(T(-6))   ≈ T(-1.0) rtol=2*eps(T)
 
             @test @inferred(erfc(T(1))) isa T
             @test erfc(T(1))  ≈ T(0.15729920705028513066) rtol=2*eps(T)
