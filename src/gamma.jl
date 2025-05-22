@@ -262,6 +262,7 @@ function _zeta(s::T, z::T) where {T<:ComplexOrReal{Float64}}
     end
 
     m = s - 1
+    minus_s = -s
     ζ = zero(T)
 
     # Algorithm is just the m-th derivative of digamma formula above,
@@ -270,67 +271,69 @@ function _zeta(s::T, z::T) where {T<:ComplexOrReal{Float64}}
     # Note: we multiply by -(-1)^m m! in polygamma below, so this factor is
     #       pulled out of all of our derivatives.
 
-    cutoff = 7 + real(m) + abs(imag(m)) # TODO: this cutoff is too conservative?
-    if x < cutoff
-        # shift using recurrence formula
-        xf = floor(x)
-        nx = Int(xf)
-        n = ceil(Int, cutoff - nx)
-        minus_s = -s
-        if nx < 0 # x < 0
-            # need to use (-z)^(-s) recurrence to be correct for real z < 0
-            # [the general form of the recurrence term is (z^2)^(-s/2)]
-            minus_z = -z
-            ζ += pow_oftype(ζ, minus_z, minus_s) # ν = 0 term
-            if xf != z
-                ζ += pow_oftype(ζ, z - nx, minus_s)
-                # real(z - nx) > 0, so use correct branch cut
-                # otherwise, if xf==z, then the definition skips this term
-            end
-            # do loop in different order, depending on the sign of s,
-            # so that we are looping from largest to smallest summands and
-            # can halt the loop early if possible; see issue #15946
-            # FIXME: still slow for small m, large Im(z)
-            if real(s) > 0
-                for ν in -nx-1:-1:1
-                    ζₒ= ζ
-                    ζ += pow_oftype(ζ, minus_z - ν, minus_s)
-                    ζ == ζₒ && break # prevent long loop for large -x > 0
-                end
-            else
-                for ν in 1:-nx-1
-                    ζₒ= ζ
-                    ζ += pow_oftype(ζ, minus_z - ν, minus_s)
-                    ζ == ζₒ && break # prevent long loop for large -x > 0
-                end
-            end
-        else # x ≥ 0 && z != 0
-            ζ += pow_oftype(ζ, z, minus_s)
-        end
-        # loop order depends on sign of s, as above
+    # If x < 0 the series begins with p=-⌊x⌋ terms where real(z+k) < 0.
+    # Since we're using the recurrence ((z+k)^2)^(s/2), we reflect
+    # these to (-z-k)^(-s).
+    nx = floor(Int, x)
+    p = max(0, -nx)
+    if p > 0
+        # do loop in different order, depending on the sign of s,
+        # so that we are looping from largest to smallest summands and
+        # can halt the loop early if possible; see issue #15946
+        # FIXME: still slow for small m, large Im(z)
+        minus_z = -z
         if real(s) > 0
-            for ν in max(1,1-nx):n-1
-                ζₒ= ζ
-                ζ += pow_oftype(ζ, z + ν, minus_s)
-                ζ == ζₒ && break # prevent long loop for large m
+            for k in p-1:-1:0
+                ζₒ = ζ
+                ζ += pow_oftype(ζ, minus_z - k, minus_s)
+                ζ == ζₒ && break # prevent long loop for large -x > 0
             end
         else
-            for ν in n-1:-1:max(1,1-nx)
-                ζₒ= ζ
-                ζ += pow_oftype(ζ, z + ν, minus_s)
-                ζ == ζₒ && break # prevent long loop for large m
+            for k in 0:1:p-1
+                ζₒ = ζ
+                ζ += pow_oftype(ζ, minus_z - k, minus_s)
+                ζ == ζₒ && break # prevent long loop for large -x > 0
             end
         end
-        z += n
+        z += p # Shift according to recurrence
     end
 
+    # real(z) ≥ 0 is guaranteed here.
+    # If any term must be dropped, it will be this one.
+    if z != 0
+        ζ += pow_oftype(ζ, z, minus_s)
+    end
+
+    # Add all terms where ⌊real(z+k)⌋ < 7 + real(s) + |imag(s)|, using
+    # at least enough terms to balance any reflected terms added
+    # previously. The loop order depends on sign of s, as above.
+    n = max(1+p, ceil(Int, 7 + real(m) + abs(imag(m)) - (nx+p)))
+    if real(s) > 0
+        for k in 1:1:n-1
+            ζₒ = ζ
+            ζ += pow_oftype(ζ, z + k, minus_s)
+            ζ == ζₒ && break # prevent long loop for large m
+        end
+    else
+        for k in n-1:-1:1
+            ζₒ = ζ
+            ζ += pow_oftype(ζ, z + k, minus_s)
+            ζ == ζₒ && break # prevent long loop for large m
+        end
+    end
+    z += n
+
+    # Euler-Maclaurin integral and tail sum
     t = inv(z)
     w = isa(t, Real) ? conj(oftype(ζ, t))^m : oftype(ζ, t)^m
     ζ += w * (inv(m) + 0.5*t)
 
     t *= t # 1/z^2
-    ζ += w*t * @pg_horner(t,m,0.08333333333333333,-0.008333333333333333,0.003968253968253968,-0.004166666666666667,0.007575757575757576,-0.021092796092796094,0.08333333333333333,-0.4432598039215686,3.0539543302701198)
-
+    ζ += w * t * @pg_horner(t, m, 0.08333333333333333,  -0.008333333333333333,
+                                  0.003968253968253968, -0.004166666666666667,
+                                  0.007575757575757576, -0.021092796092796094,
+                                  0.08333333333333333,  -0.4432598039215686,
+                                  3.0539543302701198)
     return ζ
 end
 
