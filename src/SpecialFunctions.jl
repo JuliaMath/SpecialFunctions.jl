@@ -7,6 +7,7 @@ using IrrationalConstants:
     sqrt2π,
     invπ,
     inv2π,
+    inv4π,
     invsqrt2,
     invsqrt2π,
     logtwo,
@@ -58,6 +59,7 @@ export
     logerfcx,
     faddeeva,
     eta,
+    owent,
 
     # Gamma functions
     gamma,
@@ -103,6 +105,7 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
+include("owent.jl")
 if !isdefined(Base, :get_extension)
     include("../ext/SpecialFunctionsChainRulesCoreExt.jl")
 end
