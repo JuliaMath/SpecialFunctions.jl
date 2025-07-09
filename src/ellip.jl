@@ -36,6 +36,9 @@ As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 ellipk(m::Real) = _ellipk(float(m))
 
 function _ellipk(m::Float64)
+    isnan(m) && return NaN
+    (m == -Inf) && return 0.0
+
     flag_is_m_neg = false
     if m < 0.0
         x               = m / (m-1)         #dealing with negative args
@@ -49,7 +52,7 @@ function _ellipk(m::Float64)
         return Float64(halfπ)
 
     elseif x == 1.0
-        return Inf
+        return flag_is_m_neg ? 0.0 : Inf
 
     elseif x > 1.0
         throw(DomainError(m, "`m` must lie between -Inf and 1 ---- Domain: (-Inf,1.0]"))
@@ -207,6 +210,9 @@ As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 ellipe(m::Real) = _ellipe(float(m))
 
 function _ellipe(m::Float64)
+    isnan(m) && return NaN
+    (m == -Inf) && return Inf
+
     flag_is_m_neg = false
     if m < 0.0
         x               = m / (m-1)         #dealing with negative args
@@ -219,7 +225,7 @@ function _ellipe(m::Float64)
     if x == 0.0
         return Float64(halfπ)
     elseif x == 1.0
-        return 1.0
+        return flag_is_m_neg ? Inf : 1.0
 
     elseif x > 1.0
         throw(DomainError(m,"`m` must lie between -Inf and 1 ---- Domain : (-inf,1.0]"))
