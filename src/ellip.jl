@@ -37,7 +37,7 @@ ellipk(m::Real) = _ellipk(float(m))
 
 function _ellipk(m::Float64)
     isnan(m) && return NaN
-    (m == -Inf) && return 0.0
+    (m === -Inf) && return 0.0
 
     flag_is_m_neg = false
     if m < 0.0
@@ -211,7 +211,7 @@ ellipe(m::Real) = _ellipe(float(m))
 
 function _ellipe(m::Float64)
     isnan(m) && return NaN
-    (m == -Inf) && return Inf
+    (m === -Inf) && return Inf
 
     flag_is_m_neg = false
     if m < 0.0
