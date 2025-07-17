@@ -39,6 +39,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 | [`expintx(x)`](@ref SpecialFunctions.expintx)  | scaled [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) ``e^z \operatorname{E}_\nu(z)`` |
 | [`sinint(x)`](@ref SpecialFunctions.sinint)    | [sine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Sine_integral) ``\operatorname{Si}(x)``      |
 | [`cosint(x)`](@ref SpecialFunctions.cosint)    | [cosine integral](https://en.wikipedia.org/wiki/Trigonometric_integral#Cosine_integral) ``\operatorname{Ci}(x)``  |
+| [`li(x)`](@ref SpecialFunctions.li)            | [logarithmic integral function](https://en.wikipedia.org/wiki/Logarithmic_integral_function) ``\operatorname{li}(x)``  |
 
 
 ## Error Functions, Dawson’s and Fresnel Integrals

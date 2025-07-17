@@ -610,3 +610,32 @@ function expinti(x::BigFloat)
     ccall((:mpfr_eint, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Base.MPFR.MPFRRoundingMode), z, x, Base.MPFR.ROUNDING_MODE[])
     return z
 end
+
+##############################################################################
+# Logarithmic integral function li
+
+@doc raw"""
+    expinti(x::Real)
+
+Computes the Logarithmic integral function
+```math
+\operatorname{li}(x) = \int_{0}^x \frac{1}{\ln{t}} \mathrm{d}t,
+```
+which is equivalent to ``\operatorname{Ei}(\ln{x})`` where
+``\operatorname{Ei}`` is the `expinti` function.
+
+External links: [Wikipedia](https://en.wikipedia.org/wiki/Logarithmic_integral_function)
+"""
+function li(x::Real)
+    if x < 0
+        throw(DomainError(x, "negative argument, convert to complex first"))
+    elseif x == 0
+        return 0
+    elseif x == 1
+        return -Inf
+    elseif x == Inf
+        return Inf
+    else
+        return expinti(log(x))
+    end
+end
