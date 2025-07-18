@@ -245,3 +245,10 @@ expinti_real(x) = invoke(expinti, Tuple{Real}, x)
         end
     end
 end
+
+@testset "Logarithmic integral function" begin
+    @test li(0.0) ≈ 0
+    @test li(1.0) ≈ -Inf
+    @test li(Inf) === Inf
+    @test li(2) ≈ 1.0451637801174927
+end
