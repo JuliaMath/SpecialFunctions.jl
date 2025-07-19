@@ -615,7 +615,7 @@ end
 # Logarithmic integral function li
 
 @doc raw"""
-    expinti(x::Real)
+    li(x::Real)
 
 Computes the Logarithmic integral function
 ```math
@@ -631,10 +631,6 @@ function li(x::Real)
         throw(DomainError(x, "negative argument, convert to complex first"))
     elseif x == 0
         return 0
-    elseif x == 1
-        return -Inf
-    elseif x == Inf
-        return Inf
     else
         return expinti(log(x))
     end
