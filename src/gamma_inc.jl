@@ -504,7 +504,8 @@ and ``P(a,x)/x^a`` is given by:
 (1 - J) / \Gamma(a+1)
 ```
 resulting from term-by-term integration of `gamma_inc(a,x,ind)`.
-This is used when `a < 1` and `x < 1.1` - Refer Eqn (9) in the paper.
+This is used when `a < 1` and `x < 1.1` - Refer Eqn (9) in the
+[paper by DiDonato & Morris (1986)](@cite didonato_1986).
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -542,7 +543,7 @@ end
 @doc raw"""
     gamma_inc_minimax(a,x,z)
 
-Compute ``P(a,x)`` using minimax approximations given by :
+Compute ``P(a,x)`` using minimax approximations given by:
 ```math
 1/2 * \operatorname{erfc}(\sqrt{y}) - e^{-y}/\sqrt{2\pi a} ⋅ T(a,\lambda)
 ``` where
@@ -553,8 +554,8 @@ T(a,\lambda) = \sum_{0}^{N} c_{k}(z)a^{-k}
 This is a higher accuracy approximation of Temme expansion, which deals with
 the region near `a ≈ x` with `a` large.
 Refer Appendix F in the paper for the extensive set of coefficients calculated
-using Brent's multiple precision arithmetic(set at 50 digits) in
-> Brent, R. P. A Fortran multiple-precision arithmetic package, ACM Trans. Math. Softw. 4(1978), 57-70, doi: 10.1145/355769.355775.
+using Brent's multiple precision arithmetic (set at 50 digits) in
+[Brent (1978)](@cite brent_1978).
 
 External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 
@@ -700,7 +701,7 @@ end
 
 Compute using Finite Sums for ``Q(a,x)`` when `a >= 1 && 2a` is integer.
 Used when `a <= x <= x0` and `a = n/2`.
-Refer Eqn (14) in the paper.
+Refer Eqn (14) in the [paper by DiDonato and Morris (1986)](@cite didonato_1986).
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
@@ -820,10 +821,8 @@ function gamma_inc_inv_alarge(a::Float64, minpq::Float64, pcase::Bool)
     fp = -sqrt(inv2π*a)*exp(-0.5*a*eta*eta)/gammax(a)
     return (x0, fp)
 end
-# Reference : 'Computation of the incomplete gamma function ratios and their inverse' by Armido R DiDonato, Alfred H Morris.
-# Published in Journal: ACM Transactions on Mathematical Software (TOMS)
-# Volume 12 Issue 4, Dec. 1986 Pages 377-393
-# doi>10.1145/22721.23109
+# Reference: # DiDonato & Morris (1986), doi: 10.1145/22721.23109,
+# citation key: didonato_1986
 
 @doc raw"""
     gamma_inc(a,x,IND=0)
@@ -841,8 +840,10 @@ In terms of these, the lower incomplete gamma function is
 ``\gamma(a,x) = P(a,x) \Gamma(a)`` and the upper incomplete
 gamma function is ``\Gamma(a,x) = Q(a,x) \Gamma(a)``.
 
-`IND ∈ [0,1,2]` sets accuracy: `IND=0` means 14 significant digits accuracy,
-`IND=1` means 6 significant digit, and `IND=2` means only 3 digit accuracy.
+`IND ∈ [0,1,2]` sets accuracy:
+- `IND=0` means 14 significant digits accuracy,
+- `IND=1` means 6 significant digit, and
+- `IND=2` means only 3 digit accuracy.
 
 External links:
 [DLMF 8.2.4](https://dlmf.nist.gov/8.2.4),

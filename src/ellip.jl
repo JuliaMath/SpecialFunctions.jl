@@ -27,19 +27,10 @@ See also: [`ellipe(m)`](@ref SpecialFunctions.ellipe).
        ``\alpha`` by ``k = \sin \alpha``.
 
 # Implementation
-Using piecewise approximation polynomial as given in
-> 'Fast Computation of Complete Elliptic Integrals and Jacobian Elliptic Functions',
-> Fukushima, Toshio. (2014). F09-FastEI. Celest Mech Dyn Astr,
-> DOI 10.1007/s10569-009-9228-z,
-> <https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf>
+Using piecewise approximation polynomial as given in [fukushima_2009](@citet).
 
-For ``m<0``, followed by
-> Fukushima, Toshio. (2014).
-> 'Precise, compact, and fast computation of complete elliptic integrals by piecewise
-> minimax rational function approximation'.
-> Journal of Computational and Applied Mathematics. 282.
-> DOI 10.13140/2.1.1946.6245.,
-> <https://www.researchgate.net/publication/267330394>
+For ``m < 0``, followed by [fukushima_2015](@citet).
+
 As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 """
 ellipk(m::Real) = _ellipk(float(m))
@@ -207,19 +198,10 @@ See also: [`ellipk(m)`](@ref SpecialFunctions.ellipk).
        ``\alpha`` by ``k=\sin \alpha``.
 
 # Implementation
-Using piecewise approximation polynomial as given in
-> 'Fast Computation of Complete Elliptic Integrals and Jacobian Elliptic Functions',
-> Fukushima, Toshio. (2014). F09-FastEI. Celest Mech Dyn Astr,
-> DOI 10.1007/s10569-009-9228-z,
-> <https://pdfs.semanticscholar.org/8112/c1f56e833476b61fc54d41e194c962fbe647.pdf>
+Using piecewise approximation polynomial as given in [fukushima_2015](@citet)
 
-For ``m<0``, followed by
-> Fukushima, Toshio. (2014).
-> 'Precise, compact, and fast computation of complete elliptic integrals by piecewise
-> minimax rational function approximation'.
-> Journal of Computational and Applied Mathematics. 282.
-> DOI 10.13140/2.1.1946.6245.,
-> <https://www.researchgate.net/publication/267330394>
+For ``m<0``, followed by [fukushima_2015](@citet).
+
 As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 """
 ellipe(m::Real) = _ellipe(float(m))
