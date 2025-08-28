@@ -630,7 +630,7 @@ function li(x::Real)
     if x < 0
         throw(DomainError(x, "negative argument, convert to complex first"))
     elseif x == 0
-        return zero(typeof(x))
+        return zero(float(x))
     else
         return expinti(log(x))
     end
