@@ -288,11 +288,17 @@ function _erf(x::Float32)
     
     
   else
-    #  |x| >= 4.0.  
-    r=copysign(1f0,x)
-    end
+#  |x| >= 4.0.  
+
+  if(isnan(x))
+    return NaN
+  end
+  
+  r=copysign(1f0,x)
+
   return r
 
+  end
 
 end
 
