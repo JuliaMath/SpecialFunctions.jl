@@ -25,9 +25,9 @@ for f in (:erf, :erfc)
     end
 end
 
-    _erfc(x::Float64) = ccall((:erfc, libopenlibm), Float64, (Float64,), x)
-    _erfc(x::Float32) = ccall((:erfcf, libopenlibm), Float32, (Float32,), x)
-    _erfc(x::Float16) = Float16(_erfc(Float32(x)))
+_erfc(x::Float64) = ccall((:erfc, libopenlibm), Float64, (Float64,), x)
+_erfc(x::Float32) = ccall((:erfcf, libopenlibm), Float32, (Float32,), x)
+_erfc(x::Float16) = Float16(_erfc(Float32(x)))
 
 for f in (:erfcx, :erfi, :dawson, :faddeeva)
     internalf = Symbol(:_, f)
