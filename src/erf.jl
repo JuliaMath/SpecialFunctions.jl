@@ -200,11 +200,10 @@ function _erf(x::Float64)
 
         r=1.0-evalpoly(a,PF)
         return copysign(r,x)
+    elseif isnan(x)
+        return NaN
     else
-        if(isnan(x))
-             return NaN
-        end
-        copysign(1.0,x)
+        return copysign(1.0,x)
     end
 end
 
