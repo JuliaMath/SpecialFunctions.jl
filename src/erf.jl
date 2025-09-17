@@ -246,7 +246,7 @@ function _erf(x::Float32)
     return copysign(1f0-evalpoly(xabs-2.5f0,p),x)
     
   elseif isnan(x)
-    return NaN
+    return NaN32
   else
     # range [4.0,inf)
     return copysign(1f0, x)
