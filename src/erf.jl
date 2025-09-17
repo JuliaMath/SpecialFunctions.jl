@@ -245,10 +245,11 @@ function _erf(x::Float32)
     p=(0.00040695202f0, -0.002178284f0, 0.0054457085f0, -0.008350053f0, 0.008622011f0, -0.006115167f0, 0.0027899458f0, -0.000519395f0, -0.00030461047f0, 0.00031068458f0, -0.00013866898f0, 3.6909692f-5, -5.682889f-6, 3.929763f-7)
     return copysign(1f0-evalpoly(xabs-2.5f0,p),x)
     
+  elseif isnan(x)
+    return NaN
   else
     # range [4.0,inf)
-    r=copysign(1f0,x)
-    return r
+    return copysign(1f0, x)
   end
 end
 
