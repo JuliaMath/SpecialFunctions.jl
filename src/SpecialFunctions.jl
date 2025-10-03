@@ -103,9 +103,6 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
-if !isdefined(Base, :get_extension)
-    include("../ext/SpecialFunctionsChainRulesCoreExt.jl")
-end
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
