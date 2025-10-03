@@ -17,6 +17,7 @@ jobs:
           - 'min'
           - 'lts'
           - '1'
+          - 'pre'
         os:
           - ubuntu-latest
           - macOS-latest
