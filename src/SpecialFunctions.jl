@@ -18,8 +18,6 @@ import LogExpFunctions
 using OpenLibm_jll
 using OpenSpecFun_jll
 
-using Base.Math: fastabs
-
 export
     airyai,
     airyaiprime,
@@ -117,5 +115,10 @@ for f in (:beta, :lbeta)
     @eval $(f)(::Missing, ::Missing) = missing
 end
 polygamma(m::Integer, x::Missing) = missing
+
+# `fastabs` is identical to `Base.Math.fastabs` which is not used here since it is not public
+# https://github.com/JuliaLang/julia/blob/93fb785831dcfcc442f82fab8746f0244c5274ae/base/special/trig.jl#L1057
+fastabs(x::Number) = abs(x)
+fastabs(x::Complex) = abs(real(x)) + abs(imag(x))
 
 end # module
