@@ -26,7 +26,7 @@ function _digamma(z::ComplexOrReal{Float64})
     # argument," Computer Phys. Commun.  vol. 4, pp. 221–226 (1972).
     x = real(z)
     if x <= 0 # reflection formula
-        ψ = -π * _cotpi(z)
+        ψ = -π / tanpi(z)
         z = 1 - z
         x = real(z)
     else
@@ -54,13 +54,6 @@ function _digamma(x::BigFloat)
     ccall((:mpfr_digamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
-
-"""
-    _cotpi(x) = cot(π * x)
-
-Accurate for integer arguments
-"""
-_cotpi(x) = @static VERSION >= v"1.10.0-DEV.525" ? inv(tanpi(x)) : cospi(x) / sinpi(x)
 
 """
     trigamma(x)
@@ -139,12 +132,12 @@ const cotderiv_Q = [cotderiv_q(m) for m in 1:100]
 function cotderiv(m::Integer, z)
     isinf(imag(z)) && return zero(z)
     if m <= 0
-        m == 0 && return π * _cotpi(z)
+        m == 0 && return π / tanpi(z)
         throw(DomainError(m, "`m` must be nonnegative."))
     end
     if m <= length(cotderiv_Q)
         q = cotderiv_Q[m]
-        x = _cotpi(z)
+        x = inv(tanpi(z))
         y = x*x
         s = q[1] + q[2] * y
         t = y
@@ -816,8 +809,7 @@ function logabsbeta(a::T, b::T) where T<:Real
     if a <= 0 && isinteger(a)
         if a + b <= 0 && isinteger(b)
             r = logbeta(1 - a - b, b)
-            # in julia ≥ 1.7, iseven doesn't require Int (julia#38976)
-            sgn = iseven(@static VERSION ≥ v"1.7" ? b : Int(b)) ? 1 : -1
+            sgn = iseven(b) ? 1 : -1
             return r, sgn
         else
             return -log(zero(a)), 1
