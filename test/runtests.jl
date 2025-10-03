@@ -7,6 +7,8 @@ using Random
 using Test
 using Base.MathConstants: γ
 
+using JET: JET
+
 using SpecialFunctions: AmosException, f64
 
 # useful test functions for relative error, which differ from isapprox
