@@ -17,6 +17,9 @@
         @test ellipk(1.0) == Inf
         @test ellipk(Float16(0.92)) ≈ 2.683551406315229344  rtol=2*eps(Float16)
         @test ellipk(Float32(0.92)) ≈ 2.683551406315229344  rtol=2*eps(Float32)
+        @test isnan(ellipk(NaN))
+        @test ellipk(-Inf) == 0.0
+        @test ellipk(-1e30) ≈ 0.0                          atol=1e-13
         @test_throws MethodError ellipk(BigFloat(0.5))
         @test_throws DomainError ellipk(1.1)
     end
@@ -38,6 +41,9 @@
         @test ellipe(1.0)   ≈ 1.00                          rtol=2*eps()
         @test ellipe(Float16(0.865)) ≈ 1.1322436887003925   rtol=2*eps(Float16)
         @test ellipe(Float32(0.865)) ≈ 1.1322436887003925   rtol=2*eps(Float32)
+        @test isnan(ellipe(NaN))
+        @test ellipe(-Inf) == Inf
+        @test ellipe(-1e16) > ellipe(-1e15)
         @test_throws MethodError ellipe(BigFloat(-1))
         @test_throws DomainError ellipe(1.2)
     end
