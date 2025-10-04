@@ -10,6 +10,8 @@ using Base.MathConstants: γ
 using JET: JET
 
 using SpecialFunctions: AmosException, f64
+using SpecialFunctions.AMOS
+const AMOS = SpecialFunctions.AMOS
 
 # useful test functions for relative error, which differ from isapprox
 # relerr separately looks at the real and imaginary parts if one of the arguments is complex
@@ -24,6 +26,10 @@ checktol(err::Float64) = err ≤ 1e-13
 
 
 tests = [
+# AMOS test
+    "amos/const",
+    "amos/helper",
+#
     "bessel",
     "beta_inc",
     "betanc",
