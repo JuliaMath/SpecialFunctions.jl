@@ -637,7 +637,7 @@ function ChainRulesCore.frule((_, Δa, Δb, Δx), ::typeof(beta_inc), a::Number,
     # derivatives
     T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(x)))
     _, dIa, dIb, dIx = _ibeta_grad_splus(T(a), T(b), T(x))
-    Δp = dIa * T(Δa) + dIb * T(Δb) + dIx * T(Δx)
+    Δp = dIa * convert(T, Δa) + dIb * convert(T, Δb) + dIx * convert(T, Δx)
     Δq = -Δp
     Tout = typeof((p, q))
     return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
@@ -652,7 +652,7 @@ function ChainRulesCore.rrule(::typeof(beta_inc), a::Number, b::Number, x::Numbe
     _, dIa, dIb, dIx = _ibeta_grad_splus(T(a), T(b), T(x))
     function beta_inc_pullback(Δ)
         Δp, Δq = Δ
-        s = T(Δp) - T(Δq) # because q = 1 - p
+        s = Δp - Δq # because q = 1 - p
         ā = Ta(s * dIa)
         b̄ = Tb(s * dIb)
         x̄ = Tx(s * dIx)
@@ -664,7 +664,7 @@ function ChainRulesCore.frule((_, Δa, Δb, Δx, Δy), ::typeof(beta_inc), a::Nu
     p, q = beta_inc(a, b, x, y)
     T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(x)), float(typeof(y)))
     _, dIa, dIb, dIx = _ibeta_grad_splus(T(a), T(b), T(x))
-    Δp = dIa * T(Δa) + dIb * T(Δb) + dIx * (T(Δx) - T(Δy))
+    Δp = dIa * convert(T, Δa) + dIb * convert(T, Δb) + dIx * (convert(T, Δx) - convert(T, Δy))
     Δq = -Δp
     Tout = typeof((p, q))
     return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
@@ -680,7 +680,7 @@ function ChainRulesCore.rrule(::typeof(beta_inc), a::Number, b::Number, x::Numbe
     _, dIa, dIb, dIx = _ibeta_grad_splus(T(a), T(b), T(x))
     function beta_inc_pullback(Δ)
         Δp, Δq = Δ
-        s = T(Δp) - T(Δq)
+        s = Δp - Δq
         ā = Ta(s * dIa)
         b̄ = Tb(s * dIb)
         x̄ = Tx(s * dIx)
@@ -702,7 +702,7 @@ function ChainRulesCore.frule((_, Δa, Δb, Δp), ::typeof(beta_inc_inv), a::Num
     dx_da = -dIa * inv_dIx
     dx_db = -dIb * inv_dIx
     dx_dp = inv_dIx
-    Δx = dx_da * T(Δa) + dx_db * T(Δb) + dx_dp * T(Δp)
+    Δx = dx_da * convert(T, Δa) + dx_db * convert(T, Δb) + dx_dp * convert(T, Δp)
     Δy = -Δx
     Tout = typeof((x, y))
     return (x, y), ChainRulesCore.Tangent{Tout}(Δx, Δy)
@@ -723,7 +723,7 @@ function ChainRulesCore.rrule(::typeof(beta_inc_inv), a::Number, b::Number, p::N
     dx_dp = inv_dIx
     function beta_inc_inv_pullback(Δ)
         Δx, Δy = Δ
-        s = T(Δx) - T(Δy)
+        s = Δx - Δy
         ā = Ta(s * dx_da)
         b̄ = Tb(s * dx_db)
         p̄ = Tp(s * dx_dp)
