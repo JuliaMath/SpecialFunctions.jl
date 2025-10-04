@@ -245,3 +245,13 @@ expinti_real(x) = invoke(expinti, Tuple{Real}, x)
         end
     end
 end
+
+@testset "Logarithmic integral function" begin
+    @test @inferred(li(0.0)) === 0.0 # float 64
+    @test @inferred(li(0.0f0)) === 0.0f0 # float 32
+    @test @inferred(li(Float16(0))) === Float16(0) # float 16
+
+    @test @inferred(li(1.0)) === -Inf
+    @test @inferred(li(Inf)) === Inf
+    @test @inferred(li(2)) ≈ 1.0451637801174927 # this errors idk why
+end
