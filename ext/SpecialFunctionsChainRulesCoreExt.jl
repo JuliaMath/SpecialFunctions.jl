@@ -392,13 +392,25 @@ end
 
 
 function _dan_dq(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
-    # ∂a_n/∂q via log-derivative; for n=1, uses ∂a₁/∂q
+    # ∂a_n/∂q avoiding the removable singularity at q ≈ n for integer q.
+    # For n=1, defer to the specific a₁ derivative.
     if n == 1
         return _da1_dq(p, q, f)
     end
-    an = _anfun(p, q, f, n)
-    dlog = inv(p + q + n - 2) + inv(q - n)
-    return an * dlog
+    # Use the simplified closed-form of a_n that eliminates explicit q^2 via f:
+    #   a_n = (x/(1-x))^2 * (n-1) * (p+n-1) * (p+q+n-2) * (q-n) / D(p,n)
+    # where D(p,n) = (p+2n-3)*(p+2n-2)^2*(p+2n-1) and (x/(1-x)) = p*f/q.
+    # Differentiate only the q-dependent factor G(q) = (p+q+n-2)*(q-n):
+    #   dG/dq = (q-n) + (p+q+n-2) = p + 2q - 2.
+
+    # This is equivalent to  
+    #   return _anfun(p,q,f,n) * (inv(p+q+n-2) + inv(q-n))
+    # but more precise.
+
+    pfq = (p * f) / q
+    C   = (pfq * pfq) * (n - 1) * (p + n - 1) /
+          ((p + 2*n - 3) * (p + 2*n - 2)^2 * (p + 2*n - 1))
+    return C * (p + 2*q - 2)
 end
 
 function _dbn_dp(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
@@ -542,11 +554,17 @@ function _beta_inc_grad(a::T, b::T, x::T; maxapp::Int=200, minapp::Int=3, err::T
             dBpp_dq *= invs
         end
 
-        # Form current approximant Cn=A_n/B_n and its derivatives
-        Cn    = An/Bn
-        dI_dp = dK_dp_val * Cn + K * (inv(Bn) * dAn_dp - (An/(Bn^2)) * dBn_dp)
-        dI_dq = dK_dq_val * Cn + K * (inv(Bn) * dAn_dq - (An/(Bn^2)) * dBn_dq)
-        Ixpqn = K * Cn
+        # Form current approximant Cn=A_n/B_n and its derivatives.
+        # Guard against tiny/zero Bn to avoid NaNs/Inf in divisions.
+        tiny   = sqrt(eps(T))
+        absBn  = abs(Bn)
+        sgnBn  = ifelse(Bn >= zeroT, oneT, -oneT)
+        invBn  = absBn > tiny && isfinite(absBn) ? inv(Bn) : inv(sgnBn * tiny)
+        Cn     = An * invBn
+        invBn2 = invBn * invBn
+        dI_dp  = dK_dp_val * Cn + K * (invBn * dAn_dp - (An * invBn2) * dBn_dp)
+        dI_dq  = dK_dq_val * Cn + K * (invBn * dAn_dq - (An * invBn2) * dBn_dq)
+        Ixpqn  = K * Cn
 
         # Decide convergence: 
         if n >= minapp
