@@ -227,9 +227,28 @@
         end
 
         @testset "incomplete beta: basic test_frule/test_rrule" begin
-            # Use a small, representative set of interior points (avoid endpoints for FD)
-            test_points = (0.2, 0.5, 0.8)
-            ab = (0.7, 2.5)
+            # Use an expanded set of interior points (avoid endpoints for FD) to exercise many branches:
+            # Rationale for x values:
+            # - Include values around 0.1, 0.3, 0.5, 0.7, 0.9 to trigger different code paths.
+            # - Include 0.14 and 0.28 to straddle the bx ≤ 0.7 power-series threshold for b ≈ 5 and 2.5.
+            # - Include values near 0.5 (0.49, 0.51) to probe near-symmetry and tail swaps.
+            # - Include additional midpoints to increase chance that x ≈ a/(a+b) for some (a,b), which makes λ ≈ 0
+            #   in the large-parameter regime (key for choosing symmetric asymptotics when min(a,b) > 100).
+            # - Add a few more around 0.6–0.8 to exercise continued fraction vs. asymptotics for large (a,b).
+            test_points = (
+                0.05, 0.08, 0.10, 0.12, 0.14, 0.18, 0.20, 0.22, 0.26,
+                0.28, 0.30, 0.32, 0.35, 0.38, 0.40, 0.42, 0.45,
+                0.49, 0.50, 0.51, 0.55, 0.58, 0.60, 0.62, 0.65,
+                0.68, 0.70, 0.72, 0.76, 0.80, 0.85, 0.90
+            )
+            # Rationale for a,b values:
+            # - <1: 0.4, 0.6 to stress small-parameter power series branches.
+            # - Near 1: 0.9, 1.1 to test branch boundaries and continuity across a≈1, b≈1.
+            # - Moderate: 2.5, 5.0 where multiple algorithm choices engage based on x and bx.
+            # - Large (≥15, ≥40) to drive large-parameter regimes: 16.0, 45.0.
+            # - Very large (≫100): 100.5, 150.0 to ensure symmetric vs asymmetric asymptotics are exercised when λ
+            #   is small/large, and continued fractions are robust for large shapes.
+            ab = (0.4, 0.6, 0.9, 1.1, 2.5, 5.0, 16.0, 45.0, 100.5, 150.0)
 
             # 3-argument beta_inc(a,b,x)
             for a in ab, b in ab, x in test_points
@@ -256,8 +275,12 @@
         end
 
         @testset "4-arg beta_inc identities (y = 1 - x)" begin
-            test_points = (0.2, 0.5, 0.8)
-            ab = (0.7, 2.5)
+            # Exercise more regimes while keeping y = 1 - x constraint.
+            # Same rationale as above for x and (a,b) coverage.
+            test_points = (
+                0.05, 0.10, 0.12, 0.14, 0.20, 0.28, 0.35, 0.40, 0.49, 0.50, 0.51, 0.60, 0.65, 0.70, 0.72, 0.80, 0.90
+            )
+            ab = (0.4, 0.6, 0.9, 1.1, 2.5, 5.0, 16.0, 45.0, 100.5, 150.0)
 
             for a in ab, b in ab, x in test_points
                 0.0 < x < 1.0 || continue
