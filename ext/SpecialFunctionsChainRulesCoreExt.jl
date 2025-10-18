@@ -1,8 +1,9 @@
 module SpecialFunctionsChainRulesCoreExt
 
-using SpecialFunctions, ChainRulesCore
+using SpecialFunctions
+using ChainRulesCore: ChainRulesCore
 
-import SpecialFunctions: sqrtπ, invπ
+using SpecialFunctions: sqrtπ, invπ
 
 const BESSEL_ORDER_INFO = """
 derivatives of Bessel functions with respect to the order are not implemented currently:

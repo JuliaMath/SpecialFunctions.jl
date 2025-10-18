@@ -7,7 +7,14 @@ end
     @test ExplicitImports.check_no_implicit_imports(SpecialFunctions) === nothing
 
     # All explicit imports (`using XY: Z`) are loaded via their owners
-    @test ExplicitImports.check_all_explicit_imports_via_owners(SpecialFunctions) === nothing
+    @test ExplicitImports.check_all_explicit_imports_via_owners(
+        SpecialFunctions;
+        ignore = (
+            # Ref https://github.com/JuliaTesting/ExplicitImports.jl/issues/92
+            :invπ, # SpecialFunctions
+            :sqrtπ, # SpecialFunctions
+        ),
+    ) === nothing
 
     # Limit explicit imports (`using XY: Z`) of non-public names to a minimum
     @test ExplicitImports.check_all_explicit_imports_are_public(
@@ -16,6 +23,9 @@ end
             :MPFRRoundingMode, # Base.MPFR
             :ROUNDING_MODE, # Base.MPFR
             :nan_dom_err, # Base.Math
+            # Ref https://github.com/JuliaTesting/ExplicitImports.jl/issues/92
+            :invπ, # SpecialFunctions
+            :sqrtπ, # SpecialFunctions
         ),
     ) === nothing
 
@@ -35,6 +45,7 @@ end
             :ROUNDING_MODE, # Base.MPFR
             :_fact_table64, # Base
             :version, # Base.MPFR
+            (VERSION < v"1.11" ? (:depwarn,) : ())..., # Base
         ),
     ) === nothing
 
