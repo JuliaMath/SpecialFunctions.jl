@@ -15,8 +15,8 @@ using IrrationalConstants:
 
 import LogExpFunctions
 
-using OpenLibm_jll
-using OpenSpecFun_jll
+using OpenLibm_jll: libopenlibm
+using OpenSpecFun_jll: libopenspecfun
 
 export
     airyai,

@@ -1015,6 +1015,7 @@ end
 
 function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
     haseta = false
+    fp = NaN
 
     logp = pcase ? log(minpq) : log1p(-minpq)
     loggamma1pa = a <= 1.0 ? loggamma1p(a) : loggamma(a + 1.0)
