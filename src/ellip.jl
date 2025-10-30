@@ -212,7 +212,7 @@ function _ellipe(m::Float64)
     isnan(m) && return NaN
     (m === -Inf) && return Inf
 
-    flag_is_m_neg = false
+    flag_is_m_neg = m < 0.0
     if flag_is_m_neg
         x               = m / (m-1)         #dealing with negative args
     else
