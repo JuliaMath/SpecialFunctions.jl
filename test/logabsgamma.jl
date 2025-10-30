@@ -156,3 +156,11 @@ x = 8.000001f0
 # (i.e. prevfloat(8.000001f0) == 8.0f0)
 # We still check appropriate behavior at 8.0f0
 @test ulp(8.0f0) < 0.4006594736129046
+
+@testset "JET" begin
+    # issue #502
+    JET.@test_call logabsgamma(1.0)
+    JET.@test_opt logabsgamma(1.0)
+    JET.@test_call logabsgamma(1f0)
+    JET.@test_opt logabsgamma(1f0)
+end

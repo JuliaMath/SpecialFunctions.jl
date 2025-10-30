@@ -20,33 +20,37 @@ function _logabsgamma(x::Float32)
     hx = reinterpret(Int32, x)
 
     #= purge off +-inf, NaN, +-0, tiny and negative arguments =#
-    signgam = 1
-    isneg = hx < Int32(0)
     ix = hx & 0x7fffffff
-    ix ≥ 0x7f800000 && return x * x, signgam
-    ix == 0x00000000 && return Inf32, signgam
+    ix ≥ 0x7f800000 && return x * x, 1
+    ix == 0x00000000 && return Inf32, 1
+    isneg = hx < Int32(0)
     if ix < 0x35000000 #= |x|<2**-21, return -log(|x|) =#
         if isneg
-            signgam = -1
-            return -log(-x), signgam
+            return -log(-x), -1
         else
-            return -log(x), signgam
+            return -log(x), 1
         end
     end
+
+    # remaining cases
     if isneg
         # ix ≥ 0x4b000000 && return Inf32, signgam #= |x|>=2**23, must be -integer =#
         t = sinpi(x)
-        t == 0.0f0 && return Inf32, signgam #= -integer =#
-        nadj = logπ - log(abs(t * x))
-        if t < 0.0f0; signgam = -1; end
-        x = -x
+        t == 0.0f0 && return Inf32, 1 #= -integer =#
+        r = logπ - log(abs(t * x)) - _logabsgamma_pos(-x, ix)
+        signgam = copysign(1, t)
+    else
+        r = _logabsgamma_pos(x, ix)
+        signgam = 1
     end
-
+    return r, signgam
+end
+function _logabsgamma_pos(x::Float32, ix::UInt32)
     if ix < 0x40000000 #= x < 2.0 =#
         i = round(x, RoundToZero)
         f = x - i
         if f == 0.0f0 #= purge off 1; 2 handled by x < 8.0 branch =#
-            return 0.0f0, signgam
+            return 0.0f0
         elseif i == 1.0f0
             r = 0.0f0
             c = 1.0f0
@@ -99,8 +103,5 @@ function _logabsgamma(x::Float32)
         #= 2^58 ≤ x ≤ Inf =#
         r = muladd(x, log(x), -x)
     end
-    if isneg
-        r = nadj - r
-    end
-    return r, signgam
+    return r
 end

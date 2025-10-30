@@ -7,6 +7,10 @@ using Random
 using Test
 using Base.MathConstants: γ
 
+using Aqua: Aqua
+using ExplicitImports: ExplicitImports
+using JET: JET
+
 using SpecialFunctions: AmosException, f64
 
 # useful test functions for relative error, which differ from isapprox
@@ -33,7 +37,8 @@ tests = [
     "logabsgamma",
     "sincosint",
     "other_tests",
-    "chainrules"
+    "chainrules",
+    "qa"
 ]
 
 const testdir = dirname(@__FILE__)
