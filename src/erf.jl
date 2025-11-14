@@ -101,6 +101,7 @@ See also:
 - `Float64`: Julia implementation of https://github.com/ARM-software/optimized-routines/blob/master/math/erf.c 
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
+function erf end
 
 #    Fast erf implementation using a mix of
 #    rational and polynomial approximations.
@@ -255,8 +256,6 @@ end
 
 _erf(x::Float16)=Float16(_erf(Float32(x)))
 
-
-function erf end
 """
     erf(x, y)
 
