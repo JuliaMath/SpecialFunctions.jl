@@ -36,13 +36,11 @@ As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 ellipk(m::Real) = _ellipk(float(m))
 
 function _ellipk(m::Float64)
-    flag_is_m_neg = false
-    if m < 0.0
+    flag_is_m_neg = m < 0.0
+    if flag_is_m_neg
         x               = m / (m-1)         #dealing with negative args
-        flag_is_m_neg   = true
-    elseif m >= 0.0
+    else
         x               = m
-        flag_is_m_neg   = false
     end
 
     if x == 0.0
@@ -54,7 +52,7 @@ function _ellipk(m::Float64)
     elseif x > 1.0
         throw(DomainError(m, "`m` must lie between -Inf and 1 ---- Domain: (-Inf,1.0]"))
 
-    elseif 0.0 <= x < 0.1   #Table 2 from paper
+    elseif 0.0 < x < 0.1   #Table 2 from paper
         t = x-0.05
         t = @horner(t,
             1.591003453790792180 , 0.416000743991786912 , 0.245791514264103415 ,
@@ -146,7 +144,8 @@ function _ellipk(m::Float64)
             1170222242422.439893 , 8777948323668.937971 , 66101242752484.95041 ,
             499488053713388.7989 , 37859743397240299.20)
 
-    elseif x >= 0.9
+    else
+        @assert 0.9 <= x < 1
         td  = 1-x
         td1 = td-0.05
         qd  = @horner(td,
@@ -207,13 +206,11 @@ As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 ellipe(m::Real) = _ellipe(float(m))
 
 function _ellipe(m::Float64)
-    flag_is_m_neg = false
-    if m < 0.0
+    flag_is_m_neg = m < 0.0
+    if flag_is_m_neg
         x               = m / (m-1)         #dealing with negative args
-        flag_is_m_neg   = true
-    elseif m >= 0.0
+    else
         x               = m
-        flag_is_m_neg   = false
     end
 
     if x == 0.0
@@ -224,7 +221,7 @@ function _ellipe(m::Float64)
     elseif x > 1.0
         throw(DomainError(m,"`m` must lie between -Inf and 1 ---- Domain : (-inf,1.0]"))
 
-    elseif 0.0 <= x < 0.1   #Table 2 from paper
+    elseif 0.0 < x < 0.1   #Table 2 from paper
         t = x-0.05
         t = @horner(t  ,
             +1.550973351780472328 , -0.400301020103198524 , -0.078498619442941939 ,
@@ -311,7 +308,8 @@ function _ellipe(m::Float64)
             -16120097.81581656797 , -109209938.5203089915 , -749380758.1942496220 ,
             -5198725846.725541393 , -36409256888.12139973)
 
-    elseif x >= 0.9
+    else
+        @assert 0.9 <= x < 1.0
         td  = 1-x
         td1 = td-0.05
 
