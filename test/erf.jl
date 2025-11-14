@@ -31,6 +31,7 @@
             @test erfc(T(4.0))   ≈ T(1.541725790028002e-8) rtol=2*eps(T)
             @test erfc(T(5.0))   ≈ T(1.537459794428035e-12) rtol=2*eps(T)
             @test erfc(T(6.0))   ≈ T(2.1519736712498913e-17) rtol=2*eps(T)
+            @test erfc(T(Inf))   ≈ T(0.0) rtol=2*eps(T)
 
             @test erfc(T(-0.25))   ≈ T(1.276326390168237) rtol=2*eps(T)
             @test erfc(T(-0.75))   ≈ T(1.7111556336535152) rtol=2*eps(T)
