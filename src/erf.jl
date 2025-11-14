@@ -117,7 +117,7 @@ function _erf(x::Float64)
 
         x2 = x * x
 
-        if (ia < 0x3fe00000)
+        if (ia < 0x3fe0)
         ## a < 0.5  - Use polynomial approximation.  
 
             # Minimax approximation of erf of the form x*P(x^2) approximately on the interval [0;0.5]
