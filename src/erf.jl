@@ -104,15 +104,15 @@ See also:
 
 #    Fast erf implementation using a mix of
 #    rational and polynomial approximations.
-#    Highest measured error is 1.01 ULPs at 0x1.39956ac43382fp+0.  
+#    Highest measured error is 0.80 ULPs at 0.827964. 
 function _erf(x::Float64)
 
-    # # top 32 bits 
-    ix::UInt32=reinterpret(UInt64,x)>>32
-    # # top 32, without sign bit 
-    ia::UInt32=ix & 0x7fffffff
+    # # top 16 bits 
+    ix::UInt16=reinterpret(UInt64,x)>>48
+    # # top 16, without sign bit 
+    ia::UInt16=ix & 0x7fff
 
-    if (ia < 0x3feb0000)
+    if (ia < 0x3feb)
     #  a = |x| < 0.84375.  
 
         x2 = x * x
@@ -137,7 +137,7 @@ function _erf(x::Float64)
 
             return fma(P / Q, x, x)
         end
-    elseif (ia < 0x3ff40000)
+    elseif (ia < 0x3ff4)
     ## 0.84375 <= |x| < 1.25.  
 
         # Rational approximation on [0.84375, 1.25] 
@@ -154,7 +154,7 @@ function _erf(x::Float64)
         r= C + P / Q
         return copysign(r,x)
 
-    elseif (ia < 0x40000000)
+    elseif (ia < 0x4000)
     ## 1.25 <= |x| < 2.0.  
         a = abs(x)
         a = a - 1.25
@@ -167,7 +167,7 @@ function _erf(x::Float64)
         r=1.0-evalpoly(a,PC)
         return copysign(r,x)
 
-    elseif (ia < 0x400a0000)
+    elseif (ia < 0x400a)
     ## 2 <= |x| < 3.25.  
         a = abs(x)
         a = fma(0.5, a, -1.0)
@@ -179,24 +179,24 @@ function _erf(x::Float64)
         r=1.0-evalpoly(a,PD)
         return copysign(r,x)
 
-    elseif (ia < 0x40100000)
-    ## 3.25 <= |x| < 4.0.  
+    elseif (ia < 0x4012)
+    ## 3.25 <= |x| < 4.5.  
         a = abs(x)
         a = a - 3.25
 
-        # Generated using Sollya::remez(f(c*x+d), deg, [(a-d)/c;(b-d)/c], 1, 1e-16), [|D ...|] with deg=13 a=3.25 b=4 c=1 d=3.25 
-        PE=( 0x1.20c13035539e4p-18, -0x1.e9b5e8d16df7ep-16, 0x1.8de3cd4733bf9p-14, -0x1.9aa48beb8382fp-13, 0x1.2c7d713370a9fp-12, -0x1.490b12110b9e2p-12, 0x1.1459c5d989d23p-12, -0x1.64b28e9f1269p-13, 0x1.57c76d9d05cf8p-14, -0x1.bf271d9951cf8p-16, 0x1.db7ea4d4535c9p-19, 0x1.91c2e102d5e49p-20, -0x1.e9f0826c2149ep-21, 0x1.60eebaea236e1p-23 )
+        # Generated using Sollya::remez(erfc(x+a),15,[0;b-a],1,1e-32) with a=3.25 b=4.5 
+        PE=(4.302779463707753e-6, -2.9189025396754986e-5, 9.486433337913454e-5, -0.00019580973528519273, 0.00028656966098267845, -0.0003137999213284758, 0.00026354316698539023, -0.00017004596013480086, 8.179009099315484e-5, -2.6177001557562883e-5, 2.6667235974837568e-6, 2.5840073872012914e-6, -1.7970865794807476e-6, 6.040008157462737e-7, -1.1384065360475506e-7, 9.657905491660664e-9)
 
         r=1.0-evalpoly(a,PE)
         return copysign(r,x)
 
-    elseif (ia < 0x4017a000)
-    ## 4 <= |x| < 5.90625.  
+    elseif (ia < 0x4018)
+    ## 4.5 <= |x| < 6.0.  
         a = abs(x)
-        a = fma(0.5, a, -2.0)
+        a = a - 4.5
 
-        # Generated using Sollya::remez(f(c*x+d), deg, [(a-d)/c;(b-d)/c], 1, 1e-16), [|D ...|] with deg=16 a=4 b=5.90625 c=2 d=4 
-        PF=( 0x1.08ddd130d1fa6p-26, -0x1.10b146f59ff06p-22, 0x1.10b135328b7b2p-19, -0x1.6039988e7575fp-17, 0x1.497d365e19367p-15, -0x1.da48d9afac83ep-14, 0x1.1024c9b1fbb48p-12, -0x1.fc962e7066272p-12, 0x1.87297282d4651p-11, -0x1.f057b255f8c59p-11, 0x1.0228d0eee063p-10, -0x1.b1b21b84ec41cp-11, 0x1.1ead8ae9e1253p-11, -0x1.1e708fba37fccp-12, 0x1.9559363991edap-14, -0x1.68c827b783d9cp-16, 0x1.2ec4adeccf4a2p-19 )
+        # Generated using Sollya::remez(erfc(x+a),14,[0;b-a],1,1e-32) with a=4.5 b=6.0 
+        PF=(1.966160232770269e-10, -1.8112993751963606e-9, 8.150538393058677e-9, -2.3841928179141717e-8, 5.086831026559613e-8, -8.405611838790292e-8, 1.1114551347025387e-7, -1.1927287548359634e-7, 1.0374501165951575e-7, -7.205498311583407e-8, 3.885921643476988e-8, -1.558946100318052e-8, 4.352049759187871e-9, -7.505506222192582e-10, 5.996753601814976e-11)
 
         r=1.0-evalpoly(a,PF)
         return copysign(r,x)
