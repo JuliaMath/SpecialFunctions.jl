@@ -12,9 +12,6 @@ for f in (:erf, :erfc)
     @eval begin
         $f(x::Number) = $internalf(float(x))
 
-        $internalf(x::Float64) = ccall(($libopenlibmf, libopenlibm), Float64, (Float64,), x)
-        $internalf(x::Float32) = ccall(($libopenlibmf0, libopenlibm), Float32, (Float32,), x)
-        $internalf(x::Float16) = Float16($internalf(Float32(x)))
 
         $internalf(z::Complex{Float64}) = Complex{Float64}(ccall(($openspecfunf, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), z, zero(Float64)))
         $internalf(z::Complex{Float32}) = Complex{Float32}(ccall(($openspecfunf, libopenspecfun), Complex{Float64}, (Complex{Float64}, Float64), Complex{Float64}(z), Float64(eps(Float32))))
@@ -27,6 +24,10 @@ for f in (:erf, :erfc)
         end
     end
 end
+
+_erfc(x::Float64) = ccall((:erfc, libopenlibm), Float64, (Float64,), x)
+_erfc(x::Float32) = ccall((:erfcf, libopenlibm), Float32, (Float32,), x)
+_erfc(x::Float16) = Float16(_erfc(Float32(x)))
 
 for f in (:erfcx, :erfi, :dawson, :faddeeva)
     internalf = Symbol(:_, f)
@@ -96,11 +97,165 @@ See also:
 [`erfinv(x)`](@ref erfinv), [`erfcinv(x)`](@ref erfcinv).
 
 # Implementation by
-- `Float32`/`Float64`: C standard math library
-    [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm).
+- `Float32`: polynomial approximations of erf 
+- `Float64`: Julia implementation of https://github.com/ARM-software/optimized-routines/blob/master/math/erf.c 
 - `BigFloat`: C library for multiple-precision floating-point [MPFR](https://www.mpfr.org/)
 """
 function erf end
+
+#    Fast erf implementation using a mix of
+#    rational and polynomial approximations.
+#    Highest measured error is 0.80 ULPs at 0.827964. 
+function _erf(x::Float64)
+
+    # # top 16 bits 
+    ix::UInt16=reinterpret(UInt64,x)>>48
+    # # top 16, without sign bit 
+    ia::UInt16=ix & 0x7fff
+
+    if (ia < 0x3feb)
+    #  a = |x| < 0.84375.  
+
+        x2 = x * x
+
+        if (ia < 0x3fe0)
+        ## a < 0.5  - Use polynomial approximation.  
+
+            # Minimax approximation of erf of the form x*P(x^2) approximately on the interval [0;0.5]
+            PA=(0.12837916709551256, -0.3761263890318287, 0.11283791670896592, -0.026866170630075903, 0.005223977428649761, -0.0008548312229989974, 0.00012054654502151287, -1.4906315067498891e-5, 1.6126444349070824e-6, -1.3074259056679966e-7)
+        
+            r= fma(x,evalpoly(x2,PA),x) ## This fma is crucial for accuracy.  
+            return r
+        else
+        ## 0.5 <= a < 0.84375 - Use rational approximation.  
+
+            # Rational approximation on [0x1p-28, 0.84375] 
+            NA=(0x1.06eba8214db68p-3, -0x1.4cd7d691cb913p-2, -0x1.d2a51dbd7194fp-6,-0x1.7a291236668e4p-8, -0x1.8ead6120016acp-16)
+            DA=(1,0x1.97779cddadc09p-2, 0x1.0a54c5536cebap-4, 0x1.4d022c4d36b0fp-8,0x1.15dc9221c1a1p-13, -0x1.09c4342a2612p-18)
+
+            P=evalpoly(x2,NA)
+            Q=evalpoly(x2,DA)
+
+            return fma(P / Q, x, x)
+        end
+    elseif (ia < 0x3ff4)
+    ## 0.84375 <= |x| < 1.25.  
+
+        # Rational approximation on [0.84375, 1.25] 
+        NB=( -0x1.359b8bef77538p-9, 0x1.a8d00ad92b34dp-2, -0x1.7d240fbb8c3f1p-2, 0x1.45fca805120e4p-2, -0x1.c63983d3e28ecp-4, 0x1.22a36599795ebp-5, -0x1.1bf380a96073fp-9 )
+        DB=( 1, 0x1.b3e6618eee323p-4, 0x1.14af092eb6f33p-1, 0x1.2635cd99fe9a7p-4, 0x1.02660e763351fp-3, 0x1.bedc26b51dd1cp-7, 0x1.88b545735151dp-7 )
+
+        C = 0x1.b0ac16p-1
+
+        a = abs(x) - 1.0
+
+        P=evalpoly(a,NB)
+        Q=evalpoly(a,DB)
+
+        r= C + P / Q
+        return copysign(r,x)
+
+    elseif (ia < 0x4000)
+    ## 1.25 <= |x| < 2.0.  
+        a = abs(x)
+        a = a - 1.25
+        
+        # erfc polynomial approximation
+        # Generated using Sollya::remez(f(c*x+d), deg, [(a-d)/c;(b-d)/c], 1, 1e-16), [|D ...|] with deg=15 a=1.25 b=2 c=1 d=1.25 
+        PC=( 0x1.3bcd133aa0ffcp-4, -0x1.e4652fadcb702p-3, 0x1.2ebf3dcca0446p-2, -0x1.571d01c62d66p-3, 0x1.93a9a8f5b3413p-8, 0x1.8281cbcc2cd52p-5, -0x1.5cffd86b4de16p-6, -0x1.db4ccf595053ep-9, 0x1.757cbf8684edap-8, -0x1.ce7dfd2a9e56ap-11, -0x1.99ee3bc5a3263p-11, 0x1.3c57cf9213f5fp-12, 0x1.60692996bf254p-14, -0x1.6e44cb7c1fa2ap-14, 0x1.9d4484ac482b2p-16, -0x1.578c9e375d37p-19)
+
+        # Obtains erfc of |x|
+        r=1.0-evalpoly(a,PC)
+        return copysign(r,x)
+
+    elseif (ia < 0x400a)
+    ## 2 <= |x| < 3.25.  
+        a = abs(x)
+        a = fma(0.5, a, -1.0)
+
+        # Generated using Sollya::remez(f(c*x+d), deg, [(a-d)/c;(b-d)/c], 1, 1e-16), [|D ...|] with deg=17 a=2 b=3.25 c=2 d=2 
+        PD=( 0x1.328f5ec350e5p-8, -0x1.529b9e8cf8e99p-5, 0x1.529b9e8cd9e71p-3, -0x1.8b0ae3a023bf2p-2, 0x1.1a2c592599d82p-1, -0x1.ace732477e494p-2, -0x1.e1a06a27920ffp-6, 0x1.bae92a6d27af6p-2, -0x1.a15470fcf5ce7p-2, 0x1.bafe45d18e213p-6, 0x1.0d950680d199ap-2, -0x1.8c9481e8f22e3p-3, -0x1.158450ed5c899p-4, 0x1.c01f2973b44p-3, -0x1.73ed2827546a7p-3, 0x1.47733687d1ff7p-4, -0x1.2dec70d00b8e1p-6, 0x1.a947ab83cd4fp-10 )
+
+        # Obtains erfc of |x|
+        r=1.0-evalpoly(a,PD)
+        return copysign(r,x)
+
+    elseif (ia < 0x4012)
+    ## 3.25 <= |x| < 4.5.  
+        a = abs(x)
+        a = a - 3.25
+
+        # Generated using Sollya::remez(erfc(x+a),15,[0;b-a],1,1e-32) with a=3.25 b=4.5 
+        PE=(4.302779463707753e-6, -2.9189025396754986e-5, 9.486433337913454e-5, -0.00019580973528519273, 0.00028656966098267845, -0.0003137999213284758, 0.00026354316698539023, -0.00017004596013480086, 8.179009099315484e-5, -2.6177001557562883e-5, 2.6667235974837568e-6, 2.5840073872012914e-6, -1.7970865794807476e-6, 6.040008157462737e-7, -1.1384065360475506e-7, 9.657905491660664e-9)
+
+        r=1.0-evalpoly(a,PE)
+        return copysign(r,x)
+
+    elseif (ia < 0x4018)
+    ## 4.5 <= |x| < 6.0.  
+        a = abs(x)
+        a = a - 4.5
+
+        # Generated using Sollya::remez(erfc(x+a),14,[0;b-a],1,1e-32) with a=4.5 b=6.0 
+        PF=(1.966160232770269e-10, -1.8112993751963606e-9, 8.150538393058677e-9, -2.3841928179141717e-8, 5.086831026559613e-8, -8.405611838790292e-8, 1.1114551347025387e-7, -1.1927287548359634e-7, 1.0374501165951575e-7, -7.205498311583407e-8, 3.885921643476988e-8, -1.558946100318052e-8, 4.352049759187871e-9, -7.505506222192582e-10, 5.996753601814976e-11)
+
+        r=1.0-evalpoly(a,PF)
+        return copysign(r,x)
+    elseif isnan(x)
+        return NaN
+    else
+        return copysign(1.0,x)
+    end
+end
+
+#    Fast erf implementation using 
+#    polynomial approximations of erf and erfc.
+#    Highest measured error is 1.12 ULPs at x = 1.232469  
+function _erf(x::Float32)
+    xabs=abs(x)
+
+  if (xabs< 0.5)
+    # range [0;0.5]
+    # # erf approximation using erf(x)=x+x*P(x^2) with degree 6
+    # Sollya::remez(erf(sqrt(x))/sqrt(x)-1,6,[1e-32;0.5],1,1e-32);
+
+    p=(0.12837917f0, -0.37612638f0, 0.11283784f0, -0.026865287f0, 0.005218856f0, -0.0008394848f0)
+    return copysign(fma(evalpoly(x^2,p),x,x),x)
+
+  elseif(xabs<1.25)
+    # range [0.5;1.25]
+    # # erfc approximation with degree 11
+    # Sollya::remez(erfc(x+0.5),11,[0;1.25-0.5],1,1e-32);
+    
+    p=(0.47950011f0, -0.8787826f0, 0.4393913f0, 0.14646415f0, -0.18308467f0, -0.007286422f0, 0.04987047f0, -0.0048868246f0, -0.011067663f0, 0.003422347f0, 0.00073027064f0, -0.0003758171f0)
+    return copysign(1f0-evalpoly(xabs-0.5f0,p),x)
+
+  elseif(xabs<2.5)
+    # range [1.25;2.5]
+    # erfc approximation with degree 13
+    # Sollya::remez(erfc(x+1.25),13,[1.25-1.25;2.5-1.25],1,1e-32);
+
+    p=(0.077099875f0, -0.23652112f0, 0.2956514f0, -0.16753574f0, 0.006158593f0, 0.04718712f0, -0.021331023f0, -0.0035262543f0, 0.005461831f0, -0.00047858673f0, -0.0012763853f0, 0.00073386944f0, -0.00017831658f0, 1.7451624f-5)
+    return copysign(1f0-evalpoly(xabs-1.25f0,p),x)
+
+  elseif (xabs<4.0)
+    # range [2.5;4.0]
+    # erfc approximation with degree 13
+    # Sollya::remez(erfc(x+2.5),13,[0;4-2.5],1,1e-32);
+
+    p=(0.00040695202f0, -0.002178284f0, 0.0054457085f0, -0.008350053f0, 0.008622011f0, -0.006115167f0, 0.0027899458f0, -0.000519395f0, -0.00030461047f0, 0.00031068458f0, -0.00013866898f0, 3.6909692f-5, -5.682889f-6, 3.929763f-7)
+    return copysign(1f0-evalpoly(xabs-2.5f0,p),x)
+    
+  elseif isnan(x)
+    return NaN32
+  else
+    # range [4.0,inf)
+    return copysign(1f0, x)
+  end
+end
+
+_erf(x::Float16)=Float16(_erf(Float32(x)))
+
 """
     erf(x, y)
 
