@@ -174,18 +174,37 @@
 end
 
 @testset "zeta" begin
+    # Riemann zeta function
+    # https://en.wikipedia.org/wiki/Particular_values_of_the_Riemann_zeta_function
     @test zeta(0) ≈ -0.5
+    # Positive integers
+    @test isnan(zeta(1))
     @test zeta(2) ≈ pi^2/6
     @test zeta(Complex{Float32}(2)) ≈ zeta(2)
+    @test zeta(3) ≈ 1.2020569031595942  # Apéry's constant 
     @test zeta(4) ≈ pi^4/90
-    @test zeta(1,Float16(2.)) ≈ zeta(1,2.)
-    @test zeta(1.,Float16(2.)) ≈ zeta(1,2.)
-    @test zeta(Float16(1.),Float16(2.)) ≈ zeta(1,2.)
+    @test zeta(6) ≈ pi^6/945
+    @test zeta(8) ≈ pi^8/9450
+    # Negative integers
+    for n in 1:10
+        # trivial zeros
+        @test zeta(-2n) == 0
+    end
+    @test zeta(-1) ≈ -1/12
+    @test zeta(-3) ≈ 1/120
+    @test zeta(-5) ≈ -1/252
+    @test zeta(-7) ≈ 1/240
+    # NaN
     @test isnan(zeta(NaN))
     @test isnan(zeta(1.0e0))
     @test isnan(zeta(1.0f0))
-    @test isnan(zeta(complex(0,Inf)))
-    @test isnan(zeta(complex(-Inf,0)))
+    @test isnan(zeta(complex(0, Inf)))
+    @test isnan(zeta(complex(-Inf, 0)))
+
+    # Hurwitz zeta function
+    @test zeta(1, Float16(2.)) ≈ zeta(1, 2.)
+    @test zeta(1., Float16(2.)) ≈ zeta(1, 2.)
+    @test zeta(Float16(1.), Float16(2.)) ≈ zeta(1, 2.)
 end
 
 #(compared to Wolfram Alpha)
