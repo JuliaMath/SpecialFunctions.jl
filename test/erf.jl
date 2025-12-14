@@ -2,10 +2,47 @@
     @testset "real argument" begin
         for T in (Float16, Float32, Float64)
             @test @inferred(erf(T(1))) isa T
+            @test erf(T(0.25))   ≈ T(0.27632639016823696) rtol=2*eps(T)
+            @test erf(T(0.75))   ≈ T(0.7111556336535151) rtol=2*eps(T)
             @test erf(T(1))   ≈ T(0.84270079294971486934) rtol=2*eps(T)
+            @test erf(T(1.5))   ≈ T(0.9661051464753108) rtol=2*eps(T)
+            @test erf(T(2.5))   ≈ T(0.9995930479825551) rtol=2*eps(T)
+            @test erf(T(3.5))   ≈ T(0.9999992569016276) rtol=2*eps(T)
+            @test erf(T(4.5))   ≈ T(0.9999999998033839) rtol=2*eps(T)
+            @test erf(T(6))   ≈ T(1.0) rtol=2*eps(T)
+
+            @test erf(T(-0.25))   ≈ T(-0.27632639016823696) rtol=2*eps(T)
+            @test erf(T(-0.75))   ≈ T(-0.7111556336535151) rtol=2*eps(T)
+            @test erf(T(-1))   ≈ T(-0.84270079294971486934) rtol=2*eps(T)
+            @test erf(T(-1.5))   ≈ T(-0.9661051464753108) rtol=2*eps(T)
+            @test erf(T(-2.5))   ≈ T(-0.9995930479825551) rtol=2*eps(T)
+            @test erf(T(-3.5))   ≈ T(-0.9999992569016276) rtol=2*eps(T)
+            @test erf(T(-4.5))   ≈ T(-0.9999999998033839) rtol=2*eps(T)
+            @test erf(T(-6))   ≈ T(-1.0) rtol=2*eps(T)
+
+            @test isnan(erf(T(NaN)))
 
             @test @inferred(erfc(T(1))) isa T
-            @test erfc(T(1))  ≈ T(0.15729920705028513066) rtol=2*eps(T)
+            @test erfc(T(0.25))   ≈ T(0.7236736098317631) rtol=2*eps(T)
+            @test erfc(T(0.75))   ≈ T(0.28884436634648486) rtol=2*eps(T)
+            @test erfc(T(1.0))   ≈ T(0.15729920705028513) rtol=2*eps(T)
+            @test erfc(T(2.0))   ≈ T(0.004677734981047266) rtol=2*eps(T)
+            @test erfc(T(3.0))   ≈ T(2.209049699858544e-5) rtol=2*eps(T)
+            @test erfc(T(4.0))   ≈ T(1.541725790028002e-8) rtol=2*eps(T)
+            @test erfc(T(5.0))   ≈ T(1.537459794428035e-12) rtol=2*eps(T)
+            @test erfc(T(6.0))   ≈ T(2.1519736712498913e-17) rtol=2*eps(T)
+            @test erfc(T(Inf))   ≈ T(0.0) rtol=2*eps(T)
+
+            @test erfc(T(-0.25))   ≈ T(1.276326390168237) rtol=2*eps(T)
+            @test erfc(T(-0.75))   ≈ T(1.7111556336535152) rtol=2*eps(T)
+            @test erfc(T(-1.0))   ≈ T(1.8427007929497148) rtol=2*eps(T)
+            @test erfc(T(-1.5))   ≈ T(1.9661051464753108) rtol=2*eps(T)
+            @test erfc(T(-2.5))   ≈ T(1.999593047982555) rtol=2*eps(T)
+            @test erfc(T(-3.5))   ≈ T(1.9999992569016276) rtol=2*eps(T)
+            @test erfc(T(-4.5))   ≈ T(1.999999999803384) rtol=2*eps(T)
+            @test erfc(T(-6.0))   ≈ T(2) rtol=2*eps(T)
+
+            @test isnan(erfc(T(NaN)))
 
             @test @inferred(erfcx(T(1))) isa T
             @test erfcx(T(1)) ≈ T(0.42758357615580700442) rtol=2*eps(T)
