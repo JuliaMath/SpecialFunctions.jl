@@ -142,7 +142,7 @@ end
 end
 
 
-@testset "ellipke combined function" begin
+@testset "ellipke" begin
     @testset "bit-wise equality - all branches" begin
         # ellipke is implemented independently (not calling ellipk/ellipe internally)
         # so bit-wise comparison is a valid oracle test
@@ -179,5 +179,9 @@ end
     @testset "DomainError for m > 1" begin
         @test_throws DomainError ellipke(1.1)
         @test_throws DomainError ellipke(2.0)
+    end
+
+    @testset "Missing" begin
+        @test ellipke(missing) === (missing, missing)
     end
 end

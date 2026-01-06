@@ -394,3 +394,8 @@ for T in (:Float16, :Float32)
         return ($T(K), $T(E))
     end
 end
+
+# Missing propagation for ellipke
+# Returns (missing, missing) to preserve tuple structure, following Base.sincos convention
+# Usage: any(ismissing, ellipke(x)) to check for missing
+ellipke(::Missing) = (missing, missing)
