@@ -143,6 +143,7 @@ jinc
 ```@docs
 ellipk
 ellipe
+ellipke
 ```
 
 ## Zeta and Related Functions
