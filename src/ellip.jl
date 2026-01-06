@@ -151,7 +151,7 @@ end
                 1170222242422.439893 , 8777948323668.937971 , 66101242752484.95041 ,
                 499488053713388.7989 , 37859743397240299.20)
         end
-    elseif idx == 9 # 0.9 <= m < 1.0, special log case
+    else # 0.9 <= m < 1.0, special log case
         td  = 1 - m
         td1 = td - 0.05
         qd  = @horner(td,
@@ -314,7 +314,7 @@ end
                 -16120097.81581656797 , -109209938.5203089915 , -749380758.1942496220 ,
                 -5198725846.725541393 , -36409256888.12139973)
         end
-    elseif idx == 9  # 0.9 <= m < 1.0, special case using ellipk
+    else  # 0.9 <= m < 1.0, special case using ellipk
         td  = 1 - m
         td1 = td - 0.05
         kdm = @horner(td1,
