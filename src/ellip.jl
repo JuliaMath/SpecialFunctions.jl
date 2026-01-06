@@ -380,7 +380,42 @@ end
 
     # Compute index and delegate to table lookup
     idx = unsafe_trunc(Int, m * 10)
+
+    # Special case for idx == 9 (m >= 0.9): compute K and E together
+    # to share the expensive log calculation
+    if idx == 9
+        return _ellipke_near_one(m)
+    end
+
     return @inbounds (_ellipk_horner_table(idx, m), _ellipe_horner_table(idx, m))
+end
+
+# Specialized path for m >= 0.9 where K and E share the log calculation
+@inline function _ellipke_near_one(m::Float64)
+    td  = 1 - m
+    td1 = td - 0.05
+    qd  = @horner(td,
+        0.0, (1.0/16.0), (1.0/32.0), (21.0/1024.0), (31.0/2048.0), (6257.0/524288.0),
+        (10293.0/1048576.0), (279025.0/33554432.0), (483127.0/67108864.0),
+        (435506703.0/68719476736.0), (776957575.0/137438953472.0),
+        (22417045555.0/4398046511104.0), (40784671953.0/8796093022208.0),
+        (9569130097211.0/2251799813685248.0), (17652604545791.0/4503599627370496.0))
+    kdm = @horner(td1,
+        1.591003453790792180 , 0.416000743991786912 , 0.245791514264103415 ,
+        0.179481482914906162 , 0.144556057087555150 , 0.123200993312427711 ,
+        0.108938811574293531 , 0.098853409871592910 , 0.091439629201749751 ,
+        0.085842591595413900 , 0.081541118718303215)
+    edm = @horner(td1,
+        +1.550973351780472328 , -0.400301020103198524 , -0.078498619442941939 ,
+        -0.034318853117591992 , -0.019718043317365499 , -0.013059507731993309 ,
+        -0.009442372874146547 , -0.007246728512402157 , -0.005807424012956090 ,
+        -0.004809187786009338)
+    # K calculation (single log call)
+    K = -Base.log(qd) * (kdm * invπ)
+    # E calculation reusing K
+    hdm = kdm - edm
+    E = (halfπ + K * hdm) / kdm
+    return (K, E)
 end
 
 # Support for Float32 and Float16
