@@ -140,3 +140,44 @@ end
         end
     end
 end
+
+
+@testset "ellipke combined function" begin
+    @testset "bit-wise equality - all branches" begin
+        # ellipke is implemented independently (not calling ellipk/ellipe internally)
+        # so bit-wise comparison is a valid oracle test
+        # Test values covering ALL polynomial branches (idx 0-9)
+        for m in [0.0, 0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.825, 0.875, 0.95, 0.99]
+            K, E = ellipke(m)
+            @test K === ellipk(m)  # bit-wise equality
+            @test E === ellipe(m)  # bit-wise equality
+        end
+    end
+
+    @testset "boundary cases m=0 and m=1" begin
+        @test ellipke(0.0) === (ellipk(0.0), ellipe(0.0))  # (π/2, π/2)
+        @test ellipke(1.0) === (ellipk(1.0), ellipe(1.0))  # (Inf, 1.0)
+    end
+
+    @testset "negative m values" begin
+        # Bit-wise equality with ellipk/ellipe (independent implementations)
+        for m in [-0.1, -0.5, -1.0, -2.0, -10.0, -1e5]
+            @test ellipke(m) === (ellipk(m), ellipe(m))
+        end
+
+        # Extreme negative values to test x==1.0 branch path
+        @test ellipke(-1e30) === (ellipk(-1e30), ellipe(-1e30))
+
+        # Negative infinity special case
+        @test ellipke(-Inf) === (ellipk(-Inf), ellipe(-Inf)) # (0.0, Inf)
+    end
+
+    @testset "NaN handling" begin
+        @test ellipke(NaN) === (NaN, NaN)
+    end
+
+    @testset "DomainError for m > 1" begin
+        @test_throws DomainError ellipke(1.1)
+        @test_throws DomainError ellipke(2.0)
+    end
+end

@@ -333,7 +333,64 @@ end
     end
 end
 
+@doc raw"""
+    ellipke(m)
+
+Computes both Complete Elliptic Integrals ``K(m)`` and ``E(m)``
+simultaneously, returning them as a tuple `(K, E)`.
+
+This is more efficient than calling `ellipk(m)` and `ellipe(m)`
+separately when both values are needed.
+See also: [`ellipk(m)`](@ref), [`ellipe(m)`](@ref).
+
+# Arguments
+- `m`: parameter ``m``, restricted to the domain ``(-\infty, 1]``
+
+# Returns
+- `(K, E)::Tuple`: Complete elliptic integrals of first and second kind
+"""
+ellipke(m::Real) = _ellipke(float(m))
+
+# Wrapper function that handles negative m and special cases
+function _ellipke(m::Float64)
+    isnan(m) && return (NaN, NaN)
+    
+    if m >= 0
+        return _ellipke_nonneg(m)
+    else
+        m === -Inf && return (0.0, Inf)
+        # Negative m transformation: x = m/(m-1)
+        # K(m) = K(x) / sqrt(1-m), E(m) = E(x) * sqrt(1-m)
+        x = m / (m - 1)
+        # When m is extremely negative, x rounds to 1.0
+        x == 1.0 && return (0.0, Inf)
+        K, E = _ellipke_nonneg(x)
+        sqrt_1_m = sqrt(1 - m)
+        return (K / sqrt_1_m, E * sqrt_1_m)
+    end
+end
+
+# Core implementation of combined ellipke for m >= 0
+# Returns (K, E) tuple, computing both simultaneously for efficiency
+@inline function _ellipke_nonneg(m::Float64)
+    # Edge cases
+    m == 0.0 && return (Float64(halfπ), Float64(halfπ))
+    m == 1.0 && return (Inf, 1.0)
+    m > 1.0 && throw(DomainError(m, "`m` must lie between -Inf and 1 ---- Domain: (-Inf,1.0]"))
+
+    # Compute index and delegate to table lookup
+    idx = unsafe_trunc(Int, m * 10)
+    return @inbounds (_ellipk_horner_table(idx, m), _ellipe_horner_table(idx, m))
+end
+
 # Support for Float32 and Float16
 for internalf in (:_ellipk, :_ellipe), T in (:Float16, :Float32)
     @eval $internalf(x::$T) = $T($internalf(Float64(x)))
+end
+
+for T in (:Float16, :Float32)
+    @eval function _ellipke(x::$T)
+        K, E = _ellipke(Float64(x))
+        return ($T(K), $T(E))
+    end
 end

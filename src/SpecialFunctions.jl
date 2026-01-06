@@ -47,6 +47,7 @@ export
     dawson,
     ellipk,
     ellipe,
+    ellipke,
     erf,
     erfc,
     erfcinv,
