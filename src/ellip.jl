@@ -38,19 +38,19 @@ function _ellipk(m::Float64)
     isnan(m) && return NaN
 
     if m >= 0
-        return _ellipk_nonneg(m)
+        return _ellipk_core(m)
     else
         m === -Inf && return 0.0
         # Negative m transformation: x = m/(m-1), K(m) = K(x)/sqrt(1-m)
         x = m / (m - 1)
         # When m is extremely negative, x rounds to 1.0; K(m) → 0 as m → -∞
         x == 1.0 && return 0.0
-        return _ellipk_nonneg(x) / sqrt(1 - m)
+        return _ellipk_core(x) / sqrt(1 - m)
     end
 end
 
 # Implementation of ellipk for m >= 0
-@inline function _ellipk_nonneg(m::Float64)
+@inline function _ellipk_core(m::Float64)
     # Edge cases
     m == 0.0 && return Float64(halfπ)
     m == 1.0 && return Inf
@@ -58,12 +58,7 @@ end
 
     # Compute index and delegate to table lookup
     idx = unsafe_trunc(Int, m * 10)
-    return _ellipk_horner_table(idx, m)
-end
 
-# Pure polynomial lookup for ellipk using linear if-else structure
-# LLVM optimizes this to efficient switch/jump/binary-search table
-@inline function _ellipk_horner_table(idx::Int, m::Float64)
     if idx == 0  # 0.0 < m < 0.1, Table 2
         t = m - 0.05
         return @horner(t,
@@ -204,19 +199,19 @@ function _ellipe(m::Float64)
     isnan(m) && return NaN
     
     if m >= 0
-        return _ellipe_nonneg(m)
+        return _ellipe_core(m)
     else
         m === -Inf && return Inf
         # Negative m transformation: x = m/(m-1), E(m) = E(x)*sqrt(1-m)
         x = m / (m - 1)
         # When m is extremely negative, x rounds to 1.0; E(m) → ∞ as m → -∞
         x == 1.0 && return Inf
-        return _ellipe_nonneg(x) * sqrt(1 - m)
+        return _ellipe_core(x) * sqrt(1 - m)
     end
 end
 
 # Core implementation of ellipe for m >= 0
-@inline function _ellipe_nonneg(m::Float64)
+@inline function _ellipe_core(m::Float64)
     # Edge cases
     m == 0.0 && return Float64(halfπ)
     m == 1.0 && return 1.0
@@ -224,12 +219,7 @@ end
 
     # Compute index and delegate to table lookup
     idx = unsafe_trunc(Int, m * 10)
-    return _ellipe_horner_table(idx, m)
-end
 
-# Pure polynomial lookup for ellipe using linear if-else structure
-# LLVM optimizes this to efficient switch/jump table
-@inline function _ellipe_horner_table(idx::Int, m::Float64)
     if idx == 0  # 0.0 < m < 0.1, Table 2
         t = m - 0.05
         return @horner(t,
@@ -324,7 +314,7 @@ end
             -0.009442372874146547 , -0.007246728512402157 , -0.005807424012956090 ,
             -0.004809187786009338)
         hdm = kdm - edm
-        km  = _ellipk_nonneg(m)  # Use core function instead of ellipk
+        km  = _ellipk_core(m) 
         return (halfπ + km * hdm) / kdm
     end
 end
