@@ -1,8 +1,68 @@
 using Base.Math: @horner
 
 
+@doc raw"""
+    ellipk(m)
+
+Computes Complete Elliptic Integral of 1st kind ``K(m)`` for parameter ``m`` given by
+
+```math
+\operatorname{ellipk}(m)
+= K(m)
+= \int_0^{ \frac{\pi}{2} } \frac{1}{\sqrt{1 - m \sin^2 \theta}} \, \mathrm{d}\theta
+\quad \text{for} \quad m \in \left( -\infty, 1 \right] \, .
+```
+
+External links:
+[DLMF 19.2.8](https://dlmf.nist.gov/19.2.8),
+[Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants).
+
+See also: [`ellipe(m)`](@ref SpecialFunctions.ellipe).
+
+# Arguments
+- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to
+       the elliptic modulus ``k`` by ``k^2=m`` and to the modular angle
+       ``\alpha`` by ``k = \sin \alpha``.
+
+# Implementation
+Using piecewise approximation polynomial as given in [fukushima_2009](@citet).
+
+For ``m < 0``, followed by [fukushima_2015](@citet).
+
+As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
+"""
+ellipk(m::Real) = _ellipk(float(m))
+
+# Wrapper function that handles negative m and special cases
+function _ellipk(m::Float64)
+    isnan(m) && return NaN
+
+    if m >= 0
+        return _ellipk_nonneg(m)
+    else
+        m === -Inf && return 0.0
+        # Negative m transformation: x = m/(m-1), K(m) = K(x)/sqrt(1-m)
+        x = m / (m - 1)
+        # When m is extremely negative, x rounds to 1.0; K(m) → 0 as m → -∞
+        x == 1.0 && return 0.0
+        return _ellipk_nonneg(x) / sqrt(1 - m)
+    end
+end
+
+# Implementation of ellipk for m >= 0
+@inline function _ellipk_nonneg(m::Float64)
+    # Edge cases
+    m == 0.0 && return Float64(halfπ)
+    m == 1.0 && return Inf
+    m > 1.0 && throw(DomainError(m, "`m` must lie between -Inf and 1 ---- Domain: (-Inf,1.0]"))
+
+    # Compute index and delegate to table lookup
+    idx = unsafe_trunc(Int, m * 10)
+    return _ellipk_horner_table(idx, m)
+end
+
 # Pure polynomial lookup for ellipk using linear if-else structure
-# LLVM optimizes this to efficient switch/jump table
+# LLVM optimizes this to efficient switch/jump/binary-search table
 @inline function _ellipk_horner_table(idx::Int, m::Float64)
     if idx == 0  # 0.0 < m < 0.1, Table 2
         t = m - 0.05
@@ -107,67 +167,65 @@ using Base.Math: @horner
     end
 end
 
-# Core implementation of ellipk for m >= 0
-@inline function _ellipk_core(m::Float64)
-    # Edge cases
-    m == 0.0 && return Float64(halfπ)
-    m == 1.0 && return Inf
-    m > 1.0 && throw(DomainError(m, "`m` must lie between -Inf and 1 ---- Domain: (-Inf,1.0]"))
-
-    # Compute index and delegate to table lookup
-    idx = unsafe_trunc(Int, m * 10)
-    return _ellipk_horner_table(idx, m)
-end
-
-
 @doc raw"""
-    ellipk(m)
+    ellipe(m)
 
-Computes Complete Elliptic Integral of 1st kind ``K(m)`` for parameter ``m`` given by
+Computes Complete Elliptic Integral of 2nd kind ``E(m)`` for parameter ``m`` given by
 
 ```math
-\operatorname{ellipk}(m)
-= K(m)
-= \int_0^{ \frac{\pi}{2} } \frac{1}{\sqrt{1 - m \sin^2 \theta}} \, \mathrm{d}\theta
-\quad \text{for} \quad m \in \left( -\infty, 1 \right] \, .
+\operatorname{ellipe}(m)
+= E(m)
+= \int_0^{ \frac{\pi}{2} } \sqrt{1 - m \sin^2 \theta} \, \mathrm{d}\theta
+\quad \text{for} \quad m \in \left( -\infty, 1 \right] .
 ```
 
 External links:
 [DLMF 19.2.8](https://dlmf.nist.gov/19.2.8),
-[Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants).
+[Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind).
 
-See also: [`ellipe(m)`](@ref SpecialFunctions.ellipe).
+See also: [`ellipk(m)`](@ref SpecialFunctions.ellipk).
 
 # Arguments
 - `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to
        the elliptic modulus ``k`` by ``k^2=m`` and to the modular angle
-       ``\alpha`` by ``k = \sin \alpha``.
+       ``\alpha`` by ``k=\sin \alpha``.
 
 # Implementation
-Using piecewise approximation polynomial as given in [fukushima_2009](@citet).
+Using piecewise approximation polynomial as given in [fukushima_2015](@citet)
 
-For ``m < 0``, followed by [fukushima_2015](@citet).
+For ``m<0``, followed by [fukushima_2015](@citet).
 
 As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
 """
-ellipk(m::Real) = _ellipk(float(m))
+ellipe(m::Real) = _ellipe(float(m))
 
 # Wrapper function that handles negative m and special cases
-function _ellipk(m::Float64)
+function _ellipe(m::Float64)
     isnan(m) && return NaN
-    m === -Inf && return 0.0
-
+    
     if m >= 0
-        return _ellipk_core(m)
+        return _ellipe_nonneg(m)
     else
-        # Negative m transformation: x = m/(m-1), K(m) = K(x)/sqrt(1-m)
+        m === -Inf && return Inf
+        # Negative m transformation: x = m/(m-1), E(m) = E(x)*sqrt(1-m)
         x = m / (m - 1)
-        # When m is extremely negative, x rounds to 1.0; K(m) → 0 as m → -∞
-        x == 1.0 && return 0.0
-        return _ellipk_core(x) / sqrt(1 - m)
+        # When m is extremely negative, x rounds to 1.0; E(m) → ∞ as m → -∞
+        x == 1.0 && return Inf
+        return _ellipe_nonneg(x) * sqrt(1 - m)
     end
 end
 
+# Core implementation of ellipe for m >= 0
+@inline function _ellipe_nonneg(m::Float64)
+    # Edge cases
+    m == 0.0 && return Float64(halfπ)
+    m == 1.0 && return 1.0
+    m > 1.0 && throw(DomainError(m, "`m` must lie between -Inf and 1 ---- Domain: (-Inf,1.0]"))
+
+    # Compute index and delegate to table lookup
+    idx = unsafe_trunc(Int, m * 10)
+    return _ellipe_horner_table(idx, m)
+end
 
 # Pure polynomial lookup for ellipe using linear if-else structure
 # LLVM optimizes this to efficient switch/jump table
@@ -266,69 +324,8 @@ end
             -0.009442372874146547 , -0.007246728512402157 , -0.005807424012956090 ,
             -0.004809187786009338)
         hdm = kdm - edm
-        km  = _ellipk_core(m)  # Use core function instead of ellipk
+        km  = _ellipk_nonneg(m)  # Use core function instead of ellipk
         return (halfπ + km * hdm) / kdm
-    end
-end
-
-# Core implementation of ellipe for m >= 0
-@inline function _ellipe_core(m::Float64)
-    # Edge cases
-    m == 0.0 && return Float64(halfπ)
-    m == 1.0 && return 1.0
-    m > 1.0 && throw(DomainError(m, "`m` must lie between -Inf and 1 ---- Domain: (-Inf,1.0]"))
-
-    # Compute index and delegate to table lookup
-    idx = unsafe_trunc(Int, m * 10)
-    return _ellipe_horner_table(idx, m)
-end
-
-
-@doc raw"""
-    ellipe(m)
-
-Computes Complete Elliptic Integral of 2nd kind ``E(m)`` for parameter ``m`` given by
-
-```math
-\operatorname{ellipe}(m)
-= E(m)
-= \int_0^{ \frac{\pi}{2} } \sqrt{1 - m \sin^2 \theta} \, \mathrm{d}\theta
-\quad \text{for} \quad m \in \left( -\infty, 1 \right] .
-```
-
-External links:
-[DLMF 19.2.8](https://dlmf.nist.gov/19.2.8),
-[Wikipedia](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind).
-
-See also: [`ellipk(m)`](@ref SpecialFunctions.ellipk).
-
-# Arguments
-- `m`: parameter ``m``, restricted to the domain ``(-\infty,1]``, is related to
-       the elliptic modulus ``k`` by ``k^2=m`` and to the modular angle
-       ``\alpha`` by ``k=\sin \alpha``.
-
-# Implementation
-Using piecewise approximation polynomial as given in [fukushima_2015](@citet)
-
-For ``m<0``, followed by [fukushima_2015](@citet).
-
-As suggested in this paper, the domain is restricted to ``(-\infty,1]``.
-"""
-ellipe(m::Real) = _ellipe(float(m))
-
-# Wrapper function that handles negative m and special cases
-function _ellipe(m::Float64)
-    isnan(m) && return NaN
-    m === -Inf && return Inf
-
-    if m >= 0
-        return _ellipe_core(m)
-    else
-        # Negative m transformation: x = m/(m-1), E(m) = E(x)*sqrt(1-m)
-        x = m / (m - 1)
-        # When m is extremely negative, x rounds to 1.0; E(m) → ∞ as m → -∞
-        x == 1.0 && return Inf
-        return _ellipe_core(x) * sqrt(1 - m)
     end
 end
 
