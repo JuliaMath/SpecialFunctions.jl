@@ -58,12 +58,14 @@ end
 
     # Compute index and delegate to table lookup
     idx = unsafe_trunc(Int, m * 10)
-    return _ellipk_horner_table(idx, m)
+    return @inbounds _ellipk_horner_table(idx, m)
 end
 
 # Pure polynomial lookup for ellipk using linear if-else structure
 # LLVM optimizes this to efficient switch/jump/binary-search table
 @inline function _ellipk_horner_table(idx::Int, m::Float64)
+    @boundscheck (0 <= idx <= 9) || throw(ArgumentError("idx=$idx out of valid range 0:9"))
+
     if idx == 0  # 0.0 < m < 0.1, Table 2
         t = m - 0.05
         return @horner(t,
@@ -149,7 +151,7 @@ end
                 1170222242422.439893 , 8777948323668.937971 , 66101242752484.95041 ,
                 499488053713388.7989 , 37859743397240299.20)
         end
-    else  # idx >= 9, 0.9 <= m < 1.0, special log case
+    elseif idx == 9 # 0.9 <= m < 1.0, special log case
         td  = 1 - m
         td1 = td - 0.05
         qd  = @horner(td,
@@ -224,12 +226,14 @@ end
 
     # Compute index and delegate to table lookup
     idx = unsafe_trunc(Int, m * 10)
-    return _ellipe_horner_table(idx, m)
+    return @inbounds _ellipe_horner_table(idx, m)
 end
 
 # Pure polynomial lookup for ellipe using linear if-else structure
 # LLVM optimizes this to efficient switch/jump table
 @inline function _ellipe_horner_table(idx::Int, m::Float64)
+    @boundscheck (0 <= idx <= 9) || throw(ArgumentError("idx=$idx out of valid range 0:9"))
+
     if idx == 0  # 0.0 < m < 0.1, Table 2
         t = m - 0.05
         return @horner(t,
@@ -310,7 +314,7 @@ end
                 -16120097.81581656797 , -109209938.5203089915 , -749380758.1942496220 ,
                 -5198725846.725541393 , -36409256888.12139973)
         end
-    else  # idx >= 9, 0.9 <= m < 1.0, special case using ellipk
+    elseif idx == 9  # 0.9 <= m < 1.0, special case using ellipk
         td  = 1 - m
         td1 = td - 0.05
         kdm = @horner(td1,
@@ -324,7 +328,7 @@ end
             -0.009442372874146547 , -0.007246728512402157 , -0.005807424012956090 ,
             -0.004809187786009338)
         hdm = kdm - edm
-        km  = _ellipk_nonneg(m)  # Use core function instead of ellipk
+        km  = @inbounds _ellipk_horner_table(9, m)
         return (halfπ + km * hdm) / kdm
     end
 end
