@@ -184,4 +184,11 @@ end
     @testset "Missing" begin
         @test ellipke(missing) === (missing, missing)
     end
+
+    @testset "Float16 and Float32 support" begin
+        for T in (Float16, Float32)
+            m = T(0.5)
+            @test ellipke(m) === (ellipk(m), ellipe(m))
+        end
+    end
 end
