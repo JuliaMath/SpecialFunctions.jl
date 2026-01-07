@@ -340,13 +340,15 @@ function _anfun(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # a_n coefficient (n ≥ 1) of the continued fraction for ₂F₁ in terms of p=a, q=b, f.
     # For n=1, falls back to a₁; for n≥2 uses the closed-form product from the Gauss CF.
     n == 1 && return _a1fun(p, q, f)
-    return p^2 * f^2 * (n - 1) * (p + q + n - 2) * (p + n - 1) * (q - n) /
-           (q^2 * (p + 2*n - 3) * (p + 2*n - 2)^2 * (p + 2*n - 1))
+    r = (p * f / q)^2
+    pn = p + n
+    p2n = pn + n
+    return r * (n - 1) * (pn + q - 2) * (pn - 1) * (q - n) / ((p2n - 3) * (p2n - 2)^2 * (p2n - 1))
 end
 
 function _bnfun(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # b_n coefficient (n ≥ 1) of the continued fraction. Derived for the same CF.
-    x = 2 * (p * f + 2 * q) * n^2 + 2 * (p * f + 2 * q) * (p - 1) * n + p * q * (p - 2 - p * f)
+    x = 2 * n * (p * f + 2 * q) * (n + p - 1) + p * q * (p - 2 - p * f)
     y = q * (p + 2*n - 2) * (p + 2*n)
     return x / y
 end
@@ -468,8 +470,8 @@ function _beta_inc_grad(a::T, b::T, x::T; maxapp::Int=200, minapp::Int=3, err::T
     zeroT = zero(T)
 
     # 1) Boundary cases for x
-    x == oneT && return oneT, zeroT, zeroT, zeroT
-    x == zeroT && return zeroT, zeroT, zeroT, zeroT
+    isone(x) && return oneT, zeroT, zeroT, zeroT
+    iszero(x) && return zeroT, zeroT, zeroT, zeroT
 
     # 2) Clamp iteration/tolerance parameters to robust defaults
     ϵ = min(err, T(1e-14))
@@ -615,13 +617,12 @@ function ChainRulesCore.frule((_, Δa, Δb, Δx), ::typeof(beta_inc), a::Number,
     # primal
     p, q = beta_inc(a, b, x)
     # derivatives
-    T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(x)))
-    _, dIa_, dIb_, dIx_ = _beta_inc_grad(T(a), T(b), T(x))
-    dIa::T = dIa_; dIb::T = dIb_; dIx::T = dIx_
-    ΔaT::T = Δa isa Real ? T(Δa) : zero(T)
-    ΔbT::T = Δb isa Real ? T(Δb) : zero(T)
-    ΔxT::T = Δx isa Real ? T(Δx) : zero(T)
-    Δp = dIa * ΔaT + dIb * ΔbT + dIx * ΔxT
+    _a, _b, _x = map(float, promote(a, b, x))
+    _, dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
+    _Δa = Δa isa Real ? Δa : zero(Δa)
+    _Δb = Δb isa Real ? Δb : zero(Δb)
+    _Δx = Δx isa Real ? Δx : zero(Δx)
+    Δp = dIa * _Δa + dIb * _Δb + dIx * _Δx
     Δq = -Δp
     Tout = typeof((p, q))
     return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
@@ -632,9 +633,8 @@ function ChainRulesCore.rrule(::typeof(beta_inc), a::Number, b::Number, x::Numbe
     Ta = ChainRulesCore.ProjectTo(a)
     Tb = ChainRulesCore.ProjectTo(b)
     Tx = ChainRulesCore.ProjectTo(x)
-    T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(x)))
-    _, dIa_, dIb_, dIx_ = _beta_inc_grad(T(a), T(b), T(x))
-    dIa::T = dIa_; dIb::T = dIb_; dIx::T = dIx_
+    _a, _b, _x = map(float, promote(a, b, x))
+    _, dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
     function beta_inc_pullback(Δ)
         Δp, Δq = Δ
         s = Δp - Δq # because q = 1 - p
@@ -647,14 +647,13 @@ function ChainRulesCore.rrule(::typeof(beta_inc), a::Number, b::Number, x::Numbe
 end
 function ChainRulesCore.frule((_, Δa, Δb, Δx, Δy), ::typeof(beta_inc), a::Number, b::Number, x::Number, y::Number)
     p, q = beta_inc(a, b, x, y)
-    T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(x)), float(typeof(y)))
-    _, dIa_, dIb_, dIx_ = _beta_inc_grad(T(a), T(b), T(x))
-    dIa::T = dIa_; dIb::T = dIb_; dIx::T = dIx_
-    ΔaT::T = Δa isa Real ? T(Δa) : zero(T)
-    ΔbT::T = Δb isa Real ? T(Δb) : zero(T)
-    ΔxT::T = Δx isa Real ? T(Δx) : zero(T)
-    ΔyT::T = Δy isa Real ? T(Δy) : zero(T)
-    Δp = dIa * ΔaT + dIb * ΔbT + dIx * (ΔxT - ΔyT)
+    _a, _b, _x, _y = map(float, promote(a, b, x, y))
+    _, dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
+    _Δa = Δa isa Real ? Δa : zero(Δa)
+    _Δb = Δb isa Real ? Δb : zero(Δb)
+    _Δx = Δx isa Real ? Δx : zero(Δx)
+    _Δy = Δy isa Real ? Δy : zero(Δy)
+    Δp = dIa * _Δa + dIb * _Δb + dIx * (_Δx - _Δy)
     Δq = -Δp
     Tout = typeof((p, q))
     return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
@@ -666,9 +665,8 @@ function ChainRulesCore.rrule(::typeof(beta_inc), a::Number, b::Number, x::Numbe
     Tb = ChainRulesCore.ProjectTo(b)
     Tx = ChainRulesCore.ProjectTo(x)
     Ty = ChainRulesCore.ProjectTo(y)
-    T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(x)), float(typeof(y)))
-    _, dIa_, dIb_, dIx_ = _beta_inc_grad(T(a), T(b), T(x))
-    dIa::T = dIa_; dIb::T = dIb_; dIx::T = dIx_
+    _a, _b, _x, _y = map(float, promote(a, b, x, y))
+    _, dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
     function beta_inc_pullback(Δ)
         Δp, Δq = Δ
         s = Δp - Δq
@@ -684,20 +682,19 @@ end
 # Inverse incomplete beta: beta_inc_inv(a,b,p) -> (x, 1-x)
 function ChainRulesCore.frule((_, Δa, Δb, Δp), ::typeof(beta_inc_inv), a::Number, b::Number, p::Number)
     x, y = beta_inc_inv(a, b, p)
-    T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(p)))
+    _a, _b, _x, _p = map(float, promote(a, b, x, p))
     # Implicit differentiation at solved x: I_x(a,b) = p
-    _, dIa_, dIb_, _ = _beta_inc_grad(T(a), T(b), T(x))
-    dIa::T = dIa_; dIb::T = dIb_
+    _, dIa, dIb, _ = _beta_inc_grad(_a, _b, _x)
     # ∂I/∂x at solved x via stable log-space expression
-    dIx_acc::T = exp(muladd(T(a) - one(T), log(T(x)), muladd(T(b) - one(T), log1p(-T(x)), -logbeta(T(a), T(b)))))
-    inv_dIx::T = inv(dIx_acc)
-    dx_da::T = -dIa * inv_dIx
-    dx_db::T = -dIb * inv_dIx
-    dx_dp::T = inv_dIx
-    ΔaT::T = Δa isa Real ? T(Δa) : zero(T)
-    ΔbT::T = Δb isa Real ? T(Δb) : zero(T)
-    ΔpT::T = Δp isa Real ? T(Δp) : zero(T)
-    Δx = dx_da * ΔaT + dx_db * ΔbT + dx_dp * ΔpT
+    dIx_acc = exp(muladd(_a - 1, log(_x), muladd(_b - 1, log1p(-_x), -logbeta(_a, _b))))
+    inv_dIx = inv(dIx_acc)
+    dx_da = -dIa * inv_dIx
+    dx_db = -dIb * inv_dIx
+    dx_dp = inv_dIx
+    _Δa = Δa isa Real ? Δa : zero(Δa)
+    _Δb = Δb isa Real ? Δb : zero(Δb)
+    _Δp = Δp isa Real ? Δp : zero(Δp)
+    Δx = dx_da * _Δa + dx_db * _Δb + dx_dp * _Δp
     Δy = -Δx
     Tout = typeof((x, y))
     return (x, y), ChainRulesCore.Tangent{Tout}(Δx, Δy)
@@ -708,15 +705,14 @@ function ChainRulesCore.rrule(::typeof(beta_inc_inv), a::Number, b::Number, p::N
     Ta = ChainRulesCore.ProjectTo(a)
     Tb = ChainRulesCore.ProjectTo(b)
     Tp = ChainRulesCore.ProjectTo(p)
-    T = promote_type(float(typeof(a)), float(typeof(b)), float(typeof(p)))
-    _, dIa_, dIb_, _ = _beta_inc_grad(T(a), T(b), T(x))
-    dIa::T = dIa_; dIb::T = dIb_
+    _a, _b, _x, _p = map(float, promote(a, b, x, p))
+    _, dIa, dIb, _ = _beta_inc_grad(_a, _b, _x)
     # ∂I/∂x at solved x via stable log-space expression
-    dIx_acc::T = exp(muladd(T(a) - one(T), log(T(x)), muladd(T(b) - one(T), log1p(-T(x)), -logbeta(T(a), T(b)))))
-    inv_dIx::T = inv(dIx_acc)
-    dx_da::T = -dIa * inv_dIx
-    dx_db::T = -dIb * inv_dIx
-    dx_dp::T = inv_dIx
+    dIx_acc = exp(muladd(_a - 1, log(_x), muladd(_b - 1, log1p(-_x), -logbeta(_a, _b))))
+    inv_dIx = inv(dIx_acc)
+    dx_da = -dIa * inv_dIx
+    dx_db = -dIb * inv_dIx
+    dx_dp = inv_dIx
     function beta_inc_inv_pullback(Δ)
         Δx, Δy = Δ
         s = Δx - Δy
