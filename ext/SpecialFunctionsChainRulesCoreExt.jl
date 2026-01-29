@@ -619,10 +619,7 @@ function ChainRulesCore.frule((_, Δa, Δb, Δx), ::typeof(beta_inc), a::Number,
     # derivatives
     _a, _b, _x = map(float, promote(a, b, x))
     _, dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
-    _Δa = Δa isa Real ? Δa : zero(Δa)
-    _Δb = Δb isa Real ? Δb : zero(Δb)
-    _Δx = Δx isa Real ? Δx : zero(Δx)
-    Δp = dIa * _Δa + dIb * _Δb + dIx * _Δx
+    Δp = muladd(dIx, Δx, muladd(dIb, Δb, dIa * Δa))
     Δq = -Δp
     Tout = typeof((p, q))
     return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
@@ -649,11 +646,7 @@ function ChainRulesCore.frule((_, Δa, Δb, Δx, Δy), ::typeof(beta_inc), a::Nu
     p, q = beta_inc(a, b, x, y)
     _a, _b, _x, _y = map(float, promote(a, b, x, y))
     _, dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
-    _Δa = Δa isa Real ? Δa : zero(Δa)
-    _Δb = Δb isa Real ? Δb : zero(Δb)
-    _Δx = Δx isa Real ? Δx : zero(Δx)
-    _Δy = Δy isa Real ? Δy : zero(Δy)
-    Δp = dIa * _Δa + dIb * _Δb + dIx * (_Δx - _Δy)
+    Δp = muladd(dIx, Δx, muladd(-dIx, Δy, muladd(dIb, Δb, dIa * Δa)))
     Δq = -Δp
     Tout = typeof((p, q))
     return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
@@ -691,10 +684,7 @@ function ChainRulesCore.frule((_, Δa, Δb, Δp), ::typeof(beta_inc_inv), a::Num
     dx_da = -dIa * inv_dIx
     dx_db = -dIb * inv_dIx
     dx_dp = inv_dIx
-    _Δa = Δa isa Real ? Δa : zero(Δa)
-    _Δb = Δb isa Real ? Δb : zero(Δb)
-    _Δp = Δp isa Real ? Δp : zero(Δp)
-    Δx = dx_da * _Δa + dx_db * _Δb + dx_dp * _Δp
+    Δx = muladd(dx_dp, Δp, muladd(dx_db, Δb, dx_da * Δa))
     Δy = -Δx
     Tout = typeof((x, y))
     return (x, y), ChainRulesCore.Tangent{Tout}(Δx, Δy)
