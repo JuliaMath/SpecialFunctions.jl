@@ -473,10 +473,8 @@ function _beta_inc_grad(a::T, b::T, x::T; maxapp::Int=200, minapp::Int=3, err::T
     isone(x) && return oneT, zeroT, zeroT, zeroT
     iszero(x) && return zeroT, zeroT, zeroT, zeroT
 
-    # 2) Clamp iteration/tolerance parameters to robust defaults
-    ϵ = min(err, T(1e-14))
-    maxapp = max(1000, maxapp)
-    minapp = max(5, minapp)
+    # 2) Get tolerence
+    ϵ = err
 
     # 3) Non-boundary path: precompute ∂I/∂x at original (a,b,x) via stable log form
     dx = exp((a - oneT) * log(x) + (b - oneT) * log1p(-x) - logbeta(a,b))
