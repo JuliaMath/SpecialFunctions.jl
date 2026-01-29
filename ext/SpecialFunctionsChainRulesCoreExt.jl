@@ -321,22 +321,22 @@ end
 # the auxiliary variable f, the continued-fraction coefficients a_n, b_n, and
 # their partial derivatives w.r.t. p (≡ a) and q (≡ b). See Boik & Robinson-Cox (1999).
 
-function _Kfun(x::T, p::T, q::T) where {T<:AbstractFloat}
+@inline function _Kfun(x::T, p::T, q::T) where {T<:AbstractFloat}
     # K(x;p,q) = x^p (1-x)^{q-1} / (p * B(p,q)) computed in log-space for stability
     return exp(p * log(x) + (q - 1) * log1p(-x) - log(p) - logbeta(p, q))
 end
 
-function _ffun(x::T, p::T, q::T) where {T<:AbstractFloat}
+@inline function _ffun(x::T, p::T, q::T) where {T<:AbstractFloat}
     # f = q x / (p (1-x)) — convenience variable appearing in CF coefficients
     return q * x / (p * (1 - x))
 end
 
-function _a1fun(p::T, q::T, f::T) where {T<:AbstractFloat} 
+@inline function _a1fun(p::T, q::T, f::T) where {T<:AbstractFloat} 
     # a₁ coefficient of the continued fraction for ₂F₁ representation
     return p * f * (q - 1) / (q * (p + 1))
 end
 
-function _anfun(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
+@inline function _anfun(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # a_n coefficient (n ≥ 1) of the continued fraction for ₂F₁ in terms of p=a, q=b, f.
     # For n=1, falls back to a₁; for n≥2 uses the closed-form product from the Gauss CF.
     n == 1 && return _a1fun(p, q, f)
@@ -346,24 +346,24 @@ function _anfun(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     return r * (n - 1) * (pn + q - 2) * (pn - 1) * (q - n) / ((p2n - 3) * (p2n - 2)^2 * (p2n - 1))
 end
 
-function _bnfun(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
+@inline function _bnfun(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # b_n coefficient (n ≥ 1) of the continued fraction. Derived for the same CF.
     x = 2 * n * (p * f + 2 * q) * (n + p - 1) + p * q * (p - 2 - p * f)
     y = q * (p + 2*n - 2) * (p + 2*n)
     return x / y
 end
 
-function _dK_dp(x::T, p::T, q::T, K::T, ψpq::T, ψp::T) where {T<:AbstractFloat} 
+@inline function _dK_dp(x::T, p::T, q::T, K::T, ψpq::T, ψp::T) where {T<:AbstractFloat} 
     # ∂K/∂p using digamma identities: d/dp log B(p,q) = ψ(p) - ψ(p+q)
     return K * (log(x) - inv(p) + ψpq - ψp)
 end
 
-function _dK_dq(x::T, p::T, q::T, K::T, ψpq::T, ψq::T) where {T<:AbstractFloat} 
+@inline function _dK_dq(x::T, p::T, q::T, K::T, ψpq::T, ψq::T) where {T<:AbstractFloat} 
     # ∂K/∂q using identical pattern
     K * (log1p(-x) + ψpq - ψq)
 end
 
-function _dK_dpdq(x::T, p::T, q::T) where {T<:AbstractFloat}
+@inline function _dK_dpdq(x::T, p::T, q::T) where {T<:AbstractFloat}
     # Convenience: compute (∂K/∂p, ∂K/∂q) together with shared ψ(p+q)
     ψ = digamma(p + q)
     Kf = _Kfun(x, p, q)
@@ -372,12 +372,12 @@ function _dK_dpdq(x::T, p::T, q::T) where {T<:AbstractFloat}
     return dKdp, dKdq
 end
 
-function _da1_dp(p::T, q::T, f::T) where {T<:AbstractFloat}
+@inline function _da1_dp(p::T, q::T, f::T) where {T<:AbstractFloat}
     # ∂a₁/∂p from the closed form of a₁
     return - _a1fun(p, q, f) / (p + 1)
 end
 
-function _dan_dp(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
+@inline function _dan_dp(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # ∂a_n/∂p via log-derivative: d a_n = a_n * d log a_n; for n=1, uses ∂a₁/∂p
     if n == 1
         return _da1_dp(p, q, f)
@@ -387,13 +387,13 @@ function _dan_dp(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     return an * dlog
 end
 
-function _da1_dq(p::T, q::T, f::T) where {T<:AbstractFloat}
+@inline function _da1_dq(p::T, q::T, f::T) where {T<:AbstractFloat}
     # ∂a₁/∂q
     return _a1fun(p, q, f) / (q - 1)
 end
 
 
-function _dan_dq(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
+@inline function _dan_dq(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # ∂a_n/∂q avoiding the removable singularity at q ≈ n for integer q.
     # For n=1, defer to the specific a₁ derivative.
     if n == 1
@@ -415,7 +415,7 @@ function _dan_dq(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     return C * (p + 2*q - 2)
 end
 
-function _dbn_dp(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
+@inline function _dbn_dp(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # ∂b_n/∂p via quotient rule on b_n = N/D.
     # Note the internal dependence f(p,q)=q x/(p(1-x)) — terms cancel in N as per derivation.
     g = p * f + 2 * q
@@ -431,7 +431,7 @@ function _dbn_dp(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     return (dN_dp * D - N * dD_dp) / (D^2)
 end
 
-function _dbn_dq(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
+@inline function _dbn_dq(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     # ∂b_n/∂q similarly via quotient rule
     g = p * f + 2 * q
     A = 2 * n^2 + 2 * (p - 1) * n
@@ -447,7 +447,7 @@ function _dbn_dq(p::T, q::T, f::T, n::Int) where {T<:AbstractFloat}
     return (dN_dq * D - N * dD_dq) / (D^2)
 end
 
-function _nextapp(f::T, p::T, q::T, n::Int, App::T, Ap::T, Bpp::T, Bp::T) where {T<:AbstractFloat}
+@inline function _nextapp(f::T, p::T, q::T, n::Int, App::T, Ap::T, Bpp::T, Bp::T) where {T<:AbstractFloat}
     # One step of the continuant recurrences:
     #   A_n = a_n A_{n-2} + b_n A_{n-1}
     #   B_n = a_n B_{n-2} + b_n B_{n-1}
@@ -458,7 +458,7 @@ function _nextapp(f::T, p::T, q::T, n::Int, App::T, Ap::T, Bpp::T, Bp::T) where 
     return An, Bn, an, bn
 end
 
-function _dnextapp(an::T, bn::T, dan::T, dbn::T, Xpp::T, Xp::T, dXpp::T, dXp::T) where {T<:AbstractFloat}
+@inline function _dnextapp(an::T, bn::T, dan::T, dbn::T, Xpp::T, Xp::T, dXpp::T, dXp::T) where {T<:AbstractFloat}
     # Derivative propagation for the same recurrences (X∈{A,B})
     return dan * Xpp + an * dXpp + dbn * Xp + bn * dXp
 end
