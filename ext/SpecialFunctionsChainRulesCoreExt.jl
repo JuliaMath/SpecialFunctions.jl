@@ -557,9 +557,7 @@ function _beta_inc_grad(a::T, b::T, x::T; maxapp::Int=200, minapp::Int=3, err::T
         # Form current approximant Cn=A_n/B_n and its derivatives.
         # Guard against tiny/zero Bn to avoid NaNs/Inf in divisions.
         tiny   = sqrt(eps(T))
-        absBn  = abs(Bn)
-        sgnBn  = ifelse(Bn >= zeroT, oneT, -oneT)
-        invBn  = absBn > tiny && isfinite(absBn) ? inv(Bn) : inv(sgnBn * tiny)
+        invBn  = abs(Bn) > tiny && isfinite(Bn) ? inv(Bn) : inv(sign(Bn) * tiny)
         Cn     = An * invBn
         invBn2 = invBn * invBn
         dI_dp  = dK_dp_val * Cn + K * (invBn * dAn_dp - (An * invBn2) * dBn_dp)
