@@ -440,7 +440,13 @@ end
     return dan * Xpp + an * dXpp + dbn * Xp + bn * dXp
 end
 
-function _beta_inc_grad(a::T, b::T, x::T; maxapp::Int=200, minapp::Int=3, err::T=eps(T)*T(1e4)) where {T}
+function _beta_inc_grad(a::T, b::T, x::T) where {T}
+
+    # 0) Previously keyword arguments: 
+    maxapp=200
+    minapp=3
+    ϵ=eps(T)*T(1e4)
+
     # Compute I_x(a,b) and partial derivatives (∂I/∂a, ∂I/∂b, ∂I/∂x)
     # using a differentiated continued fraction with convergence control.
     oneT = one(T)
@@ -450,16 +456,13 @@ function _beta_inc_grad(a::T, b::T, x::T; maxapp::Int=200, minapp::Int=3, err::T
     isone(x) && return oneT, zeroT, zeroT, zeroT
     iszero(x) && return zeroT, zeroT, zeroT, zeroT
 
-    # 2) Get tolerence
-    ϵ = err
-
-    logbetapq = logbeta(a,b)  # Time-consuming step; symetric in a,b
 
     # 3) Precompute log(x) and log(1-x) once at original x
     logx   = log(x)
     log1mx = log1p(-x)
 
     # 3a) Non-boundary path: precompute ∂I/∂x at original (a,b,x) via stable log form
+    logbetapq = logbeta(a,b)  # Time-consuming step; symetric in a,b
     dx = exp((a - oneT) * logx + (b - oneT) * log1mx - logbetapq)
 
     # 4) Optional tail-swap for symmetry and improved CF convergence:
