@@ -622,110 +622,30 @@ function _beta_inc_grad(a::T, b::T, x::T) where {T<:Union{Float64, Float32}}
     end
 end
 
-
-
- 
-
 # Incomplete beta: beta_inc(a,b,x) -> (p, q) with q=1-p
-function ChainRulesCore.frule((_, Δa, Δb, Δx), ::typeof(beta_inc), a::Number, b::Number, x::Number)
-    # primal
-    p, q = beta_inc(a, b, x)
-    # derivatives
-    _a, _b, _x = map(float, promote(a, b, x))
-    dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
-    Δp = muladd(dIx, Δx, muladd(dIb, Δb, dIa * Δa))
-    Δq = -Δp
-    Tout = typeof((p, q))
-    return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
-end
-
-function ChainRulesCore.rrule(::typeof(beta_inc), a::Number, b::Number, x::Number)
-    p, q = beta_inc(a, b, x)
-    Ta = ChainRulesCore.ProjectTo(a)
-    Tb = ChainRulesCore.ProjectTo(b)
-    Tx = ChainRulesCore.ProjectTo(x)
-    _a, _b, _x = map(float, promote(a, b, x))
-    dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
-    function beta_inc_pullback(Δ)
-        Δp, Δq = Δ
-        s = Δp - Δq # because q = 1 - p
-        ā = Ta(s * dIa)
-        b̄ = Tb(s * dIb)
-        x̄ = Tx(s * dIx)
-        return ChainRulesCore.NoTangent(), ā, b̄, x̄
-    end
-    return (p, q), beta_inc_pullback
-end
-function ChainRulesCore.frule((_, Δa, Δb, Δx, Δy), ::typeof(beta_inc), a::Number, b::Number, x::Number, y::Number)
-    p, q = beta_inc(a, b, x, y)
-    _a, _b, _x, _y = map(float, promote(a, b, x, y))
-    dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
-    Δp = muladd(dIx, Δx, muladd(-dIx, Δy, muladd(dIb, Δb, dIa * Δa)))
-    Δq = -Δp
-    Tout = typeof((p, q))
-    return (p, q), ChainRulesCore.Tangent{Tout}(Δp, Δq)
-end
-
-function ChainRulesCore.rrule(::typeof(beta_inc), a::Number, b::Number, x::Number, y::Number)
-    p, q = beta_inc(a, b, x, y)
-    Ta = ChainRulesCore.ProjectTo(a)
-    Tb = ChainRulesCore.ProjectTo(b)
-    Tx = ChainRulesCore.ProjectTo(x)
-    Ty = ChainRulesCore.ProjectTo(y)
-    _a, _b, _x, _y = map(float, promote(a, b, x, y))
-    dIa, dIb, dIx = _beta_inc_grad(_a, _b, _x)
-    function beta_inc_pullback(Δ)
-        Δp, Δq = Δ
-        s = Δp - Δq
-        ā = Ta(s * dIa)
-        b̄ = Tb(s * dIb)
-        x̄ = Tx(s * dIx)
-        ȳ = Ty(-s * dIx)
-        return ChainRulesCore.NoTangent(), ā, b̄, x̄, ȳ
-    end
-    return (p, q), beta_inc_pullback
-end
-
+ChainRulesCore.@scalar_rule(
+    beta_inc(a::Number, b::Number, x::Number),
+    @setup((dIa, dIb, dIx) = _beta_inc_grad(map(float, promote(a, b, x))...)),
+    (dIa, dIb, dIx),
+    (-dIa, -dIb, -dIx),
+)
+# Incomplete beta: beta_inc(a,b,x,y) -> (p, q) with y=1-x, q=1-p
+ChainRulesCore.@scalar_rule(
+    beta_inc(a::Number, b::Number, x::Number, y::Number),
+    @setup((dIa, dIb, dIx) = _beta_inc_grad(map(float, promote(a, b, x))...)),
+    (dIa, dIb, dIx, -dIx),
+    (-dIa, -dIb, -dIx, dIx),
+)
 # Inverse incomplete beta: beta_inc_inv(a,b,p) -> (x, 1-x)
-function ChainRulesCore.frule((_, Δa, Δb, Δp), ::typeof(beta_inc_inv), a::Number, b::Number, p::Number)
-    x, y = beta_inc_inv(a, b, p)
-    _a, _b, _x, _p = map(float, promote(a, b, x, p))
-    # Implicit differentiation at solved x: I_x(a,b) = p
-    dIa, dIb, _ = _beta_inc_grad(_a, _b, _x)
-    # ∂I/∂x at solved x via stable log-space expression
-    dIx_acc = exp(muladd(_a - 1, log(_x), muladd(_b - 1, log1p(-_x), -logbeta(_a, _b))))
-    inv_dIx = inv(dIx_acc)
-    dx_da = -dIa * inv_dIx
-    dx_db = -dIb * inv_dIx
-    dx_dp = inv_dIx
-    Δx = muladd(dx_dp, Δp, muladd(dx_db, Δb, dx_da * Δa))
-    Δy = -Δx
-    Tout = typeof((x, y))
-    return (x, y), ChainRulesCore.Tangent{Tout}(Δx, Δy)
-end
-
-function ChainRulesCore.rrule(::typeof(beta_inc_inv), a::Number, b::Number, p::Number)
-    x, y = beta_inc_inv(a, b, p)
-    Ta = ChainRulesCore.ProjectTo(a)
-    Tb = ChainRulesCore.ProjectTo(b)
-    Tp = ChainRulesCore.ProjectTo(p)
-    _a, _b, _x, _p = map(float, promote(a, b, x, p))
-    dIa, dIb, _ = _beta_inc_grad(_a, _b, _x)
-    # ∂I/∂x at solved x via stable log-space expression
-    dIx_acc = exp(muladd(_a - 1, log(_x), muladd(_b - 1, log1p(-_x), -logbeta(_a, _b))))
-    inv_dIx = inv(dIx_acc)
-    dx_da = -dIa * inv_dIx
-    dx_db = -dIb * inv_dIx
-    dx_dp = inv_dIx
-    function beta_inc_inv_pullback(Δ)
-        Δx, Δy = Δ
-        s = Δx - Δy
-        ā = Ta(s * dx_da)
-        b̄ = Tb(s * dx_db)
-        p̄ = Tp(s * dx_dp)
-        return ChainRulesCore.NoTangent(), ā, b̄, p̄
-    end
-    return (x, y), beta_inc_inv_pullback
-end
+ChainRulesCore.@scalar_rule(
+    beta_inc_inv(a::Number, b::Number, p::Number),
+    @setup(
+        x = first(Ω), # equivalent to : x, y = beta_inc_inv(map(float, promote(a, b, p))...)
+        (dIa, dIb, dIx) = _beta_inc_grad(a, b, x),
+        inv_dIx = inv(dIx),
+    ),
+    (-dIa * inv_dIx, -dIb * inv_dIx,  inv_dIx),
+    (dIa * inv_dIx,  dIb * inv_dIx, -inv_dIx),
+)
 
 end # module
