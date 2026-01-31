@@ -38,7 +38,7 @@
 #
 # First, different functions are implemented valid for certain domains of the
 # three arguments.
-# Finally they are put together in `wrightbessel``.
+# Finally they are put together in `wrightbessel`.
 
 # rgamma_zero: smallest value x for which rgamma(x) == 0 as x gets large
 const rgamma_zero = 178.47241115886637
@@ -48,16 +48,13 @@ const exp_inf = 709.7827128933841
 # Compute reciprocal gamma via loggamma
 @inline rgamma(y::Real) = exp(-loggamma(y))
 
-# Compute exp(x) / gamma(y) safely via loggamma
-@inline function _exp_rgamma(x::Real, y::Real)
-    # Compute exp(x) / Γ(y) = exp(x - loggamma(y)) to avoid overflow
-    return exp(x - loggamma(y))
-end
+# Compute exp(x) / Γ(y) safely via loggamma to avoid overflow
+@inline _exp_rgamma(x::Real, y::Real) = exp(x - loggamma(y))
 
 
 # 1. Taylor series expansion in x=0, for x <= 1
-# Phi(a, b, x) = sum_k x^k / k! / Gamma(a*k+b)
-# Note that every term, and therefore also Phi(a, b, x), is monotone
+# Φ(a, b, x) = sum_k x^k / k! / Γ(a*k+b)
+# Note that every term, and therefore also Φ(a, b, x), is monotone
 # decreasing with increasing a or b.
 function _wb_series(a::Float64, b::Float64, x::Float64, nstart::Int, nstop::Int)
     xk_k = x^nstart * rgamma(nstart + 1)  # x^k/k!
@@ -79,7 +76,7 @@ end
 
 
 # 2. Taylor series expansion in x=0, for large a.
-# Phi(a, b, x) = sum_k x^k / k! / Gamma(a*k+b)
+# Φ(a, b, x) = sum_k x^k / k! / Γ(a*k+b)
 # Use Stirling formula to find k=k_max, the maximum term.
 # Then use n terms of Taylor series around k_max.
 function _wb_large_a(a::Float64, b::Float64, x::Float64, n::Int)
@@ -100,22 +97,22 @@ end
 
 # 3. Taylor series in a=0 up to order 5, for tiny a and not too large x
 #
-# Phi(a, b, x) = exp(x)/Gamma(b)
-#                * (1 - a*x * Psi(b) + a^2/2*x*(1+x) * (Psi(b)^2 - Psi'(b)
-#                   + ... )
-#                + O(a^6))
+# Φ(a, b, x) = exp(x)/Γ(b)
+#              * (1 - a*x * Ψ(b) + a^2/2*x*(1+x) * (Ψ(b)^2 - Ψ'(b)
+#                 + ... )
+#              + O(a^6))
 #
-# where Psi is the digamma function.
+# where Ψ is the digamma function.
 #
 # Parameter order takes effect only when b > 1e-3 and 2 <= order <= 5,
 # otherwise it defaults to 2 or, if b <= 1e-3, to 5. The lower order is, the
 # less polygamma functions have to be computed.
 #
-# For small b, i.e. b <= 1e-3, cancellation of poles of digamma(b)/Gamma(b)
+# For small b, i.e. b <= 1e-3, cancellation of poles of Ψ(b)/Γ(b)
 # and polygamma needs to be carried out => series expansion in a=0 to order 5
 # and in b=0 to order 4.
 function _wb_small_a(a::Float64, b::Float64, x::Float64, order::Int)
-    # A: coefficients of a^k  (1, -x * Psi(b), ...)
+    # A: coefficients of a^k  (1, -x * Ψ(b), ...)
     # B: powers of b^k/k! or terms in polygamma functions
     # C: coefficients of a^k1 * b^k2
     # X: polynomials in x
@@ -149,7 +146,7 @@ function _wb_small_a(a::Float64, b::Float64, x::Float64, order::Int)
         )
         res = exp(x) * evalpoly(a, A)
     else
-        # Φ(a, b, x) = exp(x)/gamma(b) * sum(A[i] * X[i] * B[i], i=0..5)
+        # Φ(a, b, x) = exp(x)/Γ(b) * sum(A[i] * X[i] * B[i], i=0..5)
         # A[n] = a^n/n!
         # But here, we repurpose A[n] = X[n] * B[n] / n!
         dg = digamma(b)
@@ -210,7 +207,7 @@ end
 
 # 4. Asymptotic expansion for large x up to order 8
 #
-# Phi(a, b, x) ~ Z^(1/2-b) * exp((1+a)/a * Z) * sum_k (-1)^k * C_k / Z^k
+# Φ(a, b, x) ~ Z^(1/2-b) * exp((1+a)/a * Z) * sum_k (-1)^k * C_k / Z^k
 #
 # with Z = (a*x)^(1/(1+a)).
 function _wb_asymptotic(a::Float64, b::Float64, x::Float64)
