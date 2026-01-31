@@ -440,7 +440,7 @@ end
     return dan * Xpp + an * dXpp + dbn * Xp + bn * dXp
 end
 
-function _beta_inc_grad(a::T, b::T, x::T) where {T}
+function _beta_inc_grad(a::T, b::T, x::T) where {T<:Union{Float64, Float32}}
 
     # 0) Previously keyword arguments: 
     maxapp=200
