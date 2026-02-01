@@ -48,3 +48,147 @@
         @test_throws DomainError ellipe(1.2)
     end
 end
+
+@testset "elliptic edge cases" begin
+    # Boundary value tests at each polynomial table transition (idx = 0,1,2,...,9)
+    # These test the boundaries where the binary tree branching changes paths
+    @testset "ellipk boundary values" begin
+        # Table boundaries: 0.0, 0.1, 0.2, ..., 0.9, 1.0
+        # Reference values from current implementation (regression test baseline)
+        @test ellipk(0.0)  ≈ 1.5707963267948966    rtol=2*eps()  # π/2
+        @test ellipk(0.1)  ≈ 1.6124413487202192    rtol=2*eps()
+        @test ellipk(0.2)  ≈ 1.6596235986105277    rtol=2*eps()
+        @test ellipk(0.3)  ≈ 1.7138894481787912    rtol=2*eps()
+        @test ellipk(0.4)  ≈ 1.7775193714912532    rtol=2*eps()
+        @test ellipk(0.5)  ≈ 1.8540746773013721    rtol=2*eps()
+        @test ellipk(0.6)  ≈ 1.9495677498060260    rtol=2*eps()
+        @test ellipk(0.7)  ≈ 2.0753631352924691    rtol=2*eps()
+        @test ellipk(0.8)  ≈ 2.2572053268208530    rtol=2*eps()
+        @test ellipk(0.85) ≈ 2.3890164863255676    rtol=2*eps()  # Table 10-11 boundary
+        @test ellipk(0.9)  ≈ 2.5780921133481733    rtol=2*eps()
+        @test ellipk(0.95) ≈ 2.9083372484445515    rtol=2*eps()
+        @test ellipk(0.99) ≈ 3.6956373629898747    rtol=2*eps()
+
+        # Near-boundary tests using prevfloat/nextfloat
+        @test ellipk(prevfloat(0.1)) ≈ ellipk(0.1) rtol=1e-10
+        @test ellipk(nextfloat(0.1)) ≈ ellipk(0.1) rtol=1e-10
+        @test ellipk(prevfloat(0.5)) ≈ ellipk(0.5) rtol=1e-10
+        @test ellipk(nextfloat(0.5)) ≈ ellipk(0.5) rtol=1e-10
+        @test ellipk(prevfloat(0.9)) ≈ ellipk(0.9) rtol=1e-10
+        @test ellipk(nextfloat(0.9)) ≈ ellipk(0.9) rtol=1e-10
+    end
+
+    @testset "ellipe boundary values" begin
+        # Table boundaries: 0.0, 0.1, 0.2, ..., 0.9, 1.0
+        # Reference values from current implementation (regression test baseline)
+        @test ellipe(0.0)  ≈ 1.5707963267948966    rtol=2*eps()  # π/2
+        @test ellipe(0.1)  ≈ 1.5307576368977631    rtol=2*eps()
+        @test ellipe(0.2)  ≈ 1.4890350580958527    rtol=2*eps()
+        @test ellipe(0.3)  ≈ 1.4453630644126654    rtol=2*eps()
+        @test ellipe(0.4)  ≈ 1.3993921388974322    rtol=2*eps()
+        @test ellipe(0.5)  ≈ 1.3506438810476753    rtol=2*eps()
+        @test ellipe(0.6)  ≈ 1.2984280350469133    rtol=2*eps()
+        @test ellipe(0.7)  ≈ 1.2416705679458224    rtol=2*eps()
+        @test ellipe(0.8)  ≈ 1.1784899243278386    rtol=2*eps()
+        @test ellipe(0.85) ≈ 1.1433957918831656    rtol=2*eps()  # Table 10-11 boundary
+        @test ellipe(0.9)  ≈ 1.1047747327040722    rtol=2*eps()
+        @test ellipe(0.95) ≈ 1.0604737277662784    rtol=2*eps()
+        @test ellipe(0.99) ≈ 1.0159935450252240    rtol=2*eps()
+
+        # Near-boundary tests
+        @test ellipe(prevfloat(0.1)) ≈ ellipe(0.1) rtol=1e-10
+        @test ellipe(nextfloat(0.1)) ≈ ellipe(0.1) rtol=1e-10
+        @test ellipe(prevfloat(0.5)) ≈ ellipe(0.5) rtol=1e-10
+        @test ellipe(nextfloat(0.5)) ≈ ellipe(0.5) rtol=1e-10
+        @test ellipe(prevfloat(0.9)) ≈ ellipe(0.9) rtol=1e-10
+        @test ellipe(nextfloat(0.9)) ≈ ellipe(0.9) rtol=1e-10
+    end
+
+    @testset "negative m values" begin
+        # Negative m uses transformation: x = m/(m-1), K(m) = K(x)/sqrt(1-m)
+        # Reference values from current implementation (regression test baseline)
+        @test ellipk(-0.1)  ≈ 1.5335928197134567   rtol=2*eps()
+        @test ellipk(-0.5)  ≈ 1.4157372084259563   rtol=2*eps()
+        @test ellipk(-1.0)  ≈ 1.3110287771460600   rtol=2*eps()
+        @test ellipk(-2.0)  ≈ 1.1714200841467699   rtol=2*eps()
+        @test ellipk(-10.0) ≈ 0.7908718902387385   rtol=2*eps()
+
+        @test ellipe(-0.1)  ≈ 1.6093590249375296   rtol=2*eps()
+        @test ellipe(-0.5)  ≈ 1.7517712756948178   rtol=2*eps()
+        @test ellipe(-1.0)  ≈ 1.9100988945138559   rtol=2*eps()
+        @test ellipe(-2.0)  ≈ 2.1844381427462012   rtol=2*eps()
+        @test ellipe(-10.0) ≈ 3.6391380384177681   rtol=2*eps()
+    end
+
+    @testset "special edge cases" begin
+        # Values very close to 1.0
+        @test ellipk(prevfloat(1.0)) > 10.0  # Should be very large
+        @test ellipe(prevfloat(1.0)) ≈ 1.0 rtol=1e-6  # Should be close to 1
+
+        # Very small positive values
+        @test ellipk(1e-15) ≈ π/2 rtol=1e-10
+        @test ellipe(1e-15) ≈ π/2 rtol=1e-10
+
+        # Consistency: E(m) ≤ π/2 for m ∈ [0,1]
+        for m in 0.0:0.1:1.0
+            @test ellipe(m) <= π/2 + eps()
+        end
+
+        # Consistency: K(m) ≥ π/2 for m ∈ [0,1)
+        for m in 0.0:0.1:0.9
+            @test ellipk(m) >= π/2 - eps()
+        end
+    end
+end
+
+
+@testset "ellipke" begin
+    @testset "bit-wise equality - all branches" begin
+        # ellipke is implemented independently (not calling ellipk/ellipe internally)
+        # so bit-wise comparison is a valid oracle test
+        # Test values covering ALL polynomial branches (idx 0-9)
+        for m in [0.0, 0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.825, 0.875, 0.95, 0.99]
+            K, E = ellipke(m)
+            @test K === ellipk(m)  # bit-wise equality
+            @test E === ellipe(m)  # bit-wise equality
+        end
+    end
+
+    @testset "boundary cases m=0 and m=1" begin
+        @test ellipke(0.0) === (ellipk(0.0), ellipe(0.0))  # (π/2, π/2)
+        @test ellipke(1.0) === (ellipk(1.0), ellipe(1.0))  # (Inf, 1.0)
+    end
+
+    @testset "negative m values" begin
+        # Bit-wise equality with ellipk/ellipe (independent implementations)
+        for m in [-0.1, -0.5, -1.0, -2.0, -10.0, -1e5]
+            @test ellipke(m) === (ellipk(m), ellipe(m))
+        end
+
+        # Extreme negative values to test x==1.0 branch path
+        @test ellipke(-1e30) === (ellipk(-1e30), ellipe(-1e30))
+
+        # Negative infinity special case
+        @test ellipke(-Inf) === (ellipk(-Inf), ellipe(-Inf)) # (0.0, Inf)
+    end
+
+    @testset "NaN handling" begin
+        @test ellipke(NaN) === (NaN, NaN)
+    end
+
+    @testset "DomainError for m > 1" begin
+        @test_throws DomainError ellipke(1.1)
+        @test_throws DomainError ellipke(2.0)
+    end
+
+    @testset "Missing" begin
+        @test ellipke(missing) === (missing, missing)
+    end
+
+    @testset "Float16 and Float32 support" begin
+        for T in (Float16, Float32)
+            m = T(0.5)
+            @test ellipke(m) === (ellipk(m), ellipe(m))
+        end
+    end
+end

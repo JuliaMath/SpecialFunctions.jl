@@ -108,6 +108,7 @@ Here the *Special Functions* are listed according to the structure of [NIST Digi
 |:-------- |:----------- |
 | [`ellipk(m)`](@ref SpecialFunctions.ellipk) | [complete elliptic integral of 1st kind](https://en.wikipedia.org/wiki/Elliptic_integral#Notational_variants) ``K(m)``  |
 | [`ellipe(m)`](@ref SpecialFunctions.ellipe) | [complete elliptic integral of 2nd kind](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind) ``E(m)`` |
+| [`ellipke(m)`](@ref SpecialFunctions.ellipke) | complete elliptic integrals ``K(m)`` and ``E(m)`` simultaneously |
 
 
 ## Zeta and Related Functions
