@@ -7,7 +7,7 @@ struct AmosException <: Exception
 end
 
 function Base.showerror(io::IO, ex::AmosException)
-    print(io, "AmosException with id $(ex.id): ")
+    print(io, LazyString("AmosException with id ", ex.id, ": "))
     if ex.id == 0
         print(io, "normal return, computation complete.")
     elseif ex.id == 1

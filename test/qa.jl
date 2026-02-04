@@ -45,6 +45,7 @@ end
             :ROUNDING_MODE, # Base.MPFR
             :_fact_table64, # Base
             :version, # Base.MPFR
+            Symbol("@nif"), # Base
             (VERSION < v"1.11" ? (:depwarn,) : ())..., # Base
         ),
     ) === nothing

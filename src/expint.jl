@@ -52,7 +52,7 @@ macro E₁_cf64(x, n::Integer)
 end
 
 function E₁_taylor_coefficients(::Type{T}, n::Integer) where {T<:Number}
-    n < 0 && throw(ArgumentError("$n ≥ 0 is required"))
+    n < 0 && throw(ArgumentError(LazyString(n, " ≥ 0 is required")))
     n == 0 && return T[]
     n == 1 && return T[-eulergamma]
     # iteratively compute the terms in the series, starting with k=1

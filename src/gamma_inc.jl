@@ -1,25 +1,25 @@
 using Base.MPFR: ROUNDING_MODE
 #useful constants
-const acc0 = [5.0e-15, 5.0e-7, 5.0e-4] #accuracy options
-const big1 = [25.0, 14.0, 10.0]
-const e0 = [0.25e-3, 0.25e-1, 0.14]
-const x0 = [31.0, 17.0, 9.7]
+const acc0 = (5.0e-15, 5.0e-7, 5.0e-4) #accuracy options
+const big1 = (25.0, 14.0, 10.0)
+const e0 = (0.25e-3, 0.25e-1, 0.14)
+const x0 = (31.0, 17.0, 9.7)
 const alog10 = log(10)
 const rt2pin = Float64(invsqrt2π)
 const rtpi = Float64(sqrtπ)
-const stirling_coef = [1.996379051590076518221, -0.17971032528832887213e-2, 0.131292857963846713e-4, -0.2340875228178749e-6, 0.72291210671127e-8, -0.3280997607821e-9, 0.198750709010e-10, -0.15092141830e-11, 0.1375340084e-12, -0.145728923e-13, 0.17532367e-14, -0.2351465e-15, 0.346551e-16, -0.55471e-17, 0.9548e-18, -0.1748e-18, 0.332e-19, -0.58e-20]
-const auxgam_coef = [-1.013609258009865776949, 0.784903531024782283535e-1, 0.67588668743258315530e-2, -0.12790434869623468120e-2, 0.462939838642739585e-4, 0.43381681744740352e-5, -0.5326872422618006e-6, 0.172233457410539e-7, 0.8300542107118e-9, -0.10553994239968e-9, 0.39415842851e-11, 0.362068537e-13, -0.107440229e-13, 0.5000413e-15, -0.62452e-17, -0.5185e-18, 0.347e-19, -0.9e-21]
+const stirling_coef = (1.996379051590076518221, -0.17971032528832887213e-2, 0.131292857963846713e-4, -0.2340875228178749e-6, 0.72291210671127e-8, -0.3280997607821e-9, 0.198750709010e-10, -0.15092141830e-11, 0.1375340084e-12, -0.145728923e-13, 0.17532367e-14, -0.2351465e-15, 0.346551e-16, -0.55471e-17, 0.9548e-18, -0.1748e-18, 0.332e-19, -0.58e-20)
+const auxgam_coef = (-1.013609258009865776949, 0.784903531024782283535e-1, 0.67588668743258315530e-2, -0.12790434869623468120e-2, 0.462939838642739585e-4, 0.43381681744740352e-5, -0.5326872422618006e-6, 0.172233457410539e-7, 0.8300542107118e-9, -0.10553994239968e-9, 0.39415842851e-11, 0.362068537e-13, -0.107440229e-13, 0.5000413e-15, -0.62452e-17, -0.5185e-18, 0.347e-19, -0.9e-21)
 
 #----------------COEFFICIENTS FOR TEMME EXPANSION------------------
 
 const d00 = -.333333333333333E+00
-const d0  = [.833333333333333E-01, -.148148148148148E-01, .115740740740741E-02, .352733686067019E-03, -.178755144032922E-03, .391926317852244E-04]
+const d0  = (.833333333333333E-01, -.148148148148148E-01, .115740740740741E-02, .352733686067019E-03, -.178755144032922E-03, .391926317852244E-04)
 const d10 = -.185185185185185E-02
-const d1  = [-.347222222222222E-02, .264550264550265E-02, -.990226337448560E-03, .205761316872428E-03]
+const d1  = (-.347222222222222E-02, .264550264550265E-02, -.990226337448560E-03, .205761316872428E-03)
 const d20 = .413359788359788E-02
-const d2  = [-.268132716049383E-02, .771604938271605E-03]
+const d2  = (-.268132716049383E-02, .771604938271605E-03)
 const d30 = .649434156378601E-03
-const d3  =[.229472093621399E-03, -.469189494395256E-03]
+const d3  = (.229472093621399E-03, -.469189494395256E-03)
 const d40 = -.861888290916712E-03
 const d4  = .784039221720067E-03
 const d50 = -.336798553366358E-03
@@ -88,11 +88,13 @@ Compute function `g` in ``1/\Gamma(x+1) = 1 + x (x-1) g(x)``, `-1 <= x <= 1`.
 """
 function auxgam(x::Float64)
     @assert -1 <= x <= 1
-    if x < 0
-        return -(1.0 + (1.0 + x)*(1.0 + x)*auxgam(1.0 + x))/(1.0 - x)
+    xp = ifelse(x < 0, 1 + x, x)
+    t = 2xp - 1
+    cheb = chepolsum(t, auxgam_coef)
+    return if x < 0
+        - (1 + xp * xp * cheb) / (1 - x)
     else
-        t = 2*x - 1.0
-        return chepolsum(t, auxgam_coef)
+        cheb
     end
 end
 
@@ -111,7 +113,7 @@ end
 
 Computes a series of Chebyshev Polynomials given by: `a[1]/2 + a[2]T1(x) + .... + a[n]T{n-1}(X)`.
 """
-function chepolsum(x::Float64, a::Array{Float64,1})
+function chepolsum(x::Float64, a::Tuple{Float64,Vararg{Float64}})
     n = length(a)
     if n == 1
         return a[1]/2.0
@@ -471,7 +473,8 @@ function gamma_inc_asym(a::Float64, x::Float64, ind::Integer)
     ts = cumprod(ntuple(i -> (a - i) / x, Val(21)))
 
     # sum the smaller terms directly
-    first_small_t = something(findfirst(x -> abs(x) < 1.0e-3, ts), 21)
+    # Unrolled findfirst: finds the first index i in 1:21 where abs(ts[i]) < 1e-3, defaulting to 21
+    first_small_t = Base.@nif 21 (i -> abs(ts[i]) < 1e-3) (i -> i) (i -> 21)
     sm = t = ts[first_small_t]
     amn = a - first_small_t
     while abs(t) ≥ acc
@@ -998,7 +1001,7 @@ end
 # floating point numbers of the same type
 function _gamma_inc_inv(a::T, p::T, q::T) where {T<:Real}
     if p + q != 1
-        throw(ArgumentError("p + q must equal one but is $(p + q)"))
+        throw(ArgumentError(LazyString("p + q must equal one but is ", p + q)))
     end
 
     if iszero(p)
