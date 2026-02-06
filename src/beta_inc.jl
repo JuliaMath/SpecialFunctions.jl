@@ -1,4 +1,3 @@
-using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
 const exparg_n = log(nextfloat(floatmin(Float64)))
 const exparg_p =  log(prevfloat(floatmax(Float64)))
@@ -36,7 +35,7 @@ function _loggammadiv(a::Float64, b::Float64)
 
     # SET W = stirling(b) - stirling(a+b)
     t = inv(b)^2
-    w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
+    w = @evalpoly(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
 
     #COMBINING
@@ -66,11 +65,11 @@ function stirling_corr(a0::Float64, b0::Float64)
     s₉ = 1.0 + (x + x²*s₇)
     s₁₁ = 1.0 + (x + x²*s₉)
     t = inv(b)^2
-    w = @horner(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
+    w = @evalpoly(t, .833333333333333E-01, -.277777777760991E-02*s₃, .793650666825390E-03*s₅, -.595202931351870E-03*s₇, .837308034031215E-03*s₉, -.165322962780713E-02*s₁₁)
     w *= c/b
     # COMPUTE stirling(a) + w
     t = inv(a)^2
-    return @horner(t, .833333333333333E-01, -.277777777760991E-02, .793650666825390E-03, -.595202931351870E-03, .837308034031215E-03, -.165322962780713E-02)/a + w
+    return @evalpoly(t, .833333333333333E-01, -.277777777760991E-02, .793650666825390E-03, -.595202931351870E-03, .837308034031215E-03, -.165322962780713E-02)/a + w
 end
 
 @doc raw"""
@@ -948,7 +947,7 @@ function _beta_inc_inv(a::Float64, b::Float64, p::Float64, q::Float64=1-p)
     #Initial approx
     x = p
     r = sqrt(-2*log(p))
-    p_approx = r - @horner(r, 2.30753e+00, 0.27061e+00) / @horner(r, 1.0, .99229e+00, .04481e+00)
+    p_approx = r - @evalpoly(r, 2.30753e+00, 0.27061e+00) / @evalpoly(r, 1.0, .99229e+00, .04481e+00)
     fpu = floatmin(Float64)
     lb = logbeta(a, b)
 

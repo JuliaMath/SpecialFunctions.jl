@@ -1,6 +1,5 @@
 # This file contains code that was formerly a part of Julia. License is MIT: http://julialang.org/license
 
-using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
 
 for f in (:erf, :erfc)
@@ -412,14 +411,14 @@ function _erfinv(x::Float64)
         return copysign(Inf, x)
     elseif a <= 0.75 # Table 17 in Blair et al.
         t = x*x - 0.5625
-        return x * @horner(t, 0.16030_49558_44066_229311e2,
+        return x * @evalpoly(t, 0.16030_49558_44066_229311e2,
                              -0.90784_95926_29603_26650e2,
                               0.18644_91486_16209_87391e3,
                              -0.16900_14273_46423_82420e3,
                               0.65454_66284_79448_7048e2,
                              -0.86421_30115_87247_794e1,
                               0.17605_87821_39059_0) /
-                   @horner(t, 0.14780_64707_15138_316110e2,
+                   @evalpoly(t, 0.14780_64707_15138_316110e2,
                              -0.91374_16702_42603_13936e2,
                               0.21015_79048_62053_17714e3,
                              -0.22210_25412_18551_32366e3,
@@ -428,7 +427,7 @@ function _erfinv(x::Float64)
                               0.1e1)
     elseif a <= 0.9375 # Table 37 in Blair et al.
         t = x*x - 0.87890625
-        return x * @horner(t, -0.15238_92634_40726_128e-1,
+        return x * @evalpoly(t, -0.15238_92634_40726_128e-1,
                                0.34445_56924_13612_5216,
                               -0.29344_39867_25424_78687e1,
                                0.11763_50570_52178_27302e2,
@@ -436,7 +435,7 @@ function _erfinv(x::Float64)
                                0.19121_33439_65803_30163e2,
                               -0.54789_27619_59831_8769e1,
                                0.23751_66890_24448) /
-                   @horner(t, -0.10846_51696_02059_954e-1,
+                   @evalpoly(t, -0.10846_51696_02059_954e-1,
                                0.26106_28885_84307_8511,
                               -0.24068_31810_43937_57995e1,
                                0.10695_12997_33870_14469e2,
@@ -446,7 +445,7 @@ function _erfinv(x::Float64)
                                0.1e1)
     else # Table 57 in Blair et al.
         t = inv(sqrt(-log1p(-a)))
-        return @horner(t, 0.10501_31152_37334_38116e-3,
+        return @evalpoly(t, 0.10501_31152_37334_38116e-3,
                           0.10532_61131_42333_38164_25e-1,
                           0.26987_80273_62432_83544_516,
                           0.23268_69578_89196_90806_414e1,
@@ -456,7 +455,7 @@ function _erfinv(x::Float64)
                           0.36270_02483_09587_08930_02e1,
                           0.88606_27392_96515_46814_9) /
               (copysign(t, x) *
-               @horner(t, 0.10501_26668_70303_37690e-3,
+               @evalpoly(t, 0.10501_26668_70303_37690e-3,
                           0.10532_86230_09333_27531_11e-1,
                           0.27019_86237_37515_54845_553,
                           0.23501_43639_79702_53259_123e1,
@@ -477,33 +476,33 @@ function _erfinv(x::Float32)
         return copysign(Inf32, x)
     elseif a <= 0.75f0 # Table 10 in Blair et al.
         t = x*x - 0.5625f0
-        return x * @horner(t, -0.13095_99674_22f2,
+        return x * @evalpoly(t, -0.13095_99674_22f2,
                                0.26785_22576_0f2,
                               -0.92890_57365f1) /
-                   @horner(t, -0.12074_94262_97f2,
+                   @evalpoly(t, -0.12074_94262_97f2,
                                0.30960_61452_9f2,
                               -0.17149_97799_1f2,
                                0.1f1)
     elseif a <= 0.9375f0 # Table 29 in Blair et al.
         t = x*x - 0.87890625f0
-        return x * @horner(t, -0.12402_56522_1f0,
+        return x * @evalpoly(t, -0.12402_56522_1f0,
                                0.10688_05957_4f1,
                               -0.19594_55607_8f1,
                                0.42305_81357f0) /
-                   @horner(t, -0.88276_97997f-1,
+                   @evalpoly(t, -0.88276_97997f-1,
                                0.89007_43359f0,
                               -0.21757_03119_6f1,
                                0.1f1)
     else # Table 50 in Blair et al.
         t = inv(sqrt(-log1p(-a)))
-        return @horner(t, 0.15504_70003_116f0,
+        return @evalpoly(t, 0.15504_70003_116f0,
                           0.13827_19649_631f1,
                           0.69096_93488_87f0,
                          -0.11280_81391_617f1,
                           0.68054_42468_25f0,
                          -0.16444_15679_1f0) /
               (copysign(t, x) *
-               @horner(t, 0.15502_48498_22f0,
+               @evalpoly(t, 0.15502_48498_22f0,
                           0.13852_28141_995f1,
                           0.1f1))
     end
@@ -526,9 +525,9 @@ function _erfinv(x::Float16)
             y = copysign(muladd(0.88622695f0, x32, t), x32)
         elseif a32 <= 0.9375f0 # Table 26 in Blair et al.
             t = x32^2 - 0.87890625f0
-            y = x32 * @horner(t, 0.10178_950f1,
+            y = x32 * @evalpoly(t, 0.10178_950f1,
                               -0.32827_601f1) /
-                      @horner(t, 0.72455_99f0,
+                      @evalpoly(t, 0.72455_99f0,
                               -0.33871_553f1,
                               0.1f1)
         else
@@ -539,7 +538,7 @@ function _erfinv(x::Float16)
             # slightly faster and 1-x is exact.
             # Ref: https://github.com/JuliaMath/SpecialFunctions.jl/pull/372#discussion_r1592710586
             t = sqrt(-log(1-a32))
-            y = copysign(@horner(t, -0.429159f0, 1.04868f0), x32)
+            y = copysign(@evalpoly(t, -0.429159f0, 1.04868f0), x32)
         end
         return Float16(y)
     end
@@ -596,7 +595,7 @@ function _erfcinv(y::Float64)
         throw(DomainError(y, "`y` must be nonnegative."))
     elseif y >= 1e-100 # Table 57 in Blair et al.
         t = 1.0 / sqrt(-log(y))
-        return @horner(t, 0.10501_31152_37334_38116e-3,
+        return @evalpoly(t, 0.10501_31152_37334_38116e-3,
                           0.10532_61131_42333_38164_25e-1,
                           0.26987_80273_62432_83544_516,
                           0.23268_69578_89196_90806_414e1,
@@ -606,7 +605,7 @@ function _erfcinv(y::Float64)
                           0.36270_02483_09587_08930_02e1,
                           0.88606_27392_96515_46814_9) /
               (t *
-               @horner(t, 0.10501_26668_70303_37690e-3,
+               @evalpoly(t, 0.10501_26668_70303_37690e-3,
                           0.10532_86230_09333_27531_11e-1,
                           0.27019_86237_37515_54845_553,
                           0.23501_43639_79702_53259_123e1,
@@ -618,7 +617,7 @@ function _erfcinv(y::Float64)
                           0.1e1))
     else # Table 80 in Blair et al.
         t = 1.0 / sqrt(-log(y))
-        return @horner(t, 0.34654_29858_80863_50177e-9,
+        return @evalpoly(t, 0.34654_29858_80863_50177e-9,
                           0.25084_67920_24075_70520_55e-6,
                           0.47378_13196_37286_02986_534e-4,
                           0.31312_60375_97786_96408_3388e-2,
@@ -626,7 +625,7 @@ function _erfcinv(y::Float64)
                           0.70045_68123_35816_43868_271e0,
                           0.18710_42034_21679_31668_683e1,
                           0.71452_54774_31351_45428_3e0) /
-          (t * @horner(t, 0.34654_29567_31595_11156e-9,
+          (t * @evalpoly(t, 0.34654_29567_31595_11156e-9,
                           0.25084_69079_75880_27114_87e-6,
                           0.47379_53129_59749_13536_339e-4,
                           0.31320_63536_46177_68848_0813e-2,
@@ -648,13 +647,13 @@ function _erfcinv(y::Float32)
         throw(DomainError(y, "`y` must be nonnegative."))
     else # Table 50 in Blair et al.
         t = 1.0f0 / sqrt(-log(y))
-        return @horner(t, 0.15504_70003_116f0,
+        return @evalpoly(t, 0.15504_70003_116f0,
                           0.13827_19649_631f1,
                           0.69096_93488_87f0,
                          -0.11280_81391_617f1,
                           0.68054_42468_25f0,
                          -0.16444_15679_1f0) /
-        (t * @horner(t, 0.15502_48498_22f0,
+        (t * @evalpoly(t, 0.15502_48498_22f0,
                         0.13852_28141_995f1,
                         0.1f1))
     end
@@ -670,9 +669,9 @@ function _erfcinv(y::Float16)
         throw(DomainError(y, "`y` must be nonnegative."))
     else # Table 47 in Blair et al.
         t = 1.0f0 / sqrt(-log(Float32(y)))
-        x = @horner(t, 0.98650_088f0,
+        x = @evalpoly(t, 0.98650_088f0,
                        0.92601_777f0) /
-            (t * @horner(t, 0.98424_719f0,
+            (t * @evalpoly(t, 0.98424_719f0,
                             0.10074_7432f0,
                             0.1f0))
         return Float16(x)
