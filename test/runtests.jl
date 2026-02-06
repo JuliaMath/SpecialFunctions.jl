@@ -9,7 +9,6 @@ using Base.MathConstants: γ
 
 using Aqua: Aqua
 using ExplicitImports: ExplicitImports
-using JET: JET
 
 using SpecialFunctions: AmosException, f64
 
@@ -48,5 +47,13 @@ for t in tests
     tp = joinpath(testdir, "$(t).jl")
     @testset "$(t)" begin
       include(tp)
+    end
+end
+
+# Update this condition when JET support new version
+# https://github.com/aviatesk/JET.jl/blob/master/Project.toml
+if VERSION < v"1.13"
+    @testset "JET" begin
+        include(joinpath(testdir, "jet.jl"))
     end
 end
