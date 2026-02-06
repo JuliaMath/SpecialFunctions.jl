@@ -1,4 +1,3 @@
-using Base.Math: @horner
 using Base.MPFR: ROUNDING_MODE
 #useful constants
 const acc0 = [5.0e-15, 5.0e-7, 5.0e-4] #accuracy options
@@ -45,13 +44,13 @@ function rgamma1pm1(a::Float64)
     if t == 0.0
         return 0.0
     elseif t < 0.0
-        top = @horner(t, -.422784335098468E+00, -.771330383816272E+00, -.244757765222226E+00, .118378989872749E+00, .930357293360349E-03, -.118290993445146E-01, .223047661158249E-02, .266505979058923E-03, -.132674909766242E-03)
-        bot = @horner(t, 1.0, .273076135303957E+00, .559398236957378E-01)
+        top = @evalpoly(t, -.422784335098468E+00, -.771330383816272E+00, -.244757765222226E+00, .118378989872749E+00, .930357293360349E-03, -.118290993445146E-01, .223047661158249E-02, .266505979058923E-03, -.132674909766242E-03)
+        bot = @evalpoly(t, 1.0, .273076135303957E+00, .559398236957378E-01)
         w = top/bot
         return rangereduce ? t*w/a : a*(w + 1)
     else
-        top = @horner(t, .577215664901533E+00, -.409078193005776E+00, -.230975380857675E+00, .597275330452234E-01, .766968181649490E-02, -.514889771323592E-02, .589597428611429E-03)
-        bot = @horner(t, 1.0, .427569613095214E+00, .158451672430138E+00, .261132021441447E-01, .423244297896961E-02)
+        top = @evalpoly(t, .577215664901533E+00, -.409078193005776E+00, -.230975380857675E+00, .597275330452234E-01, .766968181649490E-02, -.514889771323592E-02, .589597428611429E-03)
+        bot = @evalpoly(t, 1.0, .427569613095214E+00, .158451672430138E+00, .261132021441447E-01, .423244297896961E-02)
         w = top/bot
         return rangereduce ? (t/a)*(w - 1.0) : a*w
     end
@@ -151,7 +150,7 @@ function stirling_error(x::Float64)
     else
         z = 1.0/(x*x)
         if x < 1000
-            return @horner(z, 0.25721014990011306473e-1, 0.82475966166999631057e-1, -0.25328157302663562668e-2, 0.60992926669463371e-3, -0.33543297638406e-3, 0.250505279903e-3)/((0.30865217988013567769 + z)*x)
+            return @evalpoly(z, 0.25721014990011306473e-1, 0.82475966166999631057e-1, -0.25328157302663562668e-2, 0.60992926669463371e-3, -0.33543297638406e-3, 0.250505279903e-3)/((0.30865217988013567769 + z)*x)
         else
             return (((-z/1680.0 + 1.0/1260.0)*z - 1.0/360.0)*z + 1.0/12.0)/x
         end
@@ -189,10 +188,10 @@ function lambdaeta(eta::Float64)
         la = 1
     elseif eta < -1.0
         r = exp(-1 - s)
-        la = @horner(r, 0.0, 1.0, 1.0, 1.5, 8.0/3.0, 125.0/24.0, 15.0/5.0)
+        la = @evalpoly(r, 0.0, 1.0, 1.0, 1.5, 8.0/3.0, 125.0/24.0, 15.0/5.0)
     elseif eta < 1.0
         r = eta
-        la = @horner(r, 1.0, 1.0, 1.0/3.0, 1.0/36.0, -1.0/270.0, 1.0/4320.0, 1.0/17010.0)
+        la = @evalpoly(r, 1.0, 1.0, 1.0/3.0, 1.0/36.0, -1.0/270.0, 1.0/4320.0, 1.0/17010.0)
     else
         r = 11 + s
         l = log(r)
@@ -200,11 +199,11 @@ function lambdaeta(eta::Float64)
         r = 1.0/r
         ak1 = 1.0
         ak2 = (2 - l)*0.5
-        ak3 = (@horner(l, 6, -9, 2))/6.0
-        ak4 = -(@horner(l, -12, 36, -22, 3))/12.0
-        ak5 = (@horner(l, 60, -300, 350, -125, 12))/60.0
-        ak6 = -(@horner(l, -120, 900, -1700, 1125, -274, 20))/120.0
-        la = la + l*@horner(r,0.0, ak1, ak2, ak3, ak4, ak5, ak6)
+        ak3 = (@evalpoly(l, 6, -9, 2))/6.0
+        ak4 = -(@evalpoly(l, -12, 36, -22, 3))/12.0
+        ak5 = (@evalpoly(l, 60, -300, 350, -125, 12))/60.0
+        ak6 = -(@evalpoly(l, -120, 900, -1700, 1125, -274, 20))/120.0
+        la = la + l*@evalpoly(r,0.0, ak1, ak2, ak3, ak4, ak5, ak6)
     end
     r = 1
     if (eta > -3.5 && eta < -0.03) || (eta > 0.03 && eta < 40)
@@ -228,11 +227,11 @@ Refer Eqn (3.12) in the paper
 """
 function coeff1(eta::Float64)
     if abs(eta) < 1.0
-        coeff1 = @horner(
+        coeff1 = @evalpoly(
             eta,
             -3.333333333438e-1, -2.070740359969e-1, -5.041806657154e-2,
             -4.923635739372e-3, -4.293658292782e-5
-        ) / @horner(
+        ) / @evalpoly(
             eta,
             1.000000000000e+0, 7.045554412463e-1, 2.118190062224e-1,
             3.048648397436e-2, 1.605037988091e-3
@@ -258,31 +257,31 @@ function coeff2(eta::Float64)
         lnmeta = log(-eta)
         coeff2 = (12.0 - x - 6.0*lnmeta*lnmeta)/(12.0*x*eta)
     elseif eta < -2.0
-        coeff2 = @horner(
+        coeff2 = @evalpoly(
             eta,
             -1.72847633523e-2, -1.59372646475e-2, -4.64910887221e-3,
             -6.06834887760e-4, -6.14830384279e-6
-        ) / @horner(
+        ) / @evalpoly(
             eta,
             1.00000000000e+0, 7.64050615669e-1, 2.97143406325e-1,
             5.79490176079e-2, 5.74558524851e-3)
     elseif eta < 2.0
-        coeff2 = @horner(
+        coeff2 = @evalpoly(
             eta,
             -1.72839517431e-2, -1.46362417966e-2, -3.57406772616e-3,
             -3.91032032692e-4, 2.49634036069e-6
-        ) / @horner(
+        ) / @evalpoly(
             eta,
             1.00000000000e+0, 6.90560400696e-1, 2.49962384741e-1,
             4.43843438769e-2, 4.24073217211e-3
         )
     elseif eta < 1000.0
         x = 1.0/eta
-        coeff2 = @horner(
+        coeff2 = @evalpoly(
             x,
             9.99944669480e-1, 1.04649839762e+2, 8.57204033806e+2,
             7.31901559577e+2, 4.55174411671e+1
-        ) / @horner(
+        ) / @evalpoly(
             x,
             1.00000000000e+0, 1.04526456943e+2, 8.23313447808e+2,
             3.11993802124e+3, 3.97003311219e+3
@@ -307,32 +306,32 @@ function coeff3(eta::Float64)
         coeff3=(-30.0 + eta*y*(6.0*x*y*y - 12.0 + x))/(12.0*eta*x*x)
     elseif eta < -4.0
         coeff3 = (
-            @horner(
+            @evalpoly(
                 eta,
                 4.95346498136e-2, 2.99521337141e-2, 6.88296911516e-3,
                 5.12634846317e-4, -2.01411722031e-5
-            ) / @horner(
+            ) / @evalpoly(
                 eta,
                 1.00000000000e+0, 7.59803615283e-1, 2.61547111595e-1,
                 4.64854522477e-2, 4.03751193496e-3
             )
         )/(eta*eta)
     elseif eta < -2.0
-        coeff3 = @horner(
+        coeff3 = @evalpoly(
             eta,
             4.52313583942e-3, 1.20744920113e-3, -7.89724156582e-5,
             -5.04476066942e-5, -5.35770949796e-6
-        ) / @horner(
+        ) / @evalpoly(
             eta,
             1.00000000000e+0, 9.12203410349e-1, 4.05368773071e-1,
             9.01638932349e-2, 9.48935714996e-3
         )
     elseif eta < 2.0
-        coeff3 = @horner(
+        coeff3 = @evalpoly(
             eta,
             4.39937562904e-3, 4.87225670639e-4, -1.28470657374e-4,
             5.29110969589e-6, 1.57166771750e-7
-        ) / @horner(
+        ) / @evalpoly(
             eta,
             1.00000000000e+0, 7.94435257415e-1, 3.33094721709e-1,
             7.03527806143e-2, 8.06110846078e-3
@@ -340,11 +339,11 @@ function coeff3(eta::Float64)
     elseif eta < 10.0
         x = 1.0/eta
         coeff3 = (
-            @horner(
+            @evalpoly(
                 x,
                 -1.14811912320e-3, -1.12850923276e-1, 1.51623048511e+0,
                 -2.18472031183e-1, 7.30002451555e-2
-            ) / @horner(
+            ) / @evalpoly(
                 x,
                 1.00000000000e+0, 1.42482206905e+1, 6.97360396285e+1,
                 2.18938950816e+2, 2.77067027185e+2
@@ -353,11 +352,11 @@ function coeff3(eta::Float64)
     elseif eta < 100.0
         x = 1.0/eta
         coeff3 = (
-            @horner(
+            @evalpoly(
                 x,
                 -1.45727889667e-4, -2.90806748131e-1, -1.33085045450e+1,
                 1.99722374056e+2, -1.14311378756e+1
-            ) / @horner(
+            ) / @evalpoly(
                 x,
                 1.00000000000e+0, 1.39612587808e+2, 2.18901116348e+3,
                 7.11524019009e+3, 4.55746081453e+4
@@ -569,15 +568,15 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
     w = 0.5*erfcx(sqrt(y))
 
     if abs(s) <= 1.0e-3
-        c0 = @horner(z, d00, d0[1], d0[2], d0[3])
-        c1 = @horner(z, d10, d1[1], d1[2], d1[3])
-        c2 = @horner(z, d20, d2[1], d2[2])
-        c3 = @horner(z, d30, d3[1], d3[2])
-        c4 = @horner(z, d40, d4)
-        c5 = @horner(z, d50, d5)
-        c6 = @horner(z, d60, d6)
+        c0 = @evalpoly(z, d00, d0[1], d0[2], d0[3])
+        c1 = @evalpoly(z, d10, d1[1], d1[2], d1[3])
+        c2 = @evalpoly(z, d20, d2[1], d2[2])
+        c3 = @evalpoly(z, d30, d3[1], d3[2])
+        c4 = @evalpoly(z, d40, d4)
+        c5 = @evalpoly(z, d50, d5)
+        c6 = @evalpoly(z, d60, d6)
 
-        t = @horner(z, c0, c1, c2, c3, c4, c5, c6, d70, d80)
+        t = @evalpoly(z, c0, c1, c2, c3, c4, c5, c6, d70, d80)
         if l < 1.0
             p = c*(w - rt2pin*t/sqrt(a))
             return (p, 1.0 - p)
@@ -587,17 +586,17 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
         end
     end
     #---USING THE MINIMAX APPROXIMATIONS---
-    c0 = @horner(z, -.333333333333333E+00, -.159840143443990E+00, -.335378520024220E-01, -.231272501940775E-02)/(@horner(z, 1.0, .729520430331981E+00, .238549219145773E+00,  .376245718289389E-01, .239521354917408E-02, -.939001940478355E-05, .633763414209504E-06))
-    c1 = @horner(z, -.185185185184291E-02, -.491687131726920E-02, -.587926036018402E-03, -.398783924370770E-05)/(@horner(z, 1.0, .780110511677243E+00, .283344278023803E+00,  .506042559238939E-01, .386325038602125E-02))
-    c2 = @horner(z,  .413359788442192E-02,  .669564126155663E-03)/(@horner(z, 1.0, .810647620703045E+00, .339173452092224E+00, .682034997401259E-01, .650837693041777E-02, -.421924263980656E-03))
-    c3 = @horner(z,  .649434157619770E-03,  .810586158563431E-03)/(@horner(z, 1.0, .894800593794972E+00, .406288930253881E+00, .906610359762969E-01, .905375887385478E-02, -.632276587352120E-03))
-    c4 = @horner(z, -.861888301199388E-03, -.105014537920131E-03)/(@horner(z, 1.0, .103151890792185E+01, .591353097931237E+00, .178295773562970E+00, .322609381345173E-01))
-    c5 = @horner(z, -.336806989710598E-03, -.435211415445014E-03)/(@horner(z, 1.0, .108515217314415E+01, .600380376956324E+00, .178716720452422E+00))
-    c6 = @horner(z,  .531279816209452E-03, -.182503596367782E-03)/(@horner(z, 1.0, .770341682526774E+00, .345608222411837E+00))
-    c7 = @horner(z,  .344430064306926E-03,  .443219646726422E-03)/(@horner(z, 1.0, .115029088777769E+01, .821824741357866E+00))
-    c8 = @horner(z, -.686013280418038E-03,  .878371203603888E-03)
+    c0 = @evalpoly(z, -.333333333333333E+00, -.159840143443990E+00, -.335378520024220E-01, -.231272501940775E-02)/(@evalpoly(z, 1.0, .729520430331981E+00, .238549219145773E+00,  .376245718289389E-01, .239521354917408E-02, -.939001940478355E-05, .633763414209504E-06))
+    c1 = @evalpoly(z, -.185185185184291E-02, -.491687131726920E-02, -.587926036018402E-03, -.398783924370770E-05)/(@evalpoly(z, 1.0, .780110511677243E+00, .283344278023803E+00,  .506042559238939E-01, .386325038602125E-02))
+    c2 = @evalpoly(z,  .413359788442192E-02,  .669564126155663E-03)/(@evalpoly(z, 1.0, .810647620703045E+00, .339173452092224E+00, .682034997401259E-01, .650837693041777E-02, -.421924263980656E-03))
+    c3 = @evalpoly(z,  .649434157619770E-03,  .810586158563431E-03)/(@evalpoly(z, 1.0, .894800593794972E+00, .406288930253881E+00, .906610359762969E-01, .905375887385478E-02, -.632276587352120E-03))
+    c4 = @evalpoly(z, -.861888301199388E-03, -.105014537920131E-03)/(@evalpoly(z, 1.0, .103151890792185E+01, .591353097931237E+00, .178295773562970E+00, .322609381345173E-01))
+    c5 = @evalpoly(z, -.336806989710598E-03, -.435211415445014E-03)/(@evalpoly(z, 1.0, .108515217314415E+01, .600380376956324E+00, .178716720452422E+00))
+    c6 = @evalpoly(z,  .531279816209452E-03, -.182503596367782E-03)/(@evalpoly(z, 1.0, .770341682526774E+00, .345608222411837E+00))
+    c7 = @evalpoly(z,  .344430064306926E-03,  .443219646726422E-03)/(@evalpoly(z, 1.0, .115029088777769E+01, .821824741357866E+00))
+    c8 = @evalpoly(z, -.686013280418038E-03,  .878371203603888E-03)
 
-    t = @horner(1.0/a, c0, c1, c2, c3, c4, c5, c6, c7, c8)
+    t = @evalpoly(1.0/a, c0, c1, c2, c3, c4, c5, c6, c7, c8)
     if l < 1.0
         p = c*(w - rt2pin*t/sqrt(a))
         return (p, 1.0 - p)
@@ -629,10 +628,10 @@ function gamma_inc_temme(a::Float64, x::Float64, z::Float64)
     y = -a*LogExpFunctions.logmxp1(x/a)
     c = exp(-y)
     w = 0.5*erfcx(sqrt(y))
-    c0 = @horner(z, d00, d0[1], d0[2], d0[3], d0[4], d0[5], d0[6])
-    c1 = @horner(z, d10, d1[1], d1[2], d1[3], d1[4])
-    c2 = @horner(z, d20, d2[1])
-    t  = @horner(1.0/a, c0, c1, c2)
+    c0 = @evalpoly(z, d00, d0[1], d0[2], d0[3], d0[4], d0[5], d0[6])
+    c1 = @evalpoly(z, d10, d1[1], d1[2], d1[3], d1[4])
+    c2 = @evalpoly(z, d20, d2[1])
+    t  = @evalpoly(1.0/a, c0, c1, c2)
     if l < 1.0
         p = c*(w - rt2pin*t/sqrt(a))
         return (p, 1.0 - p)
@@ -668,23 +667,23 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     w = 0.5*erfcx(sqrt(y))
     u = 1.0/a
     if iop == 1
-        c0 = @horner(z, d00, d0[1], d0[2], d0[3])
-        c1 = @horner(z, d10, d1[1], d1[2], d1[3])
-        c2 = @horner(z, d20, d2[1], d2[2])
-        c3 = @horner(z, d30, d3[1], d3[2])
-        c4 = @horner(z, d40, d4)
-        c5 = @horner(z, d50, d5)
-        c6 = @horner(z, d60, d6)
+        c0 = @evalpoly(z, d00, d0[1], d0[2], d0[3])
+        c1 = @evalpoly(z, d10, d1[1], d1[2], d1[3])
+        c2 = @evalpoly(z, d20, d2[1], d2[2])
+        c3 = @evalpoly(z, d30, d3[1], d3[2])
+        c4 = @evalpoly(z, d40, d4)
+        c5 = @evalpoly(z, d50, d5)
+        c6 = @evalpoly(z, d60, d6)
 
-        t = @horner(u, c0, c1, c2, c3, c4, c5, c6, d70, d80)
+        t = @evalpoly(u, c0, c1, c2, c3, c4, c5, c6, d70, d80)
 
     elseif iop == 2
-        c0 = @horner(d00, d0[1], d0[2])
-        c1 = @horner(d10, d1[1])
-        t = @horner(u, c0, c1, d20)
+        c0 = @evalpoly(d00, d0[1], d0[2])
+        c1 = @evalpoly(d10, d1[1])
+        t = @evalpoly(u, c0, c1, d20)
 
     else
-        t = @horner(z, d00, d0[1])
+        t = @evalpoly(z, d00, d0[1])
 
     end
     if l < 1.0
@@ -755,9 +754,9 @@ function gamma_inc_inv_psmall(a::Float64, logr::Float64)
     ck1  = 1.0
     ck2  = 1.0/(1.0 + a)
     ck3  = 0.5*(3*a + 5)/(ap1²*(a + 2))
-    ck4  = (1.0/3.0)*(@horner(a, 31, 33, 8))/(ap1³*ap2*(a + 3))
-    ck5  = (1.0/24.0)*(@horner(a, 2888, 5661, 3971, 1179, 125))/(ap1⁴*ap2²*(a + 3)*(a + 4))
-    x0   = @horner(r, 0.0, ck1, ck2, ck3, ck4, ck5)
+    ck4  = (1.0/3.0)*(@evalpoly(a, 31, 33, 8))/(ap1³*ap2*(a + 3))
+    ck5  = (1.0/24.0)*(@evalpoly(a, 2888, 5661, 3971, 1179, 125))/(ap1⁴*ap2²*(a + 3)*(a + 4))
+    x0   = @evalpoly(r, 0.0, ck1, ck2, ck3, ck4, ck5)
     return x0
 end
 
@@ -780,10 +779,10 @@ function gamma_inc_inv_qsmall(a::Float64, q::Float64, qgammaxa::Float64)
     if a > 0.12 || x0 > 5
         r = 1.0/x0
         ck1 = l - 1.0
-        ck2 = (@horner(l, @horner(b, 2, 3), @horner(b, -2, -2), 1))/2.0
-        ck3 = (@horner(l, @horner(b, -12, -24, -11), @horner(b, 12, 24, 6), @horner(b, -6, -9), 2))/6.0
-        ck4 = (@horner(l, @horner(b, 72, 162, 120, 25), @horner(b, -72, -168, -114, -12), @horner(b, 36, 84, 36), @horner(b, -12, -22), 3))/12.0
-        x0 = x0 - l + b*r*@horner(r, ck1, ck2, ck3, ck4)
+        ck2 = (@evalpoly(l, @evalpoly(b, 2, 3), @evalpoly(b, -2, -2), 1))/2.0
+        ck3 = (@evalpoly(l, @evalpoly(b, -12, -24, -11), @evalpoly(b, 12, 24, 6), @evalpoly(b, -6, -9), 2))/6.0
+        ck4 = (@evalpoly(l, @evalpoly(b, 72, 162, 120, 25), @evalpoly(b, -72, -168, -114, -12), @evalpoly(b, 36, 84, 36), @evalpoly(b, -12, -22), 3))/12.0
+        x0 = x0 - l + b*r*@evalpoly(r, ck1, ck2, ck3, ck4)
     elseif x0 > 1
         # The x0 > 1 condition isn't in the original version but without it
         # the update in the branch can cause negative initial x0
@@ -916,7 +915,7 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
                 elseif iop == 2
                     return gamma_inc_temme(a, x, z)
                 else
-                    t = @horner(z, d00, d0[1], d0[2], d0[3])
+                    t = @evalpoly(z, d00, d0[1], d0[2], d0[3])
                     return gamma_inc_temme_1(a, x, z, ind)
                 end
             else
@@ -1068,16 +1067,16 @@ function __gamma_inc_inv(a::Float64, minpq::Float64, pcase::Bool)
             end
 
             if a > 0.1
-                ck3 = (@horner(x, @horner(a, 1, -3, 2), @horner(a, 4, -4), 2))/(6*x^2)
+                ck3 = (@evalpoly(x, @evalpoly(a, 1, -3, 2), @evalpoly(a, 4, -4), 2))/(6*x^2)
 
                 # This check is not in the invincgam subroutine from IncgamFI but it probably
                 # should be since the routine fails to compute a finite value for very small p
                 if !isfinite(ck3)
                     break
                 end
-                Δx = ck1 * @horner(ck1, 1.0, ck2, ck3)
+                Δx = ck1 * @evalpoly(ck1, 1.0, ck2, ck3)
             else
-                Δx = ck1 * @horner(ck1, 1.0, ck2)
+                Δx = ck1 * @evalpoly(ck1, 1.0, ck2)
             end
         else
             Δx = ck1

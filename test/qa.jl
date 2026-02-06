@@ -26,7 +26,6 @@ end
             # Ref https://github.com/JuliaTesting/ExplicitImports.jl/issues/92
             :invπ, # SpecialFunctions
             :sqrtπ, # SpecialFunctions
-            Symbol("@horner"), # Base.Math
         ),
     ) === nothing
 
