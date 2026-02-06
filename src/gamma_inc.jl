@@ -22,11 +22,11 @@ const d2  = [-.268132716049383E-02, .771604938271605E-03]
 const d30 = .649434156378601E-03
 const d3  =[.229472093621399E-03, -.469189494395256E-03]
 const d40 = -.861888290916712E-03
-const d4  = [.784039221720067E-03]
+const d4  = .784039221720067E-03
 const d50 = -.336798553366358E-03
-const d5  = [-.697281375836586E-04]
+const d5  = -.697281375836586E-04
 const d60 = .531307936463992E-03
-const d6  = [-.592166437353694E-03]
+const d6  = -.592166437353694E-03
 const d70 = .344367606892378E-03
 const d80 = -.652623918595309E-03
 
@@ -573,9 +573,9 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
         c1 = @horner(z, d10, d1[1], d1[2], d1[3])
         c2 = @horner(z, d20, d2[1], d2[2])
         c3 = @horner(z, d30, d3[1], d3[2])
-        c4 = @horner(z, d40, d4[1])
-        c5 = @horner(z, d50, d5[1])
-        c6 = @horner(z, d60, d6[1])
+        c4 = @horner(z, d40, d4)
+        c5 = @horner(z, d50, d5)
+        c6 = @horner(z, d60, d6)
 
         t = @horner(z, c0, c1, c2, c3, c4, c5, c6, d70, d80)
         if l < 1.0
@@ -672,9 +672,9 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
         c1 = @horner(z, d10, d1[1], d1[2], d1[3])
         c2 = @horner(z, d20, d2[1], d2[2])
         c3 = @horner(z, d30, d3[1], d3[2])
-        c4 = @horner(z, d40, d4[1])
-        c5 = @horner(z, d50, d5[1])
-        c6 = @horner(z, d60, d6[1])
+        c4 = @horner(z, d40, d4)
+        c5 = @horner(z, d50, d5)
+        c6 = @horner(z, d60, d6)
 
         t = @horner(u, c0, c1, c2, c3, c4, c5, c6, d70, d80)
 
