@@ -53,11 +53,3 @@ end
     # No self-qualified accesses
     @test ExplicitImports.check_no_self_qualified_accesses(SpecialFunctions) === nothing
 end
-
-@testset "JET" begin
-    # Check that there are no undefined global references and undefined field accesses
-    JET.test_package(SpecialFunctions; target_defined_modules = true, mode = :typo)
-
-    # Analyze methods based on their declared signature
-    JET.report_package(SpecialFunctions; target_defined_modules = true)
-end

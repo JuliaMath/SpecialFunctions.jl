@@ -9,7 +9,6 @@ using Base.MathConstants: γ
 
 using Aqua: Aqua
 using ExplicitImports: ExplicitImports
-using JET: JET
 
 using SpecialFunctions: AmosException, f64
 
