@@ -34,7 +34,7 @@ jobs:
         shell: julia --project --color=yes {0}
         run: |
           using Pkg
-          Pkg.remove("JET")
+          Pkg.rm("JET")
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
