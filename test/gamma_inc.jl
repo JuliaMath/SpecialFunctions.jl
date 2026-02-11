@@ -277,3 +277,53 @@ end
     @test loggamma(7, -300.2) ≅ log(gamma(7, -300.2))
     @test_throws DomainError loggamma(6, -3.2)
 end
+
+@testset "GPU compatibility ($FT)" for FT in (Float64, Float32, Float16)
+    # Note: This test is a proxy for GPU compatibility by checking that the functions
+    # are type stable and do not allocate memory. It does not launch any GPU kernels.
+    @testset "gamma_inc type stability" begin
+        @test @inferred(gamma_inc(FT(30.0), FT(29.99999), 0)) isa Tuple{FT,FT}
+    end
+    @testset "gamma_inc_inv type stability" begin
+        @test @inferred(gamma_inc_inv(FT(1.0), FT(0.01), FT(0.99))) isa FT
+    end
+
+    @testset "gamma_inc allocations" begin
+        # `@allocated` checks for allocations for specific code paths
+        ## a >= 1
+        ### gamma_inc_temme_1: simplified Temme expansion
+        @test iszero((FT -> @allocated(gamma_inc(FT(30.0), FT(29.99999), 0)))(FT))
+        ### gamma_inc_minimax: minimax approximation
+        @test iszero((FT -> @allocated(gamma_inc(FT(100.0), FT(80.0), 0)))(FT))
+        ### gamma_inc_temme: Temme expansion
+        @test iszero((FT -> @allocated(gamma_inc(FT(100.0), FT(80.0), 1)))(FT))
+        ### gamma_inc_cf: Continued fraction
+        @test iszero((FT -> @allocated(gamma_inc(FT(1.7), FT(2.5))))(FT))
+        ### gamma_inc_taylor: Taylor series
+        @test iszero((FT -> @allocated(gamma_inc(FT(11.1), FT(0.001))))(FT))
+        ### gamma_inc_asym: Asymptotic expansion
+        @test iszero((FT -> @allocated(gamma_inc(FT(10.0), FT(35.0))))(FT))
+        ### gamma_inc_fsum: Finite sums
+        @test iszero((FT -> @allocated(gamma_inc(FT(24.0), FT(25))))(FT))
+        ## a==0.5
+        ### erfc
+        @test iszero((FT -> @allocated(gamma_inc(FT(0.5), FT(0.5))))(FT))
+        ## x < 1.1
+        ### gamma_inc_taylor_x
+        @test iszero((FT -> @allocated(gamma_inc(FT(0.9), FT(0.8))))(FT))
+        ## else
+        ### gamma_inc_cf
+        @test iszero((FT -> @allocated(gamma_inc(FT(0.7), FT(2.5))))(FT))
+    end
+
+    @testset "gamma_inc_inv allocations" begin
+        # `@allocated` checks for allocations for specific code paths
+        ## x0 approximation paths
+        ### gamma_inc_inv_psmall
+        @test iszero((FT -> @allocated(gamma_inc_inv(FT(1.0), FT(0.01), FT(0.99))))(FT))
+        ### gamma_inc_inv_qsmall
+        @test iszero((FT -> @allocated(gamma_inc_inv(FT(5.0), FT(0.99), FT(0.01))))(FT))
+        ### gamma_inc_inv_alarge
+        @test iszero((FT -> @allocated(gamma_inc_inv(FT(50.0), FT(0.3), FT(0.7))))(FT))
+    end
+end
