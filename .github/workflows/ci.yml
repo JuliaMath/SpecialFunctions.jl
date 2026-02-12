@@ -34,7 +34,7 @@ jobs:
         # JuliaLang/Pkg.jl#3741:  using Pkg; Pkg.rm("JET")
         shell: bash
         run: |
-          sed -i.bak '/JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"/d' Project.toml
+          sed -i.bak '/^JET = "/d' Project.toml
           sed -i.bak 's/"JET", //g' Project.toml
           rm Project.toml.bak
       - uses: julia-actions/julia-buildpkg@v1
