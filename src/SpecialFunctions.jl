@@ -43,6 +43,7 @@ export
     bessely0,
     bessely1,
     besselyx,
+    wrightbessel,
     jinc,
     dawson,
     ellipk,
@@ -93,6 +94,7 @@ export
     lbinomial
 
 include("bessel.jl")
+include("wrightbessel.jl")
 include("erf.jl")
 include("ellip.jl")
 include("expint.jl")
