@@ -28,6 +28,15 @@ jobs:
         with:
           version: ${{ matrix.version }}
       - uses: julia-actions/cache@v2
+      - name: Remove JET
+        # Update this condition when JET support new version
+        if: matrix.version == 'pre'
+        # JuliaLang/Pkg.jl#3741:  using Pkg; Pkg.rm("JET")
+        shell: bash
+        run: |
+          sed -i.bak '/^JET = "/d' Project.toml
+          sed -i.bak 's/"JET", //g' Project.toml
+          rm Project.toml.bak
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
