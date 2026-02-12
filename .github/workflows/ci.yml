@@ -31,10 +31,12 @@ jobs:
       - name: Remove JET
         # Update this condition when JET support new version
         if: matrix.version == 'pre'
-        shell: julia --project --color=yes {0}
+        # JuliaLang/Pkg.jl#3741:  using Pkg; Pkg.rm("JET")
+        shell: bash
         run: |
-          using Pkg
-          Pkg.rm("JET")
+          sed -i.bak '/JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"/d' Project.toml
+          sed -i.bak 's/"JET", //g' Project.toml
+          rm Project.toml.bak
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
