@@ -764,13 +764,22 @@ end
 
 Euler integral of the first kind ``\operatorname{B}(x,y) = \Gamma(x)\Gamma(y)/\Gamma(x+y)``.
 """
-function beta(a::Number, b::Number)
+beta(a::Number, b::Number) = _beta(map(float, promote(a, b))...)
+
+# here `T` is a floating point type (e.g., `Float64` or `ComplexF64`) since
+# it is called by `beta` above with arguments converted with `float`
+# we don't want to restrict the implementation to `AbstractFloat` or `Float64` though
+function _beta(a::T, b::T) where {T<:Number}
+    # two special cases
+    a == 1 && return inv(b)
+    b == 1 && return inv(a)
+
     lab, sign = logabsbeta(a, b)
     return sign*exp(lab)
 end
 
 if Base.MPFR.version() >= v"4.0.0"
-    function beta(y::BigFloat, x::BigFloat)
+    function _beta(y::BigFloat, x::BigFloat)
         z = BigFloat()
         ccall((:mpfr_beta, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, y, x, ROUNDING_MODE[])
         return z
@@ -804,6 +813,17 @@ function logabsbeta(a::T, b::T) where T<:Real
     # ensure that a <= b
     if a > b
         return logabsbeta(b, a)
+    end
+
+    # minimum of arguments is 1
+    if a == 1
+        # b >= a >= 1, so `abs` is not needed and the sign is always 1
+        return -log(b), 1
+    end
+    # maximum of arguments is 1
+    if b == 1
+        sgn = a >= 0 ? 1 : -1
+        return -log(abs(a)), sgn
     end
 
     if a <= 0 && isinteger(a)
