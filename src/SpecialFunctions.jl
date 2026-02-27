@@ -44,6 +44,7 @@ export
     bessely1,
     besselyx,
     wrightbessel,
+    logwrightbessel,
     jinc,
     dawson,
     ellipk,

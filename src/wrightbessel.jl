@@ -48,15 +48,12 @@ const exp_inf = 709.7827128933841
 # Compute reciprocal gamma via loggamma
 @inline rgamma(y::Real) = exp(-loggamma(y))
 
-# Compute exp(x) / Γ(y) safely via loggamma to avoid overflow
-@inline _exp_rgamma(x::Real, y::Real) = exp(x - loggamma(y))
-
 
 # 1. Taylor series expansion in x=0, for x <= 1
 # Φ(a, b, x) = sum_k x^k / k! / Γ(a*k+b)
 # Note that every term, and therefore also Φ(a, b, x), is monotone
 # decreasing with increasing a or b.
-function _wb_series(a::Float64, b::Float64, x::Float64, nstart::Int, nstop::Int)
+function _wb_series(a::Float64, b::Float64, x::Float64, nstart::Int, nstop::Int, logret::Bool)
     xk_k = x^nstart * rgamma(nstart + 1)  # x^k/k!
     res = xk_k * rgamma(nstart * a + b)
     # term k=nstart+1 , +2 +3, ...
@@ -71,7 +68,7 @@ function _wb_series(a::Float64, b::Float64, x::Float64, nstart::Int, nstop::Int)
             res += xk_k * rgamma(a * k + b)
         end
     end
-    return res
+    return logret ? log(res) : res
 end
 
 
@@ -79,19 +76,29 @@ end
 # Φ(a, b, x) = sum_k x^k / k! / Γ(a*k+b)
 # Use Stirling formula to find k=k_max, the maximum term.
 # Then use n terms of Taylor series around k_max.
-function _wb_large_a(a::Float64, b::Float64, x::Float64, n::Int)
+function _wb_large_a(a::Float64, b::Float64, x::Float64, n::Int, logret::Bool)
     k_max = floor(Int, (a^(-a) * x)^(1 / (1 + a)))
     n_start = k_max - (n ÷ 2)
     if n_start < 0
         n_start = 0
     end
 
-    res = 0.0
     lnx = log(x)
+
+    # For numerical stability, we factor out the maximum term exp(..) with k=k_max
+    # but only if it is larger than 0.
+    max_exponent = max(0.0, k_max * lnx - loggamma(k_max + 1.0) - loggamma(a * k_max + b))
+    res = 0.0
+
     for k in n_start:(n_start + n - 1)
-        res += exp(k * lnx - loggamma(k + 1.0) - loggamma(a * k + b))
+        res += exp(k * lnx - loggamma(k + 1.0) - loggamma(a * k + b) - max_exponent)
     end
-    return res
+
+    if logret
+        return max_exponent + log(res)
+    else
+        return exp(max_exponent) * res
+    end
 end
 
 
@@ -111,7 +118,7 @@ end
 # For small b, i.e. b <= 1e-3, cancellation of poles of Ψ(b)/Γ(b)
 # and polygamma needs to be carried out => series expansion in a=0 to order 5
 # and in b=0 to order 4.
-function _wb_small_a(a::Float64, b::Float64, x::Float64, order::Int)
+function _wb_small_a(a::Float64, b::Float64, x::Float64, order::Int, logret::Bool)
     # A: coefficients of a^k  (1, -x * Ψ(b), ...)
     # B: powers of b^k/k! or terms in polygamma functions
     # C: coefficients of a^k1 * b^k2
@@ -144,7 +151,9 @@ function _wb_small_a(a::Float64, b::Float64, x::Float64, order::Int)
             X5 / 24.0  *                           (C4        + C5 * b),
             X6 / 120.0 *                                       (C5)
         )
-        res = exp(x) * evalpoly(a, A)
+
+        res = evalpoly(a, A)
+        return logret ? x + log(res) : exp(x) * res
     else
         # Φ(a, b, x) = exp(x)/Γ(b) * sum(A[i] * X[i] * B[i], i=0..5)
         # A[n] = a^n/n!
@@ -198,10 +207,13 @@ function _wb_small_a(a::Float64, b::Float64, x::Float64, order::Int)
             res = evalpoly(a, (A1, A2, A3, A4, A5, A6)[1:(order+1)])
         end
 
-        # res *= exp(x) * rgamma(b)
-        res *= _exp_rgamma(x, b)
+        if logret
+            return log(res) + x - loggamma(b)
+        else
+            # Compute exp(x) / Γ(b) via loggamma to avoid overflow
+            return res * exp(x - loggamma(b))
+        end
     end
-    return res
 end
 
 
@@ -210,7 +222,7 @@ end
 # Φ(a, b, x) ~ Z^(1/2-b) * exp((1+a)/a * Z) * sum_k (-1)^k * C_k / Z^k
 #
 # with Z = (a*x)^(1/(1+a)).
-function _wb_asymptotic(a::Float64, b::Float64, x::Float64)
+function _wb_asymptotic(a::Float64, b::Float64, x::Float64, logret::Bool)
     A = ntuple(i -> a^(i-1), 15)        # powers of a
     B = ntuple(i -> b^(i-1), 17)        # powers of b
     Ap1 = ntuple(i -> (1 + a)^(i-1), 9) # powers of (1+a)
@@ -540,16 +552,25 @@ function _wb_asymptotic(a::Float64, b::Float64, x::Float64)
         Zp /= Z
         res += (-1)^(k + 1) * C[k] * Zp
     end
-    res *= Z^(0.5 - b) * exp(Ap1[2] / a * Z)
-    return res
+    if logret
+        return log(res) + log(Z) * (0.5 - b) + Ap1[2] / a * Z
+    else
+        return res * Z^(0.5 - b) * exp(Ap1[2] / a * Z)
+    end
 end
 
 
 # Compute integrand Kmod(eps, a, b, x, r) for Gauss-Laguerre quadrature.
 # K(a, b, x, r+eps) = exp(-r-eps) * Kmod(eps, a, b, x, r)
-@inline function _Kmod(eps::Float64, a::Float64, b::Float64, x::Float64, r::Float64)
+#
+# Kmod(eps, a, b, x, r) = exp(x * (r+eps)^(-a) * cos(pi*a)) * (r+eps)^(-b)
+#                       * sin(x * (r+eps)^(-a) * sin(pi*a) + pi * b)
+#
+# Note that we additionally factor out exp(exp_term) which helps with large
+# terms in the exponent of exp(...)
+@inline function _Kmod(exp_term::Float64, eps::Float64, a::Float64, b::Float64, x::Float64, r::Float64)
     x_r_a = x * (r + eps)^(-a)
-    return exp(x_r_a * cospi(a)) * (r + eps)^(-b) * sin(x_r_a * sinpi(a) + π * b)
+    return exp(x_r_a * cospi(a) + exp_term) * (r + eps)^(-b) * sin(x_r_a * sinpi(a) + π * b)
 end
 
 
@@ -558,9 +579,9 @@ end
 #                      * exp(eps * cos(ϕ) + x * eps^(-a) * cos(a*ϕ))
 #                      * cos(eps * sin(ϕ) - x * eps^(-a) * sin(a*ϕ)
 #                            + (1-b)*ϕ)
-@inline function _P(eps::Float64, a::Float64, b::Float64, x::Float64, ϕ::Float64)
+@inline function _P(exp_term::Float64, eps::Float64, a::Float64, b::Float64, x::Float64, ϕ::Float64)
     x_eps_a = x * eps^(-a)
-    return exp(eps * cos(ϕ) + x_eps_a * cos(a * ϕ)) *
+    return exp(eps * cos(ϕ) + x_eps_a * cos(a * ϕ) + exp_term) *
            cos(eps * sin(ϕ) - x_eps_a * sin(a * ϕ) + (1.0 - b) * ϕ)
 end
 
@@ -584,7 +605,10 @@ end
 # the end of the second line should read +(1-b)*ϕ.
 # This integral representation introduced the free parameter eps (from the
 # radius of complex contour integration). We try to choose eps such that
-# the integrand behaves smoothly.
+# the integrand behaves smoothly. Note that this is quite diffrent from how
+# Luchko (2008) deals with eps: he is either looking for the limit eps -> 0
+# or he sets (silently) eps=1. But having the freedom to set eps is much more
+# powerful for numerical evaluation.
 #
 # As K has a leading exp(-r), we factor this out and apply Gauss-Laguerre
 # quadrature rule:
@@ -681,7 +705,7 @@ const w_legendre = [
     0.006759799195745401, 0.002908622553155141
     ]
 
-function _wb_integral(a::Float64, b::Float64, x::Float64)
+function _wb_integral(a::Float64, b::Float64, x::Float64, logret::Bool)
     # Fitted parameters for optimal choice of eps
     A = (0.41037, 0.30833, 6.9952, 18.382, -2.8566, 2.1122)
 
@@ -714,19 +738,38 @@ function _wb_integral(a::Float64, b::Float64, x::Float64)
     eps = min(eps, 150.0)
     eps = max(eps, 3.0)  # Note: 3 seems to be a pretty good choice in general.
 
+    # We factor out exp(-exp_term) from _Kmod and _P to avoid overflow of exp(..).
+    exp_term = 0.0
+    # From the exponent of K:
+    r = x_laguerre[end]  # largest value of x used in _Kmod
+    x_r_a = x * (r + eps)^(-a)
+    exp_term = max(exp_term, x_r_a * cospi(a))
+    # From the exponent of P:
+    x_eps_a = x * eps^(-a)
+    # phi = 0  =>  cos(phi) = cos(a * phi) = 1
+    exp_term = max(exp_term, eps + x_eps_a)
+    # phi = pi  => cos(phi) = -1
+    exp_term = max(exp_term, -eps + x_eps_a * cospi(a))
+
     res1 = 0.0
     res2 = 0.0
     for k in eachindex(x_laguerre, w_laguerre, x_legendre)
-        res1 += w_laguerre[k] * _Kmod(eps, a, b, x, x_laguerre[k])
+        res1 += w_laguerre[k] * _Kmod(-exp_term, eps, a, b, x, x_laguerre[k])
         # y = (b-a)*(x+1)/2 + a  for integration from a=0 to b=π
         y = π * (x_legendre[k] + 1.0) / 2.0
-        res2 += w_legendre[k] * _P(eps, a, b, x, y)
+        res2 += w_legendre[k] * _P(-exp_term, eps, a, b, x, y)
     end
     res1 *= exp(-eps)
     res2 *= π / 2.0
     res2 *= eps^(1.0 - b)
 
-    return (res1 + res2) / π
+    # Remember the factored out exp_term from _Kmod and _P
+    if logret
+        res = res1 + res2
+        return res > 0 ? exp_term + log(res) - log(π) : NaN
+    else
+        return exp(exp_term) / π * (res1 + res2)
+    end
 end
 
 
@@ -759,7 +802,17 @@ One of 5 different computation methods is used depending on the ranges of the ar
 Accuracy is generally higher than 1e-11, though for some parameter values it can
 be as low as 1e-8.
 """
-function wrightbessel(a::Float64, b::Float64, x::Float64)
+wrightbessel(a::Float64, b::Float64, x::Float64) = _wrightbessel(a, b, x, false)
+
+"""
+    logwrightbessel(a::Float64, b::Float64, x::Float64)
+
+Compute the logarithm of Wright's generalized Bessel function, i.e., `log(wrightbessel(a, b, x))`.
+See [`wrightbessel`](@ref) for details.
+"""
+logwrightbessel(a::Float64, b::Float64, x::Float64) = _wrightbessel(a, b, x, true)
+
+function _wrightbessel(a::Float64, b::Float64, x::Float64, logret::Bool)
     if isnan(a) || isnan(b) || isnan(x)
         throw(ArgumentError("arguments cannot be NaN (got a=$a, b=$b, x=$x)"))
     elseif isinf(a) || isinf(b)
@@ -771,13 +824,13 @@ function wrightbessel(a::Float64, b::Float64, x::Float64)
     elseif a >= rgamma_zero || b >= rgamma_zero
         return NaN
     elseif x == 0.0
-        return rgamma(b)
+        return logret ? -loggamma(b) : rgamma(b)
     elseif a == 0.0
-        # return exp(x) * rgamma(b)
-        return _exp_rgamma(x, b)
+        # Compute exp(x) / Γ(b) via loggamma to avoid overflow
+        return logret ? x - loggamma(b) : exp(x - loggamma(b))
     elseif (a <= 1e-3 && b <= 50.0 && x <= 9.0) ||
            (a <= 1e-4 && b <= 70.0 && x <= 100.0) ||
-           (a <= 1e-5 && b <= 170.0 && x < exp_inf)
+           (a <= 1e-5 && b <= 170.0 && (x < exp_inf || (logret && x <= 1e3)))
         # Taylor Series expansion in a=0 to order=order => precision <= 1e-11
         # If beta is also small => precision <= 1e-11.
         # max order = 5
@@ -812,13 +865,13 @@ function wrightbessel(a::Float64, b::Float64, x::Float64)
                 order = 5
             end
         end
-        return _wb_small_a(a, b, x, order)
+        return _wb_small_a(a, b, x, order, logret)
     elseif x <= 1.0
         # 18 term Taylor Series => error mostly smaller 5e-14
-        return _wb_series(a, b, x, 0, 18)
+        return _wb_series(a, b, x, 0, 18, logret)
     elseif x <= 2.0
         # 20 term Taylor Series => error mostly smaller 1e-12 to 1e-13
-        return _wb_series(a, b, x, 0, 20)
+        return _wb_series(a, b, x, 0, 20, logret)
     elseif a >= 5.0
         # Taylor series around the approximate maximum term.
         # Set number of terms=order.
@@ -839,9 +892,7 @@ function wrightbessel(a::Float64, b::Float64, x::Float64)
                 order = min(floor(Int, 6 * log10(x) - 36), 100)
             end
         end
-        return _wb_large_a(a, b, x, order)
-    elseif (0.5 <= a) && (a <= 1.8) && (100.0 <= b) && (1e5 <= x)
-        return NaN
+        return _wb_large_a(a, b, x, order, logret)
     elseif (a * x)^(1 / (1 + a)) >= 14 + b * b / (2 * (1 + a))
         # Asymptotic expansion in Z = (a*x)^(1/(1+a)) up to 8th term 1/Z^8.
         # For 1/Z^k, the highest term in b is b^(2*k) * a0 / (2^k k! (1+a)^k).
@@ -849,8 +900,12 @@ function wrightbessel(a::Float64, b::Float64, x::Float64)
         # domain of good convergence set above.
         # => precision ~ 1e-11 but can go down to ~1e-8 or 1e-7
         # Note: We ensured a <= 5 as this is a bad approximation for large a.
-        return _wb_asymptotic(a, b, x)
+        return _wb_asymptotic(a, b, x, logret)
+    elseif (0.5 <= a) && (a <= 1.8) && (100.0 <= b) && (1e5 <= x)
+        # This is a very hard domain. This condition is placed after wb_asymptotic.
+        # TODO: Explore ways to cover this domain.
+        return NaN
     else
-        return _wb_integral(a, b, x)
+        return _wb_integral(a, b, x, logret)
     end
 end
