@@ -277,6 +277,11 @@ end
     # issue #450
     @test SpecialFunctions.cotderiv(0, 2.0) == Inf
     @test_throws DomainError SpecialFunctions.cotderiv(-1, 2.0)
+
+    # issue #488
+    # TODO: Perhaps these bounds can be tightened in the future.
+    @test 3e-5 > relerr(zeta(-5.75, 0.5), 0.00140748175562420497363476203726333231826481355014969602507003223784179195)
+    @test 5e-5 > relerr(zeta(-8-1im, 0.5), -0.00345211118818533736386710113396098188185995501107179962865430034343404+0.0109171284162538012544319013865107198958348806377836496833453787991565im)
 end
 
 @testset "logabsbinomial" begin
