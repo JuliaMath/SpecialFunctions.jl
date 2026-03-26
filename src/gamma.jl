@@ -783,11 +783,11 @@ function loggamma(z::Complex{BigFloat})
 
     # Upward recurrence: shift z to the Stirling region
     p = precision(BigFloat)
-    r = max(0, Int(ceil(5*p - abs(z))))
+    r = max(0, Int(ceil(p - abs(z))))
     zr = z + r
 
     # Number of Stirling terms
-    N = max(10, Int(ceil(p/6)))
+    N = max(10, Int(ceil(p/15)))
 
     # Stirling approximation for loggamma(zr)
     zinv = inv(zr)
