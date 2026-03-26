@@ -747,7 +747,6 @@ function _loggamma(z::Complex{Float64})
     return loggamma_asymptotic(Complex(x,y)) - shift
 end
 
-
 # asymptotic series for log(gamma(z)), valid for sufficiently large real(z) or |imag(z)|
 function loggamma_asymptotic(z::Complex{Float64})
     zinv = inv(z)
@@ -758,6 +757,60 @@ function loggamma_asymptotic(z::Complex{Float64})
                          7.9365079365079365079365075e-04,-5.9523809523809523809523806e-04,
                          8.4175084175084175084175104e-04,-1.9175269175269175269175262e-03,
                          6.4102564102564102564102561e-03,-2.9550653594771241830065352e-02)
+end
+
+
+function _bernoulli(n::Integer)
+    A = Vector{Rational{BigInt}}(undef, n+1)
+    for m = 0:n
+        A[m+1] = 1 // (m+1)
+        for j = m:-1:1
+            A[j] = j*(A[j] - A[j+1])
+        end
+    end
+    return A[1]
+end
+
+function loggamma(z::Complex{BigFloat})
+    # We use branch correction (offset by multiples of 2πi) 
+    # using Float64 logic instead of complicated manual high precision branch tracking
+    val_f = loggamma(Complex{Float64}(Float64(real(z)), Float64(imag(z))))
+
+    # Reflection formula
+    if real(z) < 0.5
+        return _loggamma_branchcorrect(log(big(pi)) - log(sinpi(z)) - loggamma(1 - z), val_f)
+    end
+
+    # Upward recurrence: shift z to the Stirling region
+    p = precision(BigFloat)
+    r = max(0, Int(ceil(5*p - abs(z))))
+    zr = z + r
+
+    # Number of Stirling terms
+    N = max(10, Int(ceil(p/6)))
+
+    # Stirling approximation for loggamma(zr)
+    zinv = inv(zr)
+    t = zinv * zinv
+    lg = (zr - big"0.5")*log(zr) - zr + log(sqrt(2*big(pi)))
+    for k in 1:N
+        lg += _bernoulli(2k) * zinv * t^(k-1) / (2k*(2k-1))
+    end
+
+    # Undo the upward shift via recurrence
+    s = zero(Complex{BigFloat})
+    for k in 0:r-1
+        s += log(z + k)
+    end
+
+    # Apply branch correction
+    return _loggamma_branchcorrect(lg - s, val_f)
+end
+
+# branch correct loggamma by offsetting by multiples of 2πi to match the Float64 version
+function _loggamma_branchcorrect(val_big::Complex{BigFloat}, val_correctbranch::Complex{Float64})
+    k = round(Integer, (imag(val_big) - imag(val_correctbranch)) / (2*pi))
+    return Complex{BigFloat}(real(val_big), imag(val_big) - 2*big(pi)*k)
 end
 
 @doc raw"""
@@ -873,57 +926,3 @@ function logabsbinomial(n::T, k::T) where {T<:Integer}
     end
 end
 logabsbinomial(n::Integer, k::Integer) = logabsbinomial(promote(n, k)...)
-
-
-function _bernoulli(n::Integer)
-    A = Vector{Rational{BigInt}}(undef, n+1)
-    for m = 0:n
-        A[m+1] = 1 // (m+1)
-        for j = m:-1:1
-            A[j] = j*(A[j] - A[j+1])
-        end
-    end
-    return A[1]
-end
-
-function loggamma(z::Complex{BigFloat})
-    # We use branch correction (offset by multiples of 2πi) 
-    # using Float64 logic instead of complicated manual high precision branch tracking
-    val_f = loggamma(Complex{Float64}(Float64(real(z)), Float64(imag(z))))
-
-    # Reflection formula
-    if real(z) < 0.5
-        return _loggamma_branchcorrect(log(big(pi)) - log(sinpi(z)) - loggamma(1 - z), val_f)
-    end
-
-    # Upward recurrence: shift z to the Stirling region
-    p = precision(BigFloat)
-    r = max(0, Int(ceil(5*p - abs(z))))
-    zr = z + r
-
-    # Number of Stirling terms
-    N = max(10, Int(ceil(p/6)))
-
-    # Stirling approximation for loggamma(zr)
-    zinv = inv(zr)
-    t = zinv * zinv
-    lg = (zr - big"0.5")*log(zr) - zr + log(sqrt(2*big(pi)))
-    for k in 1:N
-        lg += _bernoulli(2k) * zinv * t^(k-1) / (2k*(2k-1))
-    end
-
-    # Undo the upward shift via recurrence
-    s = zero(Complex{BigFloat})
-    for k in 0:r-1
-        s += log(z + BigFloat(k))
-    end
-
-    # Apply branch correction
-    return _loggamma_branchcorrect(lg - s, val_f)
-end
-
-# branch correct loggamma by offsetting by multiples of 2πi to match the Float64 version
-function _loggamma_branchcorrect(val_big::Complex{BigFloat}, val_correctbranch::Complex{Float64})
-    k = round(Integer, (imag(val_big) - imag(val_correctbranch)) / (2*pi))
-    return Complex{BigFloat}(real(val_big), imag(val_big) - 2*big(pi)*k)
-end
