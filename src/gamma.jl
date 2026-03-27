@@ -759,17 +759,22 @@ function loggamma_asymptotic(z::Complex{Float64})
                          6.4102564102564102564102561e-03,-2.9550653594771241830065352e-02)
 end
 
-
-function _bernoulli(n::Integer)
+# Return Bernoulli numbers B0..Bn in a single vector
+function _bernoulli_upto(n::Integer)
     A = Vector{Rational{BigInt}}(undef, n+1)
-    for m = 0:n
+    B = Vector{Rational{BigInt}}(undef, n+1)
+
+    @inbounds for m = 0:n
         A[m+1] = 1 // (m+1)
         for j = m:-1:1
-            A[j] = j*(A[j] - A[j+1])
+            A[j] = j * (A[j] - A[j+1])
         end
+        B[m+1] = A[1]   # store B_m
     end
-    return A[1]
+
+    return B
 end
+
 
 function loggamma(z::Complex{BigFloat})
     # We use branch correction (offset by multiples of 2πi) 
@@ -788,13 +793,16 @@ function loggamma(z::Complex{BigFloat})
 
     # Number of Stirling terms
     N = max(10, Int(ceil(p/15)))
+    # Precompute Bernoulli numbers B₀..B₂N
+    B = _bernoulli_upto(2N)
 
-    # Stirling approximation for loggamma(zr)
+    # Stirling series
     zinv = inv(zr)
     t = zinv * zinv
+
     lg = (zr - big"0.5")*log(zr) - zr + log(sqrt(2*big(pi)))
-    for k in 1:N
-        lg += _bernoulli(2k) * zinv * t^(k-1) / (2k*(2k-1))
+    @inbounds for k in 1:N
+        lg += B[2k+1] * zinv * t^(k-1) / (2k*(2k-1))
     end
 
     # Undo the upward shift via recurrence
