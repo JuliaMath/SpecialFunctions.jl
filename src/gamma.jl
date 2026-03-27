@@ -759,27 +759,32 @@ function loggamma_asymptotic(z::Complex{Float64})
                          6.4102564102564102564102561e-03,-2.9550653594771241830065352e-02)
 end
 
-# Return Bernoulli numbers B0..Bn in a single vector
-function _bernoulli_upto(n::Integer)
-    A = Vector{Rational{BigInt}}(undef, n+1)
-    B = Vector{Rational{BigInt}}(undef, n+1)
+# Return scaled Sterling coefficients (B_{2k}/(2k*(2k-1)) * zr^(2k-1) for k=0,1,...,n)
+function _scaled_sterling_coeffs(n::Integer, zr::Complex{BigFloat})
+    mmax = 2n
+    A = Vector{Rational{BigInt}}(undef, mmax+1)
+    E = Vector{Complex{BigFloat}}(undef, n+1)
 
-    @inbounds for m = 0:n
+    # Compute Bernoulli numbers using Akiyama-Tanigawa algorithm, and store the scaled Stirling coefficients in E
+    @inbounds for m = 0:mmax
         A[m+1] = 1 // (m+1)
         for j = m:-1:1
             A[j] = j * (A[j] - A[j+1])
         end
-        B[m+1] = A[1]   # store B_m
+        if iseven(m)
+            k = m ÷ 2
+            # store term B_{2k}/(2k*(2k-1)) * zr^(1-2k)
+            E[k + 1] = A[1] / (2k * (2k - 1)) * zr^(1-2k)
+        end
     end
 
-    return B
+    return E
 end
-
 
 function loggamma(z::Complex{BigFloat})
     # We use branch correction (offset by multiples of 2πi) 
     # using Float64 logic instead of complicated manual high precision branch tracking
-    val_f = loggamma(Complex{Float64}(Float64(real(z)), Float64(imag(z))))
+    val_f = loggamma(Complex{Float64}(z))
 
     # Reflection formula
     if real(z) < 0.5
@@ -791,25 +796,17 @@ function loggamma(z::Complex{BigFloat})
     r = max(0, Int(ceil(p - abs(z))))
     zr = z + r
 
-    # Number of Stirling terms
-    N = max(10, Int(ceil(p/15)))
-    # Precompute Bernoulli numbers B₀..B₂N
-    B = _bernoulli_upto(2N)
-
-    # Stirling series
-    zinv = inv(zr)
-    t = zinv * zinv
-
-    lg = (zr - big"0.5")*log(zr) - zr + log(sqrt(2*big(pi)))
-    @inbounds for k in 1:N
-        lg += B[2k+1] * zinv * t^(k-1) / (2k*(2k-1))
-    end
+    # Stirling
+    N = max(10, p÷15)
+    B = _scaled_sterling_coeffs(N, zr)
+    lg = sum(B[2:end]) + (zr - big"0.5")*log(zr) - zr + log(sqrt(2*big(pi)))
 
     # Undo the upward shift via recurrence
-    s = zero(Complex{BigFloat})
-    for k in 0:r-1
-        s += log(z + k)
+    partials = Vector{Complex{BigFloat}}(undef, r)
+    @inbounds Threads.@threads for i in 1:r
+        partials[i] = log(z + (i-1))
     end
+    s = sum(partials)
 
     # Apply branch correction
     return _loggamma_branchcorrect(lg - s, val_f)
@@ -817,8 +814,8 @@ end
 
 # branch correct loggamma by offsetting by multiples of 2πi to match the Float64 version
 function _loggamma_branchcorrect(val_big::Complex{BigFloat}, val_correctbranch::Complex{Float64})
-    k = round(Integer, (imag(val_big) - imag(val_correctbranch)) / (2*pi))
-    return Complex{BigFloat}(real(val_big), imag(val_big) - 2*big(pi)*k)
+    k = round(Int, (imag(val_big) - imag(val_correctbranch)) / (2*pi))
+    return val_big - 2*big(pi)*k*im
 end
 
 @doc raw"""
