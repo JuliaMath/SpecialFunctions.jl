@@ -781,14 +781,16 @@ function _scaled_sterling_coeffs(n::Integer, zr::Complex{BigFloat})
     return E
 end
 
-function loggamma(z::Complex{BigFloat})
+function _loggamma_complex_bigfloat(z::Complex{BigFloat})
     # We use branch correction (offset by multiples of 2πi) 
     # using Float64 logic instead of complicated manual high precision branch tracking
-    val_f = loggamma(Complex{Float64}(z))
+    bigpi = big(pi)
 
     # Reflection formula
-    if real(z) < 0.5
-        return _loggamma_branchcorrect(log(big(pi)) - log(sinpi(z)) - loggamma(1 - z), val_f)
+    rez = real(z)
+    if rez < 0.5
+        val = log(bigpi) - log(sinpi(z)) - _loggamma_complex_bigfloat(1 - z)
+        return _loggamma_branchcorrect(val, z)
     end
 
     # Upward recurrence: shift z to the Stirling region
@@ -799,24 +801,57 @@ function loggamma(z::Complex{BigFloat})
     # Stirling
     N = max(10, p÷15)
     B = _scaled_sterling_coeffs(N, zr)
-    lg = sum(B[2:end]) + (zr - big"0.5")*log(zr) - zr + log(sqrt(2*big(pi)))
+    lg = sum(B[2:end]) + (zr - big"0.5")*log(zr) - zr + log(sqrt(2*bigpi))
 
-    # Undo the upward shift via recurrence
-    partials = Vector{Complex{BigFloat}}(undef, r)
-    @inbounds Threads.@threads for i in 1:r
-        partials[i] = log(z + (i-1))
-    end
-    s = sum(partials)
+    # Undo the upward shift via recurrence in single product form
+    prodarg = prod([(z + (i-1)) for i in 1:r])
+    s = log(prodarg)
 
     # Apply branch correction
-    return _loggamma_branchcorrect(lg - s, val_f)
+    return _loggamma_branchcorrect(lg - s, z)
+end
+
+function loggamma(z::Complex{BigFloat})
+    imz = imag(z)
+    rez = real(z)
+    if iszero(imz)
+        # if z is purely real, then we can just call the real loggamma
+        return Complex(loggamma(rez))
+    end
+    # Guardrail precision by 16 bits for complex BigFloat inputs,
+    # compute using the internal implementation, then round the result back.
+    p0 = precision(BigFloat)
+    guard = 16
+    setprecision(p0 + guard) do
+        zhi = Complex{BigFloat}(rez, imz)
+        rhi = _loggamma_complex_bigfloat(zhi)
+        setprecision(p0) do
+            return Complex{BigFloat}(real(rhi), imag(rhi))
+        end
+    end
 end
 
 # branch correct loggamma by offsetting by multiples of 2πi to match the Float64 version
-function _loggamma_branchcorrect(val_big::Complex{BigFloat}, val_correctbranch::Complex{Float64})
-    k = round(Int, (imag(val_big) - imag(val_correctbranch)) / (2*pi))
-    return val_big - 2*big(pi)*k*im
+function _loggamma_branchcorrect(val_big::Complex{BigFloat}, z::Complex{BigFloat})
+    zf = _loggamma_oracle64_point(z)
+    val_f = SpecialFunctions.loggamma(zf)
+    imz = imag(val_big)
+    k = round(Int, (Float64(imz) - imag(val_f)) / (2*pi))
+    return Complex{BigFloat}(real(val_big), imz - 2*big(pi)*k)
 end
+
+# map a BigFloat complex point to the appropriate Float64 complex point, so that we can use the Float64 loggamma to determine the correct branch cut for the BigFloat loggamma
+function _loggamma_oracle64_point(z::Complex{BigFloat})
+    rez = real(z)
+    xr = Float64(rez)
+    xi = Float64(imag(z))
+    n = round(Int, xr)
+    if n ≤ 0 && isapprox(xr, Float64(n); atol=eps(Float64)) && abs(xi) ≤ 2eps(Float64)
+        xr = rez > n ? nextfloat(xr) : prevfloat(xr)
+    end
+    return Complex{Float64}(xr, xi)
+end
+
 
 @doc raw"""
     beta(x, y)

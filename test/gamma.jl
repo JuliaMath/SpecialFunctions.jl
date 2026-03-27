@@ -171,9 +171,42 @@
                 @test gamma(Complex{BigFloat}(big"1.4", big"3.7")) ≈ exp(loggamma(Complex{BigFloat}(big"1.4", big"3.7")))
                 @test gamma(Complex{BigFloat}(big"-3.4", big"-0.1")) ≈ exp(loggamma(Complex{BigFloat}(big"-3.4", big"-0.1")))
                 @test gamma(Complex{BigFloat}(big"1.0", big"6.5")) ≈ exp(loggamma(Complex{BigFloat}(big"1.0", big"6.5")))
+                # zero-imaginary inputs should match the real BigFloat results
+                @test loggamma(Complex{BigFloat}(big"3.099", big"0.0")) ≈ loggamma(big"3.099")
+                @test loggamma(Complex{BigFloat}(big"1.15", big"0.0")) ≈ loggamma(big"1.15")
+                @test gamma(Complex{BigFloat}(big"3.099", big"0.0")) ≈ gamma(big"3.099")
             end
         end
     end
+
+    @testset "BigFloat branch mapping near the negative real axis" begin
+    setprecision(256) do
+        ε = BigFloat(2)^(-1400)
+        xs = BigFloat.(["-0.1", "-0.7", "-1.3", "-2.6", "-3.4", "-5.2"])
+
+        for x in xs
+            z_minus = Complex{BigFloat}(x, -ε)
+            z_plus  = Complex{BigFloat}(x,  ε)
+
+            Lm = loggamma(z_minus)
+            Lp = loggamma(z_plus)
+
+            zf_minus = SpecialFunctions._loggamma_oracle64_point(z_minus)
+            zf_plus  = SpecialFunctions._loggamma_oracle64_point(z_plus)
+            Lf_minus = SpecialFunctions.loggamma(zf_minus)
+            Lf_plus  = SpecialFunctions.loggamma(zf_plus)
+
+            @test isapprox(Float64(real(Lm)), real(Lf_minus); rtol=0, atol=1e-14)
+            @test isapprox(Float64(imag(Lm)), imag(Lf_minus); rtol=0, atol=1e-14)
+            @test isapprox(Float64(real(Lp)), real(Lf_plus);  rtol=0, atol=1e-14)
+            @test isapprox(Float64(imag(Lp)), imag(Lf_plus);  rtol=0, atol=1e-14)
+
+            kdiff = round(Int, (imag(Lm) - imag(Lp)) / (2*big(pi)))
+            @test kdiff != 0
+            @test isapprox(Lm - Lp, (2*big(pi))*BigFloat(kdiff)*im; rtol=0, atol=big"1e-70")
+        end
+    end
+end
 
     @testset "Other float types" begin
         struct NotAFloat <: AbstractFloat
