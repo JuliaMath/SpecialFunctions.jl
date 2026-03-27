@@ -11,7 +11,7 @@ using Aqua: Aqua
 using ExplicitImports: ExplicitImports
 using JET: JET
 
-using SpecialFunctions: AmosException, f64
+using SpecialFunctions: AmosException, f64, _loggamma_oracle64_point
 
 # useful test functions for relative error, which differ from isapprox
 # relerr separately looks at the real and imaginary parts if one of the arguments is complex

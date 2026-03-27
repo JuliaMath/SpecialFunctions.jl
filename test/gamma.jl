@@ -191,10 +191,10 @@
             Lm = loggamma(z_minus)
             Lp = loggamma(z_plus)
 
-            zf_minus = SpecialFunctions._loggamma_oracle64_point(z_minus)
-            zf_plus  = SpecialFunctions._loggamma_oracle64_point(z_plus)
-            Lf_minus = SpecialFunctions.loggamma(zf_minus)
-            Lf_plus  = SpecialFunctions.loggamma(zf_plus)
+            zf_minus = _loggamma_oracle64_point(z_minus)
+            zf_plus  = _loggamma_oracle64_point(z_plus)
+            Lf_minus = loggamma(zf_minus)
+            Lf_plus  = loggamma(zf_plus)
 
             @test isapprox(Float64(real(Lm)), real(Lf_minus); rtol=0, atol=1e-14)
             @test isapprox(Float64(imag(Lm)), imag(Lf_minus); rtol=0, atol=1e-14)
