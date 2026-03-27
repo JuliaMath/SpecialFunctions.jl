@@ -175,38 +175,53 @@
                 @test loggamma(Complex{BigFloat}(big"3.099", big"0.0")) ≈ loggamma(big"3.099")
                 @test loggamma(Complex{BigFloat}(big"1.15", big"0.0")) ≈ loggamma(big"1.15")
                 @test gamma(Complex{BigFloat}(big"3.099", big"0.0")) ≈ gamma(big"3.099")
+                # branch mapping
+                ε = BigFloat(2)^(-1400)
+                xs = BigFloat.(["-0.1", "-0.7", "-1.3", "-2.6", "-3.4", "-5.2"])
+                for x in xs
+                    z_minus = Complex{BigFloat}(x, -ε)
+                    z_plus  = Complex{BigFloat}(x,  ε)
+
+                    Lm = loggamma(z_minus)
+                    Lp = loggamma(z_plus)
+
+                    zf_minus = _loggamma_oracle64_point(z_minus)
+                    zf_plus  = _loggamma_oracle64_point(z_plus)
+                    Lf_minus = loggamma(zf_minus)
+                    Lf_plus  = loggamma(zf_plus)
+
+                    @test isapprox(Float64(real(Lm)), real(Lf_minus); rtol=0, atol=1e-14)
+                    @test isapprox(Float64(imag(Lm)), imag(Lf_minus); rtol=0, atol=1e-14)
+                    @test isapprox(Float64(real(Lp)), real(Lf_plus);  rtol=0, atol=1e-14)
+                    @test isapprox(Float64(imag(Lp)), imag(Lf_plus);  rtol=0, atol=1e-14)
+
+                    kdiff = round(Int, (imag(Lm) - imag(Lp)) / (2*big(pi)))
+                    @test kdiff != 0
+                    @test isapprox(Lm - Lp, (2*big(pi))*BigFloat(kdiff)*im; rtol=0, atol=big"1e-70")
+                end
+                # Additional _loggamma_oracle64_point nudge tests at Float64 pole
+                n    = -3
+                x64  = Float64(n)
+                δp64 = nextfloat(x64) - x64
+                δm64 = x64 - prevfloat(x64)
+                ε64  = eps(Float64)
+
+                # right of pole: rez > n but Float64(rez) == n → nextfloat
+                rezR = BigFloat(x64) + BigFloat(δp64)/4
+                zR   = Complex{BigFloat}(rezR,  BigFloat(ε64)/4)
+                zfR  = _loggamma_oracle64_point(zR)
+                @test real(zfR) == nextfloat(x64)
+                @test abs(imag(zfR)) ≤ 2ε64
+
+                # left of pole: rez < n but Float64(rez) == n → prevfloat
+                rezL = BigFloat(x64) - BigFloat(δm64)/4
+                zL   = Complex{BigFloat}(rezL, -BigFloat(ε64)/4)
+                zfL  = _loggamma_oracle64_point(zL)
+                @test real(zfL) == prevfloat(x64)
+                @test abs(imag(zfL)) ≤ 2ε64
             end
         end
     end
-
-    @testset "BigFloat branch mapping near the negative real axis" begin
-    setprecision(256) do
-        ε = BigFloat(2)^(-1400)
-        xs = BigFloat.(["-0.1", "-0.7", "-1.3", "-2.6", "-3.4", "-5.2"])
-
-        for x in xs
-            z_minus = Complex{BigFloat}(x, -ε)
-            z_plus  = Complex{BigFloat}(x,  ε)
-
-            Lm = loggamma(z_minus)
-            Lp = loggamma(z_plus)
-
-            zf_minus = _loggamma_oracle64_point(z_minus)
-            zf_plus  = _loggamma_oracle64_point(z_plus)
-            Lf_minus = loggamma(zf_minus)
-            Lf_plus  = loggamma(zf_plus)
-
-            @test isapprox(Float64(real(Lm)), real(Lf_minus); rtol=0, atol=1e-14)
-            @test isapprox(Float64(imag(Lm)), imag(Lf_minus); rtol=0, atol=1e-14)
-            @test isapprox(Float64(real(Lp)), real(Lf_plus);  rtol=0, atol=1e-14)
-            @test isapprox(Float64(imag(Lp)), imag(Lf_plus);  rtol=0, atol=1e-14)
-
-            kdiff = round(Int, (imag(Lm) - imag(Lp)) / (2*big(pi)))
-            @test kdiff != 0
-            @test isapprox(Lm - Lp, (2*big(pi))*BigFloat(kdiff)*im; rtol=0, atol=big"1e-70")
-        end
-    end
-end
 
     @testset "Other float types" begin
         struct NotAFloat <: AbstractFloat
