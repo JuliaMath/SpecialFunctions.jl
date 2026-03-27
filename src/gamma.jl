@@ -834,7 +834,7 @@ end
 # branch correct loggamma by offsetting by multiples of 2πi to match the Float64 version
 function _loggamma_branchcorrect(val_big::Complex{BigFloat}, z::Complex{BigFloat})
     zf = _loggamma_oracle64_point(z)
-    val_f = SpecialFunctions.loggamma(zf)
+    val_f = loggamma(zf)
     imz = imag(val_big)
     k = round(Int, (Float64(imz) - imag(val_f)) / (2*pi))
     return Complex{BigFloat}(real(val_big), imz - 2*big(pi)*k)
