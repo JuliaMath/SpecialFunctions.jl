@@ -759,7 +759,7 @@ function loggamma_asymptotic(z::Complex{Float64})
                          6.4102564102564102564102561e-03,-2.9550653594771241830065352e-02)
 end
 
-# Return scaled Sterling coefficients (B_{2k}/(2k*(2k-1)) * zr^(2k-1) for k=0,1,...,n)
+# Return scaled Sterling coefficients (B_{2k}/(2k*(2k-1)) * zr^(1-2k) for k=0,1,...,n)
 function _scaled_sterling_coeffs(n::Integer, zr::Complex{BigFloat})
     mmax = 2n
     A = Vector{Rational{BigInt}}(undef, mmax+1)
