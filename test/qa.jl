@@ -1,5 +1,8 @@
 @testset "Aqua" begin
-    Aqua.test_all(SpecialFunctions)
+    # FiniteDifferences is not a direct dependency, but it's added
+    # as one during the upstream FiniteDifferences integration test
+    # with SpecialFunctions.
+    Aqua.test_all(SpecialFunctions; stale_deps=(; ignore=[:FiniteDifferences]), deps_compat=(; ignore=[:FiniteDifferences]))
 end
 
 @testset "ExplicitImports" begin
