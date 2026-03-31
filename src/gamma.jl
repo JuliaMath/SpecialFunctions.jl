@@ -64,10 +64,9 @@ trigamma(x::Number) = _trigamma(float(x))
 
 function _trigamma(z::ComplexOrReal{Float64})
     # via the derivative of the Kölbig digamma formulation
+    z′ = z  # save original value
+    z = ifelse(real(z′) <= 0, 1 - z′, z′)  # reflection formula (unrolled recursion)
     x = real(z)
-    if x <= 0 # reflection formula
-        return (π / sinpi(z))^2 - trigamma(1 - z)
-    end
     ψ = zero(z)
     N = 10
     if x < N
@@ -84,6 +83,7 @@ function _trigamma(z::ComplexOrReal{Float64})
     ψ += t + 0.5*w
     # the coefficients here are Float64(bernoulli[2:9])
     ψ += t*w * @evalpoly(w,0.16666666666666666,-0.03333333333333333,0.023809523809523808,-0.03333333333333333,0.07575757575757576,-0.2531135531135531,1.1666666666666667,-7.092156862745098)
+    ifelse(real(z′) <= 0, (π / sinpi(z′))^2 - ψ, ψ)  # reflection formula (unrolled recursion)
 end
 
 signflip(m::Number, z) = (-1+0im)^m * z
@@ -417,9 +417,6 @@ function _zeta(s::ComplexOrReal{Float64})
     # Riemann zeta function; algorithm is based on specializing the Hurwitz
     # zeta function above for z==1.
 
-    # blows up to ±Inf, but get correct sign of imaginary zero
-    s == 1 && return NaN + zero(s) * imag(s)
-
     if !isfinite(s) # annoying NaN and Inf cases
         isnan(s) && return imag(s) == 0 ? s : s*s
         if isfinite(imag(s))
@@ -436,18 +433,28 @@ function _zeta(s::ComplexOrReal{Float64})
                              -1.00078519447704240796017680222772921424,
                              -0.9998792995005711649578008136558752359121)
         end
+        ζ1ms = _zeta_core(1 - s)
         if absim > 12 # amplitude of sinpi(s/2) ≈ exp(imag(s)*π/2)
             # avoid overflow/underflow (issue #128)
             lg = loggamma(1 - s)
             rehalf = real(s)*0.5
-            return zeta(1 - s) * exp(lg + absim*halfπ + s*log2π) * inv2π * Complex(
+            return ζ1ms * exp(lg + absim*halfπ + s*log2π) * inv2π * Complex(
                 sinpi(rehalf), flipsign(cospi(rehalf), imag(s))
             )
         else
-            return zeta(1 - s) * gamma(1 - s) * sinpi(s*0.5) * twoπ^s * invπ
+            return ζ1ms * gamma(1 - s) * sinpi(s*0.5) * twoπ^s * invπ
         end
     end
 
+    return _zeta_core(s)
+end
+
+
+# Core asymptotic computation of the Riemann zeta function for real(s) >= 0.5.
+# Factored out of _zeta to avoid unprovable recursion in the reflection formula.
+function _zeta_core(s::ComplexOrReal{Float64})
+    # blows up to ±Inf, but get correct sign of imaginary zero
+    s == 1 && return NaN + zero(s) * imag(s)
     m = s - 1
 
     # shift using recurrence formula:
@@ -595,7 +602,7 @@ function gamma(n::Union{Int8,UInt8,Int16,UInt16,Int32,UInt32,Int64,UInt64})
     n < 0 && throw(DomainError(n, "`n` must not be negative."))
     n == 0 && return Inf
     n <= 2 && return 1.0
-    n > 20 && return _gamma(Float64(n))
+    n > 20 && return gamma(Float64(n))
     @inbounds return Float64(Base._fact_table64[n-1])
 end
 

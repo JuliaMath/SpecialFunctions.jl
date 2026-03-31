@@ -284,8 +284,9 @@ end
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
 function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
+    FT = promote_type(typeof(ν), typeof(real(z)))  # ensure return type isn't more precise than inputs
     # gammaterm = En_safe_gamma_term(ν, z)
-    gammaterm = gamma(1-ν)*z^(ν-1)
+    gammaterm = FT(gamma(1-ν))*z^(ν-1)
     frac = one(z)
     blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
     sumterm = abs(1 - ν) < 0.5 ? zero(z) : frac / (1 - ν)
@@ -321,13 +322,14 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
         series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
         series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
 
-        return (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
+        return (series1 + FT(series2)) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
     end
     return gammaterm - (blowup + sumterm)
 end
 
 # compute (-z)^n / n!, avoiding overflow if possible, where n is an integer ≥ 0 (but not necessarily an Integer)
 function En_safe_expfact(n::Real, z::Number)
+    FT = eltype(real(z))  # get the floating point type of the input
     if n < 100
         powerterm = one(z)
         for i = 1:Int(n)
@@ -337,9 +339,9 @@ function En_safe_expfact(n::Real, z::Number)
     else
         if z isa Real
             sgn = z ≤ 0 ? one(n) : (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
-            return sgn * exp(n * log(abs(z)) - loggamma(n+1))
+            return sgn * exp(n * log(abs(z)) - loggamma(FT(n+1)))
         else
-            return exp(n * log(-z) - loggamma(n+1))
+            return exp(n * log(-z) - loggamma(FT(n+1)))
         end
     end
 end
@@ -379,10 +381,11 @@ end
 # can find imaginary part of E_ν(x) for x on negative real axis analytically
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
 function En_imagbranchcut(ν::Number, z::Number)
+    FT = promote_type(typeof(real(ν)), typeof(real(z)))
     a = real(z)
     e1 = exp(oftype(a, π) * imag(ν))
-    e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
-    lgamma, lgammasign = ν isa Real ? logabsgamma(ν) : (loggamma(ν), 1)
+    e2 = Complex(cospi(FT(real(ν))), -sinpi(FT(real(ν))))
+    lgamma, lgammasign = ν isa Real ? logabsgamma(FT(ν)) : (loggamma(ν), 1)
     return -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
 end
 
@@ -468,12 +471,14 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
             end
             return doconj ? conj(E_start) : E_start
         end
-        while i == quick_niter
+        doublings = 0
+        while i == quick_niter && doublings < 50
             # double imaginary part until in region with fast convergence
             imstart *= 2
             z₀ = rez + imstart*im
             g_start, cf_start, i, _ = En_cf(ν, z₀, quick_niter)
             E_start = g_start + En_safeexpmult(-z₀, cf_start)
+            doublings += 1
         end
 
         # nsteps chosen so |Δ| ≤ 0.5

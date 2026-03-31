@@ -281,11 +281,23 @@ end
 @testset "GPU compatibility ($FT)" for FT in (Float64, Float32, Float16)
     # Note: This test is a proxy for GPU compatibility by checking that the functions
     # are type stable and do not allocate memory. It does not launch any GPU kernels.
+    @testset "gamma type stability" begin
+        @test @inferred(gamma(FT(2), FT(0.5))) isa FT
+        @test @inferred(gamma(FT(2), FT(0.5) * im)) isa Complex{FT}
+        # Test with integer `a`
+        @test @inferred(gamma(2, FT(0.5))) isa FT
+        @test @inferred(gamma(2, FT(0.5) * im)) isa Complex{FT}
+    end
     @testset "gamma_inc type stability" begin
         @test @inferred(gamma_inc(FT(30.0), FT(29.99999), 0)) isa Tuple{FT,FT}
     end
     @testset "gamma_inc_inv type stability" begin
         @test @inferred(gamma_inc_inv(FT(1.0), FT(0.01), FT(0.99))) isa FT
+    end
+
+    @testset "gamma allocations" begin
+        @test iszero((FT -> @allocated(gamma(2, FT(0.5))))(FT))
+        @test iszero((FT -> @allocated(gamma(2, FT(0.5) * im)))(FT))
     end
 
     @testset "gamma_inc allocations" begin
