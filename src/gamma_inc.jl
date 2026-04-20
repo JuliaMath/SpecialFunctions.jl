@@ -857,6 +857,12 @@ See also
 """
 gamma_inc(a::Real,x::Real,ind::Integer=0) = _gamma_inc(promote(float(a),float(x))...,ind)
 
+function _gamma_inc(a::Real,x::Real,ind::Integer) #generic fallback, includes BigFloat
+    z = gamma(a, x)
+    q = z / gamma(a)
+    return (1 - q, q)
+end
+
 function _gamma_inc(a::Float64, x::Float64, ind::Integer)
     iop = ind + 1
     acc = acc0[iop]
@@ -947,15 +953,6 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
     end
 end
 
-function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
-    z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr),
-          Int32,
-          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
-          z, a, x, ROUNDING_MODE[])
-    q = z/gamma(a)
-    return (1.0 - q, q)
-end
 _gamma_inc(a::Float32,x::Float32,ind::Integer) = Float32.(_gamma_inc(Float64(a),Float64(x),ind))
 _gamma_inc(a::Float16,x::Float16,ind::Integer) = Float16.(_gamma_inc(Float64(a),Float64(x),ind))
 
