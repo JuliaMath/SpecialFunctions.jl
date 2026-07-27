@@ -579,7 +579,7 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
         c5 = @evalpoly(z, d50, d5)
         c6 = @evalpoly(z, d60, d6)
 
-        t = @evalpoly(z, c0, c1, c2, c3, c4, c5, c6, d70, d80)
+        t = @evalpoly(1.0/a, c0, c1, c2, c3, c4, c5, c6, d70, d80)
         if l < 1.0
             p = c*(w - rt2pin*t/sqrt(a))
             return (p, 1.0 - p)
