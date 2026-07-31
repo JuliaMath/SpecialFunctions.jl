@@ -681,8 +681,8 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
         t = @evalpoly(u, c0, c1, c2, c3, c4, c5, c6, d70, d80)
 
     elseif iop == 2
-        c0 = @evalpoly(d00, d0[1], d0[2])
-        c1 = @evalpoly(d10, d1[1])
+        c0 = @evalpoly(z, d00, d0[1], d0[2])
+        c1 = @evalpoly(z, d10, d1[1])
         t = @evalpoly(u, c0, c1, d20)
 
     else
@@ -919,7 +919,13 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
                     return gamma_inc_temme(a, x, z)
                 else
                     t = @evalpoly(z, d00, d0[1], d0[2], d0[3])
-                    return gamma_inc_temme_1(a, x, z, ind)
+                    if l < 1.0
+                        p = c*(w - rt2pin*t/rta)
+                        return (p, 1.0 - p)
+                    else
+                        q = c*(w + rt2pin*t/rta)
+                        return (1.0 - q, q)
+                    end
                 end
             else
                 return _gamma_inc_choose_algorithm(a, x, ind)
