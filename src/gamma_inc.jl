@@ -659,6 +659,19 @@ Used instead of it's previous function when ``\sigma \leq e_{0}/\sqrt{a}``.
 
 External links: [DLMF 8.12.8](https://dlmf.nist.gov/8.12.8)
 """
+# Combine the Temme series value `t` with the Gaussian-tail term `c*w` into (P, Q);
+# shared by gamma_inc_temme_1's three branches and the ind=2 wide-band case in
+# _gamma_inc, which recomputes c/w/t itself instead of calling gamma_inc_temme_1.
+function _gamma_inc_temme_combine(c::Float64, w::Float64, t::Float64, rta::Float64, l::Float64)
+    if l < 1.0
+        p = c*(w - rt2pin*t/rta)
+        return (p, 1.0 - p)
+    else
+        q = c*(w + rt2pin*t/rta)
+        return (1.0 - q, q)
+    end
+end
+
 function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
     iop = ind + 1
     l = x/a
@@ -689,13 +702,7 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
         t = @evalpoly(z, d00, d0[1])
 
     end
-    if l < 1.0
-        p = c*(w - rt2pin*t/sqrt(a))
-        return (p, 1.0 - p)
-    else
-        q = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q, q)
-    end
+    return _gamma_inc_temme_combine(c, w, t, sqrt(a), l)
 end
 
 """
@@ -919,13 +926,7 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
                     return gamma_inc_temme(a, x, z)
                 else
                     t = @evalpoly(z, d00, d0[1], d0[2], d0[3])
-                    if l < 1.0
-                        p = c*(w - rt2pin*t/rta)
-                        return (p, 1.0 - p)
-                    else
-                        q = c*(w + rt2pin*t/rta)
-                        return (1.0 - q, q)
-                    end
+                    return _gamma_inc_temme_combine(c, w, t, rta, l)
                 end
             else
                 return _gamma_inc_choose_algorithm(a, x, ind)

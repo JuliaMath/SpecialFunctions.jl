@@ -113,8 +113,8 @@ end
         (1000.0, 650.0, 2.957759012559303e-37, 1.0),
         (1000.0, 1350.0, 1.0, 7.635408516228592e-24),
     )
-        @test gamma_inc(a, x, 2)[1] ≈ p rtol=5e-4
-        @test gamma_inc(a, x, 2)[2] ≈ q rtol=5e-4
+        @test gamma_inc(a, x, 2)[1] ≈ p rtol=2e-4
+        @test gamma_inc(a, x, 2)[2] ≈ q rtol=2e-4
     end
     @testset "ind=2 narrow band: a=$a, x=$x" for (a, x, p, q) in (
         (10.0, 9.778640563788214, 0.5140881193058611, 0.485911880694139),
@@ -122,8 +122,8 @@ end
         (100000.0, 99977.86405637882, 0.47251429019620883, 0.5274857098037912),
         (100000.0, 100022.13594362116, 0.5283205849613148, 0.4716794150386851),
     )
-        @test gamma_inc(a, x, 2)[1] ≈ p rtol=5e-4
-        @test gamma_inc(a, x, 2)[2] ≈ q rtol=5e-4
+        @test gamma_inc(a, x, 2)[1] ≈ p rtol=1e-4
+        @test gamma_inc(a, x, 2)[2] ≈ q rtol=1e-4
     end
     @testset "ind=0 unchanged: a=$a, x=$x" for (a, x, p, q) in (
         (14.0, 13.911135637064119, 0.5261046500921642, 0.4738953499078358),
