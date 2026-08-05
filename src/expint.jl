@@ -5,8 +5,8 @@ struct SimplePoly{T}
     coeffs::Vector{T}
 end
 
-Base.:*(p::SimplePoly, c) = SimplePoly(p.coeffs * c)
-Base.:*(c, p::SimplePoly) = p * c
+Base.:*(p::SimplePoly, c::Number) = SimplePoly(p.coeffs * c)
+Base.:*(c::Number, p::SimplePoly) = p * c
 
 function Base.:+(p::SimplePoly{S}, q::SimplePoly{T}) where {S, T}
     n, m = length(p.coeffs), length(q.coeffs)
