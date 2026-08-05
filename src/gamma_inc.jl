@@ -542,6 +542,19 @@ function gamma_inc_taylor_x(a::Float64, x::Float64, ind::Integer)
     end
 end
 
+# Combine the Temme series value `t` with the Gaussian-tail term `c*w` into (P, Q);
+# shared by gamma_inc_minimax, gamma_inc_temme, gamma_inc_temme_1's three branches,
+# and the ind=2 wide-band case in _gamma_inc.
+function _gamma_inc_temme_combine(c::Float64, w::Float64, t::Float64, rta::Float64, l::Float64)
+    if l < 1.0
+        p = c*(w - rt2pin*t/rta)
+        return (p, 1.0 - p)
+    else
+        q = c*(w + rt2pin*t/rta)
+        return (1.0 - q, q)
+    end
+end
+
 @doc raw"""
     gamma_inc_minimax(a,x,z)
 
@@ -580,13 +593,7 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
         c6 = @evalpoly(z, d60, d6)
 
         t = @evalpoly(1.0/a, c0, c1, c2, c3, c4, c5, c6, d70, d80)
-        if l < 1.0
-            p = c*(w - rt2pin*t/sqrt(a))
-            return (p, 1.0 - p)
-        else
-            q = c*(w + rt2pin*t/sqrt(a))
-            return (1.0 - q, q)
-        end
+        return _gamma_inc_temme_combine(c, w, t, sqrt(a), l)
     end
     #---USING THE MINIMAX APPROXIMATIONS---
     c0 = @evalpoly(z, -.333333333333333E+00, -.159840143443990E+00, -.335378520024220E-01, -.231272501940775E-02)/(@evalpoly(z, 1.0, .729520430331981E+00, .238549219145773E+00,  .376245718289389E-01, .239521354917408E-02, -.939001940478355E-05, .633763414209504E-06))
@@ -600,13 +607,7 @@ function gamma_inc_minimax(a::Float64, x::Float64, z::Float64)
     c8 = @evalpoly(z, -.686013280418038E-03,  .878371203603888E-03)
 
     t = @evalpoly(1.0/a, c0, c1, c2, c3, c4, c5, c6, c7, c8)
-    if l < 1.0
-        p = c*(w - rt2pin*t/sqrt(a))
-        return (p, 1.0 - p)
-    else
-        q = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q, q)
-    end
+    return _gamma_inc_temme_combine(c, w, t, sqrt(a), l)
 end
 
 @doc raw"""
@@ -635,13 +636,7 @@ function gamma_inc_temme(a::Float64, x::Float64, z::Float64)
     c1 = @evalpoly(z, d10, d1[1], d1[2], d1[3], d1[4])
     c2 = @evalpoly(z, d20, d2[1])
     t  = @evalpoly(1.0/a, c0, c1, c2)
-    if l < 1.0
-        p = c*(w - rt2pin*t/sqrt(a))
-        return (p, 1.0 - p)
-    else
-        q = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q, q)
-    end
+    return _gamma_inc_temme_combine(c, w, t, sqrt(a), l)
 end
 
 @doc raw"""
@@ -681,21 +676,15 @@ function gamma_inc_temme_1(a::Float64, x::Float64, z::Float64, ind::Integer)
         t = @evalpoly(u, c0, c1, c2, c3, c4, c5, c6, d70, d80)
 
     elseif iop == 2
-        c0 = @evalpoly(d00, d0[1], d0[2])
-        c1 = @evalpoly(d10, d1[1])
+        c0 = @evalpoly(z, d00, d0[1], d0[2])
+        c1 = @evalpoly(z, d10, d1[1])
         t = @evalpoly(u, c0, c1, d20)
 
     else
         t = @evalpoly(z, d00, d0[1])
 
     end
-    if l < 1.0
-        p = c*(w - rt2pin*t/sqrt(a))
-        return (p, 1.0 - p)
-    else
-        q = c*(w + rt2pin*t/sqrt(a))
-        return (1.0 - q, q)
-    end
+    return _gamma_inc_temme_combine(c, w, t, sqrt(a), l)
 end
 
 """
@@ -919,7 +908,7 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
                     return gamma_inc_temme(a, x, z)
                 else
                     t = @evalpoly(z, d00, d0[1], d0[2], d0[3])
-                    return gamma_inc_temme_1(a, x, z, ind)
+                    return _gamma_inc_temme_combine(c, w, t, rta, l)
                 end
             else
                 return _gamma_inc_choose_algorithm(a, x, ind)
