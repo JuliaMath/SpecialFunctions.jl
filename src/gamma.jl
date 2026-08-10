@@ -86,6 +86,48 @@ function _trigamma(z::ComplexOrReal{Float64})
     ψ += t*w * @evalpoly(w,0.16666666666666666,-0.03333333333333333,0.023809523809523808,-0.03333333333333333,0.07575757575757576,-0.2531135531135531,1.1666666666666667,-7.092156862745098)
 end
 
+"""
+    tetragamma(x)
+
+Compute the tetragamma function of `x` (the logarithmic third derivative of `gamma(x)`).
+"""
+tetragamma(x::Number) = _tetragamma(float(x))
+
+function _tetragamma(z::ComplexOrReal{Float64})
+    # via the second derivative of the Kölbig digamma formulation
+    x = real(z)
+    if z isa Complex && imag(z) == 0
+        # also catches 0.0+0.0im → -Inf because π / 0. is Inf in IEEE 754,
+        # but π+0im / 0+0im is Nan+Nan*im in complex
+        return complex(_tetragamma(x))
+    end
+    if x <= 0 # reflection formula
+        if !(z isa Complex) || abs(imag(z)) < log(floatmax(Float64))
+            return tetragamma(1 - z) - 2*π^3*cospi(z)*inv(sinpi(z))^3
+        else
+            # omit numerically 0 term and avoid overflow at large imag(z)
+            return tetragamma(1 - z)
+        end
+    end
+    ψ = zero(z)
+    N = 10
+    if x < N
+        # shift using recurrence formula
+        n = N - floor(Int,x)
+        ψ -= 2*inv(z)^3
+        for ν = 1:n-1
+            ψ -= 2*inv(z + ν)^3
+        end
+        z += n
+    end
+    t = inv(z)
+    w = t * t # 1/z^2
+    ψ += -w * (1.0 + t)
+    # the coefficients here are Float64(-(2*(1:10) .+ 1) .* bernoulli[2:11])
+    # order determined by Lentz's method near |z| = 10
+    ψ += w*w * @evalpoly(w,-0.5,0.16666666666666666,-0.16666666666666666,0.3,-0.8333333333333334,3.2904761904761907,-17.5,120.56666666666666,-1044.452380952381,11111.609090909091)
+end
+
 signflip(m::Number, z) = (-1+0im)^m * z
 signflip(m::Integer, z) = iseven(m) ? z : -z
 
@@ -235,6 +277,7 @@ zeta(s::Number, z::Number) = _zeta(map(float, promote(s, z))...)
 function _zeta(s::T, z::T) where {T<:ComplexOrReal{Float64}}
     (z == 1 || z == 0) && return zeta(s)
     s == 2 && return trigamma(z)
+    s == 3 && return tetragamma(z)
 
     # handle NaN cases
     if isnan(s) || isnan(z)
@@ -342,6 +385,7 @@ polygamma(m::Integer, x::Number) = _polygamma(m, float(x))
 function _polygamma(m::Integer, z::ComplexOrReal{Float64})
     m == 0 && return digamma(z)
     m == 1 && return trigamma(z)
+    m == 2 && return tetragamma(z)
 
     # In principle, we could support non-integer m here, but the
     # extension to complex m seems to be non-unique, the obvious
@@ -394,6 +438,38 @@ function _invdigamma(y::Float64)
         iteration += 1
         x_new = x_old - (digamma(x_old) - y) / trigamma(x_old)
         delta = abs(x_new - x_old)
+        x_old = x_new
+    end
+
+    return x_new
+end
+
+"""
+    invtrigamma(x)
+
+Compute the inverse [`trigamma`](@ref) function of `x`.
+"""
+invtrigamma(x::Number) = _invtrigamma(float(x))
+
+function _invtrigamma(y::Float64)
+    # inverse trigamma from limma's convex Newton's method 1/trigamma(x) = 1/y
+    # See: https://rdrr.io/bioc/limma/src/R/fitFDist.R
+
+    x_old = 0.5 + 1/y
+    x_new = x_old
+
+    # Fixed point algorithm
+    relerr = Inf
+    iteration = 0
+    # large iterations only needed for very small arguments e.g. 1e-100
+    while relerr > 1e-12 && iteration < 400
+        iteration += 1
+        if !isfinite(x_old)
+            break
+        end
+        tri = trigamma(x_old)
+        x_new = x_old + tri * (1. - tri/y) / tetragamma(x_old)
+        relerr = x_old != 0 ? abs(x_new - x_old) / abs(x_old) : abs(x_new - x_old)
         x_old = x_new
     end
 
@@ -520,7 +596,7 @@ for T in (Float16, Float32)
     @eval f64(x::Complex{$T}) = Complex{Float64}(x)
     @eval f64(x::$T) = Float64(x)
 
-    for f in (:_digamma, :_trigamma, :_zeta, :_eta, :_invdigamma)
+    for f in (:_digamma, :_trigamma, :_tetragamma, :_zeta, :_eta, :_invdigamma)
         @eval $f(z::ComplexOrReal{$T}) = oftype(z, $f(f64(z)))
     end
 

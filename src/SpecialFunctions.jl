@@ -67,6 +67,8 @@ export
     digamma,
     invdigamma,
     trigamma,
+    invtrigamma,
+    tetragamma,
     polygamma,
     gamma_inc,
     gamma_inc_inv,
@@ -106,7 +108,7 @@ include("beta_inc.jl")
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,
-          :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :ellipk, :ellipe)
+          :eta, :gamma, :invdigamma, :logfactorial, :lgamma, :trigamma, :tetragamma, :ellipk, :ellipe)
     @eval $(f)(::Missing) = missing
 end
 for f in (:beta, :lbeta)

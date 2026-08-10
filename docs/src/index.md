@@ -7,7 +7,7 @@ provides a comprehensive collection of special functions based on the
 
 Special mathematical functions in Julia, include Bessel, Hankel,
 Airy, error, Dawson, exponential (or sine and cosine) integrals, eta,
-zeta, digamma, inverse digamma, trigamma, and polygamma functions.
+zeta, digamma, inverse digamma, trigamma, tetragamma, and polygamma functions.
 
 ## Installation
 
