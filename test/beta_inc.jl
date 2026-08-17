@@ -313,4 +313,23 @@ end
         @test beta_inc_inv(0.01, 0.1, y)[1] ≈ 0.7803014210919872
         @test beta_inc(0.01, 0.1, beta_inc_inv(0.01, 0.1, y)[1])[1] ≈ y
     end
+
+    @testset "gamln1" begin
+        # The incomplete beta routines only call gamln1 with arguments in (0, 1),
+        # where |loggamma(1 + a)| <= 0.1215. The docstring claims that the absolute
+        # error is below 2e-16 there and that substituting gamln1 for the more
+        # accurate loggamma1p perturbs exp(z - u) by less than one ulp.
+        setprecision(BigFloat, 256) do
+            for a in 0.0:1.0e-4:1.0
+                @test SpecialFunctions.gamln1(a) ≈ Float64(loggamma(1 + big(a))) atol = 2.0e-16 rtol = 0
+                if a > 0
+                    @test abs(expm1(SpecialFunctions.loggamma1p(a) - SpecialFunctions.gamln1(a))) < eps(Float64)
+                end
+            end
+            # full domain of the approximation
+            for a in -0.2:1.0e-4:1.25
+                @test SpecialFunctions.gamln1(a) ≈ Float64(loggamma(1 + big(a))) atol = 5.0e-16 rtol = 0
+            end
+        end
+    end
 end
