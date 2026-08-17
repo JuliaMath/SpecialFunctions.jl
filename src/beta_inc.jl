@@ -92,6 +92,38 @@ function esum(mu::Float64, x::Float64)
 end
 
 @doc raw"""
+    gamln1(a)
+
+Compute ``\log \Gamma(1 + a)`` for `-0.2 <= a <= 1.25` with two minimax rational
+approximations.
+
+# Implementation
+`GAMLN1(A)` from the NSWC library, see also [Didonato and Morris (1992)](@cite didonato_1992).
+
+This is used in the incomplete beta routines instead of the more accurate but
+roughly eight times more expensive `loggamma1p` (a Chebyshev expansion plus a
+`log1p`). The substitution is safe here: all call sites pass `a0 = min(a, b)`
+inside an `a0 < 1` branch (zero arguments are handled earlier), so the argument
+is always in `(0, 1)`, well inside the approximation's domain. On `(0, 1)` the
+result satisfies ``|\log \Gamma(1 + a)| \leq 0.1215``, so even a few ulps of
+relative error amount to an absolute error below `2e-16`, and since the result
+is only consumed through `exp(z - u)`, this perturbs the final incomplete beta
+value by less than one ulp.
+"""
+function gamln1(a::Float64)
+    if a < 0.6
+        w = @evalpoly(a, .577215664901533e0, .844203922187225e0, -.168860593646662e0, -.780427615533591e0, -.402055799310489e0, -.673562214325671e-1, -.271935708322958e-2) /
+            @evalpoly(a, 1.0, .288743195473681e1, .312755088914843e1, .156875193295039e1, .361951990101499e0, .325038868253937e-1, .667465618796164e-3)
+        return -a*w
+    else
+        x = a - 1.0
+        w = @evalpoly(x, .422784335098467e0, .848044614534529e0, .565221050691933e0, .156513060486551e0, .170502484022650e-1, .497958207639485e-3) /
+            @evalpoly(x, 1.0, .124313399877507e1, .548042109832463e0, .101552187439830e0, .713309612391000e-2, .116165475989616e-3)
+        return x*w
+    end
+end
+
+@doc raw"""
     beta_integrand(a, b, x, y, mu=0.0)
 
 Compute ``e^{\mu} x^a y^b / B(a,b)``
@@ -132,10 +164,10 @@ function beta_integrand(a::Float64, b::Float64, x::Float64, y::Float64, mu::Floa
     if a0 < 1.0
         b0 = max(a,b)
         if b0 >= 8.0
-            u = loggamma1p(a0) + loggammadiv(a0,b0)
+            u = gamln1(a0) + loggammadiv(a0,b0)
             return a0*(esum(mu, z-u))
         elseif b0 > 1.0
-            u = loggamma1p(a0)
+            u = gamln1(a0)
             n = trunc(Int,b0 - 1.0)
             if n >= 1
                 c = 1.0
@@ -549,14 +581,14 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
     else
 
         if b0 >= 8.0
-            u = loggamma1p(a0) + loggammadiv(a0,b0)
+            u = gamln1(a0) + loggammadiv(a0,b0)
             z = a*log(x) - u
             ans = (a0/a)*exp(z)
             if ans == 0.0 || a <= 0.1*epps
                 return ans
             end
         elseif b0 > 1.0
-            u = loggamma1p(a0)
+            u = gamln1(a0)
             # In BPSER, M is implicitly declared INTEGER, so the assignment truncates
             m = trunc(Int, b0 - 1.0)
             if m >= 1
