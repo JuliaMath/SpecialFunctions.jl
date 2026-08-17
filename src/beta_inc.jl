@@ -557,8 +557,9 @@ function beta_inc_power_series(a::Float64, b::Float64, x::Float64, epps::Float64
             end
         elseif b0 > 1.0
             u = loggamma1p(a0)
-            m = b0 - 1.0
-            if m >= 1.0
+            # In BPSER, M is implicitly declared INTEGER, so the assignment truncates
+            m = trunc(Int, b0 - 1.0)
+            if m >= 1
                 c = 1.0
                 for i = 1:m
                     b0 -= 1.0
@@ -640,8 +641,9 @@ function beta_inc_diff(a::Float64, b::Float64, x::Float64, y::Float64, n::Intege
     mu = 0.0
     d = 1.0
     if n != 1 && a >= 1.0 && apb >= 1.1*ap1
-        mu = abs(exparg_n)
-        k = exparg_p
+        # In BUP, MU and K are implicitly declared INTEGER, so the assignments truncate
+        mu = trunc(abs(exparg_n))
+        k = trunc(exparg_p)
         if k < mu
             mu = k
         end
