@@ -100,15 +100,16 @@ approximations.
 # Implementation
 `GAMLN1(A)` from the NSWC library, see also [Didonato and Morris (1992)](@cite didonato_1992).
 
-This is used in the incomplete beta routines instead of the more accurate but
-roughly eight times more expensive `loggamma1p` (a Chebyshev expansion plus a
-`log1p`). The substitution is safe here: all call sites pass `a0 = min(a, b)`
-inside an `a0 < 1` branch (zero arguments are handled earlier), so the argument
-is always in `(0, 1)`, well inside the approximation's domain. On `(0, 1)` the
-result satisfies ``|\log \Gamma(1 + a)| \leq 0.1215``, so even a few ulps of
-relative error amount to an absolute error below `2e-16`, and since the result
-is only consumed through `exp(z - u)`, this perturbs the final incomplete beta
-value by less than one ulp.
+This is used in the incomplete beta routines instead of the more accurate but roughly an order
+of magnitude more expensive `loggamma1p` (a Chebyshev expansion plus a `log1p`). The
+substitution is safe here: the call sites pass `a0 = min(a, b)` inside an `a0 < 1` branch, and
+`beta_inc` rejects negative arguments and handles zero arguments earlier, so the argument is in
+`(0, 1)`, well inside the approximation's domain. There the error is at most about `8` ulp
+(versus about `4` ulp for `loggamma1p`, and about `16` ulp for `gamln1` on the full
+`[-0.2, 1.25]`), because the zeros of ``\log \Gamma(1 + a)`` at `a = 0` and `a = 1` are
+factored out of the rational approximations. Since ``|\log \Gamma(1 + a)| \leq 0.1215`` there,
+that is an absolute error below `2e-16`, and as the result is only consumed through
+`exp(z - u)`, it perturbs the final incomplete beta value by at most about one ulp.
 """
 function gamln1(a::Float64)
     if a < 0.6
