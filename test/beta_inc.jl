@@ -313,4 +313,31 @@ end
         @test beta_inc_inv(0.01, 0.1, y)[1] ≈ 0.7803014210919872
         @test beta_inc(0.01, 0.1, beta_inc_inv(0.01, 0.1, y)[1])[1] ≈ y
     end
+
+    @testset "gamln1" begin
+        # Two independent claims. The absolute error of the exponent bounds the relative
+        # perturbation of exp(z - u) in the incomplete beta routines, and is binding near
+        # the minimum of loggamma(1 + a). The ulp error pins the quality of the
+        # approximation itself, and is binding near the zeros at a = 0 and a = 1, which
+        # the factored forms -a*w and (a - 1)*w reproduce exactly.
+        setprecision(BigFloat, 128) do
+            for a in Iterators.flatten((
+                0.0:1.0e-4:1.0,
+                exp10.(range(-20, -4; length=1_000)),       # a -> 0
+                1 .- exp10.(range(-16, -4; length=1_000)),  # a -> 1
+            ))
+                g = SpecialFunctions.gamln1(a)
+                r = loggamma(1 + big(a))
+                @test abs(g - r) <= 2.0e-16               # about 1 ulp on exp(z - u)
+                @test abs(g - r) <= 16 * eps(Float64(r))  # measured worst case 7.9 ulp
+            end
+            # Full domain of the approximation, where it is about twice as inaccurate
+            for a in -0.2:1.0e-4:1.25
+                g = SpecialFunctions.gamln1(a)
+                r = loggamma(1 + big(a))
+                @test abs(g - r) <= 8.0e-16
+                @test abs(g - r) <= 32 * eps(Float64(r))  # measured worst case 15.6 ulp
+            end
+        end
+    end
 end
