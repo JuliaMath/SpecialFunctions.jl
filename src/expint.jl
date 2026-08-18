@@ -283,10 +283,12 @@ end
 
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
-function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
+#
+# `_expint` promotes `z` with `ν` before calling this, hence the type of `z`: it is
+# the type of the result, and the `oftype(z, ...)` conversions below are narrowing
+function En_expand_origin_general(ν::Number, z::Union{AbstractFloat,Complex{<:AbstractFloat}}, niter::Integer)
     # gammaterm = En_safe_gamma_term(ν, z)
-    # `gamma(1-ν)` is computed in `Float64` for e.g. integer `ν`, so it is converted
-    # to the type of `z` (which `_expint` promoted with `ν`) to keep the result type
+    # `gamma(1-ν)` is evaluated in `Float64` for e.g. an integer `ν`
     gammaterm = oftype(z, gamma(1-ν))*z^(ν-1)
     frac = one(z)
     blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
@@ -307,8 +309,10 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
         k += 1
     end
 
-    # `reνz` is bound to a variable such that the type of the values in this branch
-    # (in particular of `n`, which is passed on to `polygamma`) can be inferred
+    # the correction below is only used in `Float32`/`Float64` precision, so it is
+    # evaluated in the type of `real(ν + z)`. Binding that to a variable is what
+    # narrows it to `Union{Float64,Float32}` inside the branch, which in turn keeps
+    # `n` (and hence the `polygamma` calls) out of e.g. `BigFloat`
     reνz = real(ν + z)
     if reνz isa Union{Float64, Float32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
         δ = round(ν) - ν
@@ -326,8 +330,9 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
         series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
         series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
 
-        # the series are evaluated with `Float64` constants such as `π^2`, so the
-        # result has to be converted back to the type of the other return value
+        # the series are evaluated with `Float64` constants such as `π^2`; the guard
+        # above restricts this branch to `Float32`/`Float64`, so narrowing the result
+        # to the type of the other return value cannot lose anything
         res = (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
         return oftype(gammaterm, res)
     end
@@ -335,7 +340,7 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
 end
 
 # compute (-z)^n / n!, avoiding overflow if possible, where n is an integer ≥ 0 (but not necessarily an Integer)
-function En_safe_expfact(n::Real, z::Number)
+function En_safe_expfact(n::Real, z::Union{AbstractFloat,Complex{<:AbstractFloat}})
     if n < 100
         powerterm = one(z)
         for i = 1:Int(n)
@@ -343,20 +348,24 @@ function En_safe_expfact(n::Real, z::Number)
         end
         return powerterm
     else
-        # `loggamma(n+1)` is computed in `Float64` for integer `n`, so the result
-        # has to be converted back to the type of `z`
+        # The exponent is evaluated in at least `Float64` precision: the absolute
+        # error of `loggamma` turns into a relative error of the result, so keeping
+        # `loggamma(n+1)` in `Float64` would cap the accuracy for a `z` of higher
+        # precision (`En_safe_expfact(199, big(1.0))` was accurate to 43 bits).
+        S = promote_type(Float64, real(typeof(z)))
+        nS = convert(S, n)
         if z isa Real
             sgn = z ≤ 0 ? one(n) : (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
-            return oftype(one(z), sgn * exp(n * log(abs(z)) - loggamma(n+1)))
+            return oftype(one(z), sgn * exp(nS * log(abs(convert(S, z))) - loggamma(nS + 1)))
         else
-            return oftype(one(z), exp(n * log(-z) - loggamma(n+1)))
+            return oftype(one(z), exp(nS * log(-convert(Complex{S}, z)) - loggamma(nS + 1)))
         end
     end
 end
 
 # series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
-function En_expand_origin_posint(n, z::Number, niter::Integer)
+function En_expand_origin_posint(n, z::Union{AbstractFloat,Complex{<:AbstractFloat}}, niter::Integer)
     gammaterm = En_safe_expfact(n-1, z) # (-z)^(n-1) / (n-1)!
     frac = one(real(z))
     gammaterm *= digamma(oftype(frac,n)) - log(z)
@@ -378,7 +387,7 @@ function En_expand_origin_posint(n, z::Number, niter::Integer)
     return gammaterm - sumterm
 end
 
-function En_expand_origin(ν::Number, z::Number, niter::Integer)
+function En_expand_origin(ν::Number, z::Union{AbstractFloat,Complex{<:AbstractFloat}}, niter::Integer)
     if isinteger(ν) && real(ν) > 0
         return real(ν) < (typemax(Int)>>2) ? En_expand_origin_posint(Int(real(ν)), z, niter) : En_expand_origin_posint(real(ν), z, niter)
     else
@@ -388,13 +397,17 @@ end
 
 # can find imaginary part of E_ν(x) for x on negative real axis analytically
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
-function En_imagbranchcut(ν::Number, z::Number)
+function En_imagbranchcut(ν::Number, z::Union{AbstractFloat,Complex{<:AbstractFloat}})
     a = real(z)
     e1 = exp(oftype(a, π) * imag(ν))
-    e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
-    lgamma, lgammasign = ν isa Real ? logabsgamma(ν) : (loggamma(ν), 1)
-    # `cospi`/`sinpi`/`logabsgamma` are computed in `Float64` for e.g. integer `ν`,
-    # so the result has to be converted back to the type of `z`
+    # `cospi`, `sinpi` and `logabsgamma` are evaluated in at least `Float64`
+    # precision, for the same reason as in `En_safe_expfact`: `lgamma` enters an
+    # exponent, so evaluating it in `Float64` would cap the accuracy for a `z` of
+    # higher precision (`expint(5, big(-4)+0im)` was accurate to 53 bits)
+    S = promote_type(Float64, typeof(a))
+    νr = convert(S, real(ν))
+    e2 = Complex(cospi(νr), -sinpi(νr))
+    lgamma, lgammasign = ν isa Real ? logabsgamma(convert(S, ν)) : (loggamma(convert(Complex{S}, ν)), 1)
     res = -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
     return oftype(complex(a), res)
 end
