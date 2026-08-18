@@ -285,7 +285,9 @@ end
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
 function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
     # gammaterm = En_safe_gamma_term(ν, z)
-    gammaterm = gamma(1-ν)*z^(ν-1)
+    # `gamma(1-ν)` is computed in `Float64` for e.g. integer `ν`, so it is converted
+    # to the type of `z` (which `_expint` promoted with `ν`) to keep the result type
+    gammaterm = oftype(z, gamma(1-ν))*z^(ν-1)
     frac = one(z)
     blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
     sumterm = abs(1 - ν) < 0.5 ? zero(z) : frac / (1 - ν)
@@ -305,9 +307,12 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
         k += 1
     end
 
-    if real(ν+z) isa Union{Float64, Float32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
+    # `reνz` is bound to a variable such that the type of the values in this branch
+    # (in particular of `n`, which is passed on to `polygamma`) can be inferred
+    reνz = real(ν + z)
+    if reνz isa Union{Float64, Float32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
         δ = round(ν) - ν
-        n = real(round(ν)) - 1
+        n = oftype(reνz, real(round(ν)) - 1)
 
         # (1 - z^δ)/δ series
         logz = log(z)
@@ -321,7 +326,10 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
         series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
         series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
 
-        return (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
+        # the series are evaluated with `Float64` constants such as `π^2`, so the
+        # result has to be converted back to the type of the other return value
+        res = (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
+        return oftype(gammaterm, res)
     end
     return gammaterm - (blowup + sumterm)
 end
@@ -335,11 +343,13 @@ function En_safe_expfact(n::Real, z::Number)
         end
         return powerterm
     else
+        # `loggamma(n+1)` is computed in `Float64` for integer `n`, so the result
+        # has to be converted back to the type of `z`
         if z isa Real
             sgn = z ≤ 0 ? one(n) : (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
-            return sgn * exp(n * log(abs(z)) - loggamma(n+1))
+            return oftype(one(z), sgn * exp(n * log(abs(z)) - loggamma(n+1)))
         else
-            return exp(n * log(-z) - loggamma(n+1))
+            return oftype(one(z), exp(n * log(-z) - loggamma(n+1)))
         end
     end
 end
@@ -383,7 +393,10 @@ function En_imagbranchcut(ν::Number, z::Number)
     e1 = exp(oftype(a, π) * imag(ν))
     e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
     lgamma, lgammasign = ν isa Real ? logabsgamma(ν) : (loggamma(ν), 1)
-    return -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
+    # `cospi`/`sinpi`/`logabsgamma` are computed in `Float64` for e.g. integer `ν`,
+    # so the result has to be converted back to the type of `z`
+    res = -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
+    return oftype(complex(a), res)
 end
 
 function En_safeexpmult(z, a)

@@ -245,3 +245,29 @@ expinti_real(x) = invoke(expinti, Tuple{Real}, x)
         end
     end
 end
+
+@testset "expint type stability" begin
+    # The return type is determined by promoting the (floating point) types of the
+    # order and the argument, independently of the code path that is taken
+    @testset "$T" for T in (Float16, Float32, Float64)
+        for ν in (0, 1, 2, -2, 200, 3//2, T(3/2), T(2)+eps(T(2)), T(2)-eps(T(2)))
+            # small |z|: series about the origin (both the general and the
+            # positive integer expansion, including the near-pole correction)
+            @test @inferred(expint(ν, T(0.5))) isa T
+            @test @inferred(expintx(ν, T(1.5))) isa T
+            @test @inferred(expint(ν, Complex{T}(0.5, 0.5))) isa Complex{T}
+
+            # larger |z|: continued fraction and the procedure near the negative
+            # real axis (`z` exactly on the axis exercises `En_imagbranchcut`)
+            @test @inferred(expint(ν, T(4))) isa T
+            @test @inferred(expint(ν, Complex{T}(4, 1))) isa Complex{T}
+            @test @inferred(expint(ν, Complex{T}(-4, 1))) isa Complex{T}
+            @test @inferred(expint(ν, Complex{T}(-4))) isa Complex{T}
+            @test @inferred(expintx(ν, Complex{T}(-4))) isa Complex{T}
+        end
+        for ν in (Complex{T}(3/2, 1/2), Complex{T}(2, 0))
+            @test @inferred(expint(ν, Complex{T}(0.5, 0.5))) isa Complex{T}
+            @test @inferred(expint(ν, Complex{T}(4, 1))) isa Complex{T}
+        end
+    end
+end

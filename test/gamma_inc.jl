@@ -381,6 +381,18 @@ run_twice(f, args...) = (f(args...); f(args...))
     @testset "gamma_inc_inv type stability" begin
         @test @inferred(gamma_inc_inv(FT(1.0), FT(0.01), FT(0.99))) isa FT
     end
+    @testset "gamma(a, x) type stability" begin
+        # `gamma(a, x)` and `loggamma(a, x)` are computed via `expint` for
+        # non-positive-integer `a`, which used to widen the result to `Float64`
+        @test @inferred(gamma(FT(2), FT(3))) isa FT
+        @test @inferred(gamma(FT(0.5), FT(1.5))) isa FT
+        @test @inferred(gamma(FT(2.5), FT(0.5))) isa FT
+        @test @inferred(gamma(FT(2), FT(0))) isa FT
+        @test @inferred(gamma(2, FT(3))) isa FT
+        @test @inferred(gamma(-2, FT(3))) isa FT
+        @test @inferred(loggamma(FT(2), FT(3))) isa FT
+        @test @inferred(loggamma(2, FT(3))) isa FT
+    end
 
     @testset "gamma_inc allocations" begin
         # `@allocated` checks for allocations for specific code paths
@@ -408,6 +420,14 @@ run_twice(f, args...) = (f(args...); f(args...))
         ## else
         ### gamma_inc_cf
         @test iszero(run_twice(FT -> @allocated(gamma_inc(FT(0.7), FT(2.5))), FT))
+    end
+
+    @testset "gamma(a, x) allocations" begin
+        @test iszero(run_twice(FT -> @allocated(gamma(FT(2), FT(3))), FT))
+        @test iszero(run_twice(FT -> @allocated(gamma(FT(0.5), FT(1.5))), FT))
+        @test iszero(run_twice(FT -> @allocated(gamma(FT(2.5), FT(0.5))), FT))
+        @test iszero(run_twice(FT -> @allocated(gamma(-2, FT(3))), FT))
+        @test iszero(run_twice(FT -> @allocated(loggamma(FT(2), FT(3))), FT))
     end
 
     @testset "gamma_inc_inv allocations" begin
