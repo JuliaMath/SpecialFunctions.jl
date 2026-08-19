@@ -283,14 +283,14 @@ end
 
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
-function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
+function En_expand_origin_general(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, niter::Int) where {T<:AbstractFloat}
     # gammaterm = En_safe_gamma_term(ν, z)
     gammaterm = gamma(1-ν)*z^(ν-1)
     frac = one(z)
     blowup  = abs(1 - ν) < 0.5 ? frac / (1 - ν) : zero(z)
     sumterm = abs(1 - ν) < 0.5 ? zero(z) : frac / (1 - ν)
     k = 1
-    ε = 10*eps(typeof(abs(frac)))
+    ε = 10*eps(T)
     while k < niter
         frac *= -z / k
         prev = sumterm
@@ -305,50 +305,93 @@ function En_expand_origin_general(ν::Number, z::Number, niter::Integer)
         k += 1
     end
 
-    if real(ν+z) isa Union{Float64, Float32} && abs(gammaterm - blowup) < 1e-3 * abs(blowup)
-        δ = round(ν) - ν
-        n = real(round(ν)) - 1
+    return En_origin_pole_series(ν, z, gammaterm, blowup, sumterm)
+end
 
-        # (1 - z^δ)/δ series
-        logz = log(z)
-        series1 = -logz - logz^2*δ/2 - logz^3*δ^2/6 - logz^4*δ^3/24 - logz^5*δ^4/120
-
-        # due to https://functions.wolfram.com/GammaBetaErf/Gamma/06/01/05/01/0004/
-        # expressions for higher order terms found using:
-        # https://gist.github.com/augustt198/348e8f9ba33c0248f1548309c47c6d0e
-        ψ₀, ψ₁, ψ₂, ψ₃, ψ₄ = polygamma.((0,1,2,3,4), n+1)
-        series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
-        series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
-        series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
-
-        return (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
+# Near a positive integer order the two leading terms above cancel, and the expansion
+# in δ = round(real(ν)) - ν below is used instead. It is truncated after δ^4, so its error
+# is O(δ^5) while the cancelling form loses accuracy like eps/δ; the two meet at
+# δ ~ eps(T)^(1/6), which is where the switch is made.
+#
+# There is no method for complex `BigFloat`, and none for any other `AbstractFloat`:
+# `polygamma` is not defined for them, and five terms could not serve that precision
+# in any case.
+#
+# Real `BigFloat` is delegated to MPFR instead, which computes
+# E_ν(z) = z^(ν-1) Γ(1-ν, z) without the cancellation. `mpfr_gamma_inc` needs z > 0
+# and its cost grows linearly in ν, so the series is kept where it is adequate anyway,
+# i.e. when no term fell into `blowup` and there was no cancellation to begin with.
+function En_origin_pole_series(ν::BigFloat, z::BigFloat, gammaterm, blowup, sumterm)
+    if !iszero(blowup) && z > 0 && ν < 1000
+        return z^(ν-1) * gamma(1-ν, z)
     end
     return gammaterm - (blowup + sumterm)
 end
 
-# compute (-z)^n / n!, avoiding overflow if possible, where n is an integer ≥ 0 (but not necessarily an Integer)
-function En_safe_expfact(n::Real, z::Number)
-    if n < 100
-        powerterm = one(z)
-        for i = 1:Int(n)
-            powerterm *= -z/i
-        end
-        return powerterm
-    else
-        if z isa Real
-            sgn = z ≤ 0 ? one(n) : (n <= typemax(Int) ? (isodd(Int(n)) ? -one(n) : one(n)) : (-1)^n)
-            return sgn * exp(n * log(abs(z)) - loggamma(n+1))
-        else
-            return exp(n * log(-z) - loggamma(n+1))
-        end
+function En_origin_pole_series(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}},
+                               gammaterm, blowup, sumterm) where {T<:Union{Float16,Float32,Float64}}
+    m = round(real(ν))
+    δ = m - ν
+    if !(m >= 1 && abs(δ) < eps(T)^(1/6)/2)
+        return gammaterm - (blowup + sumterm)
     end
+    n = m - 1
+
+    # (1 - z^δ)/δ series
+    logz = log(z)
+    series1 = -logz - logz^2*δ/2 - logz^3*δ^2/6 - logz^4*δ^3/24 - logz^5*δ^4/120
+
+    # due to https://functions.wolfram.com/GammaBetaErf/Gamma/06/01/05/01/0004/
+    # expressions for higher order terms found using:
+    # https://gist.github.com/augustt198/348e8f9ba33c0248f1548309c47c6d0e
+    ψ₀, ψ₁, ψ₂, ψ₃, ψ₄ = polygamma.((0,1,2,3,4), n+1)
+    series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
+    series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
+    series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
+
+    # `π^2` and `π^4` above are `Float64`, so the series is evaluated in at least that
+    # precision and narrowed here
+    res = (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
+    return oftype(gammaterm, res)
+end
+
+# Compute (-z)^n / n!, avoiding overflow if possible.
+#
+# Internal helper. The callers guarantee that `n` is a whole number >= 0, that `z` is
+# non-zero, and that `n` and `z` have the same precision. There is deliberately no
+# promoting method, so a mismatch surfaces as a `MethodError` at the call site rather
+# than as a silent mixed precision computation.
+#
+# The product is used for small `n`, where the term is large enough to influence the
+# result and the loop is both cheap and more accurate. Above that the closed form
+# takes over: the term is then negligible next to the sums the callers add it to, and
+# orders too large to loop over have to be handled as well (`expint(1e15, 2.5)` is
+# tested, and `Int` is 32 bits on some platforms).
+function En_safe_expfact(n::T, z::T) where {T<:AbstractFloat}
+    n < 12 && return _En_powerterm(n, z)
+    sgn = z <= 0 ? one(T) : (isodd(n) ? -one(T) : one(T))
+    return sgn * exp(n*log(abs(z)) - loggamma(n + one(T)))
+end
+
+function En_safe_expfact(n::T, z::Complex{T}) where {T<:AbstractFloat}
+    n < 12 && return _En_powerterm(n, z)
+    return exp(n*log(-z) - loggamma(n + one(T)))
+end
+
+# (-z)^n / n! as a product, for whole n >= 0
+function _En_powerterm(n, z)
+    powerterm = one(z)
+    for i = 1:n
+        powerterm *= -z/i
+    end
+    return powerterm
 end
 
 # series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
 function En_expand_origin_posint(n, z::Number, niter::Integer)
-    gammaterm = En_safe_expfact(n-1, z) # (-z)^(n-1) / (n-1)!
     frac = one(real(z))
+    gammaterm = En_safe_expfact(oftype(frac, n-1), z) # (-z)^(n-1) / (n-1)!
     gammaterm *= digamma(oftype(frac,n)) - log(z)
     sumterm = n == 1 ? zero(frac) : frac / (1 - n)
     k = 1
@@ -368,19 +411,21 @@ function En_expand_origin_posint(n, z::Number, niter::Integer)
     return gammaterm - sumterm
 end
 
-function En_expand_origin(ν::Number, z::Number, niter::Integer)
+function En_expand_origin(ν::Number, z::Number, niter::Int)
     if isinteger(ν) && real(ν) > 0
         return real(ν) < (typemax(Int)>>2) ? En_expand_origin_posint(Int(real(ν)), z, niter) : En_expand_origin_posint(real(ν), z, niter)
     else
-        return En_expand_origin_general(ν, z, niter)
+        # `En_expand_origin_general` takes both arguments at the same precision
+        T = typeof(one(real(z)))
+        return En_expand_origin_general(ν isa Real ? convert(T, ν) : convert(Complex{T}, ν), z, niter)
     end
 end
 
 # can find imaginary part of E_ν(x) for x on negative real axis analytically
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
-function En_imagbranchcut(ν::Number, z::Number)
+function En_imagbranchcut(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}) where {T<:AbstractFloat}
     a = real(z)
-    e1 = exp(oftype(a, π) * imag(ν))
+    e1 = exp(π * imag(ν))
     e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
     lgamma, lgammasign = ν isa Real ? logabsgamma(ν) : (loggamma(ν), 1)
     return -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
@@ -490,7 +535,9 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
 
         # handle branch cut
         if imz == 0
-            bc = En_imagbranchcut(ν, z)
+            # `En_imagbranchcut` takes both arguments at the same precision
+            νc = ν isa Real ? convert(real(typeof(z)), ν) : convert(complex(real(typeof(z))), ν)
+            bc = En_imagbranchcut(νc, z)
             bit = !signbit(imag(z))
             sign = bit ? 1 : -1
             if isreal(ν)
