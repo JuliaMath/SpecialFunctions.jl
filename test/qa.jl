@@ -44,6 +44,7 @@ end
             :MPFRRoundingMode, # Base.MPFR
             :ROUNDING_MODE, # Base.MPFR
             :_fact_table64, # Base
+            :beta_integrand, # SpecialFunctions (used by its ChainRulesCore extension)
             :version, # Base.MPFR
             Symbol("@nif"), # Base
             (VERSION < v"1.11" ? (:depwarn,) : ())..., # Base
