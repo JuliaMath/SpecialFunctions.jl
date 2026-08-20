@@ -230,9 +230,11 @@ end
     @test @inferred(besselj0(big(1))) isa BigFloat
     @test @inferred(besselj(2, big(1))) isa BigFloat
     @test @inferred(expinti(big(2))) isa BigFloat
-    @test @inferred(loggamma(big(2), big(3))) isa BigFloat
     @test @inferred(expint(big(2), big(3)/2)) isa BigFloat
-    @test @inferred(expintx(big(2), big(3)/2)) isa BigFloat
+    # `loggamma(a, x)` and `expintx(ν, z)` have no `BigFloat` route: `_loggamma` is
+    # restricted to the hardware floats, and MPFR has no scaled incomplete gamma
+    @test_throws MethodError loggamma(big(2), big(3))
+    @test_throws MethodError expintx(big(2), big(3)/2)
     # `expint(x::BigFloat)` is inferred as `Union{Float64,BigFloat}`
     @test @inferred(expint(big(1))) isa BigFloat broken = true
     # `airyai` lacks the `f(x::Real) = f(float(x))` promotion that `besselj0` has, so a

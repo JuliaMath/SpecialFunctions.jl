@@ -131,7 +131,7 @@ end
 
 function _expint(z::Complex{Float64}, ::Val{expscaled}=Val{false}()) where {expscaled}
     if real(z) < 0
-        return _expint(1, z, 1000, Val{expscaled}())
+        return _expint(one(real(z)), z, 1000, Val{expscaled}())
     else
         return expint_opt(z, Val{expscaled}())
     end
@@ -160,8 +160,8 @@ end
 
 # Continued fraction for En(ν, z) that doesn't use a term with
 # the gamma function: https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0001/
-function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
-    B = float(z + ν)
+function En_cf_nogamma(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, n::Int=1000) where {T<:Union{Float16,Float32,Float64}}
+    B = z + ν
     Bprev::typeof(B) = z
     A::typeof(B) = 1
     Aprev::typeof(B) = 1
@@ -196,18 +196,17 @@ function En_cf_nogamma(ν::Number, z::Number, n::Int=1000)
 end
 
 # Calculate Γ(1 - ν) * z^(ν-1) safely
-function En_safe_gamma_term(ν::Number, z::Number)
-    ν1 = 1 - oftype(z, ν)
+function En_safe_gamma_term(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}) where {T<:Union{Float16,Float32,Float64}}
+    ν1 = 1 - ν
     lgamma, lgammasign = ν1 isa Real ? logabsgamma(ν1) : (loggamma(ν1), 1)
     return lgammasign * exp((ν - 1)*log(z) + lgamma)
 end
-En_safe_gamma_term(ν::Integer, z::Real) = (z ≥ 0 || isodd(ν) ? 1 : -1) * exp((ν - 1)*log(abs(z)) + loggamma(1 - oftype(z, ν)))
 
 # continued fraction for En(ν, z) that uses the gamma function:
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/10/0005/
 # returns the two terms from the above equation separately
-function En_cf_gamma(ν::Number, z::Number, n::Int=1000)
-    A, z = map(float, promote(1 - ν, z))
+function En_cf_gamma(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, n::Int=1000) where {T<:Union{Float16,Float32,Float64}}
+    A = 1 - ν + zero(z)
     B = oneunit(A)
     Bprev = zero(B)
     Aprev = oneunit(A)
@@ -243,7 +242,7 @@ end
 # picks between continued fraction representations in
 # En_cf_nogamma and En_cf_gamma
 # returns (evaluated result, # iterations used, whether En_cf_gamma was chosen)
-function En_cf(ν::Number, z::Number, niter::Int=1000)
+function En_cf(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, niter::Int=1000) where {T<:Union{Float16,Float32,Float64}}
     if real(1-ν) > 0
         gammapart, cfpart, iters = En_cf_gamma(ν, z, niter)
         gammaabs, cfabs = abs(gammapart), abs(cfpart)
@@ -257,7 +256,8 @@ end
 
 # Compute expint(ν, z₀+Δ) given start = expint(ν, z₀), as described by [Amos 1980].
 # This is used to incrementally approach the negative real axis.
-function En_taylor(ν::Number, start::Number, z₀::Number, Δ::Number)
+function En_taylor(ν::Union{T,Complex{T}}, start::Union{T,Complex{T}}, z₀::Union{T,Complex{T}},
+                   Δ::Union{T,Complex{T}}) where {T<:Union{Float16,Float32,Float64}}
     a = exp(z₀) * start
     k, iters = 0, 0
     asum = a
@@ -283,7 +283,7 @@ end
 
 # series about origin, general ν
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/01/0003/
-function En_expand_origin_general(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, niter::Int) where {T<:AbstractFloat}
+function En_expand_origin_general(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, niter::Int) where {T<:Union{Float16,Float32,Float64}}
     # gammaterm = En_safe_gamma_term(ν, z)
     gammaterm = gamma(1-ν)*z^(ν-1)
     frac = one(z)
@@ -313,21 +313,9 @@ end
 # is O(δ^5) while the cancelling form loses accuracy like eps/δ; the two meet at
 # δ ~ eps(T)^(1/6), which is where the switch is made.
 #
-# There is no method for complex `BigFloat`, and none for any other `AbstractFloat`:
-# `polygamma` is not defined for them, and five terms could not serve that precision
-# in any case.
-#
-# Real `BigFloat` is delegated to MPFR instead, which computes
-# E_ν(z) = z^(ν-1) Γ(1-ν, z) without the cancellation. `mpfr_gamma_inc` needs z > 0
-# and its cost grows linearly in ν, so the series is kept where it is adequate anyway,
-# i.e. when no term fell into `blowup` and there was no cancellation to begin with.
-function En_origin_pole_series(ν::BigFloat, z::BigFloat, gammaterm, blowup, sumterm)
-    if !iszero(blowup) && z > 0 && ν < 1000
-        return z^(ν-1) * gamma(1-ν, z)
-    end
-    return gammaterm - (blowup + sumterm)
-end
-
+# There is no method for any other type: `polygamma` is not defined beyond these
+# precisions, and five terms could not serve a wider one in any case. `BigFloat` is
+# handled by `expint(::BigFloat, ::BigFloat)`, which delegates to MPFR.
 function En_origin_pole_series(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}},
                                gammaterm, blowup, sumterm) where {T<:Union{Float16,Float32,Float64}}
     m = round(real(ν))
@@ -345,14 +333,12 @@ function En_origin_pole_series(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}},
     # expressions for higher order terms found using:
     # https://gist.github.com/augustt198/348e8f9ba33c0248f1548309c47c6d0e
     ψ₀, ψ₁, ψ₂, ψ₃, ψ₄ = polygamma.((0,1,2,3,4), n+1)
-    series2 = ψ₀ + (3*ψ₀^2 + π^2 - 3*ψ₁)*δ/6 + (ψ₀^3 + (π^2 - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
-    series2 += (7π^4 + 15*(ψ₀^4 + 2ψ₀^2 * (π^2 - 3ψ₁) + ψ₁*(-2π^2 + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
-    series2 += (3ψ₀^5 + ψ₀^3*(10π^2 - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π^2*ψ₁ - 15ψ₃ + 7π^4) - 30ψ₁*ψ₂ + 10π^2*ψ₂ + 3ψ₄)*δ^4/360
+    π², π⁴ = T(π)^2, T(π)^4
+    series2 = ψ₀ + (3*ψ₀^2 + π² - 3*ψ₁)*δ/6 + (ψ₀^3 + (π² - 3ψ₁)*ψ₀ + ψ₂)δ^2/6
+    series2 += (7π⁴ + 15*(ψ₀^4 + 2ψ₀^2 * (π² - 3ψ₁) + ψ₁*(-2π² + 3ψ₁) + 4ψ₀*ψ₂) - 15ψ₃)*δ^3/360
+    series2 += (3ψ₀^5 + ψ₀^3*(10π² - 30ψ₁) + 30ψ₀^2*ψ₂ + ψ₀*(45ψ₁^2 - 30π²*ψ₁ - 15ψ₃ + 7π⁴) - 30ψ₁*ψ₂ + 10π²*ψ₂ + 3ψ₄)*δ^4/360
 
-    # `π^2` and `π^4` above are `Float64`, so the series is evaluated in at least that
-    # precision and narrowed here
-    res = (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
-    return oftype(gammaterm, res)
+    return (series1 + series2) * En_safe_expfact(n, z) * z^(ν-n-1) - sumterm
 end
 
 # Compute (-z)^n / n!, avoiding overflow if possible.
@@ -367,13 +353,13 @@ end
 # takes over: the term is then negligible next to the sums the callers add it to, and
 # orders too large to loop over have to be handled as well (`expint(1e15, 2.5)` is
 # tested, and `Int` is 32 bits on some platforms).
-function En_safe_expfact(n::T, z::T) where {T<:AbstractFloat}
+function En_safe_expfact(n::T, z::T) where {T<:Union{Float16,Float32,Float64}}
     n < 12 && return _En_powerterm(n, z)
     sgn = z <= 0 ? one(T) : (isodd(n) ? -one(T) : one(T))
     return sgn * exp(n*log(abs(z)) - loggamma(n + one(T)))
 end
 
-function En_safe_expfact(n::T, z::Complex{T}) where {T<:AbstractFloat}
+function En_safe_expfact(n::T, z::Complex{T}) where {T<:Union{Float16,Float32,Float64}}
     n < 12 && return _En_powerterm(n, z)
     return exp(n*log(-z) - loggamma(n + one(T)))
 end
@@ -389,10 +375,10 @@ end
 
 # series about the origin, special case for integer n > 0
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/06/01/04/01/02/0005/
-function En_expand_origin_posint(n, z::Number, niter::Integer)
+function En_expand_origin_posint(n::T, z::Union{T,Complex{T}}, niter::Int) where {T<:Union{Float16,Float32,Float64}}
     frac = one(real(z))
-    gammaterm = En_safe_expfact(oftype(frac, n-1), z) # (-z)^(n-1) / (n-1)!
-    gammaterm *= digamma(oftype(frac,n)) - log(z)
+    gammaterm = En_safe_expfact(n-1, z) # (-z)^(n-1) / (n-1)!
+    gammaterm *= digamma(n) - log(z)
     sumterm = n == 1 ? zero(frac) : frac / (1 - n)
     k = 1
     ϵ = 10*eps(real(sumterm))
@@ -411,41 +397,45 @@ function En_expand_origin_posint(n, z::Number, niter::Integer)
     return gammaterm - sumterm
 end
 
-function En_expand_origin(ν::Number, z::Number, niter::Int)
+function En_expand_origin(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, niter::Int) where {T<:Union{Float16,Float32,Float64}}
     if isinteger(ν) && real(ν) > 0
-        return real(ν) < (typemax(Int)>>2) ? En_expand_origin_posint(Int(real(ν)), z, niter) : En_expand_origin_posint(real(ν), z, niter)
+        return En_expand_origin_posint(real(ν), z, niter)
     else
-        # `En_expand_origin_general` takes both arguments at the same precision
-        T = typeof(one(real(z)))
-        return En_expand_origin_general(ν isa Real ? convert(T, ν) : convert(Complex{T}, ν), z, niter)
+        return En_expand_origin_general(ν, z, niter)
     end
 end
 
 # can find imaginary part of E_ν(x) for x on negative real axis analytically
 # https://functions.wolfram.com/GammaBetaErf/ExpIntegralE/04/05/01/0003/
-function En_imagbranchcut(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}) where {T<:AbstractFloat}
+function En_imagbranchcut(ν::T, z::Union{T,Complex{T}}) where {T<:Union{Float16,Float32,Float64}}
+    a = real(z)
+    s, c = sincospi(ν)
+    lgamma, lgammasign = logabsgamma(ν)
+    return -2 * lgammasign * Complex(c, -s) * π * exp((ν-1)*log(complex(a)) - lgamma) * im
+end
+function En_imagbranchcut(ν::Complex{T}, z::Union{T,Complex{T}}) where {T<:Union{Float16,Float32,Float64}}
     a = real(z)
     e1 = exp(π * imag(ν))
-    e2 = Complex(cospi(real(ν)), -sinpi(real(ν)))
-    lgamma, lgammasign = ν isa Real ? logabsgamma(ν) : (loggamma(ν), 1)
-    return -2 * lgammasign * e1 * π * e2 * exp((ν-1)*log(complex(a)) - lgamma) * im
+    s, c = sincospi(real(ν))
+    return -2 * e1 * Complex(c, -s) * π * exp((ν-1)*log(complex(a)) - loggamma(ν)) * im
 end
 
-function En_safeexpmult(z, a)
+# compute exp(z) * a, avoiding overflow of the exponential by shifting into the exponent
+function En_safeexpmult(z::Union{T,Complex{T}}, a::T) where {T<:Union{Float16,Float32,Float64}}
     zexp = exp(z)
-    if isinf(zexp) || iszero(zexp)
-        return a isa Real ? sign(a) * exp(z + log(abs(a))) : exp(z + log(a))
-    else
-        return zexp*a
-    end
+    return isinf(zexp) || iszero(zexp) ? sign(a) * exp(z + log(abs(a))) : zexp*a
+end
+function En_safeexpmult(z::Union{T,Complex{T}}, a::Complex{T}) where {T<:Union{Float16,Float32,Float64}}
+    zexp = exp(z)
+    return isinf(zexp) || iszero(zexp) ? exp(z + log(a)) : zexp*a
 end
 
-function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{false}()) where {expscaled}
+function _expint(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, niter::Int=1000,
+                 ::Val{expscaled}=Val{false}()) where {T<:Union{Float16,Float32,Float64}, expscaled}
     if abs(ν) > 50 && !(isreal(ν) && real(ν) > 0)
         throw(ArgumentError("Unsupported order |ν| > 50 off the positive real axis"))
     end
 
-    z, = promote(float(z), ν)
     if isnan(ν) || isnan(z)
         return oftype(z, NaN) * z
     end
@@ -535,9 +525,7 @@ function _expint(ν::Number, z::Number, niter::Int=1000, ::Val{expscaled}=Val{fa
 
         # handle branch cut
         if imz == 0
-            # `En_imagbranchcut` takes both arguments at the same precision
-            νc = ν isa Real ? convert(real(typeof(z)), ν) : convert(complex(real(typeof(z))), ν)
-            bc = En_imagbranchcut(νc, z)
+            bc = En_imagbranchcut(ν, z)
             bit = !signbit(imag(z))
             sign = bit ? 1 : -1
             if isreal(ν)
@@ -565,7 +553,14 @@ External links:
 [DLMF 8.19](https://dlmf.nist.gov/8.19),
 [Wikipedia](https://en.wikipedia.org/wiki/Exponential_integral)
 """
-expint(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{false}())
+expint(ν::Number, z::Number, niter::Int=1000) =
+    _expint(promotereal(ν, float(z))..., niter, Val{false}())
+
+# For real `BigFloat` arguments MPFR's incomplete gamma gives E_ν(z) = z^(ν-1) Γ(1-ν, z)
+# directly, and unlike the series about the origin it does not cancel for `ν` near a
+# positive integer. It throws for z < 0, where Γ(1-ν, z) is generally complex. There is
+# no scaled counterpart in MPFR, so `expintx` has no `BigFloat` method.
+_expint(ν::BigFloat, z::BigFloat, niter::Int, ::Val{false}) = z^(ν-1) * gamma(1-ν, z)
 
 
 @doc raw"""
@@ -581,7 +576,8 @@ If ``\nu`` is not specified, ``\nu = 1`` is used. Arbitrary complex
 
 See also: [`expint(ν, z)`](@ref SpecialFunctions.expint)
 """
-expintx(ν::Number, z::Number, niter::Int=1000) = _expint(ν, z, niter, Val{true}())
+expintx(ν::Number, z::Number, niter::Int=1000) =
+    _expint(promotereal(ν, float(z))..., niter, Val{true}())
 
 ##############################################################################
 # expinti function Ei
