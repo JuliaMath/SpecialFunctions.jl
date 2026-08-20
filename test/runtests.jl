@@ -38,6 +38,7 @@ tests = [
     "sincosint",
     "other_tests",
     "chainrules",
+    "type_stability",
     "qa"
 ]
 
