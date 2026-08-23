@@ -165,8 +165,9 @@ function En_cf_nogamma(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, n::Int=1
     Bprev::typeof(B) = z
     A::typeof(B) = 1
     Aprev::typeof(B) = 1
-    ϵ = 10*eps(real(B))
-    scale = sqrt(floatmax(typeof(real(A))))
+    ϵ = 10*eps(T)
+    # `A` and `B` are kept below this, which bounds the products in the test by `floatmax`/16
+    scale = sqrt(floatmax(T))/4
 
     # two recurrence steps / loop
     iters = 1
@@ -181,15 +182,16 @@ function En_cf_nogamma(ν::Union{T,Complex{T}}, z::Union{T,Complex{T}}, n::Int=1
         A, Aprev = A + (ν+i-1) * Aprev, A
         B, Bprev = B + (ν+i-1) * Bprev, B
 
-        i > 4 && abs(Aprev*B - A*Bprev) < ϵ*abs(B*Bprev) && break
-
         # rescale
-        if fastabs(A) > scale
+        if max(fastabs(A), fastabs(B)) > scale
             A     /= scale
             Aprev /= scale
             B     /= scale
             Bprev /= scale
         end
+
+        # relative test on the convergents Aprev/Bprev and A/B, cleared of their denominators
+        i > 4 && abs(Aprev*B - A*Bprev) < ϵ*abs(A*Bprev) && break
     end
 
     return A/B, iters
