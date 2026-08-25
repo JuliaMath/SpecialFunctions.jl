@@ -1099,7 +1099,8 @@ Returns the upper incomplete gamma function
 ```math
 \Gamma(a,x) = \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
 ```
-supporting arbitrary real or complex `a` and `x`.
+for real or complex `a` and `x` of `Float16`, `Float32` or `Float64` precision, and for
+real `BigFloat` arguments with `x >= 0`.
 
 (The ordinary gamma function [`gamma(x)`](@ref) corresponds to ``\Gamma(a) = \Gamma(a,0)``.
 See also the [`gamma_inc`](@ref) function to compute both the upper and lower
@@ -1110,44 +1111,23 @@ External links:
 [Wikipedia](https://en.wikipedia.org/wiki/Incomplete_gamma_function)
 """
 gamma(a::Number,  x::Number) = _gamma(promotereal(float(a), float(x))...)
-gamma(a::Integer, x::Number) = _gamma(a, float(x))
 
-function _gamma(a::Number, x::Number)
+function _gamma(a::Union{T,Complex{T}}, x::Union{T,Complex{T}}) where {T<:Union{Float16,Float32,Float64}}
+    # Γ(a,x) is not real for x < 0, except for integer a, and is not supported there
+    x isa Real && x < 0 && throw(DomainError((a, x), "gamma will only return a complex result if called with a complex argument"))
     if a isa Real && x isa Real && !isfinite(a*x)
-        if isinf(x) && isfinite(a)
-            if x > 0 # == +Inf
-                return one(a)*zero(x)
-            elseif a > 0 && isinteger(a) # x == -Inf
-                return one(a)*x # -Inf
-            end
+        if isinf(x) && isfinite(a) # x == +Inf
+            return one(a)*zero(x)
         elseif isinf(a) && isfinite(x)
-            if a > 0
-                if x ≥ 0
-                    return a*one(x) # +Inf
-                else
-                    throw(DomainError((a, x), "gamma will only return a complex result if called with a complex argument"))
-                end
-            elseif a < 0
-                return zero(a)*one(x)
-            end
+            return a > 0 ? a*one(x) : zero(a)*one(x) # +Inf or 0
         end
     end
     return iszero(x) ? gamma(one(x)*a) : x^a * expint(1 - a, x)
 end
 
-_gamma(a::Integer, x::BigFloat) = _gamma_big(a, x)
-_gamma(a::BigInt, x::Real) = _gamma_big(a, x)
-_gamma(a::BigInt, x::BigFloat) = _gamma_big(a, x)
-_gamma(a::BigFloat,x::BigFloat) = _gamma_big(a, x)
-function _gamma_big(a::Real,x::Real)
-    if x < 0
-        # MPFR returns NaN in this case
-        if isinteger(a) && a > 0
-            return invoke(_gamma, Tuple{Number,Number}, a, BigFloat(x))
-        else
-            throw(DomainError((a, x), "gamma will only return a complex result if called with a complex argument"))
-        end
-    end
+function _gamma(a::BigFloat, x::BigFloat)
+    # MPFR returns NaN for x < 0, where Γ(a,x) is complex unless a is an integer
+    x < 0 && throw(DomainError((a, x), "gamma will only return a complex result if called with a complex argument"))
     z = BigFloat()
     ccall((:mpfr_gamma_inc, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, a, x, ROUNDING_MODE[])
     return z
@@ -1160,7 +1140,7 @@ Returns the log of the upper incomplete gamma function [`gamma(a,x)`](@ref):
 ```math
 \log \Gamma(a,x) = \log \int_x^\infty t^{a-1} e^{-t} \mathrm{d}t
 ```
-supporting arbitrary real or complex `a` and `x`.
+for real or complex `a` and `x` of `Float16`, `Float32` or `Float64` precision.
 
 If `a` and/or `x` is complex, then `exp(loggamma(a,x))` matches `gamma(a,x)` (up to floating-point error),
 but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of ``2\pi i``
@@ -1169,28 +1149,17 @@ but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of 
 See also [`loggamma(x)`](@ref).
 """
 loggamma(a::Number, x::Number) = _loggamma(promotereal(float(a), float(x))...)
-loggamma(a::Integer, x::Number) = _loggamma(a, float(x))
-function _loggamma(a::Number, x::Number)
+function _loggamma(a::Union{T,Complex{T}}, x::Union{T,Complex{T}}) where {T<:Union{Float16,Float32,Float64}}
+    # as for `gamma(a,x)`, x < 0 is not supported
+    x isa Real && x < 0 && throw(DomainError((a, x), "loggamma will only return a complex result if called with a complex argument"))
     if a isa Real && x isa Real && !isfinite(a*x)
-        if isinf(x) && isfinite(a)
-            if x > 0 # == +Inf
-                return -one(a)*x
-            elseif x < 0
-                throw(DomainError((a, x), "loggamma will only return a complex result if called with a complex argument"))
-            end
+        if isinf(x) && isfinite(a) # x == +Inf
+            return -one(a)*x
         elseif isinf(a) && isfinite(x)
-            if a > 0 && x ≥ 0
-                return a*one(x) # +Inf
-            elseif a < 0
-                return a*one(x) # -Inf
-            end
+            return a*one(x) # +Inf or -Inf
         end
     end
     # from gamma(a,x) = x^a * expintx(1-a, x) * exp(-x):
     iszero(x) && return loggamma(one(x)*a)
-    if x isa Real && x < 0 && a isa Integer && isodd(a)
-        # minus signs in expintx and x^a may cancel
-        return a*log(-x) + log(-expintx(1-a, x)) - x
-    end
     return a*log(x) + log(expintx(1 - a, x)) - x
 end

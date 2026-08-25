@@ -159,8 +159,8 @@ using Base.MathConstants
                 @test Γ + cf*exp(-x) ≈ y
             end
             # type stability
-            @test @inferred(SpecialFunctions.En_cf_gamma(1, 1.0 + 2.1im, 1000)) isa Tuple{ComplexF64,ComplexF64,Int}
-            @test @inferred(SpecialFunctions.En_cf_gamma(1, 1.0f0, 1000)) isa Tuple{Float32,Float32,Int}
+            @test @inferred(SpecialFunctions.En_cf_gamma(1.0, 1.0 + 2.1im, 1000)) isa Tuple{ComplexF64,ComplexF64,Int}
+            @test @inferred(SpecialFunctions.En_cf_gamma(1.0f0, 1.0f0, 1000)) isa Tuple{Float32,Float32,Int}
         end
         @testset "En_expand_origin" begin
             for (x, y) in zip(xs, ys)
@@ -242,6 +242,55 @@ expinti_real(x) = invoke(expinti, Tuple{Real}, x)
             # because of cancellation errors in computing (root+Δx)-root
             x = root + Δx
             @test expinti(x) ≈ expinti(big(x))    rtol=max(1e-14, 1e-16/Δx)
+        end
+    end
+end
+
+@testset "expint near a positive integer order" begin
+    # `Float16` used to be excluded from the near-pole correction and returned 0
+    @testset "$T" for T in (Float16, Float32, Float64)
+        z = T(3)/2
+        for ν in (nextfloat(T(3)), nextfloat(T(3), 2), prevfloat(T(3)))
+            @test expint(ν, z) ≈ T(setprecision(BigFloat, 256) do
+                expint(BigFloat(ν), BigFloat(z))
+            end) rtol = 100*eps(T)   # the δ-series is a few tens of ulps off this close in
+        end
+    end
+
+    # real `BigFloat` is delegated to MPFR's incomplete gamma, which has no
+    # cancellation here; the series it replaced was accurate to about 1e-17
+    setprecision(BigFloat, 256) do
+        ν = 3 + BigFloat(10)^-20
+        z = BigFloat(3)/2
+        hi = setprecision(BigFloat, 1024) do
+            BigFloat(expint(3 + BigFloat(10)^-20, BigFloat(3)/2))
+        end
+        @test isapprox(expint(ν, z), hi; rtol = 1e-70)
+    end
+
+    # complex `BigFloat` has neither: `polygamma` is not defined for it and MPFR is
+    # real only
+    setprecision(BigFloat, 256) do
+        @test_throws MethodError expint(Complex{BigFloat}(5//2, 1), Complex{BigFloat}(3//2, 0))
+    end
+
+    # a complex order is close to a pole of `Γ(1-ν)` only if its imaginary part is small
+    # too, so these three are far from one and take the cancelling form. `abs2(z) < 9`,
+    # so they use the series rather than the continued fraction. Reference values from
+    # the series at 500 bits.
+    @test expint(1+1im, 2.5) ≈ 0.023604664164557882 - 0.0059967105214225527im rtol = 1e-12
+    @test expint(2+3im, 1.5) ≈ 0.041610033532947484 - 0.039327583535599371im rtol = 1e-12
+    @test expint(3+1im, 2.0) ≈ 0.029047898068379150 - 0.0058773000832093846im rtol = 1e-12
+end
+
+@testset "expint continued fraction" begin
+    # These points have abs2(z) > 9, so they use the continued fraction.
+    # The reference is MPFR's incomplete gamma.
+    setprecision(BigFloat, 256) do
+        @testset "ν = $ν, z = $z" for (ν, z) in ((2, 4.15), (2, 12.0), (2, 31.81),
+                                                 (2.5, 5.91), (2.5, 33.75), (2.5, 60.0),
+                                                 (3, 35.53), (5, 41.49), (10, 35.95))
+            @test expint(ν, z) ≈ Float64(expint(BigFloat(ν), BigFloat(z))) rtol = 50*eps(Float64)
         end
     end
 end
