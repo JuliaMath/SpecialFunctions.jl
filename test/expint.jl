@@ -282,3 +282,15 @@ end
     @test expint(2+3im, 1.5) ≈ 0.041610033532947484 - 0.039327583535599371im rtol = 1e-12
     @test expint(3+1im, 2.0) ≈ 0.029047898068379150 - 0.0058773000832093846im rtol = 1e-12
 end
+
+@testset "expint continued fraction" begin
+    # These points have abs2(z) > 9, so they use the continued fraction.
+    # The reference is MPFR's incomplete gamma.
+    setprecision(BigFloat, 256) do
+        @testset "ν = $ν, z = $z" for (ν, z) in ((2, 4.15), (2, 12.0), (2, 31.81),
+                                                 (2.5, 5.91), (2.5, 33.75), (2.5, 60.0),
+                                                 (3, 35.53), (5, 41.49), (10, 35.95))
+            @test expint(ν, z) ≈ Float64(expint(BigFloat(ν), BigFloat(z))) rtol = 50*eps(Float64)
+        end
+    end
+end
