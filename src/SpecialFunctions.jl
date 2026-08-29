@@ -14,6 +14,7 @@ using IrrationalConstants:
     log2π
 
 import LogExpFunctions
+import QuadGK
 
 using OpenLibm_jll: libopenlibm
 using OpenSpecFun_jll: libopenspecfun
@@ -80,6 +81,7 @@ export
 
     ncbeta,
     ncF,
+    owens_t,
     hankelh1,
     hankelh1x,
     hankelh2,
@@ -103,6 +105,7 @@ include("gamma.jl")
 include("gamma_inc.jl")
 include("betanc.jl")
 include("beta_inc.jl")
+include("owens.jl")
 include("deprecated.jl")
 
 for f in (:digamma, :erf, :erfc, :erfcinv, :erfcx, :erfi, :erfinv, :logerfc, :logerfcx,

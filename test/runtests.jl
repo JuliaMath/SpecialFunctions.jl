@@ -35,6 +35,7 @@ tests = [
     "gamma_inc",
     "gamma",
     "logabsgamma",
+    "owens",
     "sincosint",
     "other_tests",
     "chainrules",
