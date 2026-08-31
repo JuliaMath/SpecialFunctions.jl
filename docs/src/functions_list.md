@@ -78,6 +78,7 @@ ncF
 expint
 expinti
 expintx
+li
 sinint
 cosint
 ```
