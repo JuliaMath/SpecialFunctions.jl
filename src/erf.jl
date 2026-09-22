@@ -555,11 +555,14 @@ function _erfinv(y::BigFloat)
         isfinite(x) || return x
     end
     sqrtπhalf = sqrtπ * big(0.5)
-    tol = 2eps(abs(x))
+    epsy = 2eps(y)
     while true # Newton iterations
-        Δx = sqrtπhalf * (erf(x) - y) * exp(x^2)
+        Δy = erf(x) - y
+        Δx = sqrtπhalf * Δy * exp(x^2)
         x -= Δx
-        abs(Δx) < tol && break
+        # `Δx` alone cannot go below `sqrtπhalf * exp(x^2) * eps(y)`, so the residual has
+        # to be checked as well (issue #557)
+        (abs(Δx) < 2eps(x) || abs(Δy) <= epsy) && break
     end
     return x
 end
@@ -695,11 +698,14 @@ function _erfcinv(y::BigFloat)
         isfinite(x) || return x
     end
     sqrtπhalf = sqrtπ * big(0.5)
-    tol = 2eps(abs(x))
+    epsy = 2eps(y)
     while true # Newton iterations
-        Δx = sqrtπhalf * (erfc(x) - y) * exp(x^2)
+        Δy = erfc(x) - y
+        Δx = sqrtπhalf * Δy * exp(x^2)
         x += Δx
-        abs(Δx) < tol && break
+        # `Δx` alone cannot go below `sqrtπhalf * exp(x^2) * eps(y)`, so the residual has
+        # to be checked as well (issue #557)
+        (abs(Δx) < 2eps(x) || abs(Δy) <= epsy) && break
     end
     return x
 end

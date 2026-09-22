@@ -133,10 +133,11 @@
 
         @test_throws MethodError faddeeva(BigFloat(1))
 
-        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1+big"1e-50", big"1.2", 2-big"1e-50")
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1+big"1e-50", big"1.2", 2-big"1e-50",
+                  2big"0.8", 2big(0.41))
             @test erfc(erfcinv(y)) ≈ y
         end
-        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", 1-big"1e-50")
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", 1-big"1e-50", big"0.96", big"0.969")
             @test erf(erfinv(y)) ≈ y
             @test erf(erfinv(-y)) ≈ -y
         end
