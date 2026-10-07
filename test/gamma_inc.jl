@@ -57,6 +57,82 @@
     @test_throws DomainError gamma_inc(1.0, -Inf)
 end
 
+@testset "incomplete gamma ratios: BigFloat" begin
+    # P(a,x) and Q(a,x) from MPFR's Γ(a,x)/Γ(a), with enough extra precision to absorb the
+    # cancellation in P(a,x) = 1 - Q(a,x)
+    function gamma_inc_mpfr(a, x)
+        setprecision(BigFloat, precision(BigFloat) + 2000) do
+            q = gamma(a, x) / gamma(a)
+            return (1 - q, q)
+        end
+    end
+
+    @testset "precision=$prec" for prec in (64, 256, 1024)
+        setprecision(BigFloat, prec) do
+            # P(1,x) = 1 - exp(-x) and P(1/2,x) = erf(√x), which must not be computed as
+            # 1 - Q(a,x) for small x
+            @test gamma_inc(big(1), big(1e-300))[1] ≈ -expm1(-big(1e-300)) rtol=4eps(BigFloat)
+            @test gamma_inc(big(1), big(1e-20))[1] ≈ -expm1(-big(1e-20)) rtol=4eps(BigFloat)
+            @test gamma_inc(big(1), big(0.01))[1] ≈ -expm1(-big(0.01)) rtol=4eps(BigFloat)
+            @test gamma_inc(big(1), big(0.3))[1] ≈ -expm1(-big(0.3)) rtol=4eps(BigFloat)
+            @test gamma_inc(big(0.5), big(1e-300))[1] ≈ erf(sqrt(big(1e-300))) rtol=4eps(BigFloat)
+            @test gamma_inc(big(0.5), big(1e-20))[1] ≈ erf(sqrt(big(1e-20))) rtol=4eps(BigFloat)
+            @test gamma_inc(big(0.5), big(0.01))[1] ≈ erf(sqrt(big(0.01))) rtol=4eps(BigFloat)
+            @test gamma_inc(big(0.5), big(0.3))[1] ≈ erf(sqrt(big(0.3))) rtol=4eps(BigFloat)
+
+            # P(a,x) from the series, and Q(a,x) = 1 - P(a,x)
+            @test gamma_inc(big(10), big(0.1))[1] ≈ gamma_inc_mpfr(big(10), big(0.1))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(10), big(0.1))[2] ≈ gamma_inc_mpfr(big(10), big(0.1))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(20), big(0.01))[1] ≈ gamma_inc_mpfr(big(20), big(0.01))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(20), big(0.01))[2] ≈ gamma_inc_mpfr(big(20), big(0.01))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(100), big(50))[1] ≈ gamma_inc_mpfr(big(100), big(50))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(100), big(50))[2] ≈ gamma_inc_mpfr(big(100), big(50))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e4), big(9e3))[1] ≈ gamma_inc_mpfr(big(1e4), big(9e3))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e4), big(9e3))[2] ≈ gamma_inc_mpfr(big(1e4), big(9e3))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(30.5), big(30.5))[1] ≈ gamma_inc_mpfr(big(30.5), big(30.5))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(30.5), big(30.5))[2] ≈ gamma_inc_mpfr(big(30.5), big(30.5))[2] rtol=4eps(BigFloat)
+
+            # P(a,x) ≈ 1 from the series, so Q(a,x) = 1 - P(a,x) ≪ 1 is recomputed with more bits
+            @test gamma_inc(big(1e-10), big(1e-20))[1] ≈ gamma_inc_mpfr(big(1e-10), big(1e-20))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e-10), big(1e-20))[2] ≈ gamma_inc_mpfr(big(1e-10), big(1e-20))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e-100), big(0.5))[1] ≈ gamma_inc_mpfr(big(1e-100), big(0.5))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e-100), big(0.5))[2] ≈ gamma_inc_mpfr(big(1e-100), big(0.5))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e-10), big(2))[1] ≈ gamma_inc_mpfr(big(1e-10), big(2))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e-10), big(2))[2] ≈ gamma_inc_mpfr(big(1e-10), big(2))[2] rtol=4eps(BigFloat)
+
+            # Q(a,x) from the continued fraction, and P(a,x) = 1 - Q(a,x). At 1024 bits the series
+            # is used for x < 64, so (3, 20) and (0.5, 30) are computed like the cases above.
+            @test gamma_inc(big(3), big(20))[1] ≈ gamma_inc_mpfr(big(3), big(20))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(3), big(20))[2] ≈ gamma_inc_mpfr(big(3), big(20))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(0.5), big(30))[1] ≈ gamma_inc_mpfr(big(0.5), big(30))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(0.5), big(30))[2] ≈ gamma_inc_mpfr(big(0.5), big(30))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(2.5), big(100))[1] ≈ gamma_inc_mpfr(big(2.5), big(100))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(2.5), big(100))[2] ≈ gamma_inc_mpfr(big(2.5), big(100))[2] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e3), big(1.1e3))[1] ≈ gamma_inc_mpfr(big(1e3), big(1.1e3))[1] rtol=4eps(BigFloat)
+            @test gamma_inc(big(1e3), big(1.1e3))[2] ≈ gamma_inc_mpfr(big(1e3), big(1.1e3))[2] rtol=4eps(BigFloat)
+        end
+    end
+
+    # special values, as for the Float64 method
+    @test gamma_inc(big(0), big(2)) == (1, 0)
+    @test gamma_inc(big(0), big(Inf)) == (1, 0)
+    @test gamma_inc(big(2), big(0)) == (0, 1)
+    @test gamma_inc(big(2), big(Inf)) == (1, 0)
+    @test gamma_inc(big(Inf), big(0)) == (0, 1)
+    @test gamma_inc(big(Inf), big(2)) == (0, 1)
+    @test gamma_inc(big(Inf), big(Inf)) == (1, 0)
+    @test all(isnan, gamma_inc(big(0), big(NaN)))
+    @test all(isnan, gamma_inc(big(2), big(NaN)))
+    @test all(isnan, gamma_inc(big(Inf), big(NaN)))
+    @test all(isnan, gamma_inc(big(NaN), big(0)))
+    @test all(isnan, gamma_inc(big(NaN), big(2)))
+    @test all(isnan, gamma_inc(big(NaN), big(Inf)))
+    @test all(isnan, gamma_inc(big(NaN), big(NaN)))
+    @test_throws DomainError gamma_inc(big(-1), big(2))
+    @test_throws DomainError gamma_inc(big(1), big(-2))
+    @test_throws DomainError gamma_inc(big(0), big(0))
+end
+
 # Reference values from mpmath at 50+ digits, cross-checked against the DLMF 8.7.1
 # series and the 8.9.2 continued fraction.
 @testset "incomplete gamma ratios: Temme minimax series" begin

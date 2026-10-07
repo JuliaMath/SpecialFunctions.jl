@@ -80,6 +80,11 @@ function rgammax(a::Float64, x::Float64)
         end
     end
 end
+function rgammax(a::BigFloat, x::BigFloat)
+    t = x^a * exp(-x)
+    # MPFR computes Γ(a+1) faster than Γ(a) for a < 1
+    return a >= 1 ? t / gamma(a) : a * t / gamma(a + 1)
+end
 
 @doc raw"""
     auxgam(x)
@@ -385,31 +390,32 @@ External links: [DLMF 8.9.2](https://dlmf.nist.gov/8.9.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
-function gamma_inc_cf(a::Float64, x::Float64, ind::Integer)
-    acc = acc0[ind + 1]
-    tol = 4.0*acc
-    a2nm1 = 1.0
-    a2n = 1.0
+function gamma_inc_cf(a::T, x::T, ind::Integer) where {T<:AbstractFloat}
+    # the accuracy options only apply to Float64, other types are computed to full precision
+    acc = T === Float64 ? acc0[ind + 1] : eps(T)
+    tol = 4*acc
+    a2nm1 = one(T)
+    a2n = one(T)
     b2nm1 = x
-    b2n = x + (1.0 - a)
-    c = 1.0
+    b2n = x + (1 - a)
+    c = one(T)
     while true
        a2nm1 = x*a2n + c*a2nm1
        b2nm1 = x*b2n + c*b2nm1
-       c = c + 1.0
+       c = c + 1
        t = c - a
        a2n = a2nm1 + t*a2n
        b2n = b2nm1 + t*b2n
        a2nm1 = a2nm1/b2n
        b2nm1 = b2nm1/b2n
        a2n = a2n/b2n
-       b2n = 1.0
+       b2n = one(T)
        if abs(a2n - a2nm1/b2nm1) < tol*a2n
            break
        end
     end
     q = rgammax(a, x)*a2n
-    return (1.0 - q, q)
+    return (1 - q, q)
 end
 
 @doc raw"""
@@ -425,19 +431,20 @@ External links: [DLMF 8.11.2](https://dlmf.nist.gov/8.11.2)
 
 See also: [`gamma_inc(a,x,ind)`](@ref SpecialFunctions.gamma_inc)
 """
-function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
-    acc = acc0[ind + 1]
-    tolerance = 0.5acc
+function gamma_inc_taylor(a::T, x::T, ind::Integer) where {T<:AbstractFloat}
+    # the accuracy options only apply to Float64, other types are computed to full precision
+    acc = T === Float64 ? acc0[ind + 1] : eps(T)
+    tolerance = acc/2
 
     # compute first 21 terms
     ts = cumprod(ntuple(i -> x / (a + i), Val(21)))
-    
+
     # sum the smaller terms directly
     first_small_t = something(findfirst(<(1.0e-3), ts), 21)
     sm = t = ts[first_small_t]
     apn = a + first_small_t
     while t > tolerance
-        apn += 1.0
+        apn += 1
         t *= x / apn
         sm += t
     end
@@ -447,10 +454,10 @@ function gamma_inc_taylor(a::Float64, x::Float64, ind::Integer)
     for j ∈ last_large_t:(-1):1
         sm += ts[j]
     end
-    
-    p = (rgammax(a, x) / a) * (1.0 + sm)
-    
-    return (p, 1.0 - p)
+
+    p = (rgammax(a, x) / a) * (1 + sm)
+
+    return (p, 1 - p)
 end
 
 @doc raw"""
@@ -936,14 +943,37 @@ function _gamma_inc(a::Float64, x::Float64, ind::Integer)
     end
 end
 
-function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
-    z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr),
-          Int32,
-          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
-          z, a, x, ROUNDING_MODE[])
-    q = z/gamma(a)
-    return (1.0 - q, q)
+function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer)
+    if a < 0 || x < 0
+        throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
+    elseif iszero(a) && iszero(x)
+        throw(DomainError((a, x, ind), "`a` and `x` must be greater than 0 ---- Domain : (0, Inf)"))
+    elseif isnan(a) || isnan(x)
+        return (BigFloat(NaN), BigFloat(NaN))
+    elseif iszero(a) || isinf(x)
+        return (one(BigFloat), zero(BigFloat))
+    elseif iszero(x) || isinf(a)
+        return (zero(BigFloat), one(BigFloat))
+    end
+
+    # compute with guard bits and round to the current precision at the end
+    prec = precision(BigFloat)
+    w = prec + 32
+    # the continued fraction converges slowly for small x relative to the precision
+    if x < max(a + 1, prec/16)
+        while true
+            p, q = setprecision(() -> gamma_inc_taylor(a, x, ind), BigFloat, w)
+            # q = 1 - p loses bits if p ≈ 1, in which case we retry with that many more bits
+            lost = iszero(q) ? w : -exponent(q)
+            if w - lost >= prec + 24
+                return (BigFloat(p; precision=prec), BigFloat(q; precision=prec))
+            end
+            w = prec + 32 + lost
+        end
+    else
+        p, q = setprecision(() -> gamma_inc_cf(a, x, ind), BigFloat, w)
+        return (BigFloat(p; precision=prec), BigFloat(q; precision=prec))
+    end
 end
 _gamma_inc(a::Float32,x::Float32,ind::Integer) = Float32.(_gamma_inc(Float64(a),Float64(x),ind))
 _gamma_inc(a::Float16,x::Float16,ind::Integer) = Float16.(_gamma_inc(Float64(a),Float64(x),ind))
