@@ -607,6 +607,6 @@ expinti(z::Float16) = Float16(expinti(Float64(z)))
 
 function expinti(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_eint, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Base.MPFR.MPFRRoundingMode), z, x, Base.MPFR.ROUNDING_MODE[])
+    ccall((:mpfr_eint, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Base.MPFR.MPFRRoundingMode), z, x, Base.MPFR.ROUNDING_MODE[])
     return z
 end

@@ -196,7 +196,7 @@ end
 
 function airyai(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_ai, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_ai, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -681,7 +681,7 @@ See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselj0(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_j0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_j0, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -698,13 +698,13 @@ See also: [`besselj(nu,x)`](@ref SpecialFunctions.besselj)
 """
 function besselj1(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_j1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_j1, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
 function besselj(n::Integer, x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_jn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
+    ccall((:mpfr_jn, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
     return z
 end
 
@@ -724,7 +724,7 @@ function bessely0(x::BigFloat)
         throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
-    ccall((:mpfr_y0, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_y0, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -744,7 +744,7 @@ function bessely1(x::BigFloat)
         throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
-    ccall((:mpfr_y1, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_y1, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -753,7 +753,7 @@ function bessely(n::Integer, x::BigFloat)
         throw(DomainError(x, "`x` must be nonnegative."))
     end
     z = BigFloat()
-    ccall((:mpfr_yn, :libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
+    ccall((:mpfr_yn, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Clong, Ref{BigFloat}, Int32), z, n, x, ROUNDING_MODE[])
     return z
 end
 
