@@ -545,18 +545,25 @@ function _erfinv(x::Float16)
 end
 
 function _erfinv(y::BigFloat)
-    xfloat = erfinv(Float64(y))
-    if isfinite(xfloat)
-        x = BigFloat(xfloat)
+    a = abs(y)
+    if isnan(y)
+        return y
+    elseif a > 1
+        throw(DomainError(y, "`abs(x)` cannot be greater than 1."))
+    elseif a > 0.5
+        # erf(x) ≈ ±1 cannot resolve y accurately, but erfc(x) ≈ 1 - |y| (exact) can
+        return copysign(__erfcinv(1 - a), y)
     else
-        # Float64 overflowed, use asymptotic estimate instead
-        # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
-        x = copysign(sqrt(-log((1-abs(y))*sqrtπ)), y)
-        isfinite(x) || return x
+        return __erfinv(y)
     end
+end
+
+# Newton iterations for erfinv(y), only accurate for |y| ≤ 1/2
+function __erfinv(y::BigFloat)
+    x = BigFloat(erfinv(Float64(y)))
     sqrtπhalf = sqrtπ * big(0.5)
     epsy = 2eps(y)
-    while true # Newton iterations
+    while true
         Δy = erf(x) - y
         Δx = sqrtπhalf * Δy * exp(x^2)
         x -= Δx
@@ -682,24 +689,36 @@ function _erfcinv(y::Float16)
 end
 
 function _erfcinv(y::BigFloat)
-    yfloat = Float64(y)
-    xfloat = erfcinv(yfloat)
+    if isnan(y)
+        return y
+    elseif y < 0 || y > 2
+        throw(DomainError(y, "`y` must be in [0, 2]."))
+    elseif y > 1.5
+        # erfc(x) ≈ 2 cannot resolve y accurately, but erfc(-x) ≈ 2 - y (exact) can
+        return -__erfcinv(2 - y)
+    elseif y >= 0.5
+        # erfc(x) ≈ 1 cannot resolve y accurately, but erf(x) ≈ 1 - y (exact) can
+        return __erfinv(1 - y)
+    else
+        return __erfcinv(y)
+    end
+end
+
+# Newton iterations for erfcinv(y), only accurate for 0 ≤ y < 1/2
+function __erfcinv(y::BigFloat)
+    xfloat = erfcinv(Float64(y))
     if isfinite(xfloat)
         x = BigFloat(xfloat)
     else
         # Float64 overflowed, use asymptotic estimate instead
         # from erfc(x) ≈ exp(-x²)/x√π ≈ y  ⟹  -log(yπ) ≈ x² + log(x) ≈ x²
-        if yfloat < 1
-            x = sqrt(-log(y*sqrtπ))
-        else # y must be close to 2
-            x = -sqrt(-log((2-y)*sqrtπ))
-        end
+        x = sqrt(-log(y*sqrtπ))
         # TODO: Newton convergence is slow near y=0 singularity; accelerate?
         isfinite(x) || return x
     end
     sqrtπhalf = sqrtπ * big(0.5)
     epsy = 2eps(y)
-    while true # Newton iterations
+    while true
         Δy = erfc(x) - y
         Δx = sqrtπhalf * Δy * exp(x^2)
         x += Δx
