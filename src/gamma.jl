@@ -51,7 +51,7 @@ end
 
 function _digamma(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_digamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_digamma, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -474,7 +474,7 @@ end
 
 function _zeta(x::BigFloat)
     z = BigFloat()
-    ccall((:mpfr_zeta, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_zeta, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     return z
 end
 
@@ -606,7 +606,7 @@ _gamma(x::Float16) = Float16(_gamma(Float32(x)))
 function _gamma(x::BigFloat)
     isnan(x) && return x
     z = BigFloat()
-    ccall((:mpfr_gamma, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+    ccall((:mpfr_gamma, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
     isnan(z) && throw(DomainError(x, "NaN result for non-NaN input."))
     return z
 end
@@ -631,7 +631,7 @@ end
 function _logabsgamma(x::BigFloat)
     z = BigFloat()
     lgamma_signp = Ref{Cint}()
-    ccall((:mpfr_lgamma,:libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
+    ccall((:mpfr_lgamma,Base.MPFR.libmpfr), Cint, (Ref{BigFloat}, Ref{Cint}, Ref{BigFloat}, Int32), z, lgamma_signp, x, ROUNDING_MODE[])
     return z, Int(lgamma_signp[])
 end
 
@@ -668,7 +668,7 @@ end
 function _loggamma(x::BigFloat)
     isnan(x) && return x
     y = BigFloat()
-    ccall((:mpfr_lngamma, :libmpfr), Cint, (Ref{BigFloat}, Ref{BigFloat}, MPFRRoundingMode), y, x, ROUNDING_MODE[])
+    ccall((:mpfr_lngamma, Base.MPFR.libmpfr), Cint, (Ref{BigFloat}, Ref{BigFloat}, MPFRRoundingMode), y, x, ROUNDING_MODE[])
     isnan(y) && throw(DomainError(x, "`gamma(x)` must be non-negative"))
     return y
 end
@@ -866,7 +866,7 @@ end
 if Base.MPFR.version() >= v"4.0.0"
     function beta(y::BigFloat, x::BigFloat)
         z = BigFloat()
-        ccall((:mpfr_beta, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, y, x, ROUNDING_MODE[])
+        ccall((:mpfr_beta, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, y, x, ROUNDING_MODE[])
         return z
     end
 end

@@ -18,7 +18,7 @@ for f in (:erf, :erfc)
 
         function $internalf(x::BigFloat)
             z = BigFloat()
-            ccall(($mpfrf, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
+            ccall(($mpfrf, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), z, x, ROUNDING_MODE[])
             return z
         end
     end

@@ -938,7 +938,7 @@ end
 
 function _gamma_inc(a::BigFloat,x::BigFloat,ind::Integer) #BigFloat version from GNU MPFR wrapped via ccall
     z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr),
+    ccall((:mpfr_gamma_inc, Base.MPFR.libmpfr),
           Int32,
           (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
           z, a, x, ROUNDING_MODE[])
@@ -1149,7 +1149,7 @@ function _gamma_big(a::Real,x::Real)
         end
     end
     z = BigFloat()
-    ccall((:mpfr_gamma_inc, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, a, x, ROUNDING_MODE[])
+    ccall((:mpfr_gamma_inc, Base.MPFR.libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32), z, a, x, ROUNDING_MODE[])
     return z
 end
 
