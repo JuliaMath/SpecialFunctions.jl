@@ -5,11 +5,7 @@
 # argument must not be widened. `@inferred(f(x)) isa T` checks both properties at
 # once, since a method can be perfectly inferrable and still return the wrong type.
 #
-# The entries marked `broken` are the cases that get this wrong today. Most of them are
-# in the Bessel family, where the fall-through in `besselj(nu::Real, x::AbstractFloat)`
-# and its siblings promotes the order with `float(nu)` and drags the argument up with
-# it; that fall-through also has no method to land on for a `Float16` argument, hence
-# https://github.com/JuliaMath/SpecialFunctions.jl/issues/547.
+# The entries marked `broken` are the cases that get this wrong today.
 
 @testset "error functions ($T)" for T in (Float16, Float32, Float64)
     @test @inferred(erf(T(1))) isa T
@@ -135,48 +131,45 @@ end
 end
 
 @testset "Bessel functions of general order ($T)" for T in (Float16, Float32, Float64)
-    @test @inferred(besselj(T(3)/2, T(1))) isa T broken = T === Float16
-    @test @inferred(bessely(T(3)/2, T(1))) isa T broken = T === Float16
-    @test @inferred(besseli(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(besselk(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(besseljx(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(besselyx(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(besselix(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(besselkx(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(sphericalbesselj(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(sphericalbessely(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(hankelh1(2, T(1))) isa Complex{T} broken = T !== Float64
-    @test @inferred(hankelh2(2, T(1))) isa Complex{T} broken = T !== Float64
+    @test @inferred(besselj(T(3)/2, T(1))) isa T
+    @test @inferred(bessely(T(3)/2, T(1))) isa T
+    @test @inferred(besseli(2, T(1))) isa T
+    @test @inferred(besselk(2, T(1))) isa T
+    @test @inferred(besseljx(2, T(1))) isa T
+    @test @inferred(besselyx(2, T(1))) isa T
+    @test @inferred(besselix(2, T(1))) isa T
+    @test @inferred(besselkx(2, T(1))) isa T
+    @test @inferred(sphericalbesselj(2, T(1))) isa T
+    @test @inferred(sphericalbessely(2, T(1))) isa T
+    @test @inferred(hankelh1(2, T(1))) isa Complex{T}
+    @test @inferred(hankelh2(2, T(1))) isa Complex{T}
 end
 
-# `Float16` is left out: `besselj(2, Float16(1))` and `bessely(2, Float16(1))` recurse
-# until the stack overflows, which would leave the test process corrupted (#547)
-@testset "Bessel functions of integer order ($T)" for T in (Float32, Float64)
-    @test @inferred(besselj(2, T(1))) isa T broken = T !== Float64
-    @test @inferred(bessely(2, T(1))) isa T broken = T !== Float64
+@testset "Bessel functions of integer order ($T)" for T in (Float16, Float32, Float64)
+    @test @inferred(besselj(2, T(1))) isa T
+    @test @inferred(bessely(2, T(1))) isa T
 end
 
 @testset "Bessel functions of general order ($C)" for C in (ComplexF32, ComplexF64)
-    T = real(C)
-    @test @inferred(besselj0(C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besselj1(C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(bessely0(C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(bessely1(C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(jinc(C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besselj(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(bessely(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besseli(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besselk(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besseljx(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besselyx(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besselix(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(besselkx(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(hankelh1(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(hankelh2(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(hankelh1x(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(hankelh2x(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(sphericalbesselj(2, C(1, 1))) isa C broken = C !== ComplexF64
-    @test @inferred(sphericalbessely(2, C(1, 1))) isa C broken = C !== ComplexF64
+    @test @inferred(besselj0(C(1, 1))) isa C
+    @test @inferred(besselj1(C(1, 1))) isa C
+    @test @inferred(bessely0(C(1, 1))) isa C
+    @test @inferred(bessely1(C(1, 1))) isa C
+    @test @inferred(jinc(C(1, 1))) isa C
+    @test @inferred(besselj(2, C(1, 1))) isa C
+    @test @inferred(bessely(2, C(1, 1))) isa C
+    @test @inferred(besseli(2, C(1, 1))) isa C
+    @test @inferred(besselk(2, C(1, 1))) isa C
+    @test @inferred(besseljx(2, C(1, 1))) isa C
+    @test @inferred(besselyx(2, C(1, 1))) isa C
+    @test @inferred(besselix(2, C(1, 1))) isa C
+    @test @inferred(besselkx(2, C(1, 1))) isa C
+    @test @inferred(hankelh1(2, C(1, 1))) isa C
+    @test @inferred(hankelh2(2, C(1, 1))) isa C
+    @test @inferred(hankelh1x(2, C(1, 1))) isa C
+    @test @inferred(hankelh2x(2, C(1, 1))) isa C
+    @test @inferred(sphericalbesselj(2, C(1, 1))) isa C
+    @test @inferred(sphericalbessely(2, C(1, 1))) isa C
 end
 
 # `Integer` and `Rational` arguments promote to `Float64`
