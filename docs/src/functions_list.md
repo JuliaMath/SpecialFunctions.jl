@@ -136,6 +136,8 @@ besselix
 besselk
 besselkx
 jinc
+wrightbessel
+logwrightbessel
 ```
 
 ## Elliptic Integrals
