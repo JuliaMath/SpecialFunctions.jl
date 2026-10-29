@@ -145,6 +145,10 @@
             @test_throws DomainError erfinv(x)
             @test_throws DomainError erfcinv(1-x)
         end
+
+        # Those two values were hanging before, see issue #557
+        @test erfcinv(2big"0.8") ≈ erfcinv(2big(0.8)) rtol= 2eps()
+        @test erfcinv(2big"0.41") ≈ erfcinv(2big(0.41)) rtol= 2eps()
     end
 
     @testset "Other float types" begin
