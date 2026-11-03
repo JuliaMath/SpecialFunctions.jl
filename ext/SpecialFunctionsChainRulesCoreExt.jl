@@ -75,6 +75,10 @@ ChainRulesCore.@scalar_rule(
     ),
 )
 ChainRulesCore.@scalar_rule(
+    gamma_inc_dx(a, x),
+    (SpecialFunctions._gamma_inc_dx_da(a, x, Ω), SpecialFunctions._gamma_inc_dx_dx(a, x, Ω)),
+)
+ChainRulesCore.@scalar_rule(
     invdigamma(x),
     inv(trigamma(invdigamma(x))),
 )

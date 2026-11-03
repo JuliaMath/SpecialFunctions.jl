@@ -999,6 +999,51 @@ end
 _gamma_inc_dx(a::Float32, x::Float32) = Float32(_gamma_inc_dx(Float64(a), Float64(x)))
 _gamma_inc_dx(a::Float16, x::Float16) = Float16(_gamma_inc_dx(Float64(a), Float64(x)))
 
+# Derivatives of `f = gamma_inc_dx(a, x)` with respect to `x` and `a`
+# (used by the ChainRules rules and by ForwardDiff)
+_gamma_inc_dx_dx(a::Real, x::Real, f::Real) = _gamma_inc_dx_dx(map(float, promote(a, x, f))...)
+function _gamma_inc_dx_dx(a::T, x::T, f::T) where {T<:Real}
+    # ∂f/∂x = f * (a - 1 - x) / x = gamma_inc_dx(a - 1, x) - f
+    # The second form is only needed if `f` underflows but `∂f/∂x` might not (`x < (a - 1) / 2`,
+    # where it does not cancel), and at zero and infinity, where it is exact
+    if 0 < x < Inf && abs(f) >= floatmin(f)
+        return f * ((a - 1 - x) / x)
+    else
+        return gamma_inc_dx(a - 1, x) - f
+    end
+end
+_gamma_inc_dx_da(a::Real, x::Real, f::Real) = _gamma_inc_dx_da(map(float, promote(a, x, f))...)
+function _gamma_inc_dx_da(a::T, x::T, f::T) where {T<:Real}
+    # ∂f/∂a = f * (log(x) - ψ(a))
+    if isinteger(a) && a <= 0 && x < Inf
+        # At the poles of `ψ(a)`, where `f = 0`, use `ψ(a) = ψ(1 - a) - π cot(πa)` and `Γ(a) Γ(1 - a) = π / sin(πa)`
+        lx = log(x)
+        return muladd(f, lx - digamma(1 - a), cospi(a) * exp(muladd(a - 1, lx, loggamma(1 - a) - x)))
+    elseif iszero(f)
+        return f
+    else
+        return f * _log_minus_digamma(x, a)
+    end
+end
+for g in (:_gamma_inc_dx_dx, :_gamma_inc_dx_da)
+    @eval $g(a::T, x::T, f::T) where {T<:Union{Float16,Float32}} = T($g(Float64(a), Float64(x), Float64(f)))
+end
+
+# Compute `log(x) - digamma(a)`, avoiding cancellation for large `a` and `x ≈ a`
+_log_minus_digamma(x::Real, a::Real) = log(x) - digamma(a)
+function _log_minus_digamma(x::Float64, a::Float64)
+    a < 10 && return log(x) - digamma(a)
+    # `x - a` is exact for `a <= 2x <= 4a`, and `log(x) - log(a)` does not cancel for `x < 1`
+    l = if 2x >= a
+        log1p((x - a) / a)
+    elseif x < 1
+        log(x) - log(a)
+    else
+        log(x / a)
+    end
+    return l + _log_minus_digamma_asymptotic(a)
+end
+
 function _gamma_inc_choose_algorithm(a::Float64, x::Float64, ind::Int)
     r = rgammax(a, x)
     if r == 0.0

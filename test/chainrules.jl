@@ -142,7 +142,7 @@
         for (a, x) in ((150.0, 150.0), (1e6, 1e6))
             (p, q), (∂p, ∂q) = frule((NoTangent(), NoTangent(), 1.0, NoTangent()), gamma_inc, a, x, 0)
             @test (p, q) == gamma_inc(a, x, 0)
-            @test ∂p == -∂q == SpecialFunctions.gamma_inc_dx(a, x)
+            @test ∂p == -∂q == gamma_inc_dx(a, x)
             Ω, pullback = rrule(gamma_inc, a, x, 0)
             @test Ω == (p, q)
             @test pullback(Tangent{typeof(Ω)}(2.0, 1.0))[3] == ∂p
@@ -162,6 +162,57 @@
             Ω, pullback = rrule(loggamma, n, x)
             @test Ω == loggamma(n, x)
             @test pullback(1.0)[3] == ∂Ω
+        end
+    end
+
+    @testset "gamma_inc_dx" begin
+        # includes the poles of `digamma(a)` at `a = 0, -2`
+        for (a, x) in ((2.5, 1.0), (0.3, 2.0), (-2.5, 1.5), (-2.0, 1.5), (0.0, 1.5), (30.0, 25.0), (150.0, 10.0))
+            test_frule(gamma_inc_dx, a, x)
+            test_rrule(gamma_inc_dx, a, x)
+        end
+
+        function partials(a, x)
+            Ω, pullback = rrule(gamma_inc_dx, a, x)
+            _, ∂a, ∂x = pullback(one(Ω))
+            return Ω, ∂a, ∂x
+        end
+        # f = x^(a - 1) e^(-x) / Γ(a), ∂f/∂a = f * (log(x) - ψ(a)), ∂f/∂x = f * (a - 1 - x) / x
+        function partials_ref(a, x)
+            setprecision(BigFloat, 512) do
+                a, x = big(a), big(x)
+                # 1 / Γ(a) = sin(πa) Γ(1 - a) / π
+                e = exp((a - 1) * log(x) - x)
+                f = a > 0 ? e / gamma(a) : e * sinpi(a) * gamma(1 - a) / big(π)
+                ∂a = isinteger(a) && a <= 0 ? cospi(a) * e * gamma(1 - a) : f * (log(x) - digamma(a))
+                return f, ∂a, f * (a - 1 - x) / x
+            end
+        end
+        for T in (Float32, Float64), (a, x) in (
+                (2.5, 1.0), (12.0, 11.5), (150.0, 150.0), (150.0, 149.5), (1e6, 1e6), (1e6, 999_000.0), (1e10, 1e10),
+                (0.0, 1.5), (-2.0, 1.5),
+            )
+            Ω, ∂a, ∂x = partials(T(a), T(x))
+            _, ∂a_ref, ∂x_ref = partials_ref(T(a), T(x))
+            @test Ω === gamma_inc_dx(T(a), T(x))
+            @test ∂a isa T
+            @test ∂a ≈ T(∂a_ref) rtol = 8 * eps(T)
+            @test ∂x isa T
+            @test ∂x ≈ T(∂x_ref) rtol = 8 * eps(T)
+        end
+        for (a, x) in ((2.5, 1.0), (0.0, 1.5), (-2.0, 1.5))
+            Ω, ∂a, ∂x = partials(big(a), big(x))
+            _, ∂a_ref, ∂x_ref = partials_ref(a, x)
+            @test ∂a ≈ ∂a_ref rtol = 8 * eps(BigFloat)
+            @test ∂x ≈ ∂x_ref rtol = 8 * eps(BigFloat)
+        end
+        @test all(p -> p isa Float16, partials(Float16(2.5), Float16(1)))
+
+        # `f` underflows
+        @test partials(3.0, 1e-160)[3] ≈ 1e-160 rtol = 4 * eps()
+        for T in (Float32, Float64)
+            @test partials(T(2), T(0)) === (T(0), T(0), T(1))
+            @test partials(T(2.5), T(Inf)) === (T(0), T(0), T(0))
         end
     end
 

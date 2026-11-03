@@ -71,7 +71,7 @@ end
 
 @testset "incomplete gamma and beta ($T)" for T in (Float16, Float32, Float64)
     @test @inferred(gamma_inc(T(2), T(3), 0)) isa Tuple{T,T}
-    @test @inferred(SpecialFunctions.gamma_inc_dx(T(2), T(3))) isa T
+    @test @inferred(gamma_inc_dx(T(2), T(3))) isa T
     @test @inferred(gamma_inc_inv(T(2), T(1)/2, T(1)/2)) isa T
     @test @inferred(beta_inc(T(2), T(3), T(1)/2)) isa Tuple{T,T}
     @test @inferred(beta_inc_inv(T(2), T(3), T(1)/2)) isa Tuple{T,T}

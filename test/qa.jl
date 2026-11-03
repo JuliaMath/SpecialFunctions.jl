@@ -49,7 +49,10 @@ end
             :version, # Base.MPFR
             Symbol("@nif"), # Base
             (VERSION < v"1.11" ? (:depwarn,) : ())..., # Base
-            :_loggamma_and_dx, # SpecialFunctions (used by SpecialFunctionsChainRulesCoreExt)
+            # SpecialFunctions (used by SpecialFunctionsChainRulesCoreExt)
+            :_gamma_inc_dx_da,
+            :_gamma_inc_dx_dx,
+            :_loggamma_and_dx,
         ),
     ) === nothing
 

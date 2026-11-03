@@ -308,7 +308,6 @@ end
 end
 
 @testset "derivative of incomplete gamma ratios" begin
-    gamma_inc_dx = SpecialFunctions.gamma_inc_dx
     function ref(a, x)
         setprecision(BigFloat, 512) do
             lg, s = logabsgamma(big(a))
