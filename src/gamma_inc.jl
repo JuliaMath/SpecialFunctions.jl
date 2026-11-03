@@ -1030,9 +1030,9 @@ for g in (:_gamma_inc_dx_dx, :_gamma_inc_dx_da)
 end
 
 # Compute `log(x) - digamma(a)`, avoiding cancellation for large `a` and `x ≈ a`
-_log_minus_digamma(x::Real, a::Real) = log(x) - digamma(a)
-function _log_minus_digamma(x::Float64, a::Float64)
-    a < 10 && return log(x) - digamma(a)
+function _log_minus_digamma(x::T, a::T) where {T<:Real}
+    # the remainder of the asymptotic expansion relative to `1 / (2a)` is ≈ 6 / a¹⁷
+    a < max(10, (6 / eps(T))^(1 / 17)) && return log(x) - digamma(a)
     # `x - a` is exact for `a <= 2x <= 4a`, and `log(x) - log(a)` does not cancel for `x < 1`
     l = if 2x >= a
         log1p((x - a) / a)

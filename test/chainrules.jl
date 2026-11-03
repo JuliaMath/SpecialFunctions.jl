@@ -200,7 +200,7 @@
             @test ∂x isa T
             @test ∂x ≈ T(∂x_ref) rtol = 8 * eps(T)
         end
-        for (a, x) in ((2.5, 1.0), (0.0, 1.5), (-2.0, 1.5))
+        for (a, x) in ((2.5, 1.0), (0.0, 1.5), (-2.0, 1.5), (1e6, 1e6))
             Ω, ∂a, ∂x = partials(big(a), big(x))
             _, ∂a_ref, ∂x_ref = partials_ref(a, x)
             @test ∂a ≈ ∂a_ref rtol = 8 * eps(BigFloat)
