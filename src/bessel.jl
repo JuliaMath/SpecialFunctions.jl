@@ -336,7 +336,9 @@ function besselh(nu::Float64, k::Integer, z::Complex{Float64})
     return _besselh(nu,Int32(k),z,Int32(1))
 end
 
-function besselh(nu::Float64, k::Integer, x::Float64)
+# restricted to the hardware floats: `besselj`/`bessely` support `BigFloat` for integer
+# orders only, so a `BigFloat` method here would work for some orders and not others
+function besselh(nu::T, k::Integer, x::T) where {T<:Union{Float16,Float32,Float64}}
     # Given that x is real, Jnu(x) and Ynu(x) are also real.
     if k == 1
         return complex(besselj(nu, x), bessely(nu, x))
@@ -415,6 +417,7 @@ end
 
 besselj(nu::Cint, x::Float64) = ccall((:jn, libopenlibm), Float64, (Cint, Float64), nu, x)
 besselj(nu::Cint, x::Float32) = ccall((:jnf, libopenlibm), Float32, (Cint, Float32), nu, x)
+besselj(nu::Cint, x::Float16) = Float16(besselj(nu, Float32(x)))
 
 
 function besseljx(nu::Float64, z::Complex{Float64})
@@ -445,6 +448,7 @@ function bessely(nu::Cint, x::Float32)
     end
     ccall((:ynf, libopenlibm), Float32, (Cint, Float32), nu, x)
 end
+bessely(nu::Cint, x::Float16) = Float16(bessely(nu, Float32(x)))
 
 function bessely(nu::Float64, z::Complex{Float64})
     if nu < 0
@@ -480,7 +484,7 @@ function besseli(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
         throw(DomainError(x, "`x` must be nonnegative and `nu` must be an integer."))
     end
-    real(besseli(float(nu), complex(x)))
+    real(besseli(nu, complex(x)))
 end
 
 @doc raw"""
@@ -501,7 +505,7 @@ function besselix(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
         throw(DomainError(x, "`x` must be nonnegative and `nu` must be an integer."))
     end
-    real(besselix(float(nu), complex(x)))
+    real(besselix(nu, complex(x)))
 end
 
 @doc raw"""
@@ -526,7 +530,7 @@ function besselj(nu::Real, x::AbstractFloat)
     elseif x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    real(besselj(float(nu), complex(x)))
+    real(besselj(nu, complex(x)))
 end
 
 @doc raw"""
@@ -547,7 +551,7 @@ function besseljx(nu::Real, x::AbstractFloat)
     if x < 0 && !isinteger(nu)
         throw(DomainError(x, "`x` must be nonnegative and `nu` must be an integer."))
     end
-    real(besseljx(float(nu), complex(x)))
+    real(besseljx(nu, complex(x)))
 end
 
 @doc raw"""
@@ -570,7 +574,7 @@ function besselk(nu::Real, x::AbstractFloat)
     elseif x == 0
         return oftype(x, Inf)
     end
-    real(besselk(float(nu), complex(x)))
+    real(besselk(nu, complex(x)))
 end
 
 @doc raw"""
@@ -593,7 +597,7 @@ function besselkx(nu::Real, x::AbstractFloat)
     elseif x == 0
         return oftype(x, Inf)
     end
-    real(besselkx(float(nu), complex(x)))
+    real(besselkx(nu, complex(x)))
 end
 
 """
@@ -613,7 +617,7 @@ function bessely(nu::Real, x::AbstractFloat)
     elseif isinteger(nu) && typemin(Cint) <= nu <= typemax(Cint)
         return bessely(Cint(nu), x)
     end
-    real(bessely(float(nu), complex(x)))
+    real(bessely(nu, complex(x)))
 end
 
 """
@@ -632,17 +636,16 @@ function besselyx(nu::Real, x::AbstractFloat)
     if x < 0
         throw(DomainError(x, "`x` must be nonnegative."))
     end
-    real(besselyx(float(nu), complex(x)))
+    real(besselyx(nu, complex(x)))
 end
 
 for f in ("i", "ix", "j", "jx", "k", "kx", "y", "yx")
     bfn = Symbol("bessel", f)
     @eval begin
         $bfn(nu::Real, x::Real) = $bfn(nu, float(x))
-        function $bfn(nu::Real, z::Complex)
-            Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
-            $bfn(Tf(nu), Complex{Tf}(z))
-        end
+        # promote `nu` against `z` so that an integer or rational order adopts the
+        # precision of the argument instead of forcing `Float64`
+        $bfn(nu::Real, z::Complex) = $bfn(promotereal(nu, float(z))...)
         $bfn(nu::Float16, x::Complex{Float16}) = Complex{Float16}($bfn(Float32(nu), Complex{Float32}(x)))
         $bfn(nu::Float32, x::Complex{Float32}) = Complex{Float32}($bfn(Float64(nu), Complex{Float64}(x)))
         $bfn(k::T, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(k,z)))
@@ -653,20 +656,22 @@ end
 for bfn in (:besselh, :besselhx)
     @eval begin
         $bfn(nu, z) = $bfn(nu, 1, z)
-        $bfn(nu::Real, k::Integer, x::Real) = $bfn(float(nu), k, float(x))
-        $bfn(nu::AbstractFloat, k::Integer, x::AbstractFloat) = $bfn(float(nu), k, complex(x))
+        # promote `nu` against `x` so that an integer or rational order adopts the
+        # precision of the argument instead of forcing `Float64`
+        function $bfn(nu::Real, k::Integer, x::Real)
+            nu, x = promotereal(nu, float(x))
+            return $bfn(nu, k, x)
+        end
+        $bfn(nu::T, k::Integer, x::T) where {T<:AbstractFloat} = $bfn(nu, k, complex(x))
         function $bfn(nu::Real, k::Integer, z::Complex)
-            Tf = promote_type(float(typeof(nu)),float(typeof(real(z))))
-            $bfn(Tf(nu), k, Complex{Tf}(z))
+            nu, z = promotereal(nu, float(z))
+            $bfn(nu, k, z)
         end
         $bfn(nu::Float16, k::Integer, x::Complex{Float16}) = Complex{Float16}($bfn(Float32(nu), k, Complex{Float32}(x)))
         $bfn(nu::Float32, k::Integer, x::Complex{Float32}) = Complex{Float32}($bfn(Float64(nu), k, Complex{Float64}(x)))
         $bfn(nu::T, k::Integer, z::Complex{T}) where {T<:AbstractFloat} = throw(MethodError($bfn,(nu,k,z)))
     end
 end
-
-besselh(nu::Float16, k::Integer, x::Float16) = Complex{Float16}(besselh(Float32(nu), k, Float32(x)))
-besselh(nu::Float32, k::Integer, x::Float32) = Complex{Float32}(besselh(Float64(nu), k, Float64(x)))
 
 """
     besselj0(x)
@@ -763,12 +768,14 @@ end
 Spherical Bessel function of the first kind at order `nu`, ``j_ν(x)``. This is the non-singular
 solution to the radial part of the Helmholz equation in spherical coordinates.
 """
-function sphericalbesselj(nu, x::T) where {T}
+sphericalbesselj(nu::Real, x::Number) = sphericalbesselj(promotereal(nu, float(x))...)
+
+function sphericalbesselj(nu::T, x::Union{T,Complex{T}}) where {T<:AbstractFloat}
     besselj_nuhalf_x = besselj(nu + one(nu)/2, x)
-    if abs(x) ≤ sqrt(eps(real(zero(besselj_nuhalf_x))))
-        nu == 0 ? one(besselj_nuhalf_x) : zero(besselj_nuhalf_x)
+    if abs(x) ≤ sqrt(eps(zero(T)))
+        return nu == 0 ? one(besselj_nuhalf_x) : zero(besselj_nuhalf_x)
     else
-        √((float(T))(π)/2x) * besselj_nuhalf_x
+        return √(T(π)/2x) * besselj_nuhalf_x
     end
 end
 
@@ -779,7 +786,10 @@ Spherical Bessel function of the second kind at order `nu`, ``y_ν(x)``. This is
 the singular solution to the radial part of the Helmholz equation in spherical
 coordinates. Sometimes known as a spherical Neumann function.
 """
-sphericalbessely(nu, x::T) where {T} = √((float(T))(π)/2x) * bessely(nu + one(nu)/2, x)
+sphericalbessely(nu::Real, x::Number) = sphericalbessely(promotereal(nu, float(x))...)
+
+sphericalbessely(nu::T, x::Union{T,Complex{T}}) where {T<:AbstractFloat} =
+    √(T(π)/2x) * bessely(nu + one(nu)/2, x)
 
 """
     hankelh1(nu, x)
