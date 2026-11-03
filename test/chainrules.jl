@@ -182,8 +182,9 @@
             setprecision(BigFloat, 512) do
                 a, x = big(a), big(x)
                 # 1 / Γ(a) = sin(πa) Γ(1 - a) / π
-                e = exp((a - 1) * log(x) - x)
-                f = a > 0 ? e / gamma(a) : e * sinpi(a) * gamma(1 - a) / big(π)
+                l = (a - 1) * log(x) - x
+                e = exp(l)
+                f = a > 0 ? exp(l - loggamma(a)) : e * sinpi(a) * gamma(1 - a) / big(π)
                 ∂a = isinteger(a) && a <= 0 ? cospi(a) * e * gamma(1 - a) : f * (log(x) - digamma(a))
                 return f, ∂a, f * (a - 1 - x) / x
             end
