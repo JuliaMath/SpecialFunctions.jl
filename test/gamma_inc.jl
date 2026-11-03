@@ -307,6 +307,49 @@ end
     end
 end
 
+@testset "derivative of incomplete gamma ratios" begin
+    gamma_inc_dx = SpecialFunctions.gamma_inc_dx
+    function ref(a, x)
+        setprecision(BigFloat, 512) do
+            lg, s = logabsgamma(big(a))
+            return s * exp((big(a) - 1) * log(big(x)) - big(x) - lg)
+        end
+    end
+
+    for T in (Float32, Float64), (a, x) in (
+            (0.5, 1e-3), (0.5, 2.0), (2.5, 1.0), (150.0, 150.0), (200.0, 180.0), (150.5, 150.0),
+            (1e6, 1e6), (1e10, 1e10), (-0.3, 1.5), (-2.5, 1.5), (-100.5, 300.0),
+        )
+        @test @inferred(gamma_inc_dx(T(a), T(x))) ≈ T(ref(T(a), T(x))) rtol = 4 * eps(T)
+    end
+    # Γ(a) underflows
+    @test gamma_inc_dx(-175.5, 20.0) ≈ ref(-175.5, 20.0) rtol = 1e-12
+    # Γ(n) = (n - 1)!
+    @test gamma_inc_dx(big(150), big(150)) ≈ big(150)^149 * exp(-big(150)) / factorial(big(149)) rtol = 4 * eps(BigFloat)
+    @test gamma_inc_dx(Float16(2), Float16(3)) === Float16(3 * exp(-3))
+    @test gamma_inc_dx(2, 3) === gamma_inc_dx(2.0, 3.0)
+    @test gamma_inc_dx(2.5, 1e5) === 0.0
+
+    for T in (Float32, Float64, BigFloat)
+        @test gamma_inc_dx(T(1), T(0)) == 1
+        for a in (2, 1.5, 0, -1)
+            @test iszero(gamma_inc_dx(T(a), T(0)))
+        end
+        @test gamma_inc_dx(T(0.5), T(0)) == Inf
+        @test gamma_inc_dx(T(-0.5), T(0)) == -Inf
+        @test gamma_inc_dx(T(-1.5), T(0)) == Inf
+        @test iszero(gamma_inc_dx(T(2.5), T(Inf)))
+        @test isnan(gamma_inc_dx(T(NaN), T(1)))
+        @test isnan(gamma_inc_dx(T(1), T(NaN)))
+        @test_throws DomainError(T(-1), "`x` must be non-negative") gamma_inc_dx(T(2), T(-1))
+    end
+
+    # Consistency with `gamma_inc`: P(a, x) - P(a + 1, x) = x^a e^(-x) / Γ(a + 1)
+    for (a, x) in ((2.5, 1.0), (30.0, 25.0), (150.0, 150.0))
+        @test gamma_inc(a, x)[1] - gamma_inc(a + 1, x)[1] ≈ gamma_inc_dx(a + 1, x) rtol = 1e-12
+    end
+end
+
 double(x::Real) = Float64(x)
 double(x::Integer) = Int(x)
 double(x::Complex) = ComplexF64(x)
@@ -361,7 +404,10 @@ end
     @test_throws DomainError loggamma(Inf, -3.2)
     @test loggamma(117.3, 0) == loggamma(117.3)
     @test loggamma(7, -300.2) ≅ log(gamma(7, -300.2))
+    @test loggamma(7.0, -300.2) == loggamma(7, -300.2)
     @test_throws DomainError loggamma(6, -3.2)
+    @test loggamma(2, 3f0) isa Float32
+    @test loggamma(2f0, 3) isa Float32
 end
 
 # Run `f(args...)` twice and return only the result of the second call, so that

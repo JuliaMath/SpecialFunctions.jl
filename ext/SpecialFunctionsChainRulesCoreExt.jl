@@ -3,7 +3,7 @@ module SpecialFunctionsChainRulesCoreExt
 using SpecialFunctions
 using ChainRulesCore: ChainRulesCore
 
-using SpecialFunctions: sqrtπ, invπ
+using SpecialFunctions: sqrtπ, invπ, gamma_inc_dx
 
 const BESSEL_ORDER_INFO = """
 derivatives of Bessel functions with respect to the order are not implemented currently:
@@ -62,7 +62,7 @@ ChainRulesCore.@scalar_rule(
 )
 ChainRulesCore.@scalar_rule(
     gamma_inc(a, x, IND),
-    @setup(z = exp(-x) * x^(a - 1) / gamma(a)),
+    @setup(z = gamma_inc_dx(a, x)),
     (
         ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
         z,
@@ -172,13 +172,22 @@ ChainRulesCore.@scalar_rule(
 )
 
 ChainRulesCore.@scalar_rule(loggamma(x), digamma(x))
-ChainRulesCore.@scalar_rule(
-    loggamma(a, x),
-    (
-        ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO),
-        -exp(- (x + Ω)) * x^(a - 1),
-    )
-)
+# Hand-written rules, so that the primal and the derivative share `expintx(1 - a, x)`
+function ChainRulesCore.frule((_, Δa, Δx), ::typeof(loggamma), a::Number, x::Number)
+    Ω, ∂Ω_∂x = SpecialFunctions._loggamma_and_dx(a, x)
+    ∂Ω_∂a = ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO)
+    return Ω, muladd(∂Ω_∂x, Δx, ∂Ω_∂a * Δa)
+end
+function ChainRulesCore.rrule(::typeof(loggamma), a::Number, x::Number)
+    Ω, ∂Ω_∂x = SpecialFunctions._loggamma_and_dx(a, x)
+    project_x = ChainRulesCore.ProjectTo(x)
+    function loggamma_pullback(ΔΩ)
+        ā = ChainRulesCore.@not_implemented(INCOMPLETE_GAMMA_INFO)
+        x̄ = project_x(conj(∂Ω_∂x) * ΔΩ)
+        return ChainRulesCore.NoTangent(), ā, x̄
+    end
+    return Ω, loggamma_pullback
+end
 
 # exponential integrals
 ChainRulesCore.@scalar_rule(expint(z), - exp(-z) / z)

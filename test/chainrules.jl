@@ -138,6 +138,33 @@
         end
     end
 
+    @testset "incomplete gamma functions: large arguments" begin
+        for (a, x) in ((150.0, 150.0), (1e6, 1e6))
+            (p, q), (∂p, ∂q) = frule((NoTangent(), NoTangent(), 1.0, NoTangent()), gamma_inc, a, x, 0)
+            @test (p, q) == gamma_inc(a, x, 0)
+            @test ∂p == -∂q == SpecialFunctions.gamma_inc_dx(a, x)
+            Ω, pullback = rrule(gamma_inc, a, x, 0)
+            @test Ω == (p, q)
+            @test pullback(Tangent{typeof(Ω)}(2.0, 1.0))[3] == ∂p
+        end
+        test_frule(gamma_inc, 150.0, 150.0, 0)
+        test_rrule(gamma_inc, 150.0, 150.0, 0)
+
+        # Γ(n, x) = (n - 1)! e^(-x) Σ_{k < n} x^k / k!
+        function ∂loggamma(n, x)
+            x = big(x)
+            return -(x^(n - 1) / factorial(big(n - 1))) / sum(x^k / factorial(big(k)) for k in 0:(n - 1))
+        end
+        for (n, x) in ((2, 1e10), (30, 1e6), (5, 0.1))
+            Ω, ∂Ω = frule((NoTangent(), NoTangent(), 1.0), loggamma, n, x)
+            @test Ω == loggamma(n, x)
+            @test ∂Ω ≈ ∂loggamma(n, x) rtol = 4 * eps()
+            Ω, pullback = rrule(loggamma, n, x)
+            @test Ω == loggamma(n, x)
+            @test pullback(1.0)[3] == ∂Ω
+        end
+    end
+
     @testset "exponential integrals" begin
         for x in (1.5, 2.5, 10.5, 1.6 + 1.6im, 1.6 - 1.6im, -4.6 + 1.6im)
             test_scalar(expint, x)

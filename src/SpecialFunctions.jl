@@ -92,6 +92,10 @@ export
     cosint,
     lbinomial
 
+@static if VERSION >= v"1.11.0-DEV.469"
+    eval(Expr(:public, :gamma_inc_dx))
+end
+
 include("bessel.jl")
 include("erf.jl")
 include("ellip.jl")

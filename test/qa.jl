@@ -26,6 +26,7 @@ end
             # Ref https://github.com/JuliaTesting/ExplicitImports.jl/issues/92
             :invπ, # SpecialFunctions
             :sqrtπ, # SpecialFunctions
+            (VERSION < v"1.11" ? (:gamma_inc_dx,) : ())..., # SpecialFunctions
         ),
     ) === nothing
 
@@ -48,6 +49,7 @@ end
             :version, # Base.MPFR
             Symbol("@nif"), # Base
             (VERSION < v"1.11" ? (:depwarn,) : ())..., # Base
+            :_loggamma_and_dx, # SpecialFunctions (used by SpecialFunctionsChainRulesCoreExt)
         ),
     ) === nothing
 
