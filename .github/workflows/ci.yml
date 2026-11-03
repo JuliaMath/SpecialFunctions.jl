@@ -22,6 +22,13 @@ jobs:
           - ubuntu-latest
           - macOS-latest
           - windows-latest
+        exclude:
+          # Julia < 1.10.9 fails to load on glibc >= 2.41: https://github.com/JuliaLang/julia/issues/57250
+          - version: 'min-patch'
+            os: ubuntu-latest
+        include:
+          - version: 'min-patch'
+            os: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: julia-actions/setup-julia@v3

@@ -42,11 +42,16 @@ function _digamma(z::ComplexOrReal{Float64})
         ψ -= inv(z)
         z += n
     end
+    ψ += log(z) - _log_minus_digamma_asymptotic(z)
+end
+
+# Asymptotic expansion of `log(z) - digamma(z)` for large `z`
+function _log_minus_digamma_asymptotic(z::Number)
     t = inv(z)
-    ψ += log(z) - 0.5*t
-    t *= t # 1/z^2
-    # the coefficients here are Float64(bernoulli[2:9] .// (2*(1:8)))
-    ψ -= t * @evalpoly(t,0.08333333333333333,-0.008333333333333333,0.003968253968253968,-0.004166666666666667,0.007575757575757576,-0.021092796092796094,0.08333333333333333,-0.4432598039215686)
+    t2 = t * t
+    T = real(typeof(t2))
+    # the coefficients here are bernoulli[2:9] .// (2*(1:8))
+    return muladd(t2, @evalpoly(t2, T(1//12), T(-1//120), T(1//252), T(-1//240), T(1//132), T(-691//32760), T(1//12), T(-3617//8160)), t / 2)
 end
 
 function _digamma(x::BigFloat)

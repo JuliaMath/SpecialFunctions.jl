@@ -948,6 +948,102 @@ end
 _gamma_inc(a::Float32,x::Float32,ind::Integer) = Float32.(_gamma_inc(Float64(a),Float64(x),ind))
 _gamma_inc(a::Float16,x::Float16,ind::Integer) = Float16.(_gamma_inc(Float64(a),Float64(x),ind))
 
+@doc raw"""
+    gamma_inc_dx(a, x)
+
+Compute the derivative of the incomplete gamma function ratios ``P(a, x)`` and ``Q(a, x)``
+returned by [`gamma_inc(a, x)`](@ref SpecialFunctions.gamma_inc) with respect to `x`:
+```math
+\frac{\partial P(a, x)}{\partial x} = - \frac{\partial Q(a, x)}{\partial x} = \frac{x^{a - 1} e^{-x}}{\Gamma(a)}
+```
+for real `a` and `x ≥ 0`. For `a > 0` it is the probability density function of the
+gamma distribution with shape `a` and unit scale.
+
+The implementation avoids overflow and underflow of the intermediate results in the formula
+above, e.g., for large `a` and `x`.
+"""
+gamma_inc_dx(a::Real, x::Real) = _gamma_inc_dx(map(float, promote(a, x))...)
+
+function _gamma_inc_dx(a::T, x::T) where {T<:Union{Float64,BigFloat}}
+    if isnan(a) || isnan(x)
+        return a + x
+    elseif x < 0
+        throw(DomainError(x, "`x` must be non-negative"))
+    elseif isinteger(a) && a <= 0
+        # 1 / Γ(a) = 0
+        return zero(T)
+    elseif iszero(x)
+        # For `a < 1`, the sign of `Γ(a)` is the sign of `sinpi(a)`
+        return a == 1 ? one(T) : a > 1 ? zero(T) : copysign(T(Inf), sinpi(a))
+    elseif isinf(x)
+        return zero(T)
+    end
+
+    # The direct formula is the most accurate one if `exp(-x)` and `Γ(a)` are normal and finite
+    # and `x^(a - 1) = 2^((a - 1) * log2(x))` neither overflows nor underflows
+    # (`|a - 1| * |log2(x)| <= 171 * 5 < 1022` for `1/32 <= x <= 32`)
+    if T === BigFloat || (x < 708 && -170 < a < 171 && (1/32 <= x <= 32 || abs((a - 1) * log2(x)) < 1022))
+        # `a - 1` is exact for `0.5 <= a <= 2^precision(a)`
+        y = a >= 0.5 ? x^(a - 1) : x^a / x
+        # Since `|Γ(a)| < 1` for `a < -2`, divide by `Γ(a)` first to avoid premature underflow,
+        # unless `exp(-x) > 1/e` for `x < 1`, where dividing first could overflow prematurely
+        return x < 1 ? exp(-x) * y / gamma(a) : y / gamma(a) * exp(-x)
+    elseif a >= -0.5
+        # `rgammax` supports `a >= -0.5`
+        return rgammax(a, x) / x
+    else
+        lg, s = logabsgamma(a)
+        return s * exp(muladd(a - 1, log(x), -x) - lg)
+    end
+end
+_gamma_inc_dx(a::Float32, x::Float32) = Float32(_gamma_inc_dx(Float64(a), Float64(x)))
+_gamma_inc_dx(a::Float16, x::Float16) = Float16(_gamma_inc_dx(Float64(a), Float64(x)))
+
+# Derivatives of `f = gamma_inc_dx(a, x)` with respect to `x` and `a`
+# (used by the ChainRules rules and by ForwardDiff)
+_gamma_inc_dx_dx(a::Real, x::Real, f::Real) = _gamma_inc_dx_dx(map(float, promote(a, x, f))...)
+function _gamma_inc_dx_dx(a::T, x::T, f::T) where {T<:Real}
+    # ∂f/∂x = f * (a - 1 - x) / x = gamma_inc_dx(a - 1, x) - f
+    # The second form is only needed if `f` underflows but `∂f/∂x` might not (`x < (a - 1) / 2`,
+    # where it does not cancel), and at zero and infinity, where it is exact
+    if 0 < x < Inf && abs(f) >= floatmin(f)
+        return f * ((a - 1 - x) / x)
+    else
+        return gamma_inc_dx(a - 1, x) - f
+    end
+end
+_gamma_inc_dx_da(a::Real, x::Real, f::Real) = _gamma_inc_dx_da(map(float, promote(a, x, f))...)
+function _gamma_inc_dx_da(a::T, x::T, f::T) where {T<:Real}
+    # ∂f/∂a = f * (log(x) - ψ(a))
+    if isinteger(a) && a <= 0 && x < Inf
+        # At the poles of `ψ(a)`, where `f = 0`, use `ψ(a) = ψ(1 - a) - π cot(πa)` and `Γ(a) Γ(1 - a) = π / sin(πa)`
+        lx = log(x)
+        return muladd(f, lx - digamma(1 - a), cospi(a) * exp(muladd(a - 1, lx, loggamma(1 - a) - x)))
+    elseif iszero(f)
+        return f
+    else
+        return f * _log_minus_digamma(x, a)
+    end
+end
+for g in (:_gamma_inc_dx_dx, :_gamma_inc_dx_da)
+    @eval $g(a::T, x::T, f::T) where {T<:Union{Float16,Float32}} = T($g(Float64(a), Float64(x), Float64(f)))
+end
+
+# Compute `log(x) - digamma(a)`, avoiding cancellation for large `a` and `x ≈ a`
+function _log_minus_digamma(x::T, a::T) where {T<:Real}
+    # the remainder of the asymptotic expansion relative to `1 / (2a)` is ≈ 6 / a¹⁷
+    a < max(10, (6 / eps(T))^(1 / 17)) && return log(x) - digamma(a)
+    # `x - a` is exact for `a <= 2x <= 4a`, and `log(x) - log(a)` does not cancel for `x < 1`
+    l = if 2x >= a
+        log1p((x - a) / a)
+    elseif x < 1
+        log(x) - log(a)
+    else
+        log(x / a)
+    end
+    return l + _log_minus_digamma_asymptotic(a)
+end
+
 function _gamma_inc_choose_algorithm(a::Float64, x::Float64, ind::Int)
     r = rgammax(a, x)
     if r == 0.0
@@ -1168,8 +1264,7 @@ but `loggamma(a,x)` may differ from `log(gamma(a,x))` by an integer multiple of 
 
 See also [`loggamma(x)`](@ref).
 """
-loggamma(a::Number, x::Number) = _loggamma(promotereal(float(a), float(x))...)
-loggamma(a::Integer, x::Number) = _loggamma(a, float(x))
+loggamma(a::Number, x::Number) = _loggamma(map(float, promotereal(a, x))...)
 function _loggamma(a::Number, x::Number)
     if a isa Real && x isa Real && !isfinite(a*x)
         if isinf(x) && isfinite(a)
@@ -1186,11 +1281,31 @@ function _loggamma(a::Number, x::Number)
             end
         end
     end
-    # from gamma(a,x) = x^a * expintx(1-a, x) * exp(-x):
     iszero(x) && return loggamma(one(x)*a)
-    if x isa Real && x < 0 && a isa Integer && isodd(a)
-        # minus signs in expintx and x^a may cancel
-        return a*log(-x) + log(-expintx(1-a, x)) - x
+    if x isa Real && x < 0 && !(isinteger(a) && isodd(a))
+        throw(DomainError((a, x), "loggamma will only return a complex result if called with a complex argument"))
     end
-    return a*log(x) + log(expintx(1 - a, x)) - x
+    return _loggamma(a, x, expintx(1 - a, x))
+end
+# from gamma(a,x) = x^a * expintx(1-a, x) * exp(-x), with e = expintx(1-a, x):
+function _loggamma(a::Number, x::Number, e::Number)
+    if x isa Real && x < 0 && isinteger(a) && isodd(a)
+        # minus signs in expintx and x^a may cancel
+        return a*log(-x) + log(-e) - x
+    end
+    return a*log(x) + log(e) - x
+end
+
+# Compute `loggamma(a, x)` and its derivative `-x^(a - 1) e^(-x) / Γ(a, x)` with respect to `x`
+function _loggamma_and_dx(a::Number, x::Number)
+    a, x = map(float, promotereal(a, x))
+    if isfinite(a) && isfinite(x) && !iszero(x)
+        e = expintx(1 - a, x)
+        Ω = _loggamma(a, x, e)
+        ∂Ω_∂x = -inv(x * e)
+    else
+        Ω = _loggamma(a, x)
+        ∂Ω_∂x = -exp(-(x + Ω)) * x^(a - 1)
+    end
+    return Ω, ∂Ω_∂x
 end

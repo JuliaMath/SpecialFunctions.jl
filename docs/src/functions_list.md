@@ -18,6 +18,7 @@ invdigamma
 trigamma
 polygamma
 gamma_inc
+gamma_inc_dx
 gamma_inc_inv
 loggammadiv
 gammax
