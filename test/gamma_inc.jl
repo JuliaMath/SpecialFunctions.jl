@@ -316,17 +316,20 @@ double(x::Complex) = ComplexF64(x)
         for a in Any[0:0.4:3; 1:3], x in 0:0.2:2
             @test gamma(a,x) ≈ gamma(big(a),big(x))
         end
+        # x < 0 is not supported: Γ(a,x) is not real there except for integer a
         @test_throws DomainError gamma(-2.2, -1.3)
+        @test_throws DomainError gamma(2, -1.3)
+        @test_throws DomainError gamma(2, big"-1.3")
+        @test_throws DomainError gamma(30, -1e2)
+        @test_throws DomainError gamma(30, big"-1e2")
         for (a,x, exact) in (
             (2, big"+1.3", big"0.6268231239782289871813662853957039889809398944861850589869804057956189274569818"),
-            (2, big"-1.3", big"-1.100789000285773266137246974803445875429455665367265440176867948378982424804222"),
             (big"2.2", big"1.3", big"0.7550934853735524106456916078787596171599416239996064979513848803118671763945577"),
             (big"-2.2", big"1.3", big"0.03938564959393195337328006806473296774233286427565465045140458665248322893076784"),
             (big"-2.2", big"-1.3"+0im, Complex(big"0.1688350167695890519002747177035271528716667324397453142169971691104641885370081", big"-1.724677939954414412829215929952389349929001266936564849801773346878175589599461")),
             (2, big"1.3"+2im, Complex(big"0.2347744561498965806069446787000456827042253434143074251879541754828136789074293", big"-0.7967951407674886396960561446265346226800340382780520672369163777061700801594228")),
             (big"2.2", big"1.3"+2im, Complex(big"0.4226969694490623767886715572749155659150206342283251276656790859161308520476838", big"-0.9507541450333763666696561254491461255244463810462729822382144498284499948680099")),
             (big"2.2"-2im, big"1.3"+2im, Complex(big"-3.858698824275578861673404086439928163791926530897603434146764316225759116935376", big"0.2105970967650200831829566202893410569725743566037534990454186505024476246014339")),
-            (30, big"-1e2", big"-2.080142496354742431762923569133534773079637504483999408076147454085194055640495e+101"),
             )
             if !(exact isa Complex) # we don't yet have a Complex{BigFloat} gamma function
                 @test gamma(a, x) ≈ exact atol=eps(abs(exact))*1000
@@ -334,20 +337,21 @@ double(x::Complex) = ComplexF64(x)
             @test gamma(double(a), double(x)) ≈ double(exact) rtol=1e-13
         end
     end
-    @test gamma(30, big(-1000)) ≈ big"-1.914496653187781420578078670260160511219745144309147121829045802464973219500799e+521" rtol=1e-70
-    @test gamma(30, -1000) == -Inf
+    @test_throws DomainError gamma(30, big(-1000))
+    @test_throws DomainError gamma(30, -1000)
     @test gamma(Inf, 51.2) == Inf
-    @test gamma(-Inf, -51.2) == 0.0
+    @test_throws DomainError gamma(-Inf, -51.2)
     @test_throws DomainError gamma(Inf, -51.2)
     @test gamma(2.3, Inf) == 0.0
-    @test gamma(2, -Inf) == -Inf
+    @test_throws DomainError gamma(2, -Inf)
     @test_throws DomainError gamma(2.2, -Inf)
 end
 
 @testset "upper incomplete gamma function logarithm" begin
-    for (a,z) in ((3,5), (3,-5), (3,5+4im), (3,-5+4im), (3,5-4im), (-3,5+4im), (-3,-5+4im))
+    for (a,z) in ((3,5), (3,5+4im), (3,-5+4im), (3,5-4im), (-3,5+4im), (-3,-5+4im))
         @test exp(loggamma(a,z)) ≈ gamma(a,z) rtol=1e-13
     end
+    @test_throws DomainError loggamma(3, -5)
     @test loggamma(50, 1e7) ≅ -9.9992102133082030308153473164868727954977460876571275797855e6
     @test real(loggamma(50, 1e7 + 1e8im)) ≅ -9.999097142860392e6
     @test cis(imag(loggamma(50, 1e7 + 1e8im))) ≈ cis(1.0275220422549918) rtol=1e-8
@@ -360,7 +364,7 @@ end
     @test loggamma(-Inf, 3.2) == -Inf
     @test_throws DomainError loggamma(Inf, -3.2)
     @test loggamma(117.3, 0) == loggamma(117.3)
-    @test loggamma(7, -300.2) ≅ log(gamma(7, -300.2))
+    @test_throws DomainError loggamma(7, -300.2)
     @test_throws DomainError loggamma(6, -3.2)
 end
 
