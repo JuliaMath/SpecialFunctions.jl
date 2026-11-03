@@ -163,6 +163,9 @@
             @test Ω == loggamma(n, x)
             @test pullback(1.0)[3] == ∂Ω
         end
+        for (a, ∂Ω_ref) in ((0.5, -Inf), (1.0, -1.0), (2.5, 0.0))
+            @test frule((NoTangent(), NoTangent(), 1.0), loggamma, a, 0.0)[2] == ∂Ω_ref
+        end
     end
 
     @testset "gamma_inc_dx" begin
@@ -190,7 +193,7 @@
             end
         end
         for T in (Float32, Float64), (a, x) in (
-                (2.5, 1.0), (12.0, 11.5), (150.0, 150.0), (150.0, 149.5), (1e6, 1e6), (1e6, 999_000.0), (1e10, 1e10),
+                (2.5, 1.0), (12.0, 11.5), (12.0, 0.5), (150.0, 150.0), (150.0, 149.5), (1e6, 1e6), (1e6, 999_000.0), (1e10, 1e10),
                 (0.0, 1.5), (-2.0, 1.5),
             )
             Ω, ∂a, ∂x = partials(T(a), T(x))
