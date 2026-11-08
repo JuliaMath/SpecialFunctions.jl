@@ -39,7 +39,7 @@ ChainRulesCore.@scalar_rule(
     (bessely0(x) - bessely(2, x)) / 2,
 )
 ChainRulesCore.@scalar_rule(dawson(x), 1 - (2 * x * Ω))
-ChainRulesCore.@scalar_rule(digamma(x), trigamma(x))
+ChainRulesCore.@scalar_rule(digamma(x), trigamma(x), tetragamma(x))
 
 # TODO: use `invsqrtπ` if it is added to IrrationalConstants
 ChainRulesCore.@scalar_rule(erf(x), (2 * exp(-x^2)) / sqrtπ)
@@ -78,7 +78,12 @@ ChainRulesCore.@scalar_rule(
     invdigamma(x),
     inv(trigamma(invdigamma(x))),
 )
-ChainRulesCore.@scalar_rule(trigamma(x), polygamma(2, x))
+ChainRulesCore.@scalar_rule(
+    invtrigamma(x),
+    inv(tetragamma(invtrigamma(x))),
+)
+ChainRulesCore.@scalar_rule(trigamma(x), tetragamma(x))
+ChainRulesCore.@scalar_rule(tetragamma(x), polygamma(3, x))
 
 # Bessel functions
 ChainRulesCore.@scalar_rule(

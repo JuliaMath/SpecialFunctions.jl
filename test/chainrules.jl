@@ -20,6 +20,7 @@
                 test_scalar(logerfcx, x)
 
                 test_scalar(invdigamma, x)
+                test_scalar(invtrigamma, x)
             end
 
             if x isa Real && 0 < x < 1
@@ -31,6 +32,7 @@
                 test_scalar(gamma, x)
                 test_scalar(digamma, x)
                 test_scalar(trigamma, x)
+                test_scalar(tetragamma, x)
 
                 if x isa Real
                     test_scalar(airyaix, x)

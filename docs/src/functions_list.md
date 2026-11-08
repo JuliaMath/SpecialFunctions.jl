@@ -16,6 +16,8 @@ logfactorial
 digamma
 invdigamma
 trigamma
+invtrigamma
+tetragamma
 polygamma
 gamma_inc
 gamma_inc_inv

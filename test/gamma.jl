@@ -43,6 +43,55 @@
         end
     end
 
+    @testset "tetragamma" begin
+        @testset "$elty" for elty in (Float32, Float64)
+            # closed form A&S 6.4.4, 6.4.6: ψ₂(½) = -14ζ(3), ψ₂(1) = -2ζ(3)
+            apery = zeta(convert(elty, 3))
+            @test tetragamma(convert(elty, 1/2)) ≈ -14*apery
+            @test tetragamma(convert(elty, 1))   ≈ -2*apery
+            # psi''(n+1) = psi''(n) + 2/n^3
+            @test tetragamma(convert(elty, 2))   ≈ -2*apery + 2
+            @test tetragamma(convert(elty, 3))   ≈ -2*apery + 9 / 4
+            @test tetragamma(convert(elty, 4))   ≈ -2*apery + 251 / 108
+            @test tetragamma(convert(elty, 5))   ≈ -2*apery + 2035 / 864
+            @test tetragamma(convert(elty, 10))  ≈ -2*apery + 2 * (19148110939 / 16003008000)
+        end
+
+        # real values (cross-checked against mpmath / scipy polygamma(2, ·))
+        @test tetragamma(20.0)  ≈ -0.0026281224023146543 rtol=1e-14
+        @test tetragamma(-3.2)  ≈ 246.9761555554604978 rtol=1e-14
+        @test tetragamma(-7.5)  ≈ -0.015564511795903923324 rtol=1e-14
+        @test tetragamma(-11.2) ≈ 247.04062855536026  rtol=1e-14
+        @test tetragamma(0.1)   ≈ -2001.8614573783439 rtol=1e-14
+
+        # complex values (cross-checked against mpmath.psi(2, ·))
+        @test tetragamma(-1.0+2.0im) ≈ 0.0390243540536495 - 0.157432524041303im  rtol=1e-14
+        @test tetragamma(0.5+0.1im)  ≈ -13.328673738077 + 8.55964691468135im    rtol=1e-14
+        @test tetragamma(100.0+1000.0im) ≈ 9.70782843658137e-7 + 1.95117547163695e-7im rtol=1e-14
+
+        # large |Im(z)| in the left half-plane: exercise the overflow guard
+        # that drops the cospi/sinpi term when |Im(z)| >= log(floatmax(Float64))
+        @test tetragamma(-10.0+1e100im) ≈ 1.0e-200 - 2.0999999999999998e-299im rtol=1e-14
+
+        # recurrence: ψ''(z+1) = ψ''(z) + 2/z^3
+        for z in (0.3, 2.7, -0.4+0.2im, 3.0+4.0im)
+            @test tetragamma(z + 1) ≈ tetragamma(z) + 2/z^3 rtol=1e-14
+        end
+
+        # reflection: ψ''(z) = ψ''(1-z) - 2π^3 cos(πz)/sin(πz)^3
+        for z in (0.3, 2.7+1.5im)
+            @test tetragamma(z) ≈ tetragamma(1-z) - 2*pi^3*cospi(z)/sinpi(z)^3 rtol=1e-14
+        end
+
+        # consistency with generic polygamma(2, ·)
+        for z in (0.7, 3.3, -2.1, 1.0+0.5im)
+            @test tetragamma(z) ≈ polygamma(2, z) rtol=1e-14
+        end
+
+        @test tetragamma(1.0f0) isa Float32
+        @test tetragamma(1.0f0+2.0f0im) isa ComplexF32
+    end
+
     @testset "invdigamma" begin
         @testset "$elty" for elty in (Float32, Float64)
             for val in [0.001, 0.01, 0.1, 1.0, 10.0]
@@ -289,6 +338,7 @@ end
     @test isnan(zeta(NaN, 1.))
     @test isa([digamma(x) for x in [1.0]], Vector{Float64})
     @test isa([trigamma(x) for x in [1.0]], Vector{Float64})
+    @test isa([tetragamma(x) for x in [1.0]], Vector{Float64})
     @test isa([polygamma(3,x) for x in [1.0]], Vector{Float64})
     @test zeta(2 + 1im, -1.1) ≅ zeta(2 + 1im, -1.1+0im) ≅ -64.580137707692178058665068045847533319237536295165484548 + 73.992688148809018073371913557697318846844796582012921247im
     @test polygamma(3,5) ≈ polygamma(3,5.)

@@ -51,8 +51,12 @@ end
 
     @test_throws MethodError trigamma(big"2")
     @test_throws MethodError trigamma(big"2.0")
+    @test_throws MethodError tetragamma(big"2")
+    @test_throws MethodError tetragamma(big"2.0")
     @test_throws MethodError invdigamma(big"2")
     @test_throws MethodError invdigamma(big"2.0")
+    @test_throws MethodError invtrigamma(big"2")
+    @test_throws MethodError invtrigamma(big"2.0")
 
     @test_throws MethodError eta(Complex(big"2"))
     @test_throws MethodError eta(Complex(big"2.0"))
@@ -76,7 +80,7 @@ end
 
 @testset "missing data" begin
     for f in (digamma, erf, erfc, erfcinv, erfcx, erfi, erfinv, eta, gamma,
-              invdigamma, logfactorial, trigamma)
+              invdigamma, logfactorial, trigamma, tetragamma)
         @test f(missing) === missing
     end
     @test beta(1.0, missing) === missing
