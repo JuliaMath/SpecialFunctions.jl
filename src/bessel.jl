@@ -95,7 +95,7 @@ airyaiprime(z::Complex{Float64}) =  _airy(z, Int32(1), Int32(1))
 Airy function of the second kind ``\operatorname{Bi}(x)``.
 
 External links:
-[DLMF 8.2](https://dlmf.nist.gov/9.2),
+[DLMF 9.2](https://dlmf.nist.gov/9.2),
 [Wikipedia](https://en.wikipedia.org/wiki/Airy_function)
 
 See also: [`airybix`](@ref), [`airybiprime`](@ref),  [`airyai`](@ref)
