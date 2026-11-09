@@ -436,7 +436,14 @@ function _zeta(s::ComplexOrReal{Float64})
                              -1.00078519447704240796017680222772921424,
                              -0.9998792995005711649578008136558752359121)
         end
-        if absim > 12 # amplitude of sinpi(s/2) ≈ exp(imag(s)*π/2)
+        if s isa Float64 && s < -170
+            # Combine the real reflection factors before exponentiating: gamma
+            # alone overflows while the reflected value can still be finite.
+            sinhalf = sinpi(s*0.5)
+            iszero(sinhalf) && return sinhalf # exact trivial zeros, even for huge |s|
+            magnitude = exp(loggamma(1 - s) + s*log2π - logπ + log(abs(sinhalf)))
+            return copysign(zeta(1 - s) * magnitude, sinhalf)
+        elseif absim > 12 # amplitude of sinpi(s/2) ≈ exp(imag(s)*π/2)
             # avoid overflow/underflow (issue #128)
             lg = loggamma(1 - s)
             rehalf = real(s)*0.5
@@ -489,6 +496,10 @@ Dirichlet eta function
 eta(s::Number) = _eta(float(s))
 
 function _eta(z::ComplexOrReal{Float64})
+    # The multiplier below can overflow at a trivial zero of zeta.
+    if z isa Float64 && isfinite(z) && z < -170 && isinteger(z*0.5)
+        return -sinpi(z*0.5)
+    end
     δz = 1 - z
     if fastabs(δz) < 7e-3 # Taylor expand around z==1
         return 0.6931471805599453094172321214581765 *

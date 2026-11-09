@@ -251,6 +251,47 @@ end
     @test isnan(zeta(1.0f0))
     @test isnan(zeta(complex(0,Inf)))
     @test isnan(zeta(complex(-Inf,0)))
+
+    @testset "negative-real reflection without intermediate overflow" begin
+        setprecision(BigFloat, 256) do
+            points = [-170.125, -170.62, -170.625, -170.75, -171.0, -175.0,
+                      -179.25, -200.5, -219.5, -240.25, -259.0, -260.5, -263.0]
+            for zero in (-172.0, -180.0, -200.0, -250.0, -260.0)
+                append!(points, (prevfloat(zero), nextfloat(zero)))
+            end
+            for s in points, f in (zeta, eta)
+                # BigFloat zeta uses MPFR, independently of this reflection path.
+                reference = Float64(f(BigFloat(s)))
+                actual = f(s)
+                @test actual isa Float64
+                if isfinite(reference)
+                    @test isfinite(actual)
+                    @test isapprox(actual, reference; rtol=2e-12, atol=0)
+                else
+                    @test actual == reference
+                end
+            end
+        end
+        @test zeta(-171.0) ≈ 1.2819489863517886e172
+        @test zeta(-175.0) ≈ 7.4526910304300896e177
+        # All representable Float64 values of sufficiently large magnitude are
+        # even integers. Return their zeros before gamma or eta's multiplier.
+        for s in (-172.0, -180.0, -200.0, -250.0, -1024.0, -1.0e20, -1.0e100, -floatmax(Float64))
+            @test iszero(zeta(s))
+            @test iszero(eta(s))
+            @test isequal(zeta(s), sinpi(s*0.5))
+            @test isequal(eta(s), -sinpi(s*0.5))
+        end
+        for T in (Float16, Float32)
+            expected_zero = T(sinpi(Float64(T(-172))*0.5))
+            @test zeta(T(-172)) === expected_zero
+            @test eta(T(-172)) === -expected_zero
+        end
+        for s in (-1001.0, -1003.0, -9007199254740991.0)
+            @test zeta(s) === copysign(Inf, sinpi(s*0.5))
+            @test eta(s) === -copysign(Inf, sinpi(s*0.5))
+        end
+    end
 end
 
 #(compared to Wolfram Alpha)
