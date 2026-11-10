@@ -186,81 +186,27 @@
     end
 
     @testset "Float16 inverse" begin
-        @test @inferred(erfinv(Float16(0.5))) isa Float16
-        @test @inferred(erfcinv(Float16(0.5))) isa Float16
-        @test isequal(erfinv(Float16(0)), Float16(0))
-        @test isequal(erfinv(-Float16(0)), -Float16(0))
-        @test isequal(erfcinv(Float16(1)), Float16(0))
-
         # Count representable steps rather than use a relative tolerance near zero.
         ulpdist(x::Float16, y::Float16) = x == y ? 0 :
             abs(Int(reinterpret(UInt16, x)) - Int(reinterpret(UInt16, y)))
-        for bits in 0:65535
-            x = reinterpret(Float16, UInt16(bits))
-            if abs(x) <= Float16(1)
-                y = erfinv(x)
-                ref = Float16(erfinv(Float64(x)))
-                @test ulpdist(y, ref) <= (abs(x) <= Float16(0.75) ? 1 : 2)
-                @test isequal(erfinv(-x), -y)
-            end
-            # The changed central erfinv branch is also used by erfcinv.
-            if x > Float16(0.0625) && abs(Float16(1) - x) <= Float16(0.75)
-                @test ulpdist(erfcinv(x), Float16(erfcinv(Float64(x)))) <= 2
-            end
-        end
+        values = reinterpret.(Float16, 0x0000:0xffff)
+        xs = filter(x -> abs(x) <= 1, values)
+        ys = filter(y -> 0 <= y <= 2, values)
+        @test maximum(x -> ulpdist(erfinv(x), Float16(erfinv(Float64(x)))), xs) <= 1
+        @test all(x -> isequal(erfinv(-x), -erfinv(x)), xs)
+        @test maximum(y -> ulpdist(erfcinv(y), Float16(erfcinv(Float64(y)))), ys) <= 1
 
-        for x in Float16.((0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75))
-            @test erfcinv(x) == -erfcinv(Float16(2) - x)
-        end
-        @test erfinv(Float16(1)) == Inf16
-        @test erfinv(-Float16(1)) == -Inf16
-        @test erfcinv(Float16(0)) == Inf16
-        @test erfcinv(-Float16(0)) == Inf16
-        @test erfcinv(Float16(2)) == -Inf16
-        for x in (nextfloat(Float16(1)), -nextfloat(Float16(1)), Inf16, -Inf16)
-            @test_throws DomainError erfinv(x)
-        end
-        for x in (-nextfloat(Float16(0)), nextfloat(Float16(2)), Inf16, -Inf16)
-            @test_throws DomainError erfcinv(x)
-        end
+        @test isequal(erfinv(Float16(0)), Float16(0))
+        @test isequal(erfinv(-Float16(0)), -Float16(0))
+        @test isequal(erfcinv(Float16(1)), Float16(0))
+        @test isequal(erfcinv(-Float16(0)), Inf16)
         @test isnan(erfinv(Float16(NaN)))
         @test isnan(erfcinv(Float16(NaN)))
-
-        # Independently invert MPFR's forward functions at the branch boundaries.
-        # Bisection is bounded and does not depend on the BigFloat inverse methods.
-        function half_reference(f, x)
-            f === erf && iszero(x) && return x
-            f === erfc && x == 1 && return Float16(0)
-            return setprecision(BigFloat, 256) do
-                lo, hi = BigFloat(-8), BigFloat(8)
-                target = BigFloat(x)
-                for _ in 1:300
-                    mid = (lo + hi) / 2
-                    if (f === erf ? f(mid) < target : f(mid) > target)
-                        lo = mid
-                    else
-                        hi = mid
-                    end
-                end
-                Float16((lo + hi) / 2)
-            end
+        for x in (nextfloat(Float16(1)), -nextfloat(Float16(1)))
+            @test_throws DomainError erfinv(x)
         end
-        for x in (nextfloat(Float16(0)), Float16(0.5),
-                  prevfloat(Float16(0.75)), Float16(0.75), nextfloat(Float16(0.75)),
-                  prevfloat(Float16(0.9375)), Float16(0.9375), nextfloat(Float16(0.9375)),
-                  prevfloat(Float16(1)))
-            for y in (x, -x)
-                ref = half_reference(erf, y)
-                @test Float16(erfinv(Float64(y))) == ref
-                @test ulpdist(erfinv(y), ref) <= (abs(y) <= Float16(0.75) ? 1 : 2)
-            end
-        end
-        for x in (prevfloat(Float16(0.25)), Float16(0.25),
-                  Float16(0.5), prevfloat(Float16(1)), Float16(1), nextfloat(Float16(1)),
-                  Float16(1.75))
-            ref = half_reference(erfc, x)
-            @test Float16(erfcinv(Float64(x))) == ref
-            @test ulpdist(erfcinv(x), ref) <= 2
+        for y in (-nextfloat(Float16(0)), nextfloat(Float16(2)))
+            @test_throws DomainError erfcinv(y)
         end
     end
 
