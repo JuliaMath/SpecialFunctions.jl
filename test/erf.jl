@@ -185,6 +185,31 @@
         @test erfcinv(one(Int)) == erfcinv(1.0)
     end
 
+    @testset "Float16 inverse" begin
+        # Count representable steps rather than use a relative tolerance near zero.
+        ulpdist(x::Float16, y::Float16) = x == y ? 0 :
+            abs(Int(reinterpret(UInt16, x)) - Int(reinterpret(UInt16, y)))
+        values = reinterpret.(Float16, 0x0000:0xffff)
+        xs = filter(x -> abs(x) <= 1, values)
+        ys = filter(y -> 0 <= y <= 2, values)
+        @test maximum(x -> ulpdist(erfinv(x), Float16(erfinv(Float64(x)))), xs) <= 1
+        @test all(x -> isequal(erfinv(-x), -erfinv(x)), xs)
+        @test maximum(y -> ulpdist(erfcinv(y), Float16(erfcinv(Float64(y)))), ys) <= 1
+
+        @test isequal(erfinv(Float16(0)), Float16(0))
+        @test isequal(erfinv(-Float16(0)), -Float16(0))
+        @test isequal(erfcinv(Float16(1)), Float16(0))
+        @test isequal(erfcinv(-Float16(0)), Inf16)
+        @test isnan(erfinv(Float16(NaN)))
+        @test isnan(erfcinv(Float16(NaN)))
+        for x in (nextfloat(Float16(1)), -nextfloat(Float16(1)))
+            @test_throws DomainError erfinv(x)
+        end
+        for y in (-nextfloat(Float16(0)), nextfloat(Float16(2)))
+            @test_throws DomainError erfcinv(y)
+        end
+    end
+
     @testset "two args version" begin
         @test erf(10, 11) ≈ 2.08848758232167861905709161e-45
         @test erf(11, 10) ≈ -2.08848758232167861905709161e-45

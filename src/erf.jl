@@ -508,41 +508,8 @@ function _erfinv(x::Float32)
     end
 end
 
-function _erfinv(x::Float16)
-    a = abs(x)
-    if a > Float16(1)
-        throw(DomainError(a, "`abs(x)` cannot be greater than 1."))
-    elseif a == Float16(1)
-        return copysign(Inf16, x)
-    else
-        # Perform calculations with `Float32`
-        x32 = Float32(x)
-        a32 = Float32(a)
-        if a32 <= 0.75f0
-            # Simpler and more accurate alternative to Table 7 in Blair et al.
-            # Ref: https://github.com/JuliaMath/SpecialFunctions.jl/pull/372#discussion_r1592832735
-            t = muladd(-6.73815f1, x32, 1f0) / muladd(-4.18798f0, x32, 4.54263f0)
-            y = copysign(muladd(0.88622695f0, x32, t), x32)
-        elseif a32 <= 0.9375f0 # Table 26 in Blair et al.
-            t = x32^2 - 0.87890625f0
-            y = x32 * @evalpoly(t, 0.10178_950f1,
-                              -0.32827_601f1) /
-                      @evalpoly(t, 0.72455_99f0,
-                              -0.33871_553f1,
-                              0.1f1)
-        else
-            # Simpler alternative to Table 47 in Blair et al.
-            # because of the reduced accuracy requirement
-            # (it turns out that this branch only covers 128 values).
-            # Note that the use of log(1-x) rather than log1p is intentional since it will be
-            # slightly faster and 1-x is exact.
-            # Ref: https://github.com/JuliaMath/SpecialFunctions.jl/pull/372#discussion_r1592710586
-            t = sqrt(-log(1-a32))
-            y = copysign(@evalpoly(t, -0.429159f0, 1.04868f0), x32)
-        end
-        return Float16(y)
-    end
-end
+_erfinv(x::Float16) = Float16(_erfinv(Float32(x)))
+
 
 function _erfinv(y::BigFloat)
     xfloat = erfinv(Float64(y))
@@ -659,24 +626,8 @@ function _erfcinv(y::Float32)
     end
 end
 
-function _erfcinv(y::Float16)
-    if y > Float16(0.0625)
-        return erfinv(Float16(1) - y)
-    elseif y <= Float16(0)
-        if y == Float16(0)
-            return Inf16
-        end
-        throw(DomainError(y, "`y` must be nonnegative."))
-    else # Table 47 in Blair et al.
-        t = 1.0f0 / sqrt(-log(Float32(y)))
-        x = @evalpoly(t, 0.98650_088f0,
-                       0.92601_777f0) /
-            (t * @evalpoly(t, 0.98424_719f0,
-                            0.10074_7432f0,
-                            0.1f0))
-        return Float16(x)
-    end
-end
+_erfcinv(y::Float16) = Float16(_erfcinv(Float32(y)))
+
 
 function _erfcinv(y::BigFloat)
     yfloat = Float64(y)
