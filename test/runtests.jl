@@ -27,6 +27,7 @@ checktol(err::Float64) = err ≤ 1e-13
 
 tests = [
     "bessel",
+    "wrightbessel",
     "beta_inc",
     "betanc",
     "ellip",
