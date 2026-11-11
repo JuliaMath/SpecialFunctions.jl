@@ -133,17 +133,20 @@
 
         @test_throws MethodError faddeeva(BigFloat(1))
 
-        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1+big"1e-50", big"1.2", 2-big"1e-50")
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", big"1.0", 1-big"1e-20", 1+big"1e-20", 1+big"1e-50",
+                  big"1.2", 2-big"1e-20", 2-big"1e-50", 2big"0.8", 2big(0.41))
             @test erfc(erfcinv(y)) ≈ y
+            @test erfcinv(y) ≈ setprecision(() -> erfcinv(y), 4precision(BigFloat)) rtol=8eps(BigFloat)
         end
-        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", 1-big"1e-50")
+        for y in (big"1e-1000", big"1e-60", big"0.1", big"0.5", 1-big"1e-20", 1-big"1e-50", big"0.96", big"0.969")
             @test erf(erfinv(y)) ≈ y
             @test erf(erfinv(-y)) ≈ -y
+            @test erfinv(y) ≈ setprecision(() -> erfinv(y), 4precision(BigFloat)) rtol=8eps(BigFloat)
         end
         @test erfcinv(big(0)) == -erfcinv(big(2)) == erfinv(big(1)) == -erfinv(big(-1)) == Inf
         for x in (1+big"1e-3", -1-big"1e-3")
-            @test_throws DomainError erfinv(x)
-            @test_throws DomainError erfcinv(1-x)
+            @test_throws DomainError(x, "`abs(x)` cannot be greater than 1.") erfinv(x)
+            @test_throws DomainError(1-x, "`y` must be in [0, 2].") erfcinv(1-x)
         end
     end
 
